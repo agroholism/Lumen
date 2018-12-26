@@ -114,8 +114,10 @@ namespace Lumen.Lang.Std {
 						return new KString(String.Join(other.ToString(), value));
 					case Fun fun:
 						return new Vec(value.Select((it, i) => fun.Run(new Scope(scope), it, (Num)i)).ToList());
+					case BigFloat bf:
+						return new Vec(Cycle(value, (Int32)(Double)bf).ToList());
 					default:
-						return new Vec(Cycle(value, (Int32)(Double)other.ToBigFloat(scope)).ToList());
+						throw new Lumen.Lang.Std.Exception($"operator '*' can not get a value of type {other.Type}");
 				}
 
 				IEnumerable<Value> Cycle(IEnumerable<Value> val, Int32 count) {
