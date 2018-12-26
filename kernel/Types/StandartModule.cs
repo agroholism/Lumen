@@ -9,7 +9,7 @@ namespace Lumen.Lang.Std {
 		#region Fields
 		public static KType Vector { get; } = new RVec();
 		public static KType Function { get; } = new FunctionClass();
-		public static KType Number { get; } = new NumberType();
+		public static KType Number { get; } = new RNum();
 		public static KType Expando { get; } = new ExpandoType();
 		public static KType Map { get; } = new MapClass();
 		public static KType Null { get; } = new NullClass();

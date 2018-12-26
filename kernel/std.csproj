@@ -73,7 +73,7 @@
     <Compile Include="Values\Fun\UserFun.cs" />
     <Compile Include="Values\IObject.cs" />
     <Compile Include="Values\Map.cs" />
-    <Compile Include="Types\Kernel.Number.cs" />
+    <Compile Include="Types\RNum.cs" />
     <Compile Include="Values\Fun\Arguments.cs" />
     <Compile Include="Converter.cs" />
     <Compile Include="Values\HException.cs" />

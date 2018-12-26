@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
-	internal sealed class NumberType : KType {
-		internal NumberType() {
+	internal sealed class RNum : KType {
+		internal RNum() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
-				Name = "std.num",
+				Name = "num"
 			};
 
 			IEnumerable<Value> Range(BigFloat from, BigFloat to) {
