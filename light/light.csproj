@@ -92,7 +92,7 @@
     <Compile Include="Value\MainScope.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\kernel\std.csproj">
+    <ProjectReference Include="..\std\std.csproj">
       <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
       <Name>std</Name>
     </ProjectReference>

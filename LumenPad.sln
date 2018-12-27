@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LumenPad", "LumenPad\LumenP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastColoredTextBox", "..\..\..\source\repos\KVM\FastColoredTextBox\FastColoredTextBox.csproj", "{6DD14A85-CCFC-4774-BD26-0F5772512319}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "light", "stereotype\light.csproj", "{823C41CD-2BBD-456E-BCB9-90578498C60D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "light", "light\light.csproj", "{823C41CD-2BBD-456E-BCB9-90578498C60D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "std", "kernel\std.csproj", "{B2914BDF-F767-4007-A7BE-1B478C39A54E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "std", "std\std.csproj", "{B2914BDF-F767-4007-A7BE-1B478C39A54E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{880AA778-2EBC-43A1-B162-A34ADEF10385}"
 EndProject

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Lumen.Lang.Expressions;
 using Lumen.Lang.Std;
+using Lumen.Lang.Expressions;
+
 namespace Stereotype {
 	internal sealed partial class Parser {
 		private List<Token> tokens;
@@ -61,10 +62,7 @@ namespace Stereotype {
 				return new DecoratorE(new List<Expression> { exp }, decl);
 			}
 
-			if (Match(TokenType.CONST)) {
-				result = ParseConstantDeclaration();
-			}
-			else if (Match(TokenType.RAISE)) {
+			if (Match(TokenType.RAISE)) {
 				result = ParseRaise();
 			}
 			else if (Match(TokenType.BREAK)) {
@@ -242,15 +240,7 @@ namespace Stereotype {
 							file = this.fileName
 						};
 					}
-
-					if (Match(TokenType.FINAL)) {
-						ParseFinalMember(exemplareFields, exemplareAttributes, typeFields, finalMembers);
-					}
-					else if (Match(TokenType.IN)) {
-						ParseInMember(exemplareFields, exemplareAttributes, inMembers);
-					}
-					// type field or type fun
-					else if (Match(TokenType.TYPE)) {
+ if (Match(TokenType.TYPE)) {
 						typeFields.Add(Expression());
 					}
 					// Метод.
@@ -272,78 +262,12 @@ namespace Stereotype {
 			return new StructE(nameType, exemplareFields, typeFields, exemplareAttributes, parents, inMembers, finalMembers, line, this.fileName);
 		}
 
-		private void ParseInMember(Dictionary<String, Expression> exemplareFields, List<Expression> exemplareAttributes, List<String> inMembers) {
-			if (Match(TokenType.VAR)) {
-				String nameField = Consume(TokenType.WORD).Text;
-
-				Expression type = null;
-				if (Match(TokenType.COLON)) {
-					type = ParseType();
-				}
-
-				Expression e = null;
-				if (Match(TokenType.EQ)) {
-					e = Expression();
-				}
-
-				if (type != null) {
-					exemplareAttributes.Add(CreateGetter(nameField, type));
-					exemplareAttributes.Add(CreateSetter(nameField, type));
-					exemplareFields.Add("@" + nameField, e);
-					inMembers.Add("get_" + nameField);
-					inMembers.Add("set_" + nameField);
-				}
-				else {
-					exemplareFields.Add(nameField, e);
-					inMembers.Add(nameField);
-				}
-			}
-			else if (LookMatch(0, TokenType.LET)) {
-				inMembers.Add(GetToken(1).Text);
-				exemplareAttributes.Add(Expression());
-			}
-		}
-
-		private void ParseFinalMember(Dictionary<String, Expression> exemplareFields, List<Expression> exemplareAttributes, List<Expression> typeFields, List<String> finalMembers) {
-			if (Match(TokenType.LET)) {
-				finalMembers.Add(GetToken(0).Text);
-				exemplareAttributes.Add(ParseDeclaration());
-			}
-			else if (Match(TokenType.TYPE)) {
-				if (Match(TokenType.LET)) {
-					finalMembers.Add(GetToken(0).Text);
-					typeFields.Add(ParseDeclaration());
-				}
-				typeFields.Add(Expression());
-			}
-		}
-
-		private FunctionDefineStatement CreateGetter(String name, Expression type) {
-			return new FunctionDefineStatement("get_" + name, new List<ArgumentMetadataGenerator>(), new DotExpression(new IdExpression("this", this.line, this.fileName), "@" + name), type);
-		}
-
-		private FunctionDefineStatement CreateSetter(String name, Expression type) {
-			return new FunctionDefineStatement("set_" + name, new List<ArgumentMetadataGenerator> { new ArgumentMetadataGenerator("value", type, null) }, new DotAssigment(new DotExpression(new IdExpression("this", this.line, this.fileName), "@" + name), new IdExpression("value", this.line, this.fileName), this.fileName, this.line), type);
-		}
-
-		private Expression ParseLigthTypeDeclaration(String nameType, Boolean g, Dictionary<String, Expression> generic) {
-			String parameter = Consume(TokenType.WORD).Text;
-			Expression type = null;
-			if (Match(TokenType.COLON)) {
-				type = ParseType();
-			}
-			Match(TokenType.RPAREN);
-			Expression body = Expression();
-
-			return new LigthType(nameType, parameter, type, body);
-		}
-
 		#region
-
+		/// <summary> Declaration with let </summary>
 		private Expression ParseDeclaration() {
-			String name = null;
 			Int32 line = this.line;
 
+			String name = null;
 			List<ArgumentMetadataGenerator> arguments = null;
 
 			switch (GetToken(0).Type) {
@@ -356,6 +280,7 @@ namespace Stereotype {
 					break;
 			}
 
+			// It's variable
 			if (!LookMatch(0, TokenType.LPAREN)) {
 				return ParseVariableDeclaration(name);
 			}
@@ -371,21 +296,22 @@ namespace Stereotype {
 				Match(TokenType.EOC);
 			}
 
-			List<Expression> otherContacts = new List<Expression>();
+			List<Expression> contracts = new List<Expression>();
 
 			if (LookMatch(0, TokenType.WORD) && GetToken(0).Text == "where") {
 				Match(TokenType.WORD);
 				do {
-					otherContacts.Add(Expression());
+					contracts.Add(Expression());
 				} while (Match(TokenType.SPLIT));
 				Match(TokenType.EOC);
 			}
-			Expression ex = null;
+
+			Expression body = null;
 			if (Match(TokenType.EQ) || LookMatch(0, TokenType.DO)) {
-				ex = Expression();
+				body = Expression();
 			}
 
-			return new FunctionDefineStatement(name, arguments, ex, returnedType, otherContacts, line, this.fileName);
+			return new FunctionDefineStatement(name, arguments, body, returnedType, contracts, line, this.fileName);
 		}
 
 		private Expression ParseFor() {
@@ -1099,6 +1025,10 @@ namespace Stereotype {
 				return new ValueE(Double.Parse(Current.Text));
 			}
 
+			if (Match(TokenType.BIG_NUMBER)) {
+				return new ValueE(BigFloat.Parse(Current.Text));
+			}
+
 			if (LookMatch(0, TokenType.LPAREN) && LookMatch(1, TokenType.FOR)) {
 				Match(TokenType.LPAREN);
 				Match(TokenType.FOR);
@@ -1129,30 +1059,30 @@ namespace Stereotype {
 			}
 
 			// (x) =>
-			if (LookMatch(0, TokenType.LPAREN) && LookMatch(1, TokenType.WORD) && LookMatch(2, TokenType.RPAREN) && LookMatch(3, TokenType.LAMBDA)) {
+			if (LookMatch(0, TokenType.LPAREN) && LookMatch(1, TokenType.WORD) && LookMatch(2, TokenType.RPAREN) && LookMatch(3, TokenType.EQ)) {
 				Match(TokenType.LPAREN);
 				ArgumentMetadataGenerator arg = new ArgumentMetadataGenerator(Consume(TokenType.WORD).Text, null, null);
 				Match(TokenType.RPAREN);
-				Match(TokenType.LAMBDA);
+				Match(TokenType.EQ);
 				return new AnonymeDefine(new List<ArgumentMetadataGenerator> { arg }, Expression());
 			}
 
 			// x =>
-			if (LookMatch(0, TokenType.WORD) && LookMatch(1, TokenType.LAMBDA)) {
+			if (LookMatch(0, TokenType.WORD) && LookMatch(1, TokenType.EQ)) {
 				ArgumentMetadataGenerator arg = new ArgumentMetadataGenerator(Consume(TokenType.WORD).Text, null, null);
-				Match(TokenType.LAMBDA);
+				Match(TokenType.EQ);
 				return new AnonymeDefine(new List<ArgumentMetadataGenerator> { arg }, Expression());
 			}
 
-			if (Match(TokenType.LAMBDA)) {
+			if (Match(TokenType.EQ)) {
 				return new AnonymeDefine(new List<ArgumentMetadataGenerator>(), Expression());
 			}
 
 			// () =>
-			if (LookMatch(0, TokenType.LPAREN) && (LookMatch(1, TokenType.RPAREN)) && LookMatch(2, TokenType.LAMBDA)) {
+			if (LookMatch(0, TokenType.LPAREN) && (LookMatch(1, TokenType.RPAREN)) && LookMatch(2, TokenType.EQ)) {
 				Match(TokenType.LPAREN);
 				Match(TokenType.RPAREN);
-				Match(TokenType.LAMBDA);
+				Match(TokenType.EQ);
 				return new AnonymeDefine(new List<ArgumentMetadataGenerator>(), Expression());
 			}
 
@@ -1167,7 +1097,7 @@ namespace Stereotype {
 					Match(TokenType.EOC);
 				}
 
-				Match(TokenType.LAMBDA);
+				Match(TokenType.EQ);
 
 				return new AnonymeDefine(args, Expression(), returnedType, new List<Expression>());
 			}
@@ -1199,7 +1129,7 @@ namespace Stereotype {
 					Match(TokenType.EOC);
 				}
 
-				Match(TokenType.LAMBDA);
+				Match(TokenType.EQ);
 
 				return new AnonymeDefine(args, Expression(), returnedType, new List<Expression>());
 			}
@@ -1213,7 +1143,7 @@ namespace Stereotype {
 
 				Boolean x = false;
 
-				if (Match(TokenType.LAMBDA)) {
+				if (Match(TokenType.EQ)) {
 					x = true;
 				}
 				else {

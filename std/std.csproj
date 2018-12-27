@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="AccessModifiers.cs" />
     <Compile Include="BigFloat.cs" />
+    <Compile Include="Exceptions.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="Types\FileType.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Values\Fun\Arguments.cs" />
     <Compile Include="Converter.cs" />
     <Compile Include="Values\HException.cs" />
+    <Compile Include="Values\BigNum.cs" />
     <Compile Include="Values\Type.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Values\Null.cs" />

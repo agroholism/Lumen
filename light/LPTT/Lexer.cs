@@ -658,12 +658,18 @@ namespace Stereotype {
 				current = Next();
 			}
 
+			if(current == 'b') {
+				Next();
+				AddToken(TokenType.BIG_NUMBER, buffer.ToString());
+				return;
+			}
+
 
 			if (isScientic) {
-				AddToken(TokenType.NUMBER, Double.Parse(buffer.ToString().Replace(".", ","), System.Globalization.NumberStyles.Any).ToString());
+				AddToken(TokenType.NUMBER, Double.Parse(buffer.Replace(".", ",").ToString(), System.Globalization.NumberStyles.Any).ToString());
 			}
 			else {
-				AddToken(TokenType.NUMBER, buffer.ToString());
+				AddToken(TokenType.NUMBER, buffer.Replace(".", ",").ToString());
 			}
 		}
 

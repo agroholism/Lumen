@@ -41,71 +41,67 @@ namespace Stereotype {
 		public Value Eval(Scope e) {
 			List<FunctionArgument> args = new List<FunctionArgument>();
 
-			Record exte = null;
+			Record extendableRecord = null;
 
 			foreach (ArgumentMetadataGenerator i in this.Args) {
-				var arg = i.EvalArgumnet(e);
-				/*	if (arg.name == "this" && arg.type != null && arg.type is StandartLibrary.KType) {
-						exte = (StandartLibrary.KType)arg.type;
-						continue;
-					}*/
+				FunctionArgument arg = i.EvalArgumnet(e);
+
+				// It's extension?
+				if (arg.name == "this"
+					&& arg.Attributes != null
+					&& arg.Attributes.TryGetValue("type", out var value)
+					&& value is Record record) {
+					extendableRecord = record;
+					continue;
+				}
+
 				args.Add(arg);
 			}
 
-			List<string> s = new List<string>() { "self", "_", "this", "base", "value", "kwargs", "args" };
+			List<String> notClosurableVariables = new List<String> { "self", "_", "this", "base", "value", "kwargs", "args" };
 
-			BlockE expre = new BlockE();
+			foreach (FunctionArgument i in args) {
+				String mutname = i.name.Replace("*", "");
 
-			foreach (var i in args) {
-				string mutname = i.name.Replace("*", "");
-				if (mutname == "this")
+				if (mutname == "this") {
 					throw new Lumen.Lang.Std.Exception("Параметр функции не может иметь имя this", stack: e);
-				s.Add(mutname);
+				}
+
+				notClosurableVariables.Add(mutname);
 			}
-
-			/*	if (this.otherContacts != null) {
-					foreach (Expression i in this.otherContacts) {
-						expre.Add(new ConditionE(i, new UnknownExpression(), new RaiseE(null, new ValueE("контракт " + i.ToString() + " не выполнен"), "", -1)));
-					}
-				}*/
-
-			if (this.returnedType != null || expre.expressions.Count > 0) {
-				expre.Add(Body);
-			}
-
-			if (returnedType != null || expre.expressions.Count > 0)
-				Body = expre;
-
-			List<String> visible = new List<String> { "this", "self", "null", "true", "false", "args", "kwargs", "_" };
-			visible.AddRange(this.Args.Select(i => i.name.Replace("*", "")));
 
 			UserFun v = new UserFun {
 				Arguments = args,
-				condition = otherContacts.Count > 0 ? otherContacts[0] : null,
-				body = this.Body?.Closure(visible, e)
+				condition = this.otherContacts.Count > 0 ? this.otherContacts[0] : null,
+				body = this.Body?.Closure(notClosurableVariables, e)
 			};
-			v.Set("name", (KString)NameFunction, AccessModifiers.PRIVATE, e);
 
-			if (exte != null) {
-				exte.SetAttribute(NameFunction, v);
+
+			v.Set("name", (KString)this.NameFunction, AccessModifiers.PRIVATE, e);
+
+			if(this.returnedType != null) {
+				v.Set("type", this.returnedType.Eval(e), AccessModifiers.PRIVATE, e);
+			}
+
+
+			if (extendableRecord != null) {
+				extendableRecord.SetAttribute(this.NameFunction, v);
 			}
 			else {
-				if (this.Body == null) {
-					e.Set(this.NameFunction, v);
-				}
-				else if (e.ExistsInThisScope(NameFunction) && e[NameFunction] is UserFun uf) {
+				if (e.ExistsInThisScope(NameFunction) && e[NameFunction] is UserFun uf) {
 					uf.body = v.body;
 				}
-				else
+				else {
 					e.Set(this.NameFunction, v);
+				}
 			}
 
 			return v;
 		}
 
 		public Expression Closure(List<String> visible, Scope thread) {
-			visible.Add(NameFunction);
-			return new FunctionDefineStatement(NameFunction, Args.Select(i => new ArgumentMetadataGenerator(i.name, i.type?.Closure(visible, thread), i.defaultValue?.Closure(visible, thread))).ToList(), Body.Closure(visible, thread), returnedType?.Closure(visible, thread));
+			visible.Add(this.NameFunction);
+			return new FunctionDefineStatement(this.NameFunction, this.Args.Select(i => new ArgumentMetadataGenerator(i.name, i.type?.Closure(visible, thread), i.defaultValue?.Closure(visible, thread))).ToList(), Body.Closure(visible, thread), returnedType?.Closure(visible, thread));
 		}
 	}
 }

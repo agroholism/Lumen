@@ -82,6 +82,12 @@ tail_recursion:
 					}
 
 					if (args.Length != 0) {
+						if (i.Attributes != null && i.Attributes.TryGetValue("type", out var t)) {
+							if (t != args[counter].Type) {
+								throw new Exception("type error ");
+							}
+						}
+
 						e.Set(i.name, args[counter]);
 						counter++;
 					}

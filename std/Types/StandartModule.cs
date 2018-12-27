@@ -53,6 +53,16 @@ namespace Lumen.Lang.Std {
 			Set("NL", (KString)Environment.NewLine);
 			Set("EL", (KString)System.String.Empty);
 
+			Set("sum", new LambdaFun((scope, args) => {
+				var prompt = scope["message"].ToList(scope);
+				
+				return prompt.Aggregate((x, y) => {
+					return x.Type.GetAttribute(Op.PLUS, scope).Run(new Scope(scope) { This = x }, y);
+				});
+			}) {
+				Arguments = new List<FunctionArgument> { new FunctionArgument("message", (KString)"") }
+			});
+
 			Set("print", new LambdaFun((scope, args) => {
 				String separator = scope["sep"].ToString(scope);
 				String onend = scope["onend"].ToString(scope);

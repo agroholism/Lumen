@@ -127,6 +127,7 @@ namespace Stereotype {
 		ENUM,
 		DOC,
 		BUT,
-		RECORD
+		RECORD,
+		BIG_NUMBER
 	}
 }

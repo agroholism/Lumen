@@ -35,6 +35,39 @@ namespace Lumen.Lang.Std {
 			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
 		}
 
+		public static BigFloat ToBigFloat(this Value value, Scope scope) {
+			if (value is Num num) {
+				return new BigFloat(num.value);
+			}
+			else if (value is BigNum bigNum) {
+				return bigNum.value;
+			}
+
+			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
+		}
+
+		public static BigNum ToBigNum(this Value value, Scope scope) {
+			if (value is Num num) {
+				return new BigNum(num.value);
+			}
+			else if (value is BigNum bigNum) {
+				return bigNum;
+			}
+
+			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
+		}
+
+		public static Num ToNum(this Value value, Scope scope) {
+			if (value is Num num) {
+				return num;
+			}
+			else if(value is BigNum bigNum) {
+				return (Double)bigNum.value;
+			}
+
+			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
+		}
+
 		public static Dictionary<Value, Value> ToMap(this Value value, Scope e) {
 			if (value is Map klist) {
 				return klist.value;

@@ -24,180 +24,195 @@ namespace Lumen.Lang.Std {
 				}
 			}
 
-			#region Operators
+			IEnumerable<Value> BigRange(BigNum from, BigNum to) {
+				yield return from;
+				if (from < to) {
+					while (from < to) {
+						from += 1;
+						yield return from;
+					}
+				}
+				else if (from >= to) {
+					while (from > to) {
+						from -= 1;
+						yield return from;
+					}
+				}
+			}
+
+			#region operators
+
+			SetAttribute(Op.BNOT, new LambdaFun((scope, args) => {
+				if (scope.This is Num num) {
+					return new Enumerator(Range(0, num - 1));
+				}
+
+				if (scope.This is BigNum bigNum) {
+					return new Enumerator(BigRange(0, bigNum - 1));
+				}
+
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, scope.This.Type), stack: scope);
+			}));
+
 			SetAttribute(Op.DOTI, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Enumerator(Range(scope.This as Num, (Num)other));
+					return new Enumerator(Range(scope.This.ToNum(scope), other.ToNum(scope)));
 				}
 
-				if (other.Type.AttributeExists("..")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("..", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Enumerator(BigRange(scope.This.ToBigNum(scope), other.ToBigNum(scope)));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
-			}) { Arguments = new List<FunctionArgument> { new FunctionArgument("other") } });
-			SetAttribute(Op.BNOT, new LambdaFun((scope, args) => {
-				return new Enumerator(Range(0, (Num)scope.This - 1));
-			}));
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
+			}) {
+				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
+			});
+
 			SetAttribute(Op.DOTE, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Enumerator(Range((Num)scope.This, (Num)other - 1));
+					return new Enumerator(Range(scope.This.ToNum(scope), other.ToNum(scope) - 1));
 				}
 
-				if (other.Type.AttributeExists("...")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("...", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Enumerator(BigRange(scope.This.ToBigNum(scope), other.ToBigNum(scope) - 1));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.SHIP, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Num(scope.This.CompareTo(other));
+					return new Num(scope.This.ToNum(scope).CompareTo(other.ToNum(scope)));
 				}
 
-				if (other.Type.AttributeExists("<=>")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("<=>", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Num(scope.This.ToBigNum(scope).CompareTo(other.ToBigNum(scope)));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.LTEQ, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Bool((Num)scope.This <= (Num)other);
+					return new Bool(scope.This.ToNum(scope) <= other.ToNum(scope));
 				}
 
-				if (other.Type.AttributeExists("<=")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("<=", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Bool(scope.This.ToBigNum(scope) <= other.ToBigNum(scope));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.GTEQ, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Bool((Num)scope.This >= (Num)other);
+					return new Bool(scope.This.ToNum(scope) >= other.ToNum(scope));
 				}
 
-				if (other.Type.AttributeExists(">=")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute(">=", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Bool(scope.This.ToBigNum(scope) >= other.ToBigNum(scope));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.GT, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Bool((Num)scope.This > (Num)other);
+					return new Bool(scope.This.ToNum(scope) > other.ToNum(scope));
 				}
 
-				if (other.Type.AttributeExists(">")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute(">", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Bool(scope.This.ToBigNum(scope) > other.ToBigNum(scope));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.LT, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Bool((Num)scope.This < (Num)other);
+					return new Bool(scope.This.ToNum(scope) < other.ToNum(scope));
 				}
 
-				if (other.Type.AttributeExists("<")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("<", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Bool(scope.This.ToBigNum(scope) < other.ToBigNum(scope));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
-
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.EQL, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Bool((Num)scope.This == (Num)other);
+					return new Bool(scope.This.ToNum(scope) == other.ToNum(scope));
 				}
 
-				if (other.Type.AttributeExists("==")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("==", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Bool(scope.This.ToBigNum(scope) == other.ToBigNum(scope));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.NOT_EQL, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
-					return new Bool((Num)scope.This != (Num)other);
+					return new Bool(scope.This.ToNum(scope) != other.ToNum(scope));
 				}
 
-				if (other.Type.AttributeExists("!=")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("!=", scope).Run(scope, args);
+				if (scope.This is BigNum || other is BigNum) {
+					return new Bool(scope.This.ToBigNum(scope) != other.ToBigNum(scope));
 				}
 
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
 			SetAttribute(Op.PLUS, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
+				if (scope.This is BigNum || other is BigNum) {
+					return scope.This.ToBigNum(scope) + other.ToBigNum(scope);
+				}
+
 				if (other is Num) {
-					return (Num)scope.This + (Num)other;
+					return scope.This.ToNum(scope) + other.ToNum(scope);
 				}
 
 				if (other is KString) {
 					return new KString(scope.This.ToString(scope) + other.ToString(scope));
 				}
 
-				if (other.Type.AttributeExists("+")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("+", scope).Run(scope, args);
-				}
-
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") { Attributes = new Dictionary<string, Value> { ["type"] = this } } }
 			});
@@ -207,18 +222,15 @@ namespace Lumen.Lang.Std {
 			SetAttribute(Op.MINUS, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
+				if (scope.This is BigNum || other is BigNum) {
+					return scope.This.ToBigNum(scope) - other.ToBigNum(scope);
+				}
+
 				if (other is Num) {
-					return (Num)scope.This - (Num)other;
+					return scope.This.ToNum(scope) - other.ToNum(scope);
 				}
 
-				if (other.Type.AttributeExists("-")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("-", scope).Run(scope, args);
-				}
-
-				return null;
-				//throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'");
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
@@ -228,52 +240,33 @@ namespace Lumen.Lang.Std {
 			/*	SetAttribute("@~", new LambdaFun((scope, args) => {
 					return new Num(~(Int32)Converter.ToBigFloat(scope.This, scope));
 				}));*/
-			/*SetAttribute("/", new LambdaFun((scope, args) => {
+			SetAttribute(Op.SLASH, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
+				if (scope.This is BigNum || other is BigNum) {
+					return scope.This.ToBigNum(scope) / other.ToBigNum(scope);
+				}
+
 				if (other is Num) {
-					Double numberOne = Converter.ToDouble(scope.This, scope);
-					Double numberTwo = Converter.ToDouble(other, scope);
-
-					if (numberTwo == 0) {
-						if (numberOne == 0) {
-							return new Num(Double.NaN);
-						}
-						else if (numberOne > 0) {
-							return new Num(Double.PositiveInfinity);
-						}
-						return new Num(Double.NegativeInfinity);
-					}
-
-					Double result = numberOne / numberTwo;
-
-					return (Num)result;
+					return scope.This.ToNum(scope) / other.ToNum(scope);
 				}
 
-				if (other.Type.AttributeExists("/")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("/", scope).Run(scope, args);
-				}
-
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
-			});*/
+			});
 			SetAttribute(Op.STAR, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
+				if (scope.This is BigNum || other is BigNum) {
+					return scope.This.ToBigNum(scope) * other.ToBigNum(scope);
+				}
+
 				if (other is Num) {
-					return (Num)scope.This * (Num)other;
+					return scope.This.ToNum(scope) * other.ToNum(scope);
 				}
 
-				if (other.Type.AttributeExists("*")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("*", scope).Run(scope, args);
-				}
-
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
@@ -683,17 +676,29 @@ namespace Lumen.Lang.Std {
 					return new List(new BitArray(BitConverter.GetBytes(num)).Cast<Boolean>().Select(x => (Value)new Num(x ? 1 : 0)).ToList());
 				}));*/
 			SetAttribute("to_s", new LambdaFun((scope, args) => {
-				String num = scope.This.ToString(scope);
+				Value num = scope.This;
 				Double basis = Converter.ToDouble(scope["base"], scope);
+				Boolean rat = Converter.ToBoolean(scope["rat"]);
+				Value ct = scope["ct"];
 
-				if (basis == 10) {
-					return new KString(num);
+				if(rat) {
+					return new KString(num.ToBigFloat(scope).ToRationalString());
 				}
 
-				return new KString(Converter.FromTo(num, "10", basis.ToString()));
+				if(ct != null) {
+					return new KString(num.ToBigFloat(scope).ToString((Int32)ct.ToDouble(scope)));
+				}
+
+				if (basis == 10) {
+					return new KString(num.ToString(scope));
+				}
+
+				return new KString(Converter.FromTo(num.ToString(scope), "10", basis.ToString()));
 			}) {
 				Arguments = new List<FunctionArgument> {
-						new FunctionArgument("base", (Num)10)
+						new FunctionArgument("base", (Num)10),
+						new FunctionArgument("ct", Const.NULL),
+						new FunctionArgument("rat", Const.FALSE),
 					}
 			});
 		}

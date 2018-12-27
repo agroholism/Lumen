@@ -27,13 +27,25 @@ namespace Lumen.Lang.Std {
 			}
 		}
 
+		public Boolean IsPositiveInfinity {
+			get => this.denominator.IsZero && this.numerator > 0;
+		}
+
+		public Boolean IsNeagtiveInfinity {
+			get => this.denominator.IsZero && this.numerator < 0;
+		}
+
+		public Boolean IsNaN {
+			get => this.denominator.IsZero && this.numerator == 0;
+		}
+
 		//constructors
 		public BigFloat() {
 			numerator = BigInteger.Zero;
 			denominator = BigInteger.One;
 		}
 
-		public BigFloat(string value) {
+		public BigFloat(String value) {
 			BigFloat bf = Parse(value);
 			this.numerator = bf.numerator;
 			this.denominator = bf.denominator;
@@ -41,8 +53,6 @@ namespace Lumen.Lang.Std {
 
 		public BigFloat(BigInteger numerator, BigInteger denominator) {
 			this.numerator = numerator;
-			if (denominator == 0)
-				throw new ArgumentException("denominator equals 0");
 			this.denominator = BigInteger.Abs(denominator);
 		}
 
@@ -63,34 +73,34 @@ namespace Lumen.Lang.Std {
 			}
 		}
 
-		public BigFloat(ulong value) {
+		public BigFloat(UInt64 value) {
 			numerator = new BigInteger(value);
 			denominator = BigInteger.One;
 		}
 
-		public BigFloat(long value) {
+		public BigFloat(Int64 value) {
 			numerator = new BigInteger(value);
 			denominator = BigInteger.One;
 		}
 
-		public BigFloat(uint value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+		public BigFloat(UInt32 value) {
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
-		public BigFloat(int value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+		public BigFloat(Int32 value) {
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
-		public BigFloat(float value) : this(value.ToString("N99")) {
+		public BigFloat(Single value) : this(value.ToString("N99", System.Globalization.CultureInfo.InvariantCulture.NumberFormat)) {
 		}
 
-		public BigFloat(double value) : this(value.ToString("N99", System.Globalization.CultureInfo.InvariantCulture.NumberFormat)) {
+		public BigFloat(Double value) : this(value.ToString("N99", System.Globalization.CultureInfo.InvariantCulture.NumberFormat)) {
 			
 		}
 
-		public BigFloat(decimal value) : this(value.ToString("N99")) {
+		public BigFloat(Decimal value) : this(value.ToString("N99", System.Globalization.CultureInfo.InvariantCulture.NumberFormat)) {
 		}
 
 		//non-static methods
@@ -126,8 +136,6 @@ namespace Lumen.Lang.Std {
 		public BigFloat Divide(BigFloat other) {
 			if (BigInteger.Equals(other, null))
 				throw new ArgumentNullException("other");
-			if (other.numerator == 0)
-				throw new System.DivideByZeroException("other");
 
 			this.numerator *= other.denominator;
 			this.denominator *= other.numerator;
@@ -159,7 +167,7 @@ namespace Lumen.Lang.Std {
 		}
 
 		public BigFloat Pow(int exponent) {
-			if (numerator.IsZero) {
+			if (this.numerator.IsZero) {
 				// Nothing to do
 			}
 			else if (exponent < 0) {
@@ -269,22 +277,32 @@ namespace Lumen.Lang.Std {
 			return BigInteger.Log10(numerator) - BigInteger.Log10(denominator);
 		}
 
-		public double Log(double baseValue) {
+		public double Log(Double baseValue) {
 			return BigInteger.Log(numerator, baseValue) - BigInteger.Log(numerator, baseValue);
 		}
 
-		public override string ToString() {
+		public override String ToString() {
 			//default precision = 100
-			return ToString(100);
+			return ToString(50);
 		}
 
-		public string ToString(int precision, bool trailingZeros = false) {
+		public String ToString(Int32 precision, Boolean trailingZeros = false) {
+			if(this.denominator == 0) {
+				if(this.numerator > 0) {
+					return Double.PositiveInfinity.ToString();
+				}
+				else if(this.numerator < 0) {
+					return Double.NegativeInfinity.ToString();
+				}
+				return Double.NaN.ToString();
+			}
+
 			Factor();
 
 			BigInteger remainder;
 			BigInteger result = BigInteger.DivRem(numerator, denominator, out remainder);
 
-			if (remainder == 0 && trailingZeros)
+			if (remainder == 0 && !trailingZeros)
 				return result + ".0";
 			else if (remainder == 0)
 				return result.ToString();
@@ -292,31 +310,43 @@ namespace Lumen.Lang.Std {
 
 			BigInteger decimals = (numerator * BigInteger.Pow(10, precision)) / denominator;
 
-			if (decimals == 0 && trailingZeros)
+			if (decimals == 0 && !trailingZeros) {
 				return result + ".0";
-			else if (decimals == 0)
+			}
+			else if (decimals == 0) {
 				return result.ToString();
+			}
 
 			StringBuilder sb = new StringBuilder();
 
-			while (precision-- > 0 && decimals > 0) {
+			while (precision-- > 0) {
 				sb.Append(decimals % 10);
 				decimals /= 10;
 			}
 
-			if (trailingZeros)
+			if (trailingZeros) {
 				return result + "." + new string(sb.ToString().Reverse().ToArray());
-			else
+			}
+			else {
 				return result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
-
-
+			}
 		}
 
-		public string ToMixString() {
+		public String ToMixString() {
+			if (this.denominator == 0) {
+				if (this.numerator > 0) {
+					return Double.PositiveInfinity.ToString();
+				}
+				else if (this.numerator < 0) {
+					return Double.NegativeInfinity.ToString();
+				}
+				return Double.NaN.ToString();
+			}
+
 			Factor();
 
 			BigInteger remainder;
-			BigInteger result = BigInteger.DivRem(numerator, denominator, out remainder);
+			BigInteger result = BigInteger.DivRem(this.numerator, this.denominator, out remainder);
 
 			if (remainder == 0)
 				return result.ToString();
@@ -325,6 +355,16 @@ namespace Lumen.Lang.Std {
 		}
 
 		public string ToRationalString() {
+			if (this.denominator == 0) {
+				if (this.numerator > 0) {
+					return Double.PositiveInfinity.ToString();
+				}
+				else if (this.numerator < 0) {
+					return Double.NegativeInfinity.ToString();
+				}
+				return Double.NaN.ToString();
+			}
+
 			Factor();
 
 			return numerator + "/" + denominator;
@@ -347,7 +387,7 @@ namespace Lumen.Lang.Std {
 			return BigInteger.Compare(one, two);
 		}
 
-		public int CompareTo(object other) {
+		public Int32 CompareTo(Object other) {
 			if (other == null)
 				throw new ArgumentNullException("other");
 
@@ -563,97 +603,110 @@ namespace Lumen.Lang.Std {
 		public static bool operator ==(BigFloat left, BigFloat right) {
 			return Compare(left, right) == 0;
 		}
-		public static bool operator <(BigFloat left, BigFloat right) {
+		public static Boolean operator <(BigFloat left, BigFloat right) {
 			return Compare(left, right) < 0;
 		}
-		public static bool operator <=(BigFloat left, BigFloat right) {
+		public static Boolean operator <=(BigFloat left, BigFloat right) {
 			return Compare(left, right) <= 0;
 		}
-		public static bool operator >(BigFloat left, BigFloat right) {
+		public static Boolean operator >(BigFloat left, BigFloat right) {
 			return Compare(left, right) > 0;
 		}
-		public static bool operator >=(BigFloat left, BigFloat right) {
+		public static Boolean operator >=(BigFloat left, BigFloat right) {
 			return Compare(left, right) >= 0;
 		}
 
-		public static bool operator true(BigFloat value) {
+		public static Boolean operator true(BigFloat value) {
 			return value != 0;
 		}
-		public static bool operator false(BigFloat value) {
+		public static Boolean operator false(BigFloat value) {
 			return value == 0;
 		}
 
 		public static explicit operator decimal(BigFloat value) {
-			if (decimal.MinValue > value) throw new System.OverflowException("value is less than System.decimal.MinValue.");
-			if (decimal.MaxValue < value) throw new System.OverflowException("value is greater than System.decimal.MaxValue.");
+			if (Decimal.MinValue > value) {
+				throw new OverflowException("value is less than System.decimal.MinValue.");
+			}
 
-			return (decimal)value.numerator / (decimal)value.denominator;
+			if (Decimal.MaxValue < value) {
+				throw new OverflowException("value is greater than System.decimal.MaxValue.");
+			}
+
+			return (Decimal)value.numerator / (Decimal)value.denominator;
 		}
-		public static explicit operator double(BigFloat value) {
-			if (double.MinValue > value) throw new System.OverflowException("value is less than System.double.MinValue.");
-			if (double.MaxValue < value) throw new System.OverflowException("value is greater than System.double.MaxValue.");
+		public static explicit operator Double(BigFloat value) {
+			if (Double.MinValue > value) {
+				throw new OverflowException("value is less than System.double.MinValue.");
+			}
 
-			return (double)value.numerator / (double)value.denominator;
+			if (Double.MaxValue < value) {
+				throw new OverflowException("value is greater than System.double.MaxValue.");
+			}
+
+			return (Double)value.numerator / (Double)value.denominator;
 		}
-		public static explicit operator float(BigFloat value) {
-			if (float.MinValue > value) throw new System.OverflowException("value is less than System.float.MinValue.");
-			if (float.MaxValue < value) throw new System.OverflowException("value is greater than System.float.MaxValue.");
+		public static explicit operator Single(BigFloat value) {
+			if (Single.MinValue > value) {
+				throw new OverflowException("value is less than System.Single.MinValue.");
+			}
 
-			return (float)value.numerator / (float)value.denominator;
+			if (Single.MaxValue < value) {
+				throw new OverflowException("value is greater than System.Single.MaxValue.");
+			}
+
+			return (Single)value.numerator / (Single)value.denominator;
 		}
 
 		//byte, sbyte, 
-		public static implicit operator BigFloat(byte value) {
-			return new BigFloat((uint)value);
+		public static implicit operator BigFloat(Byte value) {
+			return new BigFloat((UInt32)value);
 		}
-		public static implicit operator BigFloat(sbyte value) {
-			return new BigFloat((int)value);
-		}
-		public static implicit operator BigFloat(short value) {
-			return new BigFloat((int)value);
-		}
-		public static implicit operator BigFloat(ushort value) {
-			return new BigFloat((uint)value);
-		}
-		public static implicit operator BigFloat(int value) {
+		public static implicit operator BigFloat(SByte value) {
 			return new BigFloat(value);
 		}
-		public static implicit operator BigFloat(long value) {
+		public static implicit operator BigFloat(Int16 value) {
 			return new BigFloat(value);
 		}
-		public static implicit operator BigFloat(uint value) {
+		public static implicit operator BigFloat(UInt16 value) {
+			return new BigFloat((UInt32)value);
+		}
+		public static implicit operator BigFloat(Int32 value) {
 			return new BigFloat(value);
 		}
-		public static implicit operator BigFloat(ulong value) {
+		public static implicit operator BigFloat(Int64 value) {
 			return new BigFloat(value);
 		}
-		public static implicit operator BigFloat(decimal value) {
+		public static implicit operator BigFloat(UInt32 value) {
 			return new BigFloat(value);
 		}
-		public static implicit operator BigFloat(double value) {
+		public static implicit operator BigFloat(UInt64 value) {
 			return new BigFloat(value);
 		}
-		public static implicit operator BigFloat(float value) {
+		public static implicit operator BigFloat(Decimal value) {
+			return new BigFloat(value);
+		}
+		public static implicit operator BigFloat(Double value) {
+			return new BigFloat(value);
+		}
+		public static implicit operator BigFloat(Single value) {
 			return new BigFloat(value);
 		}
 		public static implicit operator BigFloat(BigInteger value) {
-			return new BigFloat(value);
-		}
-		public static explicit operator BigFloat(string value) {
 			return new BigFloat(value);
 		}
 
 		private BigFloat Factor() {
 			//factoring can be very slow. So use only when neccessary (ToString, and comparisons)
 
-			if (denominator == 1)
+			if (this.denominator == 1) {
 				return this;
+			}
 
 			//factor numerator and denominator
-			BigInteger factor = BigInteger.GreatestCommonDivisor(numerator, denominator);
+			BigInteger factor = BigInteger.GreatestCommonDivisor(this.numerator, this.denominator);
 
-			numerator /= factor;
-			denominator /= factor;
+			this.numerator /= factor;
+			this.denominator /= factor;
 
 			return this;
 		}
