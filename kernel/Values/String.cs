@@ -143,7 +143,7 @@ namespace Lumen.Lang.Std {
 			return this.innerValue;
 		}
 
-		public KType Type => StandartModule.String;
+		public Record Type => StandartModule.String;
 
 		#region Service
 

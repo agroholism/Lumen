@@ -30,7 +30,7 @@ namespace Stereotype {
 				if (expression is FunctionDefineStatement fun && fun.Body == null) {
 					List<FunctionArgument> args = new List<FunctionArgument>();
 
-					KType exte = null;
+					Record exte = null;
 
 					foreach (ArgumentMetadataGenerator i in fun.Args) {
 						FunctionArgument arg = i.EvalArgumnet(e);
@@ -58,7 +58,7 @@ namespace Stereotype {
 
 		public static void Rename(Module m, Scope e) {
 			foreach (KeyValuePair<String, Value> i in m.scope.variables) {
-				if (i.Value is KType type) {
+				if (i.Value is Record type) {
 					type.meta.Name = m.name.Split('.')[0] + "." + type.meta.Name;
 					foreach(KeyValuePair<String, Fun> j in type.attributes) {
 						if(j.Value is LambdaFun lfun) {

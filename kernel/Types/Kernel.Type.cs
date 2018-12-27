@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
 	[Serializable]
-	internal class TypeType : KType {
+	internal class TypeType : Record {
 		public new Dictionary<String, Value> Attributes {
 			get {
 				Dictionary<String, Value> result = new Dictionary<string, Value>();
@@ -20,12 +20,11 @@ namespace Lumen.Lang.Std {
 
 		public TypeType() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.Type"
 			};
 
 			Set("new", new LambdaFun((e, args) => {
-				KType result = new KType();
+				Record result = new Record();
 
 				String name = args[0].ToString(e);
 				List<String> fields = Converter.ToList(args[1], e).Select(i => i.ToString(e)).ToList();

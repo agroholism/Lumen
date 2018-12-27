@@ -1,110 +1,4 @@
-﻿Math |> use
-
-# <region TYPES>
-
-type Numbers = List[Number]
-type Strings = List[String]
-type Booleans = List[Boolean]
-type Lists[T] = List[List[T]]
-
-type NumberFunc = Func[Number, Number]
-type BinaryNumberFunc = Func[Number, Number, Number]
-
-type StringFunc = Func[String, String]
-type BinaryStringFunc = Func[String, String, String]
-
-type Action = Func[Object]
-type Action1[T] = Func[T, Object]
-type Action2[T1, T2] = Func[T1, T2, Object]
-type Action3[T1, T2, T3] = Func[T1, T2, T3 Object]
-
-type Predicate[T] = Func[T, Boolean]
-type Predicate2[T1, T2] = Func[T1, T2, Boolean]
-type Predicate3[T1, T2, T3] = Func[T1, T2, T3, Boolean]
-
-type Pair(item1, item2)
-type Triple(item1, item2, item3)
-
-type LinkedListNode(value, next_node=null)
-
-type LinkedList {
-    var first
-    var last
-    var count
-    
-    fun initialize() {
-        this.first = null
-        this.last = null
-        this.count = 0
-    }
-    
-    fun add!(val) {
-        if this.first is null {
-            this.first = new LinkedListNode(val)
-            this.last = this.first
-        } else {
-            this.last.next_node = new LinkedListNode(val)
-            this.last = this.last.next_node
-        }
-        this.count = this.count + 1
-    }
-    
-    fun +=(val) {
-        this.add!(val)
-        this
-    }
-    
-    fun to_s() {
-        if this.first is null {
-            return "()"
-        }
-
-        return this.first.to_s()
-    }
-}
-
-type Lazy {
-    in var value
-    in var evaluated?
-
-    fun initialize(value) {
-        this.value = value
-        this.evaluated? = false
-    }
-
-    fun get_result() {
-        if not this.evaluated? {
-            this.value = this.value()
-            this.evaluated? = true
-        }
-        this.value
-    }
-}
-
-type StringBuilder {
-    in var strings
-
-    fun initialize() {
-        this.strings = new List
-    }
-
-    fun <<(other) {
-        this.strings.add!(other)
-        this
-    }
-
-    fun append(other) {
-        this << other
-    }
-
-    fun to_s() {
-        this.strings.join("")
-    }
-}
-
-# </region>
-
-# <region CONSTANTS>
+﻿# <region CONSTANTS>
 
 const DEFAULT_STRING = ""
 const DEFAULT_NUMBER = 0
@@ -328,46 +222,61 @@ fun rad_to_deg(x: Number) => x * 180 / PI
 
 fun deg_to_rad(x: Number) => x * PI / 180
 
+
+
+
+
 namespace std
 
-NL = ...
-EL = ...
-NaN = ...
-POS_INF = ...
-NEG_INF = ...
-PI = ...
-E = ...
+[const] 
+let NL: str = ...
+[const] 
+let EL: str = ...
 
-fun print(...args, onend=NL, sep=" ", file=null, write=false)
+[const] 
+let NaN: num = ...
+[const] 
+let POS_INF: num = ...
+[const] 
+let NEG_INF: num = ...
+[const] 
+let PI: num = ...
+[const] 
+let E: num = ...
 
-fun input(message=EL)
+let print(...args: any, onend: any=NL, sep: any=" ", file=null, write: any=false): void
 
+let input(message: any=EL): str
+
+[comparable]
 record num = ...
-fun num.op_uexcl()
-fun num.op_uplus()
-fun num.op_uminus()
-fun num.op_bnot()
 
-fun num.op_range(other)
-fun num.op_range_excl(other)
-fun num.op_plus(other)
-fun num.op_minus(other)
-fun num.op_divide(other)
-fun num.op_mul(other)
-fun num.op_div(other)
-fun num.op_mod(other)
-fun num.op_pow(other)
-fun num.op_lt(other)
-fun num.op_gt(other)
-fun num.op_lteq(other)
-fun num.op_gteq(other)
-fun num.op_eql(other)
-fun num.op_noteql(other)
-fun num.op_bor(other)
-fun num.op_band(other)
-fun num.op_excl(other)
-fun num.op_lsh(other)
-fun num.op_rsh(other)
+[pure] 
+let num.op_uexcl(): num
+let num.op_uplus()
+let num.op_uminus()
+let num.op_bnot()
+
+let num.op_range([num] other)
+let num.op_range_excl([num] other)
+let num.op_plus([num] other)
+let num.op_minus([num] other)
+let num.op_divide([num] other)
+let num.op_mul([num] other)
+let num.op_div([num] other)
+let num.op_mod([num] other)
+let num.op_pow(other)
+let num.op_lt(other)
+let num.op_gt(other)
+let num.op_lteq(other)
+let num.op_gteq(other)
+let num.op_eql(other)
+let num.op_noteql(other)
+let num.op_bor(other)
+let num.op_band(other)
+let num.op_excl(other)
+let num.op_lsh(other)
+let num.op_rsh(other)
 
 # Выполняет action this раз, передавая всё новое значение this
 fun num.times(action)
@@ -387,26 +296,34 @@ fun num.get_is_even()
 fun num.get_char()
 fun num.str(base=10)
 
+record clonable
+let comparable
 
+[comparable]
 record bool = ...
-fun bool.str()
-fun bool.num()
+let bool.str()
+let bool.num()
 
+[comparable]
 record str = ...
 
+[comparable]
 record vec = ...
 
 # возвращает новый вектор
-fun vec(...args): vec
+let vec(...args, from=nil, to=nil, step:=if len is not nil: (from-to)/len, len=nil): vec
 
 # возвращает длину вектора
-fun vec.op_ustar(): num
+let vec.op_ustar(): num
 
 # делает поверхностную копию вектора, добавляет other в его конец и возвращает его
-fun vec.op_plus(other: vec | seq): vec
+[pure] 
+let vec.op_plus(other: vec|seq): vec
 
 # находит разность векторов как разность множеств
-fun vec.op_minus(other: vec | seq): vec
+[pure] 
+let vec.op_minus(other: vec|seq): vec
 
 # возвращает неглубокую копию вектора
-fun vec.clone(): vec
+[pure] 
+let vec.clone(): vec

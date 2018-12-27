@@ -25,7 +25,7 @@ namespace Lumen.Lang.Std {
 			return this;
 		}
 
-		public KType Type => StandartModule.Function;
+		public Record Type => StandartModule.Function;
 
 		public abstract List<FunctionArgument> Arguments { get; set; }
 

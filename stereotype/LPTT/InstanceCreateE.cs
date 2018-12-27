@@ -31,7 +31,7 @@ namespace Stereotype {
 			if (this.res is Applicate a) {
 				Value v = a.callable.Eval(e);
 
-				if (v is Lumen.Lang.Std.KType x) {
+				if (v is Lumen.Lang.Std.Record x) {
 					try {
 						var result = a.ExecuteCasual((Fun)x.Get("new", e), e);
 

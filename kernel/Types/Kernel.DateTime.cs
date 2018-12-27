@@ -1,11 +1,10 @@
 ﻿using System;
 
 namespace Lumen.Lang.Std {
-	internal class DateTimeClass : KType {
+	internal class DateTimeClass : Record {
 		public DateTimeClass() {
 			this.meta = new TypeMetadata {
-				Name = "Kernel.DateTime",
-				Fields = new String[0],
+				Name = "Kernel.DateTime"
 			};
 
 			Set("get_now", new LambdaFun((e, args) => {

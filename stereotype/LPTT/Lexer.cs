@@ -18,7 +18,7 @@ namespace Stereotype {
 			["//"] = new Token(TokenType.DIV, Op.DIV),
 			["("] = new Token(TokenType.LPAREN),
 			[")"] = new Token(TokenType.RPAREN),
-			["="] = new Token(TokenType.EQ),
+			["="] = new Token(TokenType.EQEQ, Op.EQL),
 			["<"] = new Token(TokenType.LT, Op.LT),
 			[">"] = new Token(TokenType.GT, Op.GT),
 			["?"] = new Token(TokenType.QUESTION),
@@ -36,18 +36,17 @@ namespace Stereotype {
 			["**"] = new Token(TokenType.POW, Op.POW),
 			["++"] = new Token(TokenType.INC, "++"),
 			["--"] = new Token(TokenType.DEC, "--"),
-			["=="] = new Token(TokenType.EQEQ, Op.EQL),
 			["==="] = new Token(TokenType.EQEQEQ, "==="),
 			["!=="] = new Token(TokenType.EXCLEQEQ, "!=="),
 			["<=>"] = new Token(TokenType.LTEQGT, Op.SHIP),
-			[":="] = new Token(TokenType.COLONEQ, ":="),
+			[":="] = new Token(TokenType.EQ, ":="),
 			["+="] = new Token(TokenType.OPEQ, Op.APLUS),
 			["-="] = new Token(TokenType.OPEQ, Op.AMINUS),
 			["/="] = new Token(TokenType.OPEQ, Op.ASLASH),
 			["*="] = new Token(TokenType.OPEQ, Op.ASTAR),
 			["**="] = new Token(TokenType.OPEQ, Op.APOW),
 			["%="] = new Token(TokenType.OPEQ, Op.AMOD),
-			["!="] = new Token(TokenType.EXCLEQ, Op.NOT_EQL),
+			["/="] = new Token(TokenType.EXCLEQ, Op.NOT_EQL),
 			["<="] = new Token(TokenType.LTEQ, Op.LTEQ),
 			[">="] = new Token(TokenType.GTEQ, Op.GTEQ),
 			["=~"] = new Token(TokenType.EQMATCH, Op.MATCH),
@@ -431,9 +430,6 @@ namespace Stereotype {
 				case "but":
 					AddToken(TokenType.BUT);
 					break;
-				case "var":
-					AddToken(TokenType.VAR);
-					break;
 				case "new":
 					AddToken(TokenType.NEW);
 					break;
@@ -497,8 +493,8 @@ namespace Stereotype {
 				case "next":
 					AddToken(TokenType.CONTINUE);
 					break;
-				case "fun":
-					AddToken(TokenType.FUN);
+				case "let":
+					AddToken(TokenType.LET);
 					break;
 				case "return":
 					AddToken(TokenType.RETURN);

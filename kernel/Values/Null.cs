@@ -8,7 +8,7 @@ namespace Lumen.Lang.Std {
 			return this;
 		}
 
-		public KType Type => StandartModule.Null;
+		public Record Type => StandartModule.Null;
 
 		public override String ToString() {
 			return this.ToString(null);

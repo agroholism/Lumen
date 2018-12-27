@@ -50,7 +50,7 @@ namespace Stereotype {
 		public String name;
 		readonly Dictionary<String, Value> cache = new Dictionary<string, Value>();
 
-		public KType Type => Lumen.Lang.Std.StandartModule._Type;
+		public Record Type => Lumen.Lang.Std.StandartModule._Type;
 
 		public NETModule(Assembly asm, String name) {
 			this.module = asm;
@@ -89,7 +89,7 @@ namespace Stereotype {
 	internal class Dynamic : Value {
 		public object Value;
 
-		public KType Type => new NETType(this.Value.GetType());
+		public Record Type => new NETType(this.Value.GetType());
 
 		public Dynamic(Object Value) {
 			this.Value = Value;
@@ -108,7 +108,7 @@ namespace Stereotype {
 		}
 	}
 
-	internal class NETType : KType {
+	internal class NETType : Record {
 		Type type;
 
 		public NETType(Type type) {

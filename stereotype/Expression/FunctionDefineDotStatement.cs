@@ -24,7 +24,16 @@ namespace Stereotype {
 		}
 
 		public FunctionArgument EvalArgumnet(Scope e) {
-			return new FunctionArgument(name,  defaultValue == null ? null : (defaultValue is ExpressionE expe ? (Object)expe.expression : defaultValue.Eval(e)));
+			var res = new FunctionArgument(name, defaultValue == null ? null : (defaultValue is ExpressionE expe ? (Object)expe.expression : defaultValue.Eval(e)));
+
+			if(this.type != null) {
+				var t = type.Eval(e);
+				if(t is Record kt) {
+					res.Attributes = new Dictionary<string, Value> { ["type"] = kt };
+				}
+			}
+
+			return res;
 		}
 
 		public Expression Optimize(Scope scope) {

@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
-	public class ExpandoType : KType {
+	public class ExpandoType : Record {
 		public static Expando BASE;
 
 		public ExpandoType() {
 			BASE = new BaseExpando();
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
-				Name = "Kernel.Expando",
+				Name = "Kernel.Expando"
 			};
 			/*
 						SetAttribute("taint", new LambdaFun(e => {

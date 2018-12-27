@@ -66,7 +66,7 @@ namespace Stereotype {
 				return ((Fun)((Expando)operandOne).Get(operation, AccessModifiers.PUBLIC, e)).Run(a, operandTwo);
 			}
 
-			KType type = operandOne.Type;
+			Record type = operandOne.Type;
 			if (type.AttributeExists(this.operation)) {
 				try {
 					return type.GetAttribute(this.operation, e).Run(new Scope(e) { ["this"] = operandOne }, operandTwo);

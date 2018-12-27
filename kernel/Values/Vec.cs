@@ -7,7 +7,7 @@ namespace Lumen.Lang.Std {
 		internal List<Value> value;
 
 		public Int32 Count => this.value.Count;
-		public KType Type => StandartModule.Vector;
+		public Record Type => StandartModule.Vector;
 		
 		public virtual Value this[Int32 index] {
 			get {

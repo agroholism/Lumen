@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang.Std {
@@ -20,7 +19,6 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Value Run(Scope e, params Value[] args) {
-go:
 			Int32 counter = 0;
 
 			foreach (FunctionArgument i in this.Arguments) {
@@ -38,6 +36,12 @@ go:
 					}
 
 					if (args.Length != 0) {
+						if(i.Attributes != null && i.Attributes.TryGetValue("type", out var t)) {
+							if(t != args[counter].Type) {
+								throw new Exception("type error ");
+							}
+						}
+
 						e.Set(i.name, args[counter]);
 						counter++;
 					}
@@ -94,7 +98,7 @@ go:
 			throw new NotImplementedException();
 		}
 
-		public KType Type => StandartModule.Function;
+		public Record Type => StandartModule.Function;
 
 		public List<FunctionArgument> Arguments { get; set; } = new List<FunctionArgument>();
 

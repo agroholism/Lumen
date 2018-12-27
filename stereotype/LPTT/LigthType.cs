@@ -28,7 +28,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			KType type = this.type.Eval(e) as KType;
+			Record type = this.type.Eval(e) as Record;
 
 			Fun f = new AnonymeDefine(new List<ArgumentMetadataGenerator> { new ArgumentMetadataGenerator(parameter, null, null) }, this.body).Eval(e) as Fun;
 			var result = new LigthTypeType(nameType, type, f);
@@ -39,15 +39,14 @@ namespace Stereotype {
 		}
 	}
 
-	class LigthTypeType : KType {
-		KType inner;
+	class LigthTypeType : Record {
+		Record inner;
 		Fun matchFun;
 
-		public LigthTypeType(string name, KType inner, Fun matchFun) {
+		public LigthTypeType(string name, Record inner, Fun matchFun) {
 			this.inner = inner;
 			this.matchFun = matchFun;
 			this.meta = new TypeMetadata {
-				Fields = new string[0],
 				Name = name
 			};
 		}

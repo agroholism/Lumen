@@ -13,10 +13,9 @@ using Lumen.Lang.Expressions;
  */
 
 namespace Lumen.Lang.Std {
-	internal sealed class FunctionClass : KType {
+	internal sealed class FunctionClass : Record {
 		internal FunctionClass() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.Function"
 			};
 

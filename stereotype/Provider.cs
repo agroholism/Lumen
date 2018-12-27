@@ -95,7 +95,7 @@ namespace Stereotype {
 						return false;
 					case TokenType.CONST:
 						return false;
-					case TokenType.FUN:
+					case TokenType.LET:
 						return false;
 					case TokenType.DIV:
 						return false;
@@ -150,8 +150,6 @@ namespace Stereotype {
 					case TokenType.LAZY:
 						return false;
 					case TokenType.LBRACKET:
-						return false;
-					case TokenType.LET:
 						return false;
 					case TokenType.LPAREN:
 						return false;

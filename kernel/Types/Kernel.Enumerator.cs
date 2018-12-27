@@ -12,10 +12,9 @@ using System.Collections.Generic;
  */
 
 namespace Lumen.Lang.Std {
-	internal sealed class EnumeratorType : KType {
+	internal sealed class EnumeratorType : Record {
 		internal EnumeratorType() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.Enumerator",
 			};
 

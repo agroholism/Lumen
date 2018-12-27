@@ -28,7 +28,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			KType type = this.type.Eval(e) as KType;
+			Record type = this.type.Eval(e) as Record;
 
 			Fun f = new AnonymeDefine(new List<ArgumentMetadataGenerator> { new ArgumentMetadataGenerator(parameter, null, null) }, this.body).Eval(e) as Fun;
 			var result = new LigthTypeType(nameType, type, f);

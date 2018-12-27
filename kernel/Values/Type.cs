@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Lumen.Lang.Std {
-	public class KType : Value {
+	public class Record : Value {
 		public IDictionary<String, Value> typeAttributes;
 		public IDictionary<String, Fun> attributes;
 		public String[] variables;
 		public List<Module> includedModules;
 		public TypeMetadata meta;
 
-		public KType() {
+		public Record() {
 			this.includedModules = new List<Module>();
 			this.typeAttributes = new Dictionary<String, Value>();
 			this.attributes = new Dictionary<String, Fun>();
@@ -67,7 +67,7 @@ namespace Lumen.Lang.Std {
 			return false;
 		}
 
-		public virtual KType Type => StandartModule._Type;
+		public virtual Record Type => StandartModule._Type;
 
 		public Boolean ToBool(Scope e) {
 			throw new NotImplementedException();

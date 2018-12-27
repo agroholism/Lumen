@@ -9,7 +9,7 @@ namespace Lumen.Lang.Std {
 			this.value = value;
 		}
 
-		public KType Type => StandartModule.DateTime;
+		public Record Type => StandartModule.DateTime;
 
 		public Value Clone() {
 			throw new NotImplementedException();

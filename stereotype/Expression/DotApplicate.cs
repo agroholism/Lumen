@@ -79,7 +79,7 @@ namespace Stereotype {
 				}
 				return new Null();
 			}
-			else if (obj is KType type) {
+			else if (obj is Record type) {
 				Value fun = null;
 				if (!type.Contains(((DotExpression)this.res).nameVariable)) {
 					if (type.AttributeExists(((DotExpression)this.res).nameVariable)) {
@@ -123,7 +123,7 @@ namespace Stereotype {
 			}
 			else {
 				String name = ((DotExpression)this.res).nameVariable;
-				Lumen.Lang.Std.KType cls = obj.Type;
+				Lumen.Lang.Std.Record cls = obj.Type;
 
 				if (!cls.AttributeExists(name)) {
 					try {

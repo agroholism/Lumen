@@ -31,7 +31,7 @@ namespace Lumen.Lang.Std {
 			throw new NotImplementedException();
 		}
 
-		public KType Type => StandartModule.Map;
+		public Record Type => StandartModule.Map;
 
 		public bool ToBool(Scope e) {
 			throw new NotImplementedException();

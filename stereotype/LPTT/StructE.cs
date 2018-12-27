@@ -40,7 +40,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			KType result = new KType();
+			Record result = new Record();
 			e.Set(this.name, result);
 
 			result.meta = new TypeMetadata {
@@ -71,7 +71,7 @@ namespace Stereotype {
 				}
 			}
 			result.meta.Name = name;
-			result.meta.Fields = names.ToArray();
+			//result.meta.Fields = names.ToArray();
 
 		//	var def = null;// new Initialize(arg.args);
 

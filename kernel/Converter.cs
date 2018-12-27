@@ -28,7 +28,7 @@ namespace Lumen.Lang.Std {
 			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Function", stack: scope);
 		}
 
-		public static BigFloat ToBigFloat(this Value value, Scope scope) {
+		public static Double ToDouble(this Value value, Scope scope) {
 			if(value is Num n) {
 				return n.value;
 			}
@@ -40,7 +40,7 @@ namespace Lumen.Lang.Std {
 				return klist.value;
 			}
 
-			KType type = value.Type;
+			Record type = value.Type;
 
 			if (type.AttributeExists("map") && type.GetAttribute("map", e) is Fun fun) {
 				Scope s = new Scope(e);
@@ -57,7 +57,7 @@ namespace Lumen.Lang.Std {
 				return klist.value;
 			}
 
-			KType type = value.Type;
+			Record type = value.Type;
 
 			if (type.AttributeExists("vec") && type.GetAttribute("vec", e) is Fun fun) {
 				Scope s = new Scope(e);

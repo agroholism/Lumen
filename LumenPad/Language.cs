@@ -23,19 +23,13 @@ namespace LumenPad {
 		private KlischeeLanguage() {
 			this.Folding.AddRange(new List<(String, String)> {
 				("{", "}"),
-				("\\brecord\\b", "\\bend\\b"),
-				("\\bfunction\\b", "\\bend\\b"),
-				("\\bif\\b", "\\bend\\b"),
-				("\\belse\\b", "\\bend\\b"),
-				("\\bfor\\b", "\\bend\\b"),
-				("\\bwhile\\b", "\\bend\\b"),
 				("#\\s*<(region)(.*?)>", "#\\s*</region>")
 			});
 
 			this.Styles.Add("\".*?[^\\\\]\"", Settings.String);
 			this.Styles.Add("#.*", Settings.Comment);
 			this.Styles.Add("@[a-zA-Z$._]+(\\(.*\\))?", Settings.Keyword);
-			this.Styles.Add("\\b(raise|record|next|try|except|finally|global|break|not|self|and|is|const|module|or|xor|where|function|new|do|end|this|if|else|for|in|while|from|return|true|false|null|(:(\\s+)?(?<range>auto)))\\b", Settings.Keyword);
+			this.Styles.Add("\\b(raise|record|next|try|except|finally|global|break|not|self|and|is|let|module|or|xor|where|new|do|end|this|if|else|for|in|while|from|return|true|false|void|(:(\\s+)?(?<range>auto)))\\b", Settings.Keyword);
 			this.Styles.Add("\\b(num|exception|seq|expando|file|str|vec|bool|map)\\b", Settings.Type);
 		}
 
@@ -176,6 +170,12 @@ namespace LumenPad {
 
 		internal override List<AutocompleteItem> GetAutocompleteItems(TextBoxManager manager) {
 			List<AutocompleteItem> items = new List<AutocompleteItem> {
+				new AutocompleteItem("let", (Int32)Images.VARIABLE, "let", "let", "let keyword"),
+				new AutocompleteItem("if", (Int32)Images.VARIABLE, "if", "if", "if keyword"),
+				new AutocompleteItem("else", (Int32)Images.VARIABLE, "else", "else", "else keyword"),
+				new AutocompleteItem("for", (Int32)Images.VARIABLE, "for", "for", "for keyword"),
+				new AutocompleteItem("while", (Int32)Images.VARIABLE, "while", "while", "while keyword"),
+
 				new AutocompleteItem("print", (Int32)Images.FUNCTION, "print", "fun print(...args, sep=\" \", onend=NL)", "Выводит аргументы в стандартный поток вывода"),
 
 				new AutocompleteItem("num", (Int32)Images.TYPE, "num", "record num(): num", "[description not founded]"),

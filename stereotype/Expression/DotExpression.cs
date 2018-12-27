@@ -41,7 +41,7 @@ namespace Stereotype {
 					return ((Module)a).Get(this.nameVariable);
 				}
 
-				if (a is KType cls) {
+				if (a is Record cls) {
 					if (!cls.Contains(this.nameVariable)) {
 						if (cls.AttributeExists(this.nameVariable)) {
 							Fun fun = (Fun)cls.GetAttribute(this.nameVariable, e);
@@ -62,17 +62,30 @@ namespace Stereotype {
 							return result;
 						}
 					}
-					return ((Lumen.Lang.Std.KType)a).Get(this.nameVariable, e);
+					return ((Lumen.Lang.Std.Record)a).Get(this.nameVariable, e);
 				}
 
 				if (a is Expando) {
 					return ((Expando)a).Get(this.nameVariable, AccessModifiers.PUBLIC, e);
 				}
 
-				KType type = a.Type;
+				Record type = a.Type;
+
+				 Int32 Index(Dictionary<String, Record> pairs, String searched) {
+					Int32 result = 0;
+
+					foreach (var pair in pairs) {
+						if (pair.Key == searched) {
+							return result;
+						}
+						result++;
+					}
+
+					return -1;
+				}
 
 				if (a is IObject obj) {
-					if (Array.IndexOf(type.meta.Fields, this.nameVariable) != -1 || type.AttributeExists("get_" + this.nameVariable)) {
+					if (Index(type.meta.Fields, this.nameVariable) != -1 || type.AttributeExists("get_" + this.nameVariable)) {
 						AccessModifiers mode = AccessModifiers.PUBLIC;
 						/*if ((this.expression is IdExpression id && id.id == "this") || (e.IsExsists("this") && e.Get("this").Type.Match(obj))) {
 							mode = AccessModifiers.PRIVATE;

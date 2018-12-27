@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Lumen.Lang.Std {
-	internal class RVec : KType {
+	internal class RVec : Record {
 		internal RVec() {
 			this.meta = new TypeMetadata {
 				Name = "vec"
@@ -11,10 +11,10 @@ namespace Lumen.Lang.Std {
 
 			Set("()", new LambdaFun((e, args) => {
 				if (e.ExistsInThisScope("to")) {
-					BigFloat from = (e.ExistsInThisScope("from") ? (Num)e["from"] : (Num)0).value;
-					BigFloat step = e.ExistsInThisScope("step") ? ((Num)e["step"]).value : null;
+					Num from = e.ExistsInThisScope("from") ? (Num)e["from"] : (Num)0;
+					Num step = e.ExistsInThisScope("step") ? (Num)e["step"] : null;
 
-					BigFloat to = ((Num)e["to"]).value;
+					Num to = (Num)e["to"];
 
 					if (step is null) {
 						if (e.ExistsInThisScope("len")) {
@@ -27,8 +27,8 @@ namespace Lumen.Lang.Std {
 
 					List<Value> res = new List<Value>();
 
-					for (BigFloat i = from; i <= to; i += step) {
-						res.Add(new Num(i));
+					for (Num i = from; i <= to; i += step) {
+						res.Add(i);
 					}
 
 					return new Vec(res);
@@ -150,7 +150,7 @@ namespace Lumen.Lang.Std {
 					}
 
 					if (args[0] is Num) {
-						Int32 index = Index((Int32)(Double)Converter.ToBigFloat(args[0], e), exemplare.Count);
+						Int32 index = Index((Int32)(Double)Converter.ToDouble(args[0], e), exemplare.Count);
 
 						if (index < 0 || index >= exemplare.Count) {
 							throw new Exception("выход за пределы списка при срезе вида [i]", stack: e);
@@ -244,7 +244,7 @@ namespace Lumen.Lang.Std {
 				if (args.Length == 2) {
 					List<Value> result = new List<Value>();
 
-					Int32 index = Index((Int32)(double)Converter.ToBigFloat(args[0], e), exemplare.Count);
+					Int32 index = Index((Int32)(double)Converter.ToDouble(args[0], e), exemplare.Count);
 
 					if (index < 0 || index >= exemplare.Count) {
 						throw new Exception("выход за пределы списка при срезе вида [i, j]", stack: e);
@@ -294,7 +294,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("seq", new LambdaFun((e, args) => {
 				List<Value> v = e.This.ToList(e);
 
-				if (args.Length > 0 && args[0].ToBigFloat(e) > 1) {
+				if (args.Length > 0 && args[0].ToDouble(e) > 1) {
 					Int32 index = 0;
 					return new Enumerator(v.Select(i => new Vec(new List<Value> { i, new Num(index++) })));
 				}
@@ -319,7 +319,7 @@ namespace Lumen.Lang.Std {
 						scope["self"] = fun;
 						scope["args"] = new Vec(new List<Value> { i, j });
 						scope["kwargs"] = new Map();
-						return (Int32)(double)Converter.ToBigFloat(fun.Run(scope, i, j), e);
+						return (Int32)(double)Converter.ToDouble(fun.Run(scope, i, j), e);
 					});
 				}
 				else if (args.Length == 0) {
@@ -333,7 +333,7 @@ namespace Lumen.Lang.Std {
 						scope["self"] = fun;
 						scope["args"] = new Vec(new List<Value> { i, j });
 						scope["kwargs"] = new Map();
-						return (Int32)(Double)Converter.ToBigFloat(fun.Run(scope, i, j), e);
+						return (Int32)(Double)Converter.ToDouble(fun.Run(scope, i, j), e);
 					});
 				}
 
@@ -505,7 +505,7 @@ namespace Lumen.Lang.Std {
 			}, "Kernel.List.find_last_index"));
 			SetAttribute("insert!", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
-				v.Insert((int)(Double)Converter.ToBigFloat(args[0], e), args[1]);
+				v.Insert((int)Converter.ToDouble(args[0], e), args[1]);
 				return Const.NULL;
 			}));
 			SetAttribute("last_index", new LambdaFun((e, args) => {

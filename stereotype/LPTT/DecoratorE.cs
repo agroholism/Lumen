@@ -27,7 +27,22 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
+			var val = this.expsOfDecos[0].Eval(e);
 			if (func is FunctionDefineStatement fds) {
+				func.Eval(e);
+				Fun v = e.Get(fds.NameFunction) as Fun;
+
+				if(val is Record type) {
+					v.Attributes["returned"] = type;
+				}
+				else if (val == Const.NULL) {
+					v.Attributes["returned"] = StandartModule.Null;
+				}
+			}
+
+
+				return null;
+			/*if (func is FunctionDefineStatement fds) {
 				func.Eval(e);
 				Value v = e.Get(fds.NameFunction);
 				for (int i = expsOfDecos.Count - 1; i > -1; i--) {
@@ -44,7 +59,7 @@ namespace Stereotype {
 				e.Set(fds.NameFunction, v);
 				return Const.NULL;
 			}
-			else if (func is AnonymeDefine ad) {
+			else */if (func is AnonymeDefine ad) {
 				Value v = func.Eval(e);
 				for (int i = expsOfDecos.Count - 1; i > -1; i--) {
 					if (expsOfDecos[i] is IdExpression || expsOfDecos[i] is DotExpression)

@@ -24,7 +24,7 @@ namespace Lumen.Lang.Std {
 			this.condition = condition;
 		}
 
-		public KType Type => StandartModule.Function;
+		public Record Type => StandartModule.Function;
 
 		public List<FunctionArgument> Arguments { get; set; }
 
@@ -134,6 +134,13 @@ tail_recursion:
 				}
 				goto tail_recursion;
 			}
+
+			if(this.Attributes.TryGetValue("returned", out var ret)) {
+				if(!(result.Type == ret)) {
+					throw new Exception("wrong ret type");
+				}
+			}
+
 			return result;
 		}
 

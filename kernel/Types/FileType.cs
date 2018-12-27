@@ -2,10 +2,9 @@
 using System.Linq;
 
 namespace Lumen.Lang.Std {
-	internal sealed class FileType : KType {
+	internal sealed class FileType : Record {
 		public FileType() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.File"
 				//BaseType = StandartModule.Object
 			};

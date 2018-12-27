@@ -6,10 +6,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Lumen.Lang.Std {
-	internal sealed class StringClass : KType {
+	internal sealed class StringClass : Record {
 		internal StringClass() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.String"
 			};
 
@@ -28,7 +27,7 @@ namespace Lumen.Lang.Std {
 			}));*/
 			SetAttribute("*", new LambdaFun((e, args) => {
 				String str = e.Get("this").ToString(e);
-				Int32 count = (Int32)(decimal)Converter.ToBigFloat(args[0], e);
+				Int32 count = (Int32)Converter.ToDouble(args[0], e);
 				StringBuilder buffer = new StringBuilder();
 
 				for (Int32 i = 0; i < count; i++) {
@@ -92,7 +91,7 @@ namespace Lumen.Lang.Std {
 				String value = e.Get("this").ToString();
 				if (args.Length == 1) {
 					if (args[0] is Num) {
-						Int32 index = (Int32)(Double)Converter.ToBigFloat(args[0], e);
+						Int32 index = (Int32)Converter.ToDouble(args[0], e);
 						Int32 i = index;
 
 						index = index < 0 ? value.Length + index : index;
@@ -225,7 +224,7 @@ namespace Lumen.Lang.Std {
 				String v = e.Get("this").ToString();
 
 				if (args.Length > 0) {
-					BigFloat wait = Converter.ToBigFloat(args[0], e);
+					Double wait = Converter.ToDouble(args[0], e);
 					Int32 index = 0;
 					if (wait == 2) {
 						return new Enumerator(GlobalizationEach(v).Select(i => new Vec(new List<Value> { i, new Num(index++) })));
@@ -560,7 +559,7 @@ namespace Lumen.Lang.Std {
 
 			SetAttribute("num", new LambdaFun((e, args) => {
 				String v = e.Get("this").ToString();
-				return new Num(BigFloat.Parse(v));
+				return new Num(Double.Parse(v));
 			}));
 
 			SetAttribute("format", GetAttribute("%", null));

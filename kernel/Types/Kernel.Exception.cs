@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Lumen.Lang.Std { 
-	public sealed class ExceptionType : KType {
+	public sealed class ExceptionType : Record {
 		internal ExceptionType() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.Exception",
 				//BaseType = StandartModule.Object
 			};
@@ -23,10 +22,9 @@ namespace Lumen.Lang.Std {
 		}
 	}
 
-	public class LexerException : KType {
+	public class LexerException : Record {
 		public LexerException() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.LexerException",
 				//BaseType = StandartModule.Exception
 			};
@@ -37,10 +35,9 @@ namespace Lumen.Lang.Std {
 		}
 	}
 
-	public class ArgumentExceptionType : KType {
+	public class ArgumentExceptionType : Record {
 		public ArgumentExceptionType() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.ArgumentException",
 				//BaseType = StandartModule.Exception
 			};
@@ -51,10 +48,9 @@ namespace Lumen.Lang.Std {
 		}
 	}
 
-	public class TypeException : KType {
+	public class TypeException : Record {
 		public TypeException() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.TypeException",
 				//BaseType = StandartModule.Exception
 			};
@@ -65,10 +61,9 @@ namespace Lumen.Lang.Std {
 		}
 	}
 
-	public class CastExceptionType : KType {
+	public class CastExceptionType : Record {
 		public CastExceptionType() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.CastException",
 				//BaseType = StandartModule.Exception
 			};

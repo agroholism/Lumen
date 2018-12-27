@@ -62,7 +62,7 @@
     <Compile Include="Types\Kernel.Exception.cs" />
     <Compile Include="Types\Kernel.Math.cs" />
     <Compile Include="Types\Kernel.Enumerable.cs" />
-    <Compile Include="Types\Kernel.Null.cs" />
+    <Compile Include="Types\RVoid.cs" />
     <Compile Include="Types\Kernel.String.cs" />
     <Compile Include="Expression\GotoE.cs" />
     <Compile Include="Values\Fun\GenericFunc.cs" />

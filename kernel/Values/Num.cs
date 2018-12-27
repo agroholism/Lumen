@@ -2,13 +2,13 @@
 
 namespace Lumen.Lang.Std {
 	public class Num : Value {
-		internal BigFloat value;
+		internal Double value;
 
-		public KType Type {
+		public Record Type {
 			get => StandartModule.Number;
 		}
 
-		public Num(BigFloat value) {
+		public Num(Double value) {
 			this.value = value;
 		}
 
@@ -18,6 +18,90 @@ namespace Lumen.Lang.Std {
 
 		public static implicit operator Num(Int32 value) {
 			return new Num(value);
+		}
+
+		public static Num operator -(Num one) {
+			return new Num(-one.value);
+		}
+
+		public static Num operator +(Num one,Num other) {
+			return new Num(one.value + other.value);
+		}
+
+		public static Num operator +(Num one, Double other) {
+			return new Num(one.value + other);
+		}
+
+		public static Num operator -(Num one, Num other) {
+			return new Num(one.value - other.value);
+		}
+
+		public static Num operator -(Num one, Double other) {
+			return new Num(one.value - other);
+		}
+
+		public static Num operator /(Num one, Num other) {
+			return new Num(one.value / other.value);
+		}
+
+		public static Num operator /(Num one, Double other) {
+			return new Num(one.value / other);
+		}
+
+		public static Num operator *(Num one, Num other) {
+			return new Num(one.value * other.value);
+		}
+
+		public static Num operator *(Num one, Double other) {
+			return new Num(one.value * other);
+		}
+
+		public static Boolean operator ==(Num one, Num other) {
+			return one.value == other.value;
+		}
+
+		public static Boolean operator ==(Num one, Double other) {
+			return one.value == other;
+		}
+
+		public static Boolean operator !=(Num one, Num other) {
+			return one.value != other.value;
+		}
+
+		public static Boolean operator !=(Num one, Double other) {
+			return one.value != other;
+		}
+
+		public static Boolean operator >(Num one, Num other) {
+			return one.value > other.value;
+		}
+
+		public static Boolean operator >(Num one, Double other) {
+			return one.value > other;
+		}
+
+		public static Boolean operator <(Num one, Num other) {
+			return one.value < other.value;
+		}
+
+		public static Boolean operator <(Num one, Double other) {
+			return one.value < other;
+		}
+
+		public static Boolean operator >=(Num one, Num other) {
+			return one.value >= other.value;
+		}
+
+		public static Boolean operator >=(Num one, Double other) {
+			return one.value >= other;
+		}
+
+		public static Boolean operator <=(Num one, Num other) {
+			return one.value <= other.value;
+		}
+
+		public static Boolean operator <=(Num one, Double other) {
+			return one.value <= other;
 		}
 
 		public Value Clone() {
@@ -46,8 +130,7 @@ namespace Lumen.Lang.Std {
 
 		public Int32 CompareTo(Object obj) {
 			if (obj is Num num) {
-				var z = this.value.CompareTo(num.value);
-				return z;
+				return this.value.CompareTo(num.value);
 			}
 
 			throw new Exception("expected value of type 'Kernel.Number'", stack: null);

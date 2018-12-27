@@ -2,7 +2,7 @@
 
 namespace Lumen.Lang.Std {
 	public interface Value : IComparable {
-		KType Type { get; }
+		Record Type { get; }
 
 		String ToString(Scope e);
 

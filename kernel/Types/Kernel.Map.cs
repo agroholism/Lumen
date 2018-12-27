@@ -4,32 +4,30 @@ using System.Linq;
 using System.Text;
 
 namespace Lumen.Lang.Std {
-	internal class MapClass : KType {
+	internal class MapClass : Record {
 		internal MapClass() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.Map",
 				//BaseType = StandartModule.Object
 			};
 
 			Set("[]", new LambdaFun((e, args) => {
-				KType sub = args[0] as KType;
-				KType V = args[1] as KType;
-				KType type = new KType();
+				Record sub = args[0] as Record;
+				Record V = args[1] as Record;
+				Record type = new Record();
 				//type.meta.BaseType = this;
 				type.meta = new TypeMetadata {
-					Fields = new[] { "_dictionary" },
 					Name = "Kernel.Map[" + args[0] + "]"
 				};
 				type.SetAttribute("initialize", new LambdaFun((scope, argsx) => {
 					(scope.Get("this") as IObject).Set("_dictionary", new Map(new Dictionary<Value, Value>()), AccessModifiers.PRIVATE, scope);
 					return Const.NULL;
 				}));
-				type.Set("new", new LambdaFun((scope, argsx) => {
+				/*type.Set("new", new LambdaFun((scope, argsx) => {
 					var exe = new Object1(type);
 					exe.element = new Map(new Dictionary<Value, Value>());
 					return exe;
-				}));
+				}));*/
 				type.SetAttribute("to_m", new LambdaFun((scope, argsx) => {
 					return (scope["this"] as IObject).Get("_dictionary", AccessModifiers.PRIVATE, scope);
 				}));

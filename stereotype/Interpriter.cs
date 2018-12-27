@@ -17,7 +17,8 @@ namespace Stereotype {
 				return new Parser(tokens).Parsing(scope ?? mainScope, fileName);
 			}
 			catch (Lumen.Lang.Std.Exception uex) {
-				OnError?.Invoke(uex, scope ?? mainScope);
+				Console.Write(uex.Message);
+				//OnError?.Invoke(uex, scope ?? mainScope);
 			}
 			catch (System.Threading.ThreadAbortException threadAbortException) {
 				throw threadAbortException;

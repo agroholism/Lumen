@@ -20,7 +20,7 @@ namespace Stereotype {
 			return this;
 		}
 
-		public ValueE(BigFloat Object) {
+		public ValueE(Double Object) {
 			this.val = new Num(Object);
 		}
 

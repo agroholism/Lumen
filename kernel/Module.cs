@@ -54,7 +54,7 @@ namespace Lumen.Lang.Std {
 			this.scope.AddConstant(name);
 		}
 
-		public virtual Boolean TypeImplemented(KType s) {
+		public virtual Boolean TypeImplemented(Record s) {
 			foreach(KeyValuePair<String, Value> i in this.scope.variables) {
 				if (i.Value is Fun f) {
 					if (!s.attributes.ContainsKey(i.Key)) {
@@ -74,7 +74,7 @@ namespace Lumen.Lang.Std {
 			throw new NotImplementedException();
 		}
 
-		public KType Type => throw new NotImplementedException();
+		public Record Type => throw new NotImplementedException();
 
 		public Int32 CompareTo(Object obj) {
 			return 0;

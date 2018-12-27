@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
 	public class Exception : System.Exception, IObject {
-		public KType type;
+		public Record type;
 		public Int32 line;
 		public String file;
 		public Scope stack;
@@ -12,7 +12,7 @@ namespace Lumen.Lang.Std {
 
 		public override String Message => this.mess;
 
-		public Exception(String message, KType type = null, Scope stack = null) {
+		public Exception(String message, Record type = null, Scope stack = null) {
 			this.type = type ?? StandartModule.Exception;
 			this.stack = stack;
 			this.DATA = new Expando();
@@ -31,7 +31,7 @@ namespace Lumen.Lang.Std {
 			BuildCallStack(e.parent, result);
 		}
 
-		public KType Type => this.type;
+		public Record Type => this.type;
 
 		public Int32 CompareTo(Object obj) {
 			if (obj is Value) {

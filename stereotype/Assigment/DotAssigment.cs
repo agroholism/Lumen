@@ -33,7 +33,7 @@ namespace Stereotype {
 			else if (obj is Module module) {
 				module.Set(name, value);
 			}
-			else if (obj is KType type) {
+			else if (obj is Record type) {
 				type.Set(name, value, e);
 			}
 			else if (obj is Expando hobj) {

@@ -7,21 +7,21 @@ using System.Net.Mail;
 namespace Lumen.Lang.Std {
 	public sealed class StandartModule : Module {
 		#region Fields
-		public static KType Vector { get; } = new RVec();
-		public static KType Function { get; } = new FunctionClass();
-		public static KType Number { get; } = new RNum();
-		public static KType Expando { get; } = new ExpandoType();
-		public static KType Map { get; } = new MapClass();
-		public static KType Null { get; } = new NullClass();
-		public static KType String { get; } = new StringClass();
-		public static KType Enumerator { get; } = new EnumeratorType();
-		public static KType File { get; } = new FileType();
+		public static Record Vector { get; } = new RVec();
+		public static Record Function { get; } = new FunctionClass();
+		public static Record Number { get; } = new RNum();
+		public static Record Expando { get; } = new ExpandoType();
+		public static Record Map { get; } = new MapClass();
+		public static Record Null { get; } = new RVoid();
+		public static Record String { get; } = new StringClass();
+		public static Record Enumerator { get; } = new EnumeratorType();
+		public static Record File { get; } = new FileType();
 
-		public static KType Exception { get; } = new ExceptionType();
+		public static Record Exception { get; } = new ExceptionType();
 
-		public static KType Boolean { get; } = new RBoolean();
-		public static KType DateTime { get; } = new DateTimeClass();
-		public static KType _Type { get; } = new TypeType();
+		public static Record Boolean { get; } = new RBoolean();
+		public static Record DateTime { get; } = new DateTimeClass();
+		public static Record _Type { get; } = new TypeType();
 
 		public static StandartModule __Kernel__ { get; } = new StandartModule();
 
@@ -45,7 +45,7 @@ namespace Lumen.Lang.Std {
 
 			Set("true", Const.TRUE);
 			Set("false", Const.FALSE);
-			Set("null", Const.NULL);
+			Set("void", Const.NULL);
 
 			Set("PI", (Num)Math.PI);
 			Set("E", (Num)Math.E);

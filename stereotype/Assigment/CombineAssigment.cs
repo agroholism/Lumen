@@ -36,7 +36,7 @@ namespace Stereotype {
 			}
 
 			Value oldValue = scope[this.id];
-			KType type = oldValue.Type;
+			Record type = oldValue.Type;
 
 			Value newValue;
 

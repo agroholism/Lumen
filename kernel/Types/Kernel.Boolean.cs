@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
-	internal sealed class RBoolean : KType {
+	internal sealed class RBoolean : Record {
 		internal RBoolean() {
 			this.meta = new TypeMetadata {
 				Name = "std.bool"

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
 	public class Expando : IObject {
-		public KType type;
+		public Record type;
 		public Dictionary<String, Value> Fields { get; set; }
 		public List<String> Final { get; set; }
-		public KType Type => type;
+		public Record Type => type;
 		public Expando Prototype => this["prototype", null] as Expando;
 
 		public Value this[String key, Scope e] {
@@ -19,13 +19,13 @@ namespace Lumen.Lang.Std {
 			}
 		}
 
-		public Expando(KType type = null) {
+		public Expando(Record type = null) {
 			this.Fields = new Dictionary<String, Value>() { ["prototype"] = ExpandoType.BASE };
 			this.Final = new List<String>();
 			this.type = type ?? StandartModule.Expando;
 		}
 
-		public Expando(Value value, KType type = null) {
+		public Expando(Value value, Record type = null) {
 			this.Fields = new Dictionary<String, Value> { ["prototype"] = value };
 			this.type = type ?? StandartModule.Expando;
 		}

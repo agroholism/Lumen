@@ -354,7 +354,7 @@ namespace Lumen.Lang.Std {
 			}
 		}
 
-		public override Boolean TypeImplemented(KType s) {
+		public override Boolean TypeImplemented(Record s) {
 			if (s.attributes.ContainsKey("to_i")) {
 				Fill(s);
 				return true;
@@ -369,7 +369,7 @@ namespace Lumen.Lang.Std {
 			return false;
 		}
 
-		private void Fill(KType type) {
+		private void Fill(Record type) {
 			foreach (KeyValuePair<String, Value> i in this.scope.variables) {
 				if (i.Value is Fun f) {
 					if (!type.attributes.ContainsKey(i.Key)) {

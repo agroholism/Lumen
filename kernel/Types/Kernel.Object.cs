@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Lumen.Lang.Std {
-	internal class ObjectClass : KType {
+	internal class ObjectClass : Record {
 		internal ObjectClass() {
 			this.meta = new TypeMetadata {
-				Fields = new String[0],
 				Name = "Kernel.Object",
 			};
 
@@ -19,7 +18,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("get_null?", new LambdaFun((e, args) => new Bool(e.Get("this") is Null), "Kernel.Object.get_null?"));
 			SetAttribute("send", new LambdaFun((e, args) => {
 				Value val = e.Get("this");
-				KType type = val.Type;
+				Record type = val.Type;
 
 				Value[] _args = new Value[args.Length - 1];
 				Array.Copy(args, 1, _args, 0, args.Length - 1);
@@ -48,16 +47,16 @@ namespace Lumen.Lang.Std {
 				return (KString)$"<object:{val.Type.meta.Name}>";
 			}, "Kernel.Object.to_s"));
 
-			Set("new", new LambdaFun((e, args) => {
+		/*	Set("new", new LambdaFun((e, args) => {
 				return new Object0(this);
 			}));
-
+			*/
 			Set("include?", new LambdaFun((e, args) => {
-				KType type = e.Get("this") as KType;
+				Record type = e.Get("this") as Record;
 				return (Bool)type.includedModules.Contains(args[0]);
 			}, "Kernel.Object.include?"));
 			Set("get_included", new LambdaFun((e, args) => {
-				KType type = e.Get("this") as KType;
+				Record type = e.Get("this") as Record;
 				return new Vec(type.includedModules.Cast<Value>().ToList());
 			}, "Kernel.Object.get_included"));
 			/*Set("get_methods", new LambdaFun((e, args) => {

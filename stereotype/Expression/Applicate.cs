@@ -190,7 +190,7 @@ namespace Stereotype {
 					return ExecuteCasual((Fun)h.Get("call", AccessModifiers.PUBLIC, e), new Scope(e) { ["this"] = h });
 				case IObject y:
 					return ExecuteCasual((Fun)y.Type.GetAttribute("call", e), new Scope(e) { ["this"] = y });
-				case KType x:
+				case Record x:
 					return this.ExecuteCasual((Fun)x.Get("()", e), e);
 			}
 

@@ -20,9 +20,9 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			KType result = new KType {
+			Record result = new Record {
 				meta = new TypeMetadata {
-					Fields = constants.ToArray(),
+					/*Fields = constants.ToArray(),*/
 					Name = name
 				}
 			};
@@ -66,15 +66,15 @@ namespace Stereotype {
 		private class EnumTypeInstance : Value {
 			internal String name;
 			internal Value value;
-			internal KType type;
+			internal Record type;
 
-			public EnumTypeInstance(String name, Value value, KType type) {
+			public EnumTypeInstance(String name, Value value, Record type) {
 				this.name = name;
 				this.value = value;
 				this.type = type;
 			}
 
-			public KType Type => this.type;
+			public Record Type => this.type;
 
 			public Value Clone() {
 				return this;

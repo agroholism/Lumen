@@ -53,10 +53,15 @@ namespace Stereotype {
 				return new DocE(sb.ToString(), Expression());
 			}
 
-			if (Match(TokenType.VAR)) {
-				result = ParseVariableDeclaration();
+			if (Match(TokenType.LBRACKET)) {
+				Expression exp = Expression();
+				Match(TokenType.RBRACKET);
+				Expression decl = Expression();
+
+				return new DecoratorE(new List<Expression> { exp }, decl);
 			}
-			else if (Match(TokenType.CONST)) {
+
+			if (Match(TokenType.CONST)) {
 				result = ParseConstantDeclaration();
 			}
 			else if (Match(TokenType.RAISE)) {
@@ -93,8 +98,8 @@ namespace Stereotype {
 			else if (Match(TokenType.WHILE)) {
 				result = ParseWhile();
 			}
-			else if (Match(TokenType.FUN)) {
-				result = ParseFunDeclaration();
+			else if (Match(TokenType.LET)) {
+				result = ParseDeclaration();
 			}
 			else if (Match(TokenType.FOR)) {
 				result = ParseFor();
@@ -159,10 +164,9 @@ namespace Stereotype {
 			return result;
 		}
 
-		private VariableDeclaration ParseVariableDeclaration() {
+		private VariableDeclaration ParseVariableDeclaration(String id) {
 			VariableDeclaration result;
 			Expression type;
-			String id = Consume(TokenType.WORD).Text;
 
 			Expression expression = new UnknownExpression();
 
@@ -245,25 +249,12 @@ namespace Stereotype {
 					else if (Match(TokenType.IN)) {
 						ParseInMember(exemplareFields, exemplareAttributes, inMembers);
 					}
-					else if (Match(TokenType.VAR)) { // exemplare field
-						VariableDeclaration exp = ParseVariableDeclaration();
-
-						if (exp.type != null) {
-							String newName = "@" + exp.id;
-							exemplareAttributes.Add(CreateGetter(exp.id, exp.type));
-							exemplareAttributes.Add(CreateSetter(exp.id, exp.type));
-							exemplareFields.Add(newName, exp.exp);
-						}
-						else {
-							exemplareFields.Add(exp.id, exp.exp);
-						}
-					}
 					// type field or type fun
 					else if (Match(TokenType.TYPE)) {
 						typeFields.Add(Expression());
 					}
 					// Метод.
-					else if (LookMatch(0, TokenType.FUN)) {
+					else if (LookMatch(0, TokenType.LET)) {
 						exemplareAttributes.Add(Expression());
 					}
 					// Константа
@@ -307,51 +298,21 @@ namespace Stereotype {
 					inMembers.Add(nameField);
 				}
 			}
-			else if (LookMatch(0, TokenType.FUN)) {
+			else if (LookMatch(0, TokenType.LET)) {
 				inMembers.Add(GetToken(1).Text);
 				exemplareAttributes.Add(Expression());
 			}
 		}
 
 		private void ParseFinalMember(Dictionary<String, Expression> exemplareFields, List<Expression> exemplareAttributes, List<Expression> typeFields, List<String> finalMembers) {
-			if (Match(TokenType.FUN)) { 
+			if (Match(TokenType.LET)) {
 				finalMembers.Add(GetToken(0).Text);
-				exemplareAttributes.Add(ParseFunDeclaration());
-			}
-			else if (Match(TokenType.VAR)) {
-				VariableDeclaration exp = ParseVariableDeclaration();
-
-				if (exp.type != null) {
-					String newName = "@" + exp.id;
-					exemplareAttributes.Add(CreateGetter(exp.id, exp.type));
-					exemplareAttributes.Add(CreateSetter(exp.id, exp.type));
-					exemplareFields.Add(newName, exp.exp);
-					finalMembers.Add(newName);
-				}
-				else {
-					exemplareFields.Add(exp.id, exp.exp);
-					finalMembers.Add(exp.id);
-				}
+				exemplareAttributes.Add(ParseDeclaration());
 			}
 			else if (Match(TokenType.TYPE)) {
-				if (Match(TokenType.FUN)) {
+				if (Match(TokenType.LET)) {
 					finalMembers.Add(GetToken(0).Text);
-					typeFields.Add(ParseFunDeclaration());
-				}
-				else if (Match(TokenType.VAR)) {
-					VariableDeclaration exp = ParseVariableDeclaration();
-
-					if (exp.type != null) {
-						String newName = "@" + exp.id;
-						typeFields.Add(CreateGetter(exp.id, exp.type));
-						typeFields.Add(CreateSetter(exp.id, exp.type));
-						typeFields.Add(exp);
-						finalMembers.Add(newName);
-					}
-					else {
-						typeFields.Add(exp);
-						finalMembers.Add(exp.id);
-					}
+					typeFields.Add(ParseDeclaration());
 				}
 				typeFields.Add(Expression());
 			}
@@ -379,7 +340,7 @@ namespace Stereotype {
 
 		#region
 
-		private Expression ParseFunDeclaration() {
+		private Expression ParseDeclaration() {
 			String name = null;
 			Int32 line = this.line;
 
@@ -395,24 +356,11 @@ namespace Stereotype {
 					break;
 			}
 
-			Dictionary<String, Expression> generic = null;
-			Boolean isGeneric = false;
-
-			if (Match(TokenType.LBRACKET)) {
-				isGeneric = true;
-				generic = new Dictionary<String, Expression>();
-				while (!Match(TokenType.RBRACKET)) {
-					String id = Consume(TokenType.WORD).Text;
-					Expression defaultValue = null;
-					if (Match(TokenType.EQ)) {
-						defaultValue = Expression();
-					}
-					generic[id] = defaultValue;
-					Match(TokenType.SPLIT);
-				}
+			if (!LookMatch(0, TokenType.LPAREN)) {
+				return ParseVariableDeclaration(name);
 			}
-
-			if (Match(TokenType.LPAREN)) {
+			else {
+				Match(TokenType.LPAREN);
 				arguments = ParseArgs(TokenType.RPAREN);
 			}
 
@@ -433,16 +381,11 @@ namespace Stereotype {
 				Match(TokenType.EOC);
 			}
 			Expression ex = null;
-			if (Match(TokenType.LAMBDA) || LookMatch(0, TokenType.DO)) {
+			if (Match(TokenType.EQ) || LookMatch(0, TokenType.DO)) {
 				ex = Expression();
 			}
 
-			FunctionDefineStatement res = new FunctionDefineStatement(name, arguments, ex, returnedType, otherContacts, line, this.fileName);
-
-			if (isGeneric) {
-				return new GenericFunctionMaker(res, generic);
-			}
-			return res;
+			return new FunctionDefineStatement(name, arguments, ex, returnedType, otherContacts, line, this.fileName);
 		}
 
 		private Expression ParseFor() {
@@ -1153,7 +1096,7 @@ namespace Stereotype {
 			}
 
 			if (Match(TokenType.NUMBER)) {
-				return new ValueE(BigFloat.Parse(Current.Text));
+				return new ValueE(Double.Parse(Current.Text));
 			}
 
 			if (LookMatch(0, TokenType.LPAREN) && LookMatch(1, TokenType.FOR)) {
