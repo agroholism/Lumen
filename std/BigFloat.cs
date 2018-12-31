@@ -15,7 +15,7 @@ namespace Lumen.Lang.Std {
 
 		public Int32 Sign {
 			get {
-				switch (numerator.Sign + denominator.Sign) {
+				switch (this.numerator.Sign + this.denominator.Sign) {
 					case 2:
 					case -2:
 						return 1;
@@ -41,8 +41,8 @@ namespace Lumen.Lang.Std {
 
 		//constructors
 		public BigFloat() {
-			numerator = BigInteger.Zero;
-			denominator = BigInteger.One;
+			this.numerator = BigInteger.Zero;
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(String value) {
@@ -74,13 +74,13 @@ namespace Lumen.Lang.Std {
 		}
 
 		public BigFloat(UInt64 value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(Int64 value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(UInt32 value) {
@@ -125,8 +125,9 @@ namespace Lumen.Lang.Std {
 		}
 
 		public BigFloat Multiply(BigFloat other) {
-			if (BigFloat.Equals(other, null))
+			if (Equals(other, null)) {
 				throw new ArgumentNullException("other");
+			}
 
 			this.numerator *= other.numerator;
 			this.denominator *= other.denominator;
@@ -134,8 +135,9 @@ namespace Lumen.Lang.Std {
 		}
 
 		public BigFloat Divide(BigFloat other) {
-			if (BigInteger.Equals(other, null))
+			if (BigInteger.Equals(other, null)) {
 				throw new ArgumentNullException("other");
+			}
 
 			this.numerator *= other.denominator;
 			this.denominator *= other.numerator;
@@ -143,8 +145,9 @@ namespace Lumen.Lang.Std {
 		}
 
 		public BigFloat Remainder(BigFloat other) {
-			if (BigInteger.Equals(other, null))
+			if (BigInteger.Equals(other, null)) {
 				throw new ArgumentNullException("other");
+			}
 
 			//b = a mod n
 			//remainder = a - floor(a/n) * n
@@ -166,65 +169,69 @@ namespace Lumen.Lang.Std {
 			return this;
 		}
 
-		public BigFloat Pow(int exponent) {
+		public BigFloat Pow(Int32 exponent) {
 			if (this.numerator.IsZero) {
 				// Nothing to do
 			}
 			else if (exponent < 0) {
-				BigInteger savedNumerator = numerator;
-				numerator = BigInteger.Pow(denominator, -exponent);
-				denominator = BigInteger.Pow(savedNumerator, -exponent);
+				BigInteger savedNumerator = this.numerator;
+				this.numerator = BigInteger.Pow(this.denominator, -exponent);
+				this.denominator = BigInteger.Pow(savedNumerator, -exponent);
 			}
 			else {
-				numerator = BigInteger.Pow(numerator, exponent);
-				denominator = BigInteger.Pow(denominator, exponent);
+				this.numerator = BigInteger.Pow(this.numerator, exponent);
+				this.denominator = BigInteger.Pow(this.denominator, exponent);
 			}
 
 			return this;
 		}
 
 		public BigFloat Abs() {
-			numerator = BigInteger.Abs(numerator);
+			this.numerator = BigInteger.Abs(this.numerator);
 			return this;
 		}
 
 		public BigFloat Negate() {
-			numerator = BigInteger.Negate(numerator);
+			this.numerator = BigInteger.Negate(this.numerator);
 			return this;
 		}
 
 		public BigFloat Inverse() {
-			BigInteger temp = numerator;
-			numerator = denominator;
-			denominator = temp;
+			BigInteger temp = this.numerator;
+			this.numerator = this.denominator;
+			this.denominator = temp;
 			return this;
 		}
 
 		public BigFloat Increment() {
-			numerator += denominator;
+			this.numerator += this.denominator;
 			return this;
 		}
 
 		public BigFloat Decrement() {
-			numerator -= denominator;
+			this.numerator -= this.denominator;
 			return this;
 		}
 
 		public BigFloat Ceil() {
-			if (numerator < 0)
-				numerator -= BigInteger.Remainder(numerator, denominator);
-			else
-				numerator += denominator - BigInteger.Remainder(numerator, denominator);
+			if (this.numerator < 0) {
+				this.numerator -= BigInteger.Remainder(this.numerator, this.denominator);
+			}
+			else {
+				this.numerator += this.denominator - BigInteger.Remainder(this.numerator, this.denominator);
+			}
 
 			Factor();
 			return this;
 		}
 
 		public BigFloat Floor() {
-			if (numerator < 0)
-				numerator += denominator - BigInteger.Remainder(numerator, denominator);
-			else
-				numerator -= BigInteger.Remainder(numerator, denominator);
+			if (this.numerator < 0) {
+				this.numerator += this.denominator - BigInteger.Remainder(this.numerator, this.denominator);
+			}
+			else {
+				this.numerator -= BigInteger.Remainder(this.numerator, this.denominator);
+			}
 
 			Factor();
 			return this;
@@ -234,51 +241,56 @@ namespace Lumen.Lang.Std {
 			//get remainder. Over divisor see if it is > new BigFloat(0.5)
 			BigFloat value = BigFloat.Decimals(this);
 
-			if (value.CompareTo(OneHalf) >= 0)
+			if (value.CompareTo(OneHalf) >= 0) {
 				this.Ceil();
-			else
+			}
+			else {
 				this.Floor();
+			}
 
 			return this;
 		}
 
 		public BigFloat Truncate() {
-			numerator -= BigInteger.Remainder(numerator, denominator);
+			this.numerator -= BigInteger.Remainder(this.numerator, this.denominator);
 			Factor();
 			return this;
 		}
 
 		public BigFloat Decimals() {
-			BigInteger result = BigInteger.Remainder(numerator, denominator);
+			BigInteger result = BigInteger.Remainder(this.numerator, this.denominator);
 
-			return new BigFloat(result, denominator);
+			return new BigFloat(result, this.denominator);
 		}
 
-		public BigFloat ShiftDecimalLeft(int shift) {
-			if (shift < 0)
+		public BigFloat ShiftDecimalLeft(Int32 shift) {
+			if (shift < 0) {
 				return ShiftDecimalRight(-shift);
+			}
 
-			numerator *= BigInteger.Pow(10, shift);
+			this.numerator *= BigInteger.Pow(10, shift);
 			return this;
 		}
 
-		public BigFloat ShiftDecimalRight(int shift) {
-			if (shift < 0)
+		public BigFloat ShiftDecimalRight(Int32 shift) {
+			if (shift < 0) {
 				return ShiftDecimalLeft(-shift);
-			denominator *= BigInteger.Pow(10, shift);
+			}
+
+			this.denominator *= BigInteger.Pow(10, shift);
 			return this;
 		}
 
-		public double Sqrt() {
-			return Math.Pow(10, BigInteger.Log10(numerator) / 2) / Math.Pow(10, BigInteger.Log10(denominator) / 2);
+		public Double Sqrt() {
+			return Math.Pow(10, BigInteger.Log10(this.numerator) / 2) / Math.Pow(10, BigInteger.Log10(this.denominator) / 2);
 		}
 
-		public double Log10() {
-			return BigInteger.Log10(numerator) - BigInteger.Log10(denominator);
+		public Double Log10() {
+			return BigInteger.Log10(this.numerator) - BigInteger.Log10(this.denominator);
 		}
 
-		public double Log(Double baseValue) {
-			return BigInteger.Log(numerator, baseValue) - BigInteger.Log(numerator, baseValue);
+		public Double Log(Double baseValue) {
+			return BigInteger.Log(this.numerator, baseValue) - BigInteger.Log(this.numerator, baseValue);
 		}
 
 		public override String ToString() {
@@ -299,16 +311,16 @@ namespace Lumen.Lang.Std {
 
 			Factor();
 
-			BigInteger remainder;
-			BigInteger result = BigInteger.DivRem(numerator, denominator, out remainder);
+			BigInteger result = BigInteger.DivRem(this.numerator, this.denominator, out BigInteger remainder);
 
-			if (remainder == 0 && !trailingZeros)
+			if (remainder == 0 && !trailingZeros) {
 				return result + ".0";
-			else if (remainder == 0)
+			}
+			else if (remainder == 0) {
 				return result.ToString();
+			}
 
-
-			BigInteger decimals = (numerator * BigInteger.Pow(10, precision)) / denominator;
+			BigInteger decimals = (this.numerator * BigInteger.Pow(10, precision)) / this.denominator;
 
 			if (decimals == 0 && !trailingZeros) {
 				return result + ".0";
@@ -316,6 +328,8 @@ namespace Lumen.Lang.Std {
 			else if (decimals == 0) {
 				return result.ToString();
 			}
+
+			decimals = BigInteger.Abs(decimals); 
 
 			StringBuilder sb = new StringBuilder();
 
@@ -325,10 +339,10 @@ namespace Lumen.Lang.Std {
 			}
 
 			if (trailingZeros) {
-				return result + "." + new string(sb.ToString().Reverse().ToArray());
+				return result + "." + new String(sb.ToString().Reverse().ToArray());
 			}
 			else {
-				return result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
+				return result + "." + new String(sb.ToString().Reverse().ToArray()).TrimEnd(new Char[] { '0' });
 			}
 		}
 
@@ -345,16 +359,17 @@ namespace Lumen.Lang.Std {
 
 			Factor();
 
-			BigInteger remainder;
-			BigInteger result = BigInteger.DivRem(this.numerator, this.denominator, out remainder);
+			BigInteger result = BigInteger.DivRem(this.numerator, this.denominator, out BigInteger remainder);
 
-			if (remainder == 0)
+			if (remainder == 0) {
 				return result.ToString();
-			else
-				return result + ", " + remainder + "/" + denominator;
+			}
+			else {
+				return result + ", " + remainder + "/" + this.denominator;
+			}
 		}
 
-		public string ToRationalString() {
+		public String ToRationalString() {
 			if (this.denominator == 0) {
 				if (this.numerator > 0) {
 					return Double.PositiveInfinity.ToString();
@@ -367,7 +382,7 @@ namespace Lumen.Lang.Std {
 
 			Factor();
 
-			return numerator + "/" + denominator;
+			return this.numerator + "/" + this.denominator;
 		}
 
 		public Int32 CompareTo(BigFloat other) {
@@ -388,16 +403,18 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Int32 CompareTo(Object other) {
-			if (other == null)
+			if (other == null) {
 				throw new ArgumentNullException("other");
+			}
 
-			if (!(other is BigFloat))
+			if (!(other is BigFloat)) {
 				throw new System.ArgumentException("other is not a BigFloat");
+			}
 
 			return CompareTo((BigFloat)other);
 		}
 
-		public override bool Equals(object other) {
+		public override Boolean Equals(Object other) {
 			if (other == null || GetType() != other.GetType()) {
 				return false;
 			}
@@ -405,25 +422,32 @@ namespace Lumen.Lang.Std {
 			return this.numerator == ((BigFloat)other).numerator && this.denominator == ((BigFloat)other).denominator;
 		}
 
-		public bool Equals(BigFloat other) {
+		public Boolean Equals(BigFloat other) {
 			return (other.numerator == this.numerator && other.denominator == this.denominator);
 		}
 
-		public override int GetHashCode() {
+		public override Int32 GetHashCode() {
 			return this.numerator.GetHashCode() | this.denominator.GetHashCode();
 			//return base.GetHashCode();
 		}
 
 		//static methods
-		public static bool Equals(object left, object right) {
-			if (left == null && right == null) return true;
-			else if (left == null || right == null) return false;
-			else if (left.GetType() != right.GetType()) return false;
-			else
+		public new static Boolean Equals(Object left, Object right) {
+			if (left == null && right == null) {
+				return true;
+			}
+			else if (left == null || right == null) {
+				return false;
+			}
+			else if (left.GetType() != right.GetType()) {
+				return false;
+			}
+			else {
 				return (((BigInteger)left).Equals((BigInteger)right));
+			}
 		}
 
-		public static string ToString(BigFloat value) {
+		public static String ToString(BigFloat value) {
 			return value.ToString();
 		}
 
@@ -463,7 +487,7 @@ namespace Lumen.Lang.Std {
 			return (new BigFloat(left)).Divide(right);
 		}
 
-		public static BigFloat Pow(BigFloat value, int exponent) {
+		public static BigFloat Pow(BigFloat value, Int32 exponent) {
 			return (new BigFloat(value)).Pow(exponent);
 		}
 
@@ -495,13 +519,14 @@ namespace Lumen.Lang.Std {
 			return (new BigFloat(value)).Round();
 		}
 
-		public static BigFloat Parse(string value) {
-			if (value == null)
+		public static BigFloat Parse(String value) {
+			if (value == null) {
 				throw new ArgumentNullException("value");
+			}
 
 			value.Trim();
 			value = value.Replace(",", "");
-			int pos = value.IndexOf('.');
+			Int32 pos = value.IndexOf('.');
 			value = value.Replace(".", "");
 
 			if (pos < 0) {
@@ -518,14 +543,14 @@ namespace Lumen.Lang.Std {
 			}
 		}
 
-		public static BigFloat ShiftDecimalLeft(BigFloat value, int shift) {
+		public static BigFloat ShiftDecimalLeft(BigFloat value, Int32 shift) {
 			return (new BigFloat(value)).ShiftDecimalLeft(shift);
 		}
 
-		public static BigFloat ShiftDecimalRight(BigFloat value, int shift) {
+		public static BigFloat ShiftDecimalRight(BigFloat value, Int32 shift) {
 			return (new BigFloat(value)).ShiftDecimalRight(shift);
 		}
-		public static bool TryParse(string value, out BigFloat result) {
+		public static Boolean TryParse(String value, out BigFloat result) {
 			try {
 				result = BigFloat.Parse(value);
 				return true;
@@ -539,21 +564,24 @@ namespace Lumen.Lang.Std {
 				return false;
 			}
 		}
-		public static int Compare(BigFloat left, BigFloat right) {
-			if (BigFloat.Equals(left, null))
+		public static Int32 Compare(BigFloat left, BigFloat right) {
+			if (BigFloat.Equals(left, null)) {
 				throw new ArgumentNullException("left");
-			if (BigFloat.Equals(right, null))
+			}
+
+			if (BigFloat.Equals(right, null)) {
 				throw new ArgumentNullException("right");
+			}
 
 			return (new BigFloat(left)).CompareTo(right);
 		}
-		public static double Log10(BigFloat value) {
+		public static Double Log10(BigFloat value) {
 			return (new BigFloat(value)).Log10();
 		}
-		public static double Log(BigFloat value, double baseValue) {
+		public static Double Log(BigFloat value, Double baseValue) {
 			return (new BigFloat(value)).Log(baseValue);
 		}
-		public static double Sqrt(BigFloat value) {
+		public static Double Sqrt(BigFloat value) {
 			return (new BigFloat(value)).Sqrt();
 		}
 
@@ -584,23 +612,23 @@ namespace Lumen.Lang.Std {
 		public static BigFloat operator /(BigFloat left, BigFloat right) {
 			return (new BigFloat(left)).Divide(right);
 		}
-		public static BigFloat operator >>(BigFloat value, int shift) {
+		public static BigFloat operator >>(BigFloat value, Int32 shift) {
 			return (new BigFloat(value)).ShiftDecimalRight(shift);
 		}
-		public static BigFloat operator <<(BigFloat value, int shift) {
+		public static BigFloat operator <<(BigFloat value, Int32 shift) {
 			return (new BigFloat(value)).ShiftDecimalLeft(shift);
 		}
-		public static BigFloat operator ^(BigFloat left, int right) {
+		public static BigFloat operator ^(BigFloat left, Int32 right) {
 			return (new BigFloat(left)).Pow(right);
 		}
 		public static BigFloat operator ~(BigFloat value) {
 			return (new BigFloat(value)).Inverse();
 		}
 
-		public static bool operator !=(BigFloat left, BigFloat right) {
+		public static Boolean operator !=(BigFloat left, BigFloat right) {
 			return Compare(left, right) != 0;
 		}
-		public static bool operator ==(BigFloat left, BigFloat right) {
+		public static Boolean operator ==(BigFloat left, BigFloat right) {
 			return Compare(left, right) == 0;
 		}
 		public static Boolean operator <(BigFloat left, BigFloat right) {
@@ -623,7 +651,7 @@ namespace Lumen.Lang.Std {
 			return value == 0;
 		}
 
-		public static explicit operator decimal(BigFloat value) {
+		public static explicit operator Decimal(BigFloat value) {
 			if (Decimal.MinValue > value) {
 				throw new OverflowException("value is less than System.decimal.MinValue.");
 			}

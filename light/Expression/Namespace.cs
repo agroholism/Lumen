@@ -23,10 +23,11 @@ namespace Stereotype {
 
 		public Value Eval(Scope e) {
 			Scope x = new Scope(e);
-			Module mod = new Module(x);
-			mod.name = name;
+			Module mod = new Module(x) {
+				name = this.name
+			};
 
-			foreach (Expression expression in expressions) {
+			foreach (Expression expression in this.expressions) {
 				if (expression is FunctionDefineStatement fun && fun.Body == null) {
 					List<FunctionArgument> args = new List<FunctionArgument>();
 

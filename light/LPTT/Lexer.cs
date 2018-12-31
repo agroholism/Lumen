@@ -69,12 +69,12 @@ namespace Stereotype {
 			[".?"] = new Token(TokenType.OPTIONAl, ".?"),
 			["@"] = new Token(TokenType.DECO, "@")
 		};
-		private String source;
-		private Int32 length;
-		private List<Token> tokens;
+		private readonly String source;
+		private readonly Int32 length;
+		private readonly List<Token> tokens;
 		private Int32 position;
 		private Int32 line;
-		private String file;
+		private readonly String file;
 
 		internal Lexer(String source, String file) {
 			this.file = file;
@@ -363,7 +363,7 @@ namespace Stereotype {
 
 			StringBuilder buffer = new StringBuilder();
 
-			char current = Peek(0);
+			Char current = Peek(0);
 
 			while (true) {
 				if (current == '\\') {
@@ -380,8 +380,9 @@ namespace Stereotype {
 					}
 				}
 
-				if (current == '/')
+				if (current == '/') {
 					break;
+				}
 
 				buffer.Append(current);
 
@@ -419,10 +420,10 @@ namespace Stereotype {
 					AddToken(TokenType.NUMBER, this.line.ToString());
 					break;
 				case "__FILE__":
-					AddToken(TokenType.TEXT, file);
+					AddToken(TokenType.TEXT, this.file);
 					break;
 				case "record":
-					AddToken(TokenType.RECORD);
+					AddToken(TokenType.TYPE);
 					break;
 				case "final":
 					AddToken(TokenType.FINAL);
@@ -442,9 +443,6 @@ namespace Stereotype {
 				case "enum":
 					AddToken(TokenType.ENUM);
 					break;
-				case "type":
-					AddToken(TokenType.TYPE);
-					break;
 				case "for":
 					AddToken(TokenType.FOR);
 					break;
@@ -462,9 +460,6 @@ namespace Stereotype {
 					break;
 				case "finally":
 					AddToken(TokenType.FINALLY);
-					break;
-				case "const":
-					AddToken(TokenType.CONST);
 					break;
 				case "using":
 					AddToken(TokenType.USING);
@@ -534,15 +529,16 @@ namespace Stereotype {
 			Next();
 
 			// Текущий.
-			char current = Next();
+			Char current = Next();
 
 			while (Char.IsLetterOrDigit(current)) {
 				// Добавляем.
 				buffer.Append(current);
 				// Берём следующий.
 				current = Next();
-				while (current == '_')
+				while (current == '_') {
 					current = Next();
+				}
 			}
 
 			// Добавляем токен.
@@ -551,7 +547,7 @@ namespace Stereotype {
 
 		private void Operator() {
 			// Берём текущий символ.
-			char current = Peek(0);
+			Char current = Peek(0);
 
 			// Комменты.
 			if (current == '#') {
@@ -576,14 +572,15 @@ namespace Stereotype {
 
 		private void MultilineComment() {
 			// Берём текущий.
-			char current = Peek(0);
+			Char current = Peek(0);
 
 			StringBuilder sb = new StringBuilder();
 
 			while (true) {
 				// Итакпанятна.
-				if ("\r\n\0".IndexOf(current) != -1)
+				if ("\r\n\0".IndexOf(current) != -1) {
 					break;
+				}
 				// Тоже.
 				current = Next();
 				sb.Append(current);
@@ -630,8 +627,9 @@ namespace Stereotype {
 						}
 					}
 					// Не, ну логично же.
-					if (buffer.ToString().IndexOf('.') != -1)
+					if (buffer.ToString().IndexOf('.') != -1) {
 						throw new Lumen.Lang.Std.Exception("лишняя точка < литерал num", stack: null);
+					}
 				}
 				else if (current == '_') {
 					current = Next();
@@ -701,8 +699,9 @@ namespace Stereotype {
 			while (true) {
 				if (current == '.') {
 					// Не, ну логично же.
-					if (buffer.ToString().IndexOf('.') != -1)
+					if (buffer.ToString().IndexOf('.') != -1) {
 						throw new Lumen.Lang.Std.Exception("лишняя точка < литерал num", stack: null);
+					}
 				}
 				else if (current == '_') {
 					current = Next();
@@ -734,16 +733,18 @@ namespace Stereotype {
 		}
 
 		private Char Next() {
-			position++;
+			this.position++;
 			return Peek(0);
 		}
 
 		private Char Peek(Int32 relativePosition) {
 			// Да  нет-нет.
-			int position = this.position + relativePosition;
-			if (position >= length)
+			Int32 position = this.position + relativePosition;
+			if (position >= this.length) {
 				return '\0';
-			return source[position];
+			}
+
+			return this.source[position];
 		}
 
 		private void AddToken(Token token) {

@@ -1,0 +1,14 @@
+﻿struct style(background, foreground, style)
+
+[base]
+background = (75, 32, 65)
+foreground = 'yellow'
+
+[text-box]
+background = (75, 32, 65)
+foreground = 'yellow'
+
+[syntax]
+keyword = '#fff'
+text = '#fff'
+number = 'yellow'

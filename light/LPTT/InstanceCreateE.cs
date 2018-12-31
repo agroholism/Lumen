@@ -24,7 +24,7 @@ namespace Stereotype {
 		}
 
 		public Expression Closure(System.Collections.Generic.List<String> visible, Scope thread) {
-			return new InstanceCreateE(res.Closure(visible, thread), inits?.Select(i => i.Closure(visible, thread)).ToList(), this.line, this.fileName);
+			return new InstanceCreateE(this.res.Closure(visible, thread), this.inits?.Select(i => i.Closure(visible, thread)).ToList(), this.line, this.fileName);
 		}
 
 		public Value Eval(Scope e) {
@@ -33,7 +33,7 @@ namespace Stereotype {
 
 				if (v is Lumen.Lang.Std.Record x) {
 					try {
-						var result = a.ExecuteCasual((Fun)x.Get("new", e), e);
+						Value result = a.ExecuteCasual((Fun)x.Get("new", e), e);
 
 						foreach(Expression i in this.inits) {
 							if (i is Assigment ass) {
@@ -71,7 +71,7 @@ namespace Stereotype {
 
 				return Const.NULL;
 			}
-			else if (res is DotApplicate da) {
+			else if (this.res is DotApplicate da) {
 				return new Applicate(new DotExpression(da.res, "new"), da.exps, this.line).Eval(e);
 			}
 

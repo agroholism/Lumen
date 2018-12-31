@@ -7,11 +7,11 @@ using Lumen.Lang.Std;
 namespace Stereotype {
 	[Serializable]
 	internal class LigthTypeGeneric : Expression {
-		private System.String nameType;
-		private System.String parameter;
-		private Expression type;
-		private Expression body;
-		private Dictionary<System.String, Expression> generic;
+		private readonly System.String nameType;
+		private readonly System.String parameter;
+		private readonly Expression type;
+		private readonly Expression body;
+		private readonly Dictionary<System.String, Expression> generic;
 		public Expression Optimize(Scope scope) {
 			return this;
 		}
@@ -30,10 +30,10 @@ namespace Stereotype {
 		public Value Eval(Scope e) {
 			Record type = this.type.Eval(e) as Record;
 
-			Fun f = new AnonymeDefine(new List<ArgumentMetadataGenerator> { new ArgumentMetadataGenerator(parameter, null, null) }, this.body).Eval(e) as Fun;
-			var result = new LigthTypeType(nameType, type, f);
+			Fun f = new AnonymeDefine(new List<ArgumentMetadataGenerator> { new ArgumentMetadataGenerator(this.parameter, null, null) }, this.body).Eval(e) as Fun;
+			LigthTypeType result = new LigthTypeType(this.nameType, type, f);
 
-			e.Set(nameType, result);
+			e.Set(this.nameType, result);
 
 			return Const.NULL;
 		}

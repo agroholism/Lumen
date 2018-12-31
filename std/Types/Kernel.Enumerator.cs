@@ -18,6 +18,25 @@ namespace Lumen.Lang.Std {
 				Name = "Kernel.Enumerator",
 			};
 
+			IEnumerable<Value> Step(IEnumerable<Value> val, Int32 by) {
+				Int32 indexer = by;
+				foreach (Value i in val) {
+					if (by == indexer) {
+						yield return i;
+						indexer = 1;
+					}
+					else {
+						indexer++;
+					}
+				}
+			}
+
+			SetAttribute("step", new LambdaFun((e, args) => {
+				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
+
+				return new Enumerator(Step(v, (int)Converter.ToDouble(args[0], e)));
+			}));
+
 			SetAttribute(Op.SLASH, new LambdaFun((scope, args) => {
 				IEnumerable<Value> value = scope.This.ToIterator(scope);
 				Fun func = scope["func"].ToFunction(scope);
@@ -39,7 +58,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("get_enumerator", new LambdaFun((e, args) => {
 				Enumerator v = ((Enumerator)e.Get("this"));
 
-				var enumerator = v.GetEnumerator();
+				IEnumerator<Value> enumerator = v.GetEnumerator();
 
 				return new Expando {
 					["get_next", e] = new LambdaFun((scope, argsx) => (Bool)enumerator.MoveNext()),
@@ -60,15 +79,17 @@ namespace Lumen.Lang.Std {
 			}));
 		}
 
-		internal IEnumerable<Value> By(IEnumerable<Value> val, int by) {
-			int indexer = by;
-			foreach (var i in val)
+		internal IEnumerable<Value> By(IEnumerable<Value> val, Int32 by) {
+			Int32 indexer = by;
+			foreach (Value i in val) {
 				if (by == indexer) {
 					yield return i;
 					indexer = 1;
 				}
-				else
+				else {
 					indexer++;
+				}
+			}
 		}
 	}
 }

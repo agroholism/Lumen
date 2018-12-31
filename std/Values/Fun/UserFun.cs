@@ -82,7 +82,7 @@ tail_recursion:
 					}
 
 					if (args.Length != 0) {
-						if (i.Attributes != null && i.Attributes.TryGetValue("type", out var t)) {
+						if (i.Attributes != null && i.Attributes.TryGetValue("type", out Value t)) {
 							if (t != args[counter].Type) {
 								throw new Exception("type error ");
 							}
@@ -141,7 +141,7 @@ tail_recursion:
 				goto tail_recursion;
 			}
 
-			if(this.Attributes.TryGetValue("returned", out var ret)) {
+			if(this.Attributes.TryGetValue("returned", out Value ret)) {
 				if(!(result.Type == ret)) {
 					throw new Exception("wrong ret type");
 				}
@@ -150,7 +150,7 @@ tail_recursion:
 			return result;
 		}
 
-		public int CompareTo(object obj) {
+		public Int32 CompareTo(Object obj) {
 			return 0;
 		}
 

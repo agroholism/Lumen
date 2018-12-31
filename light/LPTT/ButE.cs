@@ -23,12 +23,12 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			res.Eval(e);
-			return expression.Eval(e);
+			this.res.Eval(e);
+			return this.expression.Eval(e);
 		}
 
 		public override System.String ToString() {
-			return expression.ToString();
+			return this.expression.ToString();
 		}
 	}
 }

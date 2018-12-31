@@ -17,16 +17,16 @@ namespace Stereotype {
 		}
 
 		public Expression Closure(List<System.String> visible, Scope scope) {
-			return new GenericFunctionMaker(functionDefineStatement.Closure(visible, scope) as FunctionDefineStatement, this.generic);
+			return new GenericFunctionMaker(this.functionDefineStatement.Closure(visible, scope) as FunctionDefineStatement, this.generic);
 		}
 
 		public Value Eval(Scope e) {
-			Dictionary<String, Value> args = new Dictionary<string, Value>();
-			foreach (var i in this.generic) {
+			Dictionary<String, Value> args = new Dictionary<String, Value>();
+			foreach (KeyValuePair<String, Expression> i in this.generic) {
 				args.Add(i.Key, i.Value?.Eval(e));
 			}
 
-			e.Set(functionDefineStatement.NameFunction, new GenericFunc(args, functionDefineStatement, functionDefineStatement.NameFunction));
+			e.Set(this.functionDefineStatement.NameFunction, new GenericFunc(args, this.functionDefineStatement, this.functionDefineStatement.NameFunction));
 			return Const.NULL;
 		}
 	}

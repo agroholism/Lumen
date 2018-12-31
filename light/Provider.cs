@@ -6,8 +6,8 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang.Std;
 namespace Stereotype {
 	public class OptimizationScope : Scope {
-		public List<String> whileConstants = new List<string> { "true", "false", "null" };
-		public Dictionary<String, Expression> constsValues = new Dictionary<string, Lumen.Lang.Expressions.Expression> {
+		public List<String> whileConstants = new List<String> { "true", "false", "null" };
+		public Dictionary<String, Expression> constsValues = new Dictionary<String, Lumen.Lang.Expressions.Expression> {
 			["true"] = new ValueE(Const.TRUE),
 			["false"] = new ValueE(Const.FALSE),
 			["null"] = new ValueE(Const.NULL)
@@ -59,7 +59,7 @@ namespace Stereotype {
 			Interpriter.mainScope[name] = value;
 		}
 
-		public static Boolean IsCompleted(string source) {
+		public static Boolean IsCompleted(String source) {
 			List<Token> Result;
 			try {
 				Result = new Lexer(source, "").Tokenization();
@@ -204,17 +204,21 @@ namespace Stereotype {
 				}
 			}
 
-			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.LPAREN)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.RPAREN)).Count)
+			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.LPAREN)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.RPAREN)).Count) {
 				return false;
+			}
 
-			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.FROM)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.WORD && i.Text == "yield")).Count)
+			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.FROM)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.WORD && i.Text == "yield")).Count) {
 				return false;
+			}
 
-			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.LBRACKET)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.RBRACKET)).Count)
+			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.LBRACKET)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.RBRACKET)).Count) {
 				return false;
+			}
 
-			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.DO)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.END)).Count)
+			if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.DO)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.END)).Count) {
 				return false;
+			}
 
 			return true;
 		}

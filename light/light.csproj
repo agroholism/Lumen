@@ -92,12 +92,6 @@
     <Compile Include="Value\MainScope.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\std\std.csproj">
-      <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
-      <Name>std</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="examples\client.ks">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -147,6 +141,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="deprecated.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\std\std.csproj">
+      <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
+      <Name>std</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

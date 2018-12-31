@@ -17,7 +17,7 @@ namespace Stereotype {
 			return this;
 		}
 		public Value Eval(Scope e) {
-			return (KString)text;
+			return (KString)this.text;
 		}
 
 		public override String ToString() {

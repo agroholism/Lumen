@@ -7,12 +7,12 @@ using Lumen.Lang.Std;
 
 namespace Stereotype {
 	internal class DynamicLoad : Expression {
-		private string name;
+		private readonly String name;
 
 		public Expression Optimize(Scope scope) {
 			return this;
 		}
-		public DynamicLoad(string name) {
+		public DynamicLoad(String name) {
 			this.name = name;
 		}
 
@@ -48,7 +48,7 @@ namespace Stereotype {
 	internal class NETModule : Lumen.Lang.Std.IObject {
 		public Assembly module;
 		public String name;
-		readonly Dictionary<String, Value> cache = new Dictionary<string, Value>();
+		readonly Dictionary<String, Value> cache = new Dictionary<String, Value>();
 
 		public Record Type => Lumen.Lang.Std.StandartModule._Type;
 
@@ -59,12 +59,11 @@ namespace Stereotype {
 		public Value Get(String name, AccessModifiers mode, Scope e) {
 			String fullName = this.name == null ? name : this.name + "." + name;
 
-			Value val = null;
-			if (this.cache.TryGetValue(fullName, out val)) {
+			if (this.cache.TryGetValue(fullName, out Value val)) {
 				return val;
 			}
 			else {
-				var t = this.module.GetType(fullName);
+				Type t = this.module.GetType(fullName);
 				return new NETType(t);
 			}
 		}
@@ -87,7 +86,7 @@ namespace Stereotype {
 	}
 
 	internal class Dynamic : Value {
-		public object Value;
+		public Object Value;
 
 		public Record Type => new NETType(this.Value.GetType());
 
@@ -109,26 +108,28 @@ namespace Stereotype {
 	}
 
 	internal class NETType : Record {
-		Type type;
+		readonly Type type;
 
 		public NETType(Type type) {
 			this.type = type;
 		}
 
 		public Value Get(String Name) {
-			if (type.IsEnum)
-				return new Dynamic(type.GetField(Name).GetValue(type));
+			if (this.type.IsEnum) {
+				return new Dynamic(this.type.GetField(Name).GetValue(this.type));
+			}
 
 			if (Name == "()") {
 				return new LambdaFun((e, args) => {
 					Type[] Types = new Type[args.Length];
 
-					for (int i = 0; i < args.Length; i++)
+					for (Int32 i = 0; i < args.Length; i++) {
 						Types[i] = args[i].GetType();
+					}
 
 					dynamic x;
 
-					x = type.GetConstructor(Types);
+					x = this.type.GetConstructor(Types);
 
 					x = x.Invoke(args);
 
@@ -141,16 +142,19 @@ namespace Stereotype {
 						return new DynamicType(i);
 	*/
 			try {
-				var x = type.GetMethod(Name);
-				if (x != null)
+				MethodInfo x = this.type.GetMethod(Name);
+				if (x != null) {
 					return new LambdaFun((e, args) => {
-						object[] margs = new object[args.Length];
-						for (int i = 0; i < args.Length; i++)
-							margs[i] = /*C.Unpack(*/args[i]/*)*/;
-						return new Dynamic(x.Invoke(null, margs));
+						Object[] margs = new Object[args.Length];
+						for (Int32 i = 0; i < args.Length; i++) {
+		margs[i] = /*C.Unpack(*/args[i]/*)*/;
+	}
+
+	return new Dynamic(x.Invoke(null, margs));
 					});
+				}
 				else {
-					var a = type.GetProperty(Name);
+					PropertyInfo a = this.type.GetProperty(Name);
 					/*if (a == null)
 						return new FunDelegate(type, Name);
 					else return new Dynamic(a.GetValue(type, new object[] { }));*/

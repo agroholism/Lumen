@@ -3,7 +3,7 @@
 namespace Lumen.Lang.Std {
 	[Serializable]
 	class DateTime : Value {
-		System.DateTime value;
+		readonly System.DateTime value;
 
 		public DateTime(System.DateTime value) {
 			this.value = value;

@@ -12,19 +12,21 @@ namespace Lumen.Lang.Std {
 		public virtual Value this[Int32 index] {
 			get {
 				Int32 i = index;
-				index = index < 0 ? value.Count + index : index;
+				index = index < 0 ? this.value.Count + index : index;
 
-				if (index >= value.Count || index < 0)
-					throw new Exception("выход за пределы списка при срезе вида [i]. Требуемый индекс [" + i + "] превышает длину списка [" + value.Count + "]");
+				if (index >= this.value.Count || index < 0) {
+					throw new Exception("выход за пределы списка при срезе вида [i]. Требуемый индекс [" + i + "] превышает длину списка [" + this.value.Count + "]");
+				}
 
-				return value[index];
+				return this.value[index];
 			}
 			set {
 				index = index < 0 ? this.value.Count + index : index;
 
 				if (index >= this.value.Count) {
-					for (Int32 j = this.value.Count; j < index; j++)
+					for (Int32 j = this.value.Count; j < index; j++) {
 						this.value.Add(Const.NULL);
+					}
 
 					this.value.Add(value);
 
@@ -44,25 +46,31 @@ namespace Lumen.Lang.Std {
 				Int32 i = first;
 				Int32 j = second;
 
-				if (first < 0)
-					first = value.Count + first;
+				if (first < 0) {
+					first = this.value.Count + first;
+				}
 
-				if (second < 0)
-					second = value.Count + second;
+				if (second < 0) {
+					second = this.value.Count + second;
+				}
 
-				if (second != value.Count)
+				if (second != this.value.Count) {
 					second++;
+				}
 
-				if (first > value.Count || second > value.Count || first < 0 || second < 0)
-					throw new Exception("выход за пределы списка при срезе вида [i:j]: границы требуемого диапазонa [" + i + ":" + j + "] превышают длину списка [" + value.Count + "]", stack: null);
+				if (first > this.value.Count || second > this.value.Count || first < 0 || second < 0) {
+					throw new Exception("выход за пределы списка при срезе вида [i:j]: границы требуемого диапазонa [" + i + ":" + j + "] превышают длину списка [" + this.value.Count + "]", stack: null);
+				}
 
-				if (first >= second)
+				if (first >= second) {
 					return new Vec();
+				}
 
 				List<Value> val = new List<Value>();
 
-				for (int index = first; index < second; index++)
-					val.Add(value[index]);
+				for (Int32 index = first; index < second; index++) {
+					val.Add(this.value[index]);
+				}
 
 				return new Vec(val);
 			}
@@ -70,18 +78,23 @@ namespace Lumen.Lang.Std {
 				Int32 i = first;
 				Int32 j = second;
 
-				if (first < 0)
+				if (first < 0) {
 					first = this.value.Count + first;
+				}
 
-				if (second < 0)
+				if (second < 0) {
 					second = this.value.Count + second;
+				}
 
-				if (i == 0)
-					if (second != this.value.Count)
+				if (i == 0) {
+					if (second != this.value.Count) {
 						second++;
+					}
+				}
 
-				if (first > this.value.Count || second > this.value.Count)
+				if (first > this.value.Count || second > this.value.Count) {
 					throw new Exception("выход за пределы списка при срезе вида [i:j]: границы требуемого диапазонa [" + i + ":" + j + "] превышают длину списка [" + this.value.Count + "]", stack: null);
+				}
 
 				this.value.RemoveRange(first, second);
 

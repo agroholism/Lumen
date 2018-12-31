@@ -14,7 +14,7 @@ namespace Stereotype {
 			try {
 				String code = System.IO.File.ReadAllText(fileName);
 				List<Token> tokens = new Lexer(code, fileName).Tokenization();
-				return new Parser(tokens).Parsing(scope ?? mainScope, fileName);
+				return new Parser(tokens, fileName).Parsing(scope ?? mainScope);
 			}
 			catch (Lumen.Lang.Std.Exception uex) {
 				Console.Write(uex.Message);
@@ -37,7 +37,7 @@ namespace Stereotype {
 		public static List<Expression> GetAST(String code, String file, Scope scope = null) {
 			try {
 				List<Token> tokens = new Lexer(code, file).Tokenization();
-				return new Parser(tokens).Parsing(file);
+				return new Parser(tokens, file).Parsing();
 			}
 			catch { 
 			}

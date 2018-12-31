@@ -5,11 +5,11 @@ using Lumen.Lang.Std;
 
 namespace Stereotype {
 	public class ArgumentMetadataGenerator : Expression {
-		public string name;
+		public String name;
 		public Expression type;
 		public Expression defaultValue;
 
-		public ArgumentMetadataGenerator(string name, Expression type, Expression defaultValue) {
+		public ArgumentMetadataGenerator(String name, Expression type, Expression defaultValue) {
 			this.name = name;
 			this.type = type;
 			this.defaultValue = defaultValue;
@@ -24,12 +24,12 @@ namespace Stereotype {
 		}
 
 		public FunctionArgument EvalArgumnet(Scope e) {
-			var res = new FunctionArgument(name, defaultValue == null ? null : (defaultValue is ExpressionE expe ? (Object)expe.expression : defaultValue.Eval(e)));
+			FunctionArgument res = new FunctionArgument(this.name, this.defaultValue == null ? null : (this.defaultValue is ExpressionE expe ? (Object)expe.expression : this.defaultValue.Eval(e)));
 
 			if(this.type != null) {
-				var t = type.Eval(e);
+				Value t = this.type.Eval(e);
 				if(t is Record kt) {
-					res.Attributes = new Dictionary<string, Value> { ["type"] = kt };
+					res.Attributes = new Dictionary<String, Value> { ["type"] = kt };
 				}
 			}
 

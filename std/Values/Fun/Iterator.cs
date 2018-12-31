@@ -20,13 +20,13 @@ namespace Lumen.Lang.Std {
 		}
 
 		public IEnumerator<Value> GetEnumerator() {
-			return innerValue.GetEnumerator();
+			return this.innerValue.GetEnumerator();
 		}
 
 		public Record Type => StandartModule.Enumerator;
 
 		IEnumerator IEnumerable.GetEnumerator() {
-			return innerValue.GetEnumerator();
+			return this.innerValue.GetEnumerator();
 		}
 
 		public String ToString(Scope e) {

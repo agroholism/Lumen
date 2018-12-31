@@ -22,28 +22,28 @@ namespace Stereotype {
 		}
 
 		public Expression Closure(List<System.String> visible, Scope scope) {
-			visible.Add(parameter);
-			visible.Add(nameType);
-			return new LigthType(nameType, parameter, this.type.Closure(visible, scope), this.body.Closure(visible, scope));
+			visible.Add(this.parameter);
+			visible.Add(this.nameType);
+			return new LigthType(this.nameType, this.parameter, this.type.Closure(visible, scope), this.body.Closure(visible, scope));
 		}
 
 		public Value Eval(Scope e) {
 			Record type = this.type.Eval(e) as Record;
 
-			Fun f = new AnonymeDefine(new List<ArgumentMetadataGenerator> { new ArgumentMetadataGenerator(parameter, null, null) }, this.body).Eval(e) as Fun;
-			var result = new LigthTypeType(nameType, type, f);
+			Fun f = new AnonymeDefine(new List<ArgumentMetadataGenerator> { new ArgumentMetadataGenerator(this.parameter, null, null) }, this.body).Eval(e) as Fun;
+			LigthTypeType result = new LigthTypeType(this.nameType, type, f);
 
-			e.Set(nameType, result);
+			e.Set(this.nameType, result);
 
 			return Const.NULL;
 		}
 	}
 
 	class LigthTypeType : Record {
-		Record inner;
-		Fun matchFun;
+		readonly Record inner;
+		readonly Fun matchFun;
 
-		public LigthTypeType(string name, Record inner, Fun matchFun) {
+		public LigthTypeType(String name, Record inner, Fun matchFun) {
 			this.inner = inner;
 			this.matchFun = matchFun;
 			this.meta = new TypeMetadata {

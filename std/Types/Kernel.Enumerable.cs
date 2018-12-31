@@ -11,8 +11,9 @@ namespace Lumen.Lang.Std {
 			while (true) {
 				Value current = null;
 				try {
-					Scope s = new Scope(e);
-					s.This = obj;
+					Scope s = new Scope(e) {
+						This = obj
+					};
 					current = function.Run(s);
 				}
 				catch (Break) {
@@ -78,8 +79,9 @@ namespace Lumen.Lang.Std {
 			// Kernel.Function (predicate) | Any => Kernel.Number.Fix
 			this.scope.Set("count", new LambdaFun((e, args) => {
 				if (args[0] is Fun fun) {
-					Scope s = new Scope(e);
-					s.This = this;
+					Scope s = new Scope(e) {
+						This = this
+					};
 					return new Num(Converter.ToIterator(e.Get("this"), 1, e).Count(i => Converter.ToBoolean(fun.Run(s, i))));
 				}
 				return new Num(Converter.ToIterator(e.Get("this"), 1, e).Count(i => args[0] == i));
@@ -191,16 +193,18 @@ namespace Lumen.Lang.Std {
 			this.scope.Set("min", new LambdaFun((e, args) => {
 				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
 				return v.Aggregate((x, y) => {
-					Scope s = new Scope(e);
-					s.This = x;
+					Scope s = new Scope(e) {
+						This = x
+					};
 					return Converter.ToBoolean(x.Type.GetAttribute("<", e).Run(s, y)) ? x : y;
 				});
 			}));
 			this.scope.Set("max", new LambdaFun((e, args) => {
 				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
 				return v.Aggregate((x, y) => {
-					Scope s = new Scope(e);
-					s.This = x;
+					Scope s = new Scope(e) {
+						This = x
+					};
 					return Converter.ToBoolean(x.Type.GetAttribute(">", e).Run(s, y)) ? x : y;
 				});
 			}));
@@ -233,7 +237,7 @@ namespace Lumen.Lang.Std {
 			this.scope.Set("orderby", new LambdaFun((e, args) => {
 				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
 				Fun f = (Fun)args[0];
-				var res = v.OrderBy(x => f.Run(new Scope(e), x));
+				IOrderedEnumerable<Value> res = v.OrderBy(x => f.Run(new Scope(e), x));
 				return new Enumerator(res);
 			}));
 
@@ -259,8 +263,10 @@ namespace Lumen.Lang.Std {
 
 			this.scope.Set("zip", new LambdaFun((e, args) => {
 				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
-				if (args.Length == 1)
+				if (args.Length == 1) {
 					return new Vec(v.Zip<Value, Value, Value>(Converter.ToIterator(args[0], e), (x, y) => new Vec(new List<Value> { x, y })).ToList());
+				}
+
 				return new Enumerator(v.Zip(Converter.ToIterator(args[0], e), (x, y) => ((Fun)args[1]).Run(new Scope(e), x, y)));
 			}));
 
@@ -377,8 +383,9 @@ namespace Lumen.Lang.Std {
 					}
 				}
 			}
-			if (!type.includedModules.Contains(this))
+			if (!type.includedModules.Contains(this)) {
 				type.includedModules.Add(this);
+			}
 		}
 	}
 }

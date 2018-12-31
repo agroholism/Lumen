@@ -100,7 +100,6 @@ namespace Lumen.Lang.Std {
 							throw new Exception("выход за пределы строки при срезе вида [i]. Требуемый индекс [" + i + "] превышает длину строки [" + value.Length + "]", stack: e);
 						}
 						return new KString(GlobalizationEach(value).Skip(index).First().ToString());
-						return new KString(value[index].ToString());
 					}
 					else if (args[0] is KString) {
 						Int32 position = value.IndexOf(args[0].ToString());
@@ -141,16 +140,18 @@ namespace Lumen.Lang.Std {
 			SetAttribute("==", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString))
+				if (!(args[0] is KString)) {
 					return new Bool(false);
+				}
 
 				return new Bool(args[0].ToString() == e.Get("this").ToString());
 			}));
 			SetAttribute("!=", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString))
+				if (!(args[0] is KString)) {
 					return new Bool(true);
+				}
 
 				return new Bool(args[0].ToString() != e.Get("this").ToString());
 			}));
@@ -167,16 +168,18 @@ namespace Lumen.Lang.Std {
 			SetAttribute(">=", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString))
+				if (!(args[0] is KString)) {
 					throw new Exception("правый операнд должен иметь тип Kernel.String", stack: e);
+				}
 
 				return new Bool(e.Get("this").ToString().CompareTo(args[0].ToString()) >= 0);
 			}));
 			SetAttribute("<=>", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString))
+				if (!(args[0] is KString)) {
 					throw new Exception("правый операнд должен иметь тип Kernel.String", stack: e);
+				}
 
 				return new Num(e.Get("this").ToString(e).CompareTo(args[0].ToString(e)));
 			}));
@@ -272,32 +275,42 @@ namespace Lumen.Lang.Std {
 			}));
 			SetAttribute("control?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsControl(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsControl(x))).ToList());
 			}));
 			SetAttribute("digit?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsDigit(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsDigit(x))).ToList());
 			}));
 			SetAttribute("letter?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsLetter(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsLetter(x))).ToList());
 			}));
 			SetAttribute("letter_or_digit?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsLetterOrDigit(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsLetterOrDigit(x))).ToList());
 			}));
 			SetAttribute("lower?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsLower(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsLower(x))).ToList());
 			}));
 			SetAttribute("get_chars", new LambdaFun((e, args) => {
@@ -307,32 +320,42 @@ namespace Lumen.Lang.Std {
 
 			SetAttribute("number?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsNumber(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsNumber(x))).ToList());
 			}));
 			SetAttribute("punctuation?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsPunctuation(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsPunctuation(x))).ToList());
 			}));
 			SetAttribute("separator?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsSeparator(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsSeparator(x))).ToList());
 			}));
 			SetAttribute("symbol?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsSymbol(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsSymbol(x))).ToList());
 			}));
 			SetAttribute("upper?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsUpper(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsUpper(x))).ToList());
 			}));
 			SetAttribute("get_say", new LambdaFun((e, args) => {
@@ -357,10 +380,10 @@ namespace Lumen.Lang.Std {
 
 				StringBuilder buff = new StringBuilder();
 
-				for (int i = 0; i < source.Length; i++) {
+				for (Int32 i = 0; i < source.Length; i++) {
 					if (i + 1 < source.Length && source[i + 1] == '-') {
 						if (Char.IsLetterOrDigit(source[i]) && Char.IsLetterOrDigit(source[i + 2])) {
-							for (int j = (int)source[i]; j <= (int)source[i + 2]; j++) {
+							for (Int32 j = (Int32)source[i]; j <= (Int32)source[i + 2]; j++) {
 								buff.Append((Char)j);
 							}
 							i += 2;
@@ -375,10 +398,10 @@ namespace Lumen.Lang.Std {
 				Console.WriteLine(source);
 				buff.Clear();
 
-				for (int i = 0; i < to.Length; i++) {
+				for (Int32 i = 0; i < to.Length; i++) {
 					if (i + 1 < to.Length && to[i + 1] == '-') {
 						if (Char.IsLetterOrDigit(to[i]) && Char.IsLetterOrDigit(to[i + 2])) {
-							for (int j = (int)to[i]; j <= (int)to[i + 2]; j++) {
+							for (Int32 j = (Int32)to[i]; j <= (Int32)to[i + 2]; j++) {
 								buff.Append((Char)j);
 							}
 							i += 2;
@@ -392,7 +415,7 @@ namespace Lumen.Lang.Std {
 				to = buff.ToString();
 				Console.WriteLine(to);
 				buff.Clear();
-				for (int i = 0; i < s.Length; i++) {
+				for (Int32 i = 0; i < s.Length; i++) {
 					Int32 position = source.IndexOf(s[i]);
 					if (position != -1) {
 						buff.Append(position >= to.Length ? to[to.Length - 1] : to[position]);
@@ -405,8 +428,10 @@ namespace Lumen.Lang.Std {
 			}));
 			SetAttribute("white_space?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (s.Length == 1)
+				if (s.Length == 1) {
 					return new Bool(Char.IsWhiteSpace(s[0]));
+				}
+
 				return new Vec(s.Select<Char, Value>(x => new Bool(Char.IsWhiteSpace(x))).ToList());
 			}));
 			SetAttribute("capitalize", new LambdaFun((e, args) => {
@@ -421,11 +446,15 @@ namespace Lumen.Lang.Std {
 			SetAttribute("swap_caze", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
 				String result = "";
-				foreach (Char i in s)
-					if (Char.IsUpper(i))
+				foreach (Char i in s) {
+					if (Char.IsUpper(i)) {
 						result += Char.ToLower(i);
-					else
+					}
+					else {
 						result += Char.ToUpper(i);
+					}
+				}
+
 				return new KString(result);
 			}));
 			/*SetAttribute("ljust", new LambdaFun((e, args) => {
@@ -444,24 +473,30 @@ namespace Lumen.Lang.Std {
 			}));*/
 			SetAttribute("chomp", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (args.Length == 0)
+				if (args.Length == 0) {
 					return new KString(s.Trim());
-				else
+				}
+				else {
 					return new KString(s.Trim(args[0].ToString().ToCharArray()));
+				}
 			}));
 			SetAttribute("rchomp", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (args.Length == 0)
+				if (args.Length == 0) {
 					return new KString(s.TrimEnd());
-				else
+				}
+				else {
 					return new KString(s.TrimEnd(args[0].ToString().ToCharArray()));
+				}
 			}));
 			SetAttribute("lchomp", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
-				if (args.Length == 0)
+				if (args.Length == 0) {
 					return new KString(s.TrimStart());
-				else
+				}
+				else {
 					return new KString(s.TrimStart(args[0].ToString().ToCharArray()));
+				}
 			}));
 			SetAttribute("reverse", new LambdaFun((e, args) => {
 				Char[] a = e.Get("this").ToString().ToCharArray();

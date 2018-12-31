@@ -5,7 +5,7 @@ namespace LumenPad {
 	class ConsoleReader : TextReader {
 		public static ConsoleReader Instance;
 
-		private ConsoleEmulator tb;
+		private readonly ConsoleEmulator tb;
 
 		public ConsoleReader(ConsoleEmulator tb) {
 			this.tb = tb;

@@ -33,7 +33,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			return val;
+			return this.val;
 		}
 
 		public override String ToString() {

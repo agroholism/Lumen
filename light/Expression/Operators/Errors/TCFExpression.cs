@@ -8,12 +8,12 @@ using Lumen.Lang.Std;
 namespace Stereotype {
 	[Serializable]
 	internal class TCFExpression : Expression {
-		private IDictionary<Expression, Expression> exceptCases;
-		private Expression finallyExpression;
-		private Expression tryExpression;
+		private readonly IDictionary<Expression, Expression> exceptCases;
+		private readonly Expression finallyExpression;
+		private readonly Expression tryExpression;
 
 		public Expression Optimize(Scope scope) {
-			return new TCFExpression(tryExpression.Optimize(scope), this.exceptCases, this.finallyExpression);
+			return new TCFExpression(this.tryExpression.Optimize(scope), this.exceptCases, this.finallyExpression);
 		}
 
 		public TCFExpression(Expression tryExpression, IDictionary<Expression, Expression> exceptCases, Expression finallyExpression) {
@@ -56,11 +56,11 @@ namespace Stereotype {
 		}
 
 		public override String ToString() {
-			var result = new StringBuilder();
+			StringBuilder result = new StringBuilder();
 
 			result.Append("try " + this.tryExpression.ToString()).Append(Environment.NewLine);
 
-			foreach(var i in exceptCases) {
+			foreach(KeyValuePair<Expression, Expression> i in this.exceptCases) {
 				result.Append("except " + i.Key + " " + i.Value).Append(Environment.NewLine);
 			}
 

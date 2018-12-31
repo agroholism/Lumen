@@ -70,30 +70,30 @@ namespace LumenPad {
 			if (result.ErrorLine > 0) {
 				Range range = this.textBox.GetLine(result.ErrorLine - 1);
 
-				err = result.ErrorMessage;
+				this.err = result.ErrorMessage;
 
 				if (result.ErrorCharEnd == -1) {
-					b = new Place(result.ErrorCharBegin, result.ErrorLine - 1);
-					e = new Place(range.Length, result.ErrorLine - 1);
-					range = this.textBox.GetRange(b.Value, e.Value);
+					this.b = new Place(result.ErrorCharBegin, result.ErrorLine - 1);
+					this.e = new Place(range.Length, result.ErrorLine - 1);
+					range = this.textBox.GetRange(this.b.Value, this.e.Value);
 				}
 				else {
-					b = new Place(result.ErrorCharBegin, result.ErrorLine - 1);
-					e = new Place(result.ErrorCharEnd, result.ErrorLine - 1);
-					range = this.textBox.GetRange(b.Value, e.Value);
+					this.b = new Place(result.ErrorCharBegin, result.ErrorLine - 1);
+					this.e = new Place(result.ErrorCharEnd, result.ErrorLine - 1);
+					range = this.textBox.GetRange(this.b.Value, this.e.Value);
 				}
 
 				range.SetStyle(Settings.Error);
 
-				errorTable.Rows.Add(result.ErrorType, result.ErrorMessage);
+				this.errorTable.Rows.Add(result.ErrorType, result.ErrorMessage);
 			}
 		}
 
 		private void textBox_TextChanged(Object sender, TextChangedEventArgs e) {
-			err = null;
-			b = null;
+			this.err = null;
+			this.b = null;
 			e = null;
-			errorTable.Rows.Clear();
+			this.errorTable.Rows.Clear();
 
 			MainTextBoxManager?.OnTextChanged();
 		}
@@ -115,10 +115,10 @@ namespace LumenPad {
 		}
 
 		private void textBox_ToolTipNeeded(Object sender, ToolTipNeededEventArgs e) {
-			if (b.HasValue) {
-				if (e.Place.iLine == b.Value.iLine) {
-					if (e.Place.iChar >= b.Value.iChar && e.Place.iChar <= this.e.Value.iChar) {
-						e.ToolTipTitle = err;
+			if (this.b.HasValue) {
+				if (e.Place.iLine == this.b.Value.iLine) {
+					if (e.Place.iChar >= this.b.Value.iChar && e.Place.iChar <= this.e.Value.iChar) {
+						e.ToolTipTitle = this.err;
 						e.ToolTipText = "     ";
 					}
 					return;

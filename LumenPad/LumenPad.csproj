@@ -89,19 +89,20 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="settings.cdl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\source\repos\KVM\FastColoredTextBox\FastColoredTextBox.csproj">
       <Project>{6dd14a85-ccfc-4774-bd26-0f5772512319}</Project>
       <Name>FastColoredTextBox</Name>
     </ProjectReference>
-    <ProjectReference Include="..\kernel\std.csproj">
-      <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
-      <Name>std</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\stereotype\light.csproj">
+    <ProjectReference Include="..\light\light.csproj">
       <Project>{823c41cd-2bbd-456e-bcb9-90578498c60d}</Project>
       <Name>light</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\std\std.csproj">
+      <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
+      <Name>std</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

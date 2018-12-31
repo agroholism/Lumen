@@ -17,7 +17,7 @@ namespace Lumen.Lang.Std {
 			this.Attributes[name] = value;
 		}
 
-		public int CompareTo(object obj) {
+		public Int32 CompareTo(Object obj) {
 			return 0;
 		}
 
@@ -31,11 +31,11 @@ namespace Lumen.Lang.Std {
 
 		public abstract Value Run(Scope e, params Value[] args);
 
-		public bool ToBool(Scope e) {
+		public Boolean ToBool(Scope e) {
 			throw new NotImplementedException();
 		}
 
-		public double ToDouble(Scope e) {
+		public Double ToDouble(Scope e) {
 			throw new NotImplementedException();
 		}
 

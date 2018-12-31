@@ -7,7 +7,7 @@ namespace Lumen.Lang.Std {
 	internal class TypeType : Record {
 		public new Dictionary<String, Value> Attributes {
 			get {
-				Dictionary<String, Value> result = new Dictionary<string, Value>();
+				Dictionary<String, Value> result = new Dictionary<String, Value>();
 				foreach(KeyValuePair<String, Value> i in this.typeAttributes) {
 					result.Add(i.Key, i.Value);
 				}

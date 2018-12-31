@@ -27,14 +27,14 @@ namespace Stereotype {
 			this.returnedType = returnedType;
 		}
 
-		public FunctionDefineStatement(string NameFunction, List<ArgumentMetadataGenerator> Args, Expression Body, Expression returnedType, List<Expression> otherContacts, Int32 line, String file) : this(NameFunction, Args, Body, returnedType) {
+		public FunctionDefineStatement(String NameFunction, List<ArgumentMetadataGenerator> Args, Expression Body, Expression returnedType, List<Expression> otherContacts, Int32 line, String file) : this(NameFunction, Args, Body, returnedType) {
 			this.otherContacts = otherContacts;
 			this.line = line;
 			this.file = file;
 		}
 
 		public override String ToString() {
-			String result = "fun " + this.NameFunction + "(" + String.Join(", ", this.Args.Select(i => i.name)) + ")" + "{" + this.Body + "}";
+			String result = "let " + this.NameFunction + "(" + String.Join(", ", this.Args.Select(i => i.name)) + ")" + "{" + this.Body + "}";
 			return result;
 		}
 
@@ -49,7 +49,7 @@ namespace Stereotype {
 				// It's extension?
 				if (arg.name == "this"
 					&& arg.Attributes != null
-					&& arg.Attributes.TryGetValue("type", out var value)
+					&& arg.Attributes.TryGetValue("type", out Value value)
 					&& value is Record record) {
 					extendableRecord = record;
 					continue;
@@ -88,7 +88,7 @@ namespace Stereotype {
 				extendableRecord.SetAttribute(this.NameFunction, v);
 			}
 			else {
-				if (e.ExistsInThisScope(NameFunction) && e[NameFunction] is UserFun uf) {
+				if (e.ExistsInThisScope(this.NameFunction) && e[this.NameFunction] is UserFun uf) {
 					uf.body = v.body;
 				}
 				else {
@@ -101,7 +101,7 @@ namespace Stereotype {
 
 		public Expression Closure(List<String> visible, Scope thread) {
 			visible.Add(this.NameFunction);
-			return new FunctionDefineStatement(this.NameFunction, this.Args.Select(i => new ArgumentMetadataGenerator(i.name, i.type?.Closure(visible, thread), i.defaultValue?.Closure(visible, thread))).ToList(), Body.Closure(visible, thread), returnedType?.Closure(visible, thread));
+			return new FunctionDefineStatement(this.NameFunction, this.Args.Select(i => new ArgumentMetadataGenerator(i.name, i.type?.Closure(visible, thread), i.defaultValue?.Closure(visible, thread))).ToList(), this.Body.Closure(visible, thread), this.returnedType?.Closure(visible, thread));
 		}
 	}
 }

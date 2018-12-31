@@ -14,10 +14,11 @@ namespace Lumen.Lang.Std {
 			Set("[]", new LambdaFun((e, args) => {
 				Record sub = args[0] as Record;
 				Record V = args[1] as Record;
-				Record type = new Record();
-				//type.meta.BaseType = this;
-				type.meta = new TypeMetadata {
-					Name = "Kernel.Map[" + args[0] + "]"
+				Record type = new Record {
+					//type.meta.BaseType = this;
+					meta = new TypeMetadata {
+						Name = "Kernel.Map[" + args[0] + "]"
+					}
 				};
 				type.SetAttribute("initialize", new LambdaFun((scope, argsx) => {
 					(scope.Get("this") as IObject).Set("_dictionary", new Map(new Dictionary<Value, Value>()), AccessModifiers.PRIVATE, scope);
@@ -69,9 +70,9 @@ namespace Lumen.Lang.Std {
 				return new Vec(dict.Values.ToList());
 			}));
 
-			var to_l = new LambdaFun((e, args) => {
-				var obj = e.Get("this") as Expando;
-				var result = new List<Value> {
+			LambdaFun to_l = new LambdaFun((e, args) => {
+				Expando obj = e.Get("this") as Expando;
+				List<Value> result = new List<Value> {
 					obj.Get("key", AccessModifiers.PUBLIC, e),
 					obj.Get("value", AccessModifiers.PUBLIC, e)
 				};

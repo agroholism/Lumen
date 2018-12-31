@@ -5,8 +5,8 @@ namespace Lumen.Lang.Std {
 	public class Scope {
 		public IDictionary<String, Value> variables;
 		public List<Module> usings;
-		public List<String> constants;
 		public Scope parent;
+		public Dictionary<String, List<Value>> attributes;
 
 		public Value this[String name] {
 			get => Get(name);
@@ -20,8 +20,8 @@ namespace Lumen.Lang.Std {
 
 		public Scope() {
 			this.variables = new Dictionary<String, Value>();
-			this.constants = new List<String>();
 			this.usings = new List<Module>();
+			this.attributes = new Dictionary<string, List<Value>>();
 		}
 
 		public Scope(Scope parent) : this() {
@@ -77,7 +77,14 @@ namespace Lumen.Lang.Std {
 			result = null;
 			return false;
 		}
-		
+
+		public void SetAttribute(String id, Value val) {
+			if(this.attributes.TryGetValue(id, out List<Value> attributesList)) {
+				attributesList.Add(val);
+			}
+			this.attributes[id] = new List<Value> { val };
+		}
+
 		public Value Get(String name) {
 			if (this.variables.TryGetValue(name, out Value value)) {
 				return value;
@@ -104,22 +111,20 @@ namespace Lumen.Lang.Std {
 		}
 		
 		public virtual void Set(String name, Value value) {
-			if (!this.constants.Contains(name)) {
+			if (!IsConstant(name)) {
 				this.variables[name] = value;
 			}
 			else {
 				throw new Exception("изменить константу '" + name + "' невозможно", stack: this);
 			}
 		}
-	
-		public void AddConstant(String name) {
-			if (!this.constants.Contains(name)) {
-				this.constants.Add(name);
-			}
-		}
 
 		public Boolean IsConstant(String id) {
-			return this.constants.Contains(id);
+			if (this.attributes.TryGetValue(id, out List<Value> attributesList)) {
+				return attributesList.Contains(StandartModule.CONSTANT) ;
+			}
+
+			return false;
 		}
 
 		public void AddUsing(Module obj) {

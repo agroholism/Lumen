@@ -19,15 +19,16 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Module(Scope e) {
-			if (e.ExistsInThisScope("$"))
+			if (e.ExistsInThisScope("$")) {
 				this.privateVar = e.Get("$");
+			}
+
 			e.Remove("$");
 			this.scope = e;
 		}
 
 		public void DeleteVar(String name) {
 			this.scope.variables.Remove(name);
-			this.scope.constants.Remove(name);
 		}
 
 		public Boolean Contains(String name) {
@@ -48,10 +49,6 @@ namespace Lumen.Lang.Std {
 
 		public void SetNonStrict(String Name, Value Object) {
 			this.scope[Name] = Object;
-		}
-
-		public void AddConstant(String name) {
-			this.scope.AddConstant(name);
 		}
 
 		public virtual Boolean TypeImplemented(Record s) {
@@ -85,7 +82,7 @@ namespace Lumen.Lang.Std {
 		}
 
 		public String ToString(Scope e) {
-			return name;
+			return this.name;
 		}
 
 		public override String ToString() {

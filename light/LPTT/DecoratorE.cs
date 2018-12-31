@@ -16,9 +16,9 @@ namespace Stereotype {
 			this.expsOfDecos = expsOfDecos;
 			this.func = func;
 			if(func is DecoratorE dece) {
-				hightestExpression = dece.hightestExpression;
+				this.hightestExpression = dece.hightestExpression;
 			} else {
-				hightestExpression = func;
+				this.hightestExpression = func;
 			}
 		}
 
@@ -27,9 +27,9 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			var val = this.expsOfDecos[0].Eval(e);
-			if (func is FunctionDefineStatement fds) {
-				func.Eval(e);
+			Value val = this.expsOfDecos[0].Eval(e);
+			if (this.func is FunctionDefineStatement fds) {
+				this.func.Eval(e);
 				Fun v = e.Get(fds.NameFunction) as Fun;
 
 				if(val is Record type) {
@@ -40,8 +40,13 @@ namespace Stereotype {
 				}
 			}
 
+			if (this.func is VariableDeclaration vd) {
+				this.func.Eval(e);
 
-				return null;
+				e.SetAttribute(vd.id, val);
+			}
+
+
 			/*if (func is FunctionDefineStatement fds) {
 				func.Eval(e);
 				Value v = e.Get(fds.NameFunction);
@@ -59,14 +64,16 @@ namespace Stereotype {
 				e.Set(fds.NameFunction, v);
 				return Const.NULL;
 			}
-			else */if (func is AnonymeDefine ad) {
-				Value v = func.Eval(e);
-				for (int i = expsOfDecos.Count - 1; i > -1; i--) {
-					if (expsOfDecos[i] is IdExpression || expsOfDecos[i] is DotExpression)
-						v = new Applicate(expsOfDecos[i], new List<Expression> { new ValueE(v) }, -1).Eval(e);
-					else if (expsOfDecos[i] is Applicate app) {
+			else */
+			if (this.func is AnonymeDefine ad) {
+				Value v = this.func.Eval(e);
+				for (Int32 i = this.expsOfDecos.Count - 1; i > -1; i--) {
+					if (this.expsOfDecos[i] is IdExpression || this.expsOfDecos[i] is DotExpression) {
+						v = new Applicate(this.expsOfDecos[i], new List<Expression> { new ValueE(v) }, -1).Eval(e);
+					}
+					else if (this.expsOfDecos[i] is Applicate app) {
 						List<Expression> args = new List<Expression> { new ValueE(v) };
-						foreach (var x in app.argse) {
+						foreach (Expression x in app.argse) {
 							args.Add(x);
 						}
 						v = new Applicate(app.callable, args, -1).Eval(e);
@@ -74,7 +81,7 @@ namespace Stereotype {
 				}
 				return v;
 			}
-			else if (func is StructE classCreator) {
+			else if (this.func is StructE classCreator) {
 				classCreator.Eval(e);
 				Value v = e[classCreator.name];
 			/*	Value v = new HObject {
@@ -82,12 +89,13 @@ namespace Stereotype {
 				//	["fields", e] = new KList(classCreator.)
 				};
 				*/
-				for (int i = expsOfDecos.Count - 1; i > -1; i--) {
-					if (expsOfDecos[i] is IdExpression || expsOfDecos[i] is DotExpression)
-						v = new Applicate(expsOfDecos[i], new List<Expression> { new ValueE(v) }, -1).Eval(e);
-					else if (expsOfDecos[i] is Applicate app) {
+				for (Int32 i = this.expsOfDecos.Count - 1; i > -1; i--) {
+					if (this.expsOfDecos[i] is IdExpression || this.expsOfDecos[i] is DotExpression) {
+						v = new Applicate(this.expsOfDecos[i], new List<Expression> { new ValueE(v) }, -1).Eval(e);
+					}
+					else if (this.expsOfDecos[i] is Applicate app) {
 						List<Expression> args = new List<Expression> { new ValueE(v) };
-						foreach (var x in app.argse) {
+						foreach (Expression x in app.argse) {
 							args.Add(x);
 						}
 						v = new Applicate(app.callable, args, -1).Eval(e);

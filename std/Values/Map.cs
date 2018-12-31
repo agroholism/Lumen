@@ -10,7 +10,7 @@ namespace Lumen.Lang.Std {
 		public Dictionary<Value, Value> value;
 
 		public Map() {
-			value = new Dictionary<Value, Value>();
+			this.value = new Dictionary<Value, Value>();
 		}
 		public override String ToString() {
 			return this.ToString(null);
@@ -20,36 +20,40 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Value Get(Value name) {
-			return value[name];
+			return this.value[name];
 		}
 
 		public void Set(Value name, Value value) {
 			this.value[name] = value;
 		}
 
-		public int CompareTo(object obj) {
+		public Int32 CompareTo(Object obj) {
 			throw new NotImplementedException();
 		}
 
 		public Record Type => StandartModule.Map;
 
-		public bool ToBool(Scope e) {
+		public Boolean ToBool(Scope e) {
 			throw new NotImplementedException();
 		}
 
-		public double ToDouble(Scope e) {
+		public Double ToDouble(Scope e) {
 			throw new NotImplementedException();
 		}
 
-		public string ToString(Scope e) {
-			if (value.Count == 0)
+		public String ToString(Scope e) {
+			if (this.value.Count == 0) {
 				return "[:]";
+			}
+
 			StringBuilder sb = new StringBuilder("[");
-			int indexer = 0;
-			foreach (var i in value) {
+			Int32 indexer = 0;
+			foreach (KeyValuePair<Value, Value> i in this.value) {
 				sb.Append(i.Key + " : " + i.Value.ToString(e));
-				if (indexer < value.Count - 1)
+				if (indexer < this.value.Count - 1) {
 					sb.Append(", ");
+				}
+
 				indexer++;
 			}
 			sb.Append("]");

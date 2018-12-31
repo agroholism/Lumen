@@ -10,25 +10,26 @@ namespace Stereotype
 			return this;
 		}
 		internal Expression expression;
-        public int i;
+        public Int32 i;
 		public Expression Optimize(Scope scope) {
 			return this;
 		}
 		public SpreadE(Expression expression)
         {
             this.expression = expression;
-            if (expression is SpreadE)
-                i += ((SpreadE)expression).i + 1;
-        }
+            if (expression is SpreadE) {
+				this.i += ((SpreadE)expression).i + 1;
+			}
+		}
 
-        public int Get()
+        public Int32 Get()
         {
-            return i;
+            return this.i;
         }
 
         public Value Eval(Scope e)
         {
-            return expression.Eval(e);
+            return this.expression.Eval(e);
         }
     }
 }

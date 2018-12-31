@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Net.Mail;
 
 namespace Lumen.Lang.Std {
 	public sealed class StandartModule : Module {
@@ -22,6 +21,8 @@ namespace Lumen.Lang.Std {
 		public static Record Boolean { get; } = new RBoolean();
 		public static Record DateTime { get; } = new DateTimeClass();
 		public static Record _Type { get; } = new TypeType();
+
+		public static Fun CONSTANT = new LambdaFun((e, args) => throw new Exception("is constant"));
 
 		public static StandartModule __Kernel__ { get; } = new StandartModule();
 
@@ -47,6 +48,8 @@ namespace Lumen.Lang.Std {
 			Set("false", Const.FALSE);
 			Set("void", Const.NULL);
 
+			Set("const", CONSTANT);
+
 			Set("PI", (Num)Math.PI);
 			Set("E", (Num)Math.E);
 
@@ -54,7 +57,7 @@ namespace Lumen.Lang.Std {
 			Set("EL", (KString)System.String.Empty);
 
 			Set("sum", new LambdaFun((scope, args) => {
-				var prompt = scope["message"].ToList(scope);
+				List<Value> prompt = scope["message"].ToList(scope);
 				
 				return prompt.Aggregate((x, y) => {
 					return x.Type.GetAttribute(Op.PLUS, scope).Run(new Scope(scope) { This = x }, y);
@@ -67,7 +70,7 @@ namespace Lumen.Lang.Std {
 				String separator = scope["sep"].ToString(scope);
 				String onend = scope["onend"].ToString(scope);
 
-				var temp = scope["params"];
+				Value temp = scope["params"];
 
 				String result = System.String.Join(separator, temp.ToIterator(scope).Select(i => 
 					i.ToString(scope))) + (onend);
@@ -121,8 +124,9 @@ namespace Lumen.Lang.Std {
 			}
 
 			if (callable.Type.AttributeExists("()")) {
-				Scope s = new Scope(scope);
-				s.This = callable;
+				Scope s = new Scope(scope) {
+					This = callable
+				};
 				return Call(callable.Type.GetAttribute("()", scope), s, args);
 			}
 

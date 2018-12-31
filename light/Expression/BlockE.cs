@@ -8,33 +8,34 @@ using Lumen.Lang.Std;
 namespace Stereotype {
 	public class BlockE : Expression {
 		public List<Expression> expressions;
-		private IDictionary<String, Value> saver;
+		private readonly IDictionary<String, Value> saver;
 		internal Boolean saved = true;
 
 		public BlockE() {
-			expressions = new List<Expression>();
-			saver = new Dictionary<string, Value>(0);
+			this.expressions = new List<Expression>();
+			this.saver = new Dictionary<String, Value>(0);
 		}
 
 		public BlockE(List<Expression> Expressions) {
 			this.expressions = Expressions;
-			saver = new Dictionary<string, Value>(0);
+			this.saver = new Dictionary<String, Value>(0);
 		}
 
 		public void Add(Expression Expression) {
-			expressions.Add(Expression);
+			this.expressions.Add(Expression);
 		}
 
 		public Value Eval(Scope e) {
 			for (Int32 i = 0; i < this.expressions.Count - 1; i++) {
-				if (saved && expressions[i] is VariableDeclaration decvar_) {
+				if (this.saved && this.expressions[i] is VariableDeclaration decvar_) {
 					if (e.IsExsists(decvar_.id)) {
-						saver[decvar_.id] = e.Get(decvar_.id);
+						this.saver[decvar_.id] = e.Get(decvar_.id);
 						Value value = decvar_.exp.Eval(e);
 						Value type = null;
 
-						if (decvar_.type != null)
+						if (decvar_.type != null) {
 							type = decvar_.type.Eval(e);
+						}
 
 						e.variables[decvar_.id] = value;
 					}
@@ -50,8 +51,8 @@ namespace Stereotype {
 
 			Value v = Const.NULL;
 
-			if (expressions.Count > 0) {
-				if (saved && expressions[expressions.Count - 1] is VariableDeclaration decvar) {
+			if (this.expressions.Count > 0) {
+				if (this.saved && this.expressions[this.expressions.Count - 1] is VariableDeclaration decvar) {
 					if (e.IsExsists(decvar.id)) {
 						this.saver[decvar.id] = e.variables[decvar.id];
 						Value value = decvar.exp.Eval(e);

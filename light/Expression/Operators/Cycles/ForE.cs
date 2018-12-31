@@ -9,9 +9,9 @@ namespace Stereotype {
 	internal class ForE : Expression {
 		public Expression expression;
 		public Expression body;
-		private String varName;
-		private Expression varType;
-		private Boolean declaredVar;
+		private readonly String varName;
+		private readonly Expression varType;
+		private readonly Boolean declaredVar;
 
 		public ForE(String varName, Expression varType, Boolean declaredVar, Expression expressions, Expression statement) {
 			this.varName = varName;

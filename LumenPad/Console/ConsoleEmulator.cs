@@ -8,22 +8,22 @@ using FastColoredTextBoxNS;
 
 namespace LumenPad {
 	public class ConsoleEmulator : FastColoredTextBox {
-		private volatile bool isReadLineMode;
-		private volatile bool isUpdating;
+		private volatile Boolean isReadLineMode;
+		private volatile Boolean isUpdating;
 		private Place StartReadPlace { get; set; }
 
 		/// <summary>
 		/// Control is waiting for line entering. 
 		/// </summary>
-		public bool IsReadLineMode {
-			get { return isReadLineMode; }
-			set { isReadLineMode = value; }
+		public Boolean IsReadLineMode {
+			get { return this.isReadLineMode; }
+			set { this.isReadLineMode = value; }
 		}
 
 		/// <summary>
 		/// Append line to end of text.
 		/// </summary>
-		public void WriteLine(string text) {
+		public void WriteLine(String text) {
 			this.IsReadLineMode = false;
 			this.isUpdating = true;
 			try {
@@ -41,25 +41,25 @@ namespace LumenPad {
 		/// <summary>
 		/// Append line to end of text.
 		/// </summary>
-		public void Write(string text) {
-			IsReadLineMode = false;
-			isUpdating = true;
+		public void Write(String text) {
+			this.IsReadLineMode = false;
+			this.isUpdating = true;
 			try {
 				this.InvokeNeded(() => AppendText(text));
 			}
 			finally {
-				isUpdating = false;
+				this.isUpdating = false;
 				this.InvokeNeded(() => ClearUndo());
 			}
 		}
 
-		public void Write(string text, Boolean b = true) {
+		public void Write(String text, Boolean b = true) {
 			try {
 				this.InvokeNeded(() => AppendText(text));
 			}
 			finally {
-				isReadLineMode = b;
-				isUpdating = b;
+				this.isReadLineMode = b;
+				this.isUpdating = b;
 				this.InvokeNeded(() => ClearUndo());
 			}
 		}
@@ -71,22 +71,22 @@ namespace LumenPad {
 		/// Set IsReadLineMode to false for break of waiting.
 		/// </summary>
 		/// <returns></returns>
-		public string ReadLine() {
+		public String ReadLine() {
 			GoEnd();
-			StartReadPlace = Range.End;
-			IsReadLineMode = true;
+			this.StartReadPlace = this.Range.End;
+			this.IsReadLineMode = true;
 			try {
-				while (IsReadLineMode) {
+				while (this.IsReadLineMode) {
 					Application.DoEvents();
 					Thread.Sleep(5);
 				}
 			}
 			finally {
-				IsReadLineMode = false;
+				this.IsReadLineMode = false;
 				ClearUndo();
 			}
 
-			var res = new Range(this, StartReadPlace, Range.End).Text.TrimEnd('\r', '\n');
+			String res = new Range(this, this.StartReadPlace, this.Range.End).Text.TrimEnd('\r', '\n');
 
 			OnReadLine?.Invoke(res, new EventArgs { });
 
@@ -94,25 +94,27 @@ namespace LumenPad {
 		}
 
 		public override void OnTextChanging(ref String text) {
-			if (!IsReadLineMode && !isUpdating) {
+			if (!this.IsReadLineMode && !this.isUpdating) {
 				text = ""; //cancel changing
 				return;
 			}
 
-			if (IsReadLineMode) {
-				if (Selection.Start < StartReadPlace || Selection.End < StartReadPlace)
+			if (this.IsReadLineMode) {
+				if (this.Selection.Start < this.StartReadPlace || this.Selection.End < this.StartReadPlace) {
 					GoEnd();//move caret to entering position
+				}
 
-				if (Selection.Start == StartReadPlace || Selection.End == StartReadPlace)
+				if (this.Selection.Start == this.StartReadPlace || this.Selection.End == this.StartReadPlace) {
 					if (text == "\b") //backspace
 					{
 						text = ""; //cancel deleting of last char of readonly text
 						return;
 					}
+				}
 
 				if (text != null && text.Contains('\n')) {
 					text = text.Substring(0, text.IndexOf('\n') + 1);
-					IsReadLineMode = false;
+					this.IsReadLineMode = false;
 				}
 			}
 
@@ -120,17 +122,17 @@ namespace LumenPad {
 		}
 
 		public override void Clear() {
-			var oldIsReadMode = isReadLineMode;
+			Boolean oldIsReadMode = this.isReadLineMode;
 
-			isReadLineMode = false;
-			isUpdating = true;
+			this.isReadLineMode = false;
+			this.isUpdating = true;
 
 			base.Clear();
 
-			isUpdating = false;
-			isReadLineMode = oldIsReadMode;
+			this.isUpdating = false;
+			this.isReadLineMode = oldIsReadMode;
 
-			StartReadPlace = Place.Empty;
+			this.StartReadPlace = Place.Empty;
 		}
 	}
 }

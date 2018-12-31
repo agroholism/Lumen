@@ -214,7 +214,7 @@ namespace Lumen.Lang.Std {
 
 				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
-				Arguments = new List<FunctionArgument> { new FunctionArgument("other") { Attributes = new Dictionary<string, Value> { ["type"] = this } } }
+				Arguments = new List<FunctionArgument> { new FunctionArgument("other") { Attributes = new Dictionary<String, Value> { ["type"] = this } } }
 			});
 			SetAttribute(Op.UPLUS, new LambdaFun((scope, args) => {
 				return scope.This;
@@ -235,6 +235,10 @@ namespace Lumen.Lang.Std {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
 			SetAttribute(Op.UMINUS, new LambdaFun((scope, args) => {
+				if (scope.This is BigNum ) {
+					return -scope.This.ToBigNum(scope);
+				}
+
 				return -(Num)scope.This;
 			}));
 			/*	SetAttribute("@~", new LambdaFun((scope, args) => {

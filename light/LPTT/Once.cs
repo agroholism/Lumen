@@ -7,7 +7,7 @@ using Lumen.Lang.Std;
 namespace Stereotype {
 	[Serializable]
 	internal class Once : Expression {
-		private Expression expression;
+		private readonly Expression expression;
 		private Boolean isDepricated;
 
 		public Once(Expression expression) {

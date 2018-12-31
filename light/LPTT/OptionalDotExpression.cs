@@ -8,10 +8,10 @@ namespace Stereotype
 	[Serializable]
 	internal class OptionalDotExpression : Expression
     {
-        private Expression res;
-        private string v;
+        private readonly Expression res;
+        private readonly String v;
 
-        public OptionalDotExpression(Expression res, string v)
+        public OptionalDotExpression(Expression res, String v)
         {
             this.res = res;
             this.v = v;
@@ -25,27 +25,45 @@ namespace Stereotype
 
 		public Value Eval(Scope e)
         {
-            Value a = res.Eval(e);
-            if (a is Module)
-                if (((Module)a).Contains(v))
-                    return ((Module)a).Get(v);
-                else return Const.NULL;
-            if (a is Expando)
-                if (((Expando)a).IsExists(v))
-                    return ((Expando)a).Get(v, AccessModifiers.PUBLIC, e);
-                else return Const.NULL;
-            if (a is IObject)
-                if (((IObject)a).Type.Contains(v))
-                    return ((IObject)a).Get(v, AccessModifiers.PRIVATE, e);
-                else return Const.NULL;
-            if (a.Type.Contains(v))
-                return a.Type.Get(v, e);
-            else return Const.NULL;
-        }
+            Value a = this.res.Eval(e);
+            if (a is Module) {
+				if (((Module)a).Contains(this.v)) {
+					return ((Module)a).Get(this.v);
+				}
+				else {
+					return Const.NULL;
+				}
+			}
 
-        public override string ToString()
+			if (a is Expando) {
+				if (((Expando)a).IsExists(this.v)) {
+					return ((Expando)a).Get(this.v, AccessModifiers.PUBLIC, e);
+				}
+				else {
+					return Const.NULL;
+				}
+			}
+
+			if (a is IObject) {
+				if (((IObject)a).Type.Contains(this.v)) {
+					return ((IObject)a).Get(this.v, AccessModifiers.PRIVATE, e);
+				}
+				else {
+					return Const.NULL;
+				}
+			}
+
+			if (a.Type.Contains(this.v)) {
+				return a.Type.Get(this.v, e);
+			}
+			else {
+				return Const.NULL;
+			}
+		}
+
+        public override String ToString()
         {
-            return res.ToString() + "." + v;
+            return this.res.ToString() + "." + this.v;
         }
     }
 }

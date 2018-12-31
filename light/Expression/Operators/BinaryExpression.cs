@@ -23,32 +23,34 @@ namespace Stereotype {
 		public Value Eval(Scope e) {
 			if (this.expressionOne is IdExpression ide) {
 				if (ide.id == "_") {
-					if (expressionTwo == null) {
-						return new UserFun(new List<FunctionArgument> { new FunctionArgument("x") }, new BinaryExpression(new IdExpression("x", ide.line, ide.file), null, operation, line, file));
+					if (this.expressionTwo == null) {
+						return new UserFun(new List<FunctionArgument> { new FunctionArgument("x") }, new BinaryExpression(new IdExpression("x", ide.line, ide.file), null, this.operation, this.line, this.file));
 					}
 
-					if (expressionTwo is IdExpression ide2 && ide2.id == "_")
-						return new UserFun(new List<FunctionArgument> { new FunctionArgument("x"), new FunctionArgument("y") }, new BinaryExpression(new IdExpression("x", ide.line, ide.file), new IdExpression("y", ide2.line, ide2.file), operation, line, file));
-					else
-						return new UserFun(new List<FunctionArgument> { new FunctionArgument("x") }, new BinaryExpression(new IdExpression("x", ide.line, ide.file), expressionTwo, operation, line, file));
+					if (this.expressionTwo is IdExpression ide2 && ide2.id == "_") {
+						return new UserFun(new List<FunctionArgument> { new FunctionArgument("x"), new FunctionArgument("y") }, new BinaryExpression(new IdExpression("x", ide.line, ide.file), new IdExpression("y", ide2.line, ide2.file), this.operation, this.line, this.file));
+					}
+					else {
+						return new UserFun(new List<FunctionArgument> { new FunctionArgument("x") }, new BinaryExpression(new IdExpression("x", ide.line, ide.file), this.expressionTwo, this.operation, this.line, this.file));
+					}
 				}
 			}
 			else if (this.expressionTwo is IdExpression _ide && _ide.id == "_") {
-				return new UserFun(new List<FunctionArgument> { new FunctionArgument("x") }, new BinaryExpression(expressionOne, new IdExpression("x", _ide.line, _ide.file), operation, line, file));
+				return new UserFun(new List<FunctionArgument> { new FunctionArgument("x") }, new BinaryExpression(this.expressionOne, new IdExpression("x", _ide.line, _ide.file), this.operation, this.line, this.file));
 			}
 
 			Value operandOne = this.expressionOne.Eval(e);
 
 			if (this.operation == "and") {
-				return !Converter.ToBoolean(operandOne) ? false : (Bool)Converter.ToBoolean(expressionTwo.Eval(e));
+				return !Converter.ToBoolean(operandOne) ? false : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e));
 			}
 
 			if (this.operation == "or") {
-				return Converter.ToBoolean(operandOne) ? true : (Bool)Converter.ToBoolean(expressionTwo.Eval(e));
+				return Converter.ToBoolean(operandOne) ? true : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e));
 			}
 
 			if (this.operation == "xor") {
-				return (Bool)(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(expressionTwo.Eval(e)));
+				return (Bool)(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e)));
 			}
 
 			if (this.operation == "@not") {
@@ -59,11 +61,13 @@ namespace Stereotype {
 
 			// SOLVE
 			if (operandOne is Expando typ) {
-				var a = new Scope();
+				Scope a = new Scope();
 				a.Set("this", operandOne);
-				if (typ.IsExists(operation))
-					return ((Fun)typ.Get(operation, AccessModifiers.PUBLIC, e)).Run(a, operandTwo);
-				return ((Fun)((Expando)operandOne).Get(operation, AccessModifiers.PUBLIC, e)).Run(a, operandTwo);
+				if (typ.IsExists(this.operation)) {
+					return ((Fun)typ.Get(this.operation, AccessModifiers.PUBLIC, e)).Run(a, operandTwo);
+				}
+
+				return ((Fun)((Expando)operandOne).Get(this.operation, AccessModifiers.PUBLIC, e)).Run(a, operandTwo);
 			}
 
 			Record type = operandOne.Type;
@@ -127,7 +131,7 @@ namespace Stereotype {
 				}
 			}
 			*/
-			return new BinaryExpression(opt1, opt2, operation, line, file);
+			return new BinaryExpression(opt1, opt2, this.operation, this.line, this.file);
 		}
 
 		public override String ToString() {

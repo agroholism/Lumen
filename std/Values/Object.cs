@@ -7,7 +7,7 @@ namespace Lumen.Lang.Std {
 		public Record type;
 		public Dictionary<String, Value> Fields { get; set; }
 		public List<String> Final { get; set; }
-		public Record Type => type;
+		public Record Type => this.type;
 		public Expando Prototype => this["prototype", null] as Expando;
 
 		public Value this[String key, Scope e] {
@@ -61,19 +61,22 @@ namespace Lumen.Lang.Std {
 			}
 
 			if (this.Fields.ContainsKey("get_" + name) && this.Fields["get_" + name] is Fun f) {
-				Scope sc = new Scope(e);
-				sc.This = this;
+				Scope sc = new Scope(e) {
+					This = this
+				};
 				return f.Run(sc);
 			}
 
 			if (this.Prototype.IsExists("get_" + name) && this.Prototype.Get("get_" + name, AccessModifiers.PUBLIC, e) is Fun property) {
-				Scope sc = new Scope(e);
-				sc.This = this;
+				Scope sc = new Scope(e) {
+					This = this
+				};
 				return property.Run(sc);
 			}
 
-			Scope s = new Scope(e);
-			s.This = this;
+			Scope s = new Scope(e) {
+				This = this
+			};
 
 			return ((Fun)Get("missing", AccessModifiers.PUBLIC, e)).Run(s, new KString(name));
 		}
@@ -84,8 +87,9 @@ namespace Lumen.Lang.Std {
 			}
 
 			if (this.Fields.ContainsKey("set_" + name) && this.Fields["set_" + name] is Fun f) {
-				Scope s = new Scope(e);
-				s.This = this;
+				Scope s = new Scope(e) {
+					This = this
+				};
 				f.Run(s, value);
 			}
 			else {
@@ -94,16 +98,18 @@ namespace Lumen.Lang.Std {
 		}
 
 		public String ToString(Scope e) {
-			if (Fields.ContainsKey("to_s")) {
-				Scope s = new Scope(e);
-				s.This = this;
+			if (this.Fields.ContainsKey("to_s")) {
+				Scope s = new Scope(e) {
+					This = this
+				};
 				return ((Fun)this.Fields["to_s"]).Run(s).ToString(e);
 			}
 
-			if (Fields["prototype"] is Expando obj) {
+			if (this.Fields["prototype"] is Expando obj) {
 				if (obj.IsExists("to_s")) {
-					Scope s = new Scope(e);
-					s.This = this;
+					Scope s = new Scope(e) {
+						This = this
+					};
 					return ((Fun)obj.Get("to_s", AccessModifiers.PUBLIC, e)).Run(s).ToString(e);
 				}
 			}
@@ -111,7 +117,7 @@ namespace Lumen.Lang.Std {
 			throw new Exception("невозможно преобразовать объект к типу Kernel.Number", stack: e);
 		}
 
-		public int CompareTo(object obj) {
+		public Int32 CompareTo(Object obj) {
 			if (obj is Value) {
 				Scope e = new Scope(null);
 				e.Set("this", this);

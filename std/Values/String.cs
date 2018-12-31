@@ -163,13 +163,14 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Int32 GetLength() {
-			return innerValue.Length;
+			return this.innerValue.Length;
 		}
 
 		public Int32 CompareTo(Object obj) {
 			if (obj is Value) {
-				Scope s = new Scope(null);
-				s.This = this;
+				Scope s = new Scope(null) {
+					This = this
+				};
 				//return (int)Converter.ToDouble(((Fun)Type.Get("<=>", null)).Run(s, (Value)obj), null);
 			}
 

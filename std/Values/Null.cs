@@ -14,11 +14,11 @@ namespace Lumen.Lang.Std {
 			return this.ToString(null);
 		}
 
-		public string ToString(Scope e) {
+		public String ToString(Scope e) {
 			return "";
 		}
 
-		public int CompareTo(object obj) {
+		public Int32 CompareTo(Object obj) {
 			if (obj is Value) {
 				Scope e = new Scope(null);
 				e.Set("this", this);

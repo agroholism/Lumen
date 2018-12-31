@@ -6,22 +6,21 @@ using Lumen.Lang.Std;
 using Lumen.Lang.Expressions;
 
 namespace Stereotype {
-	internal sealed partial class Parser {
-		private List<Token> tokens;
-		private Int32 size;
+	internal sealed class Parser {
+		private readonly List<Token> tokens;
+		private readonly Int32 size;
 		private Int32 position;
 		private Int32 line;
-		private String fileName;
+		private readonly String fileName;
 
-		internal Parser(List<Token> Tokens) {
+		internal Parser(List<Token> Tokens, String fileName) {
+			this.fileName = fileName;
 			this.tokens = Tokens;
 			this.size = Tokens.Count;
 			this.line = 0;
 		}
 
-		internal List<Expression> Parsing(String fileName) {
-			this.fileName = fileName;
-
+		internal List<Expression> Parsing() {
 			List<Expression> result = new List<Expression>();
 			while (!Match(TokenType.EOF)) {
 				result.Add(Expression());
@@ -30,12 +29,10 @@ namespace Stereotype {
 			return result;
 		}
 
-		internal Value Parsing(Scope x, String fileName) {
-			this.fileName = fileName;
-
+		internal Value Parsing(Scope scope) {
 			Value result = null;
 			while (!Match(TokenType.EOF)) {
-				result = Expression().Eval(x);
+				result = Expression().Eval(scope);
 				Match(TokenType.EOC);
 			}
 			return result;
@@ -128,8 +125,9 @@ namespace Stereotype {
 
 			Match(TokenType.RBRACKET);
 
-			if (isDynamic)
+			if (isDynamic) {
 				return new DynamicLoad(sb.ToString());
+			}
 
 			return new Import(sb.ToString(), this.fileName, this.line);
 		}
@@ -201,10 +199,8 @@ namespace Stereotype {
 
 			// Generic only
 			Dictionary<String, Expression> generic = null;
-			Boolean isGeneric = false;
 
 			if (Match(TokenType.LBRACKET)) {
-				isGeneric = true;
 				generic = new Dictionary<String, Expression>();
 				while (!Match(TokenType.RBRACKET)) {
 					String id = Consume(TokenType.WORD).Text;
@@ -217,49 +213,10 @@ namespace Stereotype {
 				}
 			}
 
-			Dictionary<String, Expression> exemplareFields = new Dictionary<String, Expression>();
-			List<Expression> typeFields = new List<Expression>();
-			List<Expression> exemplareAttributes = new List<Expression>();
-			List<String> inMembers = new List<String>();
-			List<String> finalMembers = new List<String>();
-			List<Expression> parents = new List<Expression>();
+			Match(TokenType.LPAREN);
+			var fields = ParseArgs(TokenType.RPAREN);
 
-			// RECORDS?
-
-			if (Match(TokenType.LT)) {
-				do {
-					parents.Add(ParseType());
-				} while (Match(TokenType.SPLIT));
-			}
-
-			if (Match(TokenType.DO)) {
-				while (!Match(TokenType.END)) {
-					if (Match(TokenType.EOF)) {
-						throw new Lumen.Lang.Std.Exception("end of file (type parsing)") {
-							line = this.line,
-							file = this.fileName
-						};
-					}
- if (Match(TokenType.TYPE)) {
-						typeFields.Add(Expression());
-					}
-					// Метод.
-					else if (LookMatch(0, TokenType.LET)) {
-						exemplareAttributes.Add(Expression());
-					}
-					// Константа
-					else if (LookMatch(0, TokenType.CONST)) {
-						typeFields.Add(Expression());
-					}
-					else {
-						Match(GetToken(0).Type);
-					}
-
-					Match(TokenType.EOC);
-				}
-			}
-
-			return new StructE(nameType, exemplareFields, typeFields, exemplareAttributes, parents, inMembers, finalMembers, line, this.fileName);
+			return new StructE(nameType, fields, line, this.fileName);
 		}
 
 		#region
@@ -314,12 +271,13 @@ namespace Stereotype {
 			return new FunctionDefineStatement(name, arguments, body, returnedType, contracts, line, this.fileName);
 		}
 
+		/// <summary> For cycle </summary>
 		private Expression ParseFor() {
 			String varName;
 			Expression varType = null;
 			Boolean declaredVar = false;
 
-			if (Match(TokenType.VAR)) {
+			if (Match(TokenType.LET)) {
 				varName = Consume(TokenType.WORD).Text;
 
 				if (Match(TokenType.COLON)) {

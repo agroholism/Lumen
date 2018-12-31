@@ -26,7 +26,7 @@ namespace Stereotype {
 
 			Boolean isPartial = false;
 
-			List<Int32> placeholders = new List<int>();
+			List<Int32> placeholders = new List<Int32>();
 
 			Dictionary<Value, Value> kwargs = new Dictionary<Value, Value>();
 			List<Value> args = new List<Value>();
@@ -86,15 +86,15 @@ namespace Stereotype {
 			}
 
 			if (isPartial) {
-				var a = new List<FunctionArgument>();
-				foreach (var i in placeholders) {
+				List<FunctionArgument> a = new List<FunctionArgument>();
+				foreach (Int32 i in placeholders) {
 					a.Add(new FunctionArgument("x" + i));
 				}
-				var fmtd = a;
+				List<FunctionArgument> fmtd = a;
 
-				var nexps = new List<Expression>();
-				var x = 0;
-				foreach (var exp in this.argse) {
+				List<Expression> nexps = new List<Expression>();
+				Int32 x = 0;
+				foreach (Expression exp in this.argse) {
 					if (exp is IdExpression ide && ide.id == "_") {
 						nexps.Add(new IdExpression("x" + placeholders[x], ide.line, ide.file));
 						x++;
@@ -174,8 +174,8 @@ namespace Stereotype {
 			}
 		}
 
-		public override string ToString() {
-			return callable.ToString() + "(" + String.Join(", ", argse) + ")";
+		public override String ToString() {
+			return this.callable.ToString() + "(" + String.Join(", ", this.argse) + ")";
 		}
 
 		public Value Eval(Scope e) {

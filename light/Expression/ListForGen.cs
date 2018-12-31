@@ -28,11 +28,11 @@ namespace Stereotype {
 		private IEnumerable<Value> Generator(Scope scope) {
 			Value current;
 
-			foreach (Value i in container.Eval(scope).ToIterator(scope)) {
+			foreach (Value i in this.container.Eval(scope).ToIterator(scope)) {
 				scope.Set(this.names, i);
 
 				try {
-					current = body.Eval(scope);
+					current = this.body.Eval(scope);
 				}
 				catch (Break bs) {
 					if (bs.UseLabel() > 0) {

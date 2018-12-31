@@ -23,8 +23,6 @@ namespace Stereotype {
 			Value value = this.exp.Eval(e);
 
 			e.Set(this.id, value);
-			e.AddConstant(this.id);
-
 			return value;
 		}
 

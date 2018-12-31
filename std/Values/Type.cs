@@ -42,14 +42,16 @@ namespace Lumen.Lang.Std {
 			}
 
 			if (this.typeAttributes.ContainsKey("get_" + name) && this.typeAttributes["get_" + name] is Fun property) {
-				Scope s = new Scope(e);
-				s.This = this;
+				Scope s = new Scope(e) {
+					This = this
+				};
 				return property.Run(s);
 			}
 
 			if (this.Contains("name_missing") && this.Get("name_missing", e) is Fun func) {
-				Scope s = new Scope(e);
-				s.This = e.This;
+				Scope s = new Scope(e) {
+					This = e.This
+				};
 				return func.Run(s, (KString)name);
 			}
 
@@ -61,8 +63,9 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Boolean Contains(String Name) {
-			if (variables.Contains(Name) || typeAttributes.ContainsKey(Name))
+			if (this.variables.Contains(Name) || this.typeAttributes.ContainsKey(Name)) {
 				return true;
+			}
 
 			return false;
 		}

@@ -45,8 +45,8 @@ namespace Stereotype {
 				// TODO
 				Scope x = new Scope(e.parent);
 				x.AddUsing(Kernel);
-				Parser p = new Parser(new Lexer(System.IO.File.ReadAllText(path), "").Tokenization());
-				p.Parsing(x, fullPath);
+				Parser p = new Parser(new Lexer(System.IO.File.ReadAllText(path), "").Tokenization(), "");
+				p.Parsing(x);
 
 			/*	if (x.IsExsists("this")) {
 					new Applicate(new ValueE(x["this"]), expressions).Eval(x);

@@ -22,7 +22,7 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Fun MakeType(List<Value> @params, Scope e) {
-			foreach (KeyValuePair<List<Value>, Fun> i in memo) {
+			foreach (KeyValuePair<List<Value>, Fun> i in this.memo) {
 				Boolean match = true;
 
 				for (Int32 z = 0; z < i.Key.Count; z++) {
@@ -40,7 +40,7 @@ namespace Lumen.Lang.Std {
 			Scope scope = new Scope(e);
 
 			Int32 index = 0;
-			foreach (KeyValuePair<String, Value> i in genericParams) {
+			foreach (KeyValuePair<String, Value> i in this.genericParams) {
 				if (index < @params.Count) {
 					scope[i.Key] = @params[index];
 				}
@@ -54,8 +54,8 @@ namespace Lumen.Lang.Std {
 			this.exp.Eval(scope);
 
 			Fun re = scope[this.name] as Fun;
-			re.Attributes["name"] = (KString)(name + $"[{String.Join(", ", @params)}]");
-			memo[@params] = re;
+			re.Attributes["name"] = (KString)(this.name + $"[{String.Join(", ", @params)}]");
+			this.memo[@params] = re;
 			return re;
 		}
 	}

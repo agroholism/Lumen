@@ -5,12 +5,11 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang.Std;
 
 namespace Stereotype {
-	[Serializable]
 	internal class DotExpression : Expression {
 		internal Expression expression;
 		internal String nameVariable;
-		private String fileName;
-		private Int32 line;
+		private readonly String fileName;
+		private readonly Int32 line;
 		public Expression Optimize(Scope scope) {
 			return this;
 		}
@@ -25,13 +24,13 @@ namespace Stereotype {
 		}
 
 		public Expression Closure(List<String> visible, Scope thread) {
-			return new DotExpression(this.expression.Closure(visible, thread), nameVariable, this.fileName, this.line);
+			return new DotExpression(this.expression.Closure(visible, thread), this.nameVariable, this.fileName, this.line);
 		}
 
 		public Value Eval(Scope e) {
 			if (this.expression is IdExpression conste && conste.id == "_") {
 				return new UserFun(
-					new List<FunctionArgument> { new FunctionArgument("x") }, new DotExpression(new IdExpression("x", line, fileName), nameVariable));
+					new List<FunctionArgument> { new FunctionArgument("x") }, new DotExpression(new IdExpression("x", this.line, this.fileName), this.nameVariable));
 			}
 
 			try {
@@ -71,11 +70,11 @@ namespace Stereotype {
 
 				Record type = a.Type;
 
-				 Int32 Index(Dictionary<String, Record> pairs, String searched) {
+				Int32 Index(List<FunctionArgument> pairs, String searched) {
 					Int32 result = 0;
 
-					foreach (var pair in pairs) {
-						if (pair.Key == searched) {
+					foreach (FunctionArgument pair in pairs) {
+						if (pair.name == searched) {
 							return result;
 						}
 						result++;
@@ -133,8 +132,8 @@ namespace Stereotype {
 			}
 		}
 
-		public override string ToString() {
-			return expression.ToString() + "." + nameVariable;
+		public override String ToString() {
+			return this.expression.ToString() + "." + this.nameVariable;
 		}
 	}
 }

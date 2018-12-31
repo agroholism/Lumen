@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Lumen.Lang.Std {
@@ -22,8 +21,9 @@ namespace Lumen.Lang.Std {
 
 				Value[] _args = new Value[args.Length - 1];
 				Array.Copy(args, 1, _args, 0, args.Length - 1);
-				Scope s = new Scope(e);
-				s.This = val;
+				Scope s = new Scope(e) {
+					This = val
+				};
 				return ((Fun)type.GetAttribute(args[0].ToString(), e)).Run(s, _args);
 			}, "Kernel.Object.send"));
 			SetAttribute("ref_get_attr", new LambdaFun((e, args) => {

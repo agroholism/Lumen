@@ -31,16 +31,16 @@ namespace web {
 				MailAddress from = new MailAddress(fmail, fromName);
 				MailAddress to = new MailAddress(toMail, toName);
 
-				MailMessage message = new MailMessage(from, to);
+				MailMessage message = new MailMessage(from, to) {
+					Subject = theme,
 
-				message.Subject = theme;
+					Body = mess
+				};
 
-				message.Body = mess;
-
-				SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
-
-				client.Credentials = new NetworkCredential(userName, password);
-				client.EnableSsl = true;
+				SmtpClient client = new SmtpClient("smtp.gmail.com", 587) {
+					Credentials = new NetworkCredential(userName, password),
+					EnableSsl = true
+				};
 
 				client.Send(message);
 

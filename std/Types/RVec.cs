@@ -244,7 +244,7 @@ namespace Lumen.Lang.Std {
 				if (args.Length == 2) {
 					List<Value> result = new List<Value>();
 
-					Int32 index = Index((Int32)(double)Converter.ToDouble(args[0], e), exemplare.Count);
+					Int32 index = Index((Int32)(Double)Converter.ToDouble(args[0], e), exemplare.Count);
 
 					if (index < 0 || index >= exemplare.Count) {
 						throw new Exception("выход за пределы списка при срезе вида [i, j]", stack: e);
@@ -319,7 +319,7 @@ namespace Lumen.Lang.Std {
 						scope["self"] = fun;
 						scope["args"] = new Vec(new List<Value> { i, j });
 						scope["kwargs"] = new Map();
-						return (Int32)(double)Converter.ToDouble(fun.Run(scope, i, j), e);
+						return (Int32)(Double)Converter.ToDouble(fun.Run(scope, i, j), e);
 					});
 				}
 				else if (args.Length == 0) {
@@ -410,12 +410,12 @@ namespace Lumen.Lang.Std {
 				}
 
 				if (f.Arguments.Count == 1) {
-					for (int i = 0; i < v.Count; i++) {
+					for (Int32 i = 0; i < v.Count; i++) {
 						v[i] = f.Run(new Scope(e), v[i]);
 					}
 				}
 				else {
-					for (int i = 0; i < v.Count; i++) {
+					for (Int32 i = 0; i < v.Count; i++) {
 						v[i] = f.Run(new Scope(e), v[i], new Num(i));
 					}
 				}
@@ -505,7 +505,7 @@ namespace Lumen.Lang.Std {
 			}, "Kernel.List.find_last_index"));
 			SetAttribute("insert!", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
-				v.Insert((int)Converter.ToDouble(args[0], e), args[1]);
+				v.Insert((Int32)Converter.ToDouble(args[0], e), args[1]);
 				return Const.NULL;
 			}));
 			SetAttribute("last_index", new LambdaFun((e, args) => {

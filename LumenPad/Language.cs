@@ -6,7 +6,7 @@ using FastColoredTextBoxNS;
 namespace LumenPad {
 	public class Language {
 		public Dictionary<String, Style> Styles = new Dictionary<String, Style>();
-		public List<(String, String)> Folding { get; private set; } = new List<(string, string)>();
+		public List<(String, String)> Folding { get; private set; } = new List<(String, String)>();
 
 		internal virtual List<AutocompleteItem> GetAutocompleteItems(TextBoxManager manager) {
 			throw new NotImplementedException();
@@ -28,7 +28,7 @@ namespace LumenPad {
 
 			this.Styles.Add("\".*?[^\\\\]\"", Settings.String);
 			this.Styles.Add("#.*", Settings.Comment);
-			this.Styles.Add("@[a-zA-Z$._]+(\\(.*\\))?", Settings.Keyword);
+			this.Styles.Add("\\[[a-zA-Z$._]+(\\(.*\\))?\\]", Settings.String);
 			this.Styles.Add("\\b(raise|record|next|try|except|finally|global|break|not|self|and|is|let|module|or|xor|where|new|do|end|this|if|else|for|in|while|from|return|true|false|void|(:(\\s+)?(?<range>auto)))\\b", Settings.Keyword);
 			this.Styles.Add("\\b(num|exception|seq|expando|file|str|vec|bool|map)\\b", Settings.Type);
 		}
@@ -44,7 +44,7 @@ namespace LumenPad {
 				textBox.Range.SetFoldingMarkers(i.Item1, i.Item2);
 			}
 
-			textBox.Range.ClearStyle(StyleIndex.All);
+			textBox.Range.ClearStyle(StyleIndex.ALL);
 
 			foreach (KeyValuePair<String, Style> i in this.Styles) {
 				textBox.Range.SetStyle(i.Value, i.Key);
@@ -175,12 +175,13 @@ namespace LumenPad {
 				new AutocompleteItem("else", (Int32)Images.VARIABLE, "else", "else", "else keyword"),
 				new AutocompleteItem("for", (Int32)Images.VARIABLE, "for", "for", "for keyword"),
 				new AutocompleteItem("while", (Int32)Images.VARIABLE, "while", "while", "while keyword"),
+				new AutocompleteItem("record", (Int32)Images.VARIABLE, "record", "record", "record keyword"),
+
+				new AutocompleteItem("[const]", (Int32)Images.VARIABLE, "[const]", "[const]", "let const()"),
 
 				new AutocompleteItem("print", (Int32)Images.FUNCTION, "print", "fun print(...args, sep=\" \", onend=NL)", "Выводит аргументы в стандартный поток вывода"),
 
 				new AutocompleteItem("num", (Int32)Images.TYPE, "num", "record num(): num", "[description not founded]"),
-				new AutocompleteItem("cur", (Int32)Images.TYPE, "cur", "record cur(): cur", "[description not founded]"),
-				new AutocompleteItem("dbl", (Int32)Images.TYPE, "dbl", "record dbl(): dbl", "[description not founded]"),
 				new AutocompleteItem("str", (Int32)Images.TYPE, "str", "record str(): str", "[description not founded]"),
 				new AutocompleteItem("map", (Int32)Images.TYPE, "map", "record map(): map", "[description not founded]"),
 				new AutocompleteItem("bool", (Int32)Images.TYPE, "bool", "record bool(): bool", "[description not founded]"),
@@ -229,40 +230,44 @@ namespace LumenPad {
 	}
 
 	class Mod : AutocompleteItem {
-		public Mod(string s) : base(s) { }
+		public Mod(String s) : base(s) { }
 
-		public Mod(string text, int imageIndex) : base(text, imageIndex) {
+		public Mod(String text, Int32 imageIndex) : base(text, imageIndex) {
 		}
 
-		public Mod(string text, int imageIndex, string menuText) : base(text, imageIndex, menuText) {
+		public Mod(String text, Int32 imageIndex, String menuText) : base(text, imageIndex, menuText) {
 		}
 
-		public Mod(string text, int imageIndex, string menuText, string toolTipTitle, string toolTipText) : base(text, imageIndex, menuText, toolTipTitle, toolTipText) {
+		public Mod(String text, Int32 imageIndex, String menuText, String toolTipTitle, String toolTipText) : base(text, imageIndex, menuText, toolTipTitle, toolTipText) {
 		}
 
 		public override CompareResult Compare(String fragmentText) {
 			Int32 i = fragmentText.LastIndexOf('.');
 			if (i < 0) {
-				return CompareResult.Hidden;
+				return CompareResult.HIDDEN;
 			}
 
 			if (this.Text.Contains(".")) {
 				if (!this.Text.StartsWith(fragmentText) && !Extended(fragmentText)) {
-					return CompareResult.Hidden;
+					return CompareResult.HIDDEN;
 				}
-				return CompareResult.Visible;
+				return CompareResult.VISIBLE;
 			}
 
-			string lastPart = fragmentText.Substring(i + 1);
-			if (lastPart == "") return CompareResult.Visible;
-			if (Text.StartsWith(lastPart, StringComparison.InvariantCultureIgnoreCase) || Extended(lastPart))
-				return CompareResult.VisibleAndSelected;
+			String lastPart = fragmentText.Substring(i + 1);
+			if (lastPart == "") {
+				return CompareResult.VISIBLE;
+			}
 
-			return CompareResult.Hidden;
+			if (this.Text.StartsWith(lastPart, StringComparison.InvariantCultureIgnoreCase) || Extended(lastPart)) {
+				return CompareResult.VISIBLE_AND_SELECTED;
+			}
+
+			return CompareResult.HIDDEN;
 		}
 
-		public override string GetTextForReplace() {
-			return Text;
+		public override String GetTextForReplace() {
+			return this.Text;
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace LumenPad {
 
 		public static ConsoleWriter Instance;
 
-		private ConsoleEmulator tb;
+		private readonly ConsoleEmulator tb;
 
 		public ConsoleWriter(ConsoleEmulator tb) {
 			this.tb = tb;

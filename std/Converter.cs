@@ -76,8 +76,9 @@ namespace Lumen.Lang.Std {
 			Record type = value.Type;
 
 			if (type.AttributeExists("map") && type.GetAttribute("map", e) is Fun fun) {
-				Scope s = new Scope(e);
-				s.This = value;
+				Scope s = new Scope(e) {
+					This = value
+				};
 
 				return ToMap(fun.Run(s), e);
 			}
@@ -93,13 +94,15 @@ namespace Lumen.Lang.Std {
 			Record type = value.Type;
 
 			if (type.AttributeExists("vec") && type.GetAttribute("vec", e) is Fun fun) {
-				Scope s = new Scope(e);
-				s.This = value;
+				Scope s = new Scope(e) {
+					This = value
+				};
 				return ToList(fun.Run(s), e);
 			}
 			else if (type.AttributeExists("seq") && type.GetAttribute("seq", e) is Fun fun1) {
-				Scope s = new Scope(e);
-				s.This = value;
+				Scope s = new Scope(e) {
+					This = value
+				};
 				return ToIterator(fun1.Run(s), e).ToList();
 			}
 
@@ -114,9 +117,10 @@ namespace Lumen.Lang.Std {
 			}
 			else {
 				if (val.Type.AttributeExists("seq") && val.Type.GetAttribute("seq", e) is Fun fun) {
-					Scope s = new Scope(e);
-					s.This = val;
-					foreach (var i in ToIterator(fun.Run(s, new Num(count)), count, e)) {
+					Scope s = new Scope(e) {
+						This = val
+					};
+					foreach (Value i in ToIterator(fun.Run(s, new Num(count)), count, e)) {
 						yield return i;
 					}
 				}
@@ -131,8 +135,9 @@ namespace Lumen.Lang.Std {
 			}
 			else {
 				if (val.Type.AttributeExists("seq") && val.Type.GetAttribute("seq", e) is Fun fun) {
-					Scope s = new Scope(e);
-					s.This = val;
+					Scope s = new Scope(e) {
+						This = val
+					};
 					foreach (Value i in ToIterator(fun.Run(s), e)) {
 						yield return i;
 					}
@@ -140,7 +145,7 @@ namespace Lumen.Lang.Std {
 			}
 		}
 
-		static string bukv = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		static String bukv = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 		#region BaseConverter
 
@@ -152,19 +157,21 @@ namespace Lumen.Lang.Std {
 		/// <param name="number">Число, которое переводим </param>
 		/// <param name="sys">Система счисления, в которую переводим</param>
 		/// <returns>Возвращает переведенное число в строковом формате</returns>
-		public static string ToN(string number, string sys) {
-			string newNum = "";
-			int num = Convert.ToInt32(number);
-			int chast = Convert.ToInt32(number);
+		public static String ToN(String number, String sys) {
+			String newNum = "";
+			Int32 num = Convert.ToInt32(number);
+			Int32 chast = Convert.ToInt32(number);
 			ArrayList numTemp = new ArrayList();
 			while (chast > 0) {
 				chast = chast / Convert.ToInt32(sys);
 				numTemp.Add(num - chast * Convert.ToInt32(sys));
 				num = chast;
 			}
-			int j;
-			for (j = numTemp.Count - 1; j >= 0; j--)
+			Int32 j;
+			for (j = numTemp.Count - 1; j >= 0; j--) {
 				newNum += newCh(numTemp[j].ToString(), "to");
+			}
+
 			return newNum;
 		}
 		/// <summary>
@@ -173,19 +180,23 @@ namespace Lumen.Lang.Std {
 		/// <param name="sym">Число, над которым нужно работать</param>
 		/// <param name="otk">В какую сторону осуществляется действие относительно десятичной системы счисления</param>
 		/// <returns>Возвращает букву, если числу соответствует буква и наоборот, иначе число</returns>
-		public static string newCh(string sym, string otk) {
-			string s = "";
+		public static String newCh(String sym, String otk) {
+			String s = "";
 			if (otk == "to") {
-				if (Convert.ToInt32(sym) > 10)
+				if (Convert.ToInt32(sym) > 10) {
 					s += bukv.Substring(Convert.ToInt32(sym) - 10, 1);
-				else
+				}
+				else {
 					s += sym;
+				}
 			}
 			else if (otk == "from") {
-				if (bukv.IndexOf(sym) == -1)
+				if (bukv.IndexOf(sym) == -1) {
 					s += sym;
-				else
+				}
+				else {
 					s += (bukv.IndexOf(sym) + 10).ToString();
+				}
 			}
 			return s;
 		}
@@ -197,22 +208,22 @@ namespace Lumen.Lang.Std {
 		/// <param name="number">Число, которое переводим </param>
 		/// <param name="sys">Система счисления, из которой переводим</param>
 		/// <returns>Возвращает переведенное число в строковом формате</returns>
-		public static string FromN(string number, string sys) {
-			int newNum = 0;
-			string temp = "";
-			int t;
-			int i;
+		public static String FromN(String number, String sys) {
+			Int32 newNum = 0;
+			String temp = "";
+			Int32 t;
+			Int32 i;
 			for (i = 0; i < number.Length; i++) {
 				temp = "";
 				temp += newCh(number.Substring(i, 1), "from");
-				t = (int)System.Math.Pow(Convert.ToDouble(sys), Convert.ToDouble(number.Length - (i + 1)));
+				t = (Int32)System.Math.Pow(Convert.ToDouble(sys), Convert.ToDouble(number.Length - (i + 1)));
 				newNum += Convert.ToInt32(temp) * t;
 			}
 			return newNum.ToString();
 		}
 
-		public static string FromTo(string number, string sysN, string sysK) {
-			string temp = "";
+		public static String FromTo(String number, String sysN, String sysK) {
+			String temp = "";
 			temp = FromN(number, sysN);
 			temp = ToN(temp, sysK);
 			return temp;

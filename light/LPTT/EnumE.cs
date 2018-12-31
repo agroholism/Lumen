@@ -6,7 +6,7 @@ using Lumen.Lang.Std;
 namespace Stereotype {
 	internal class EnumE : Expression {
 		private System.String name;
-		private List<System.String> constants;
+		private readonly List<System.String> constants;
 
 		public EnumE(System.String name, List<System.String> constants) {
 			this.name = name;
@@ -55,11 +55,11 @@ namespace Stereotype {
 				return (Bool)true;
 			}));
 
-			for (Int32 i = 0; i < constants.Count; i++) {
-				result.Set(constants[i], new EnumTypeInstance(constants[i], (Num)i, result));
+			for (Int32 i = 0; i < this.constants.Count; i++) {
+				result.Set(this.constants[i], new EnumTypeInstance(this.constants[i], (Num)i, result));
 			}
 
-			e.Set(name, result);
+			e.Set(this.name, result);
 			return Const.NULL;
 		}
 

@@ -9,12 +9,12 @@ namespace Lumen.Lang.Std {
 
 		public LambdaFun(HFun value) {
 			this.value = value;
-			this.Attributes = new Dictionary<string, Value>();
+			this.Attributes = new Dictionary<String, Value>();
 		}
 
 		public LambdaFun(HFun value, String name) {
 			this.value = value;
-			this.Attributes = new Dictionary<string, Value>();
+			this.Attributes = new Dictionary<String, Value>();
 			this.Attributes["name"] = (KString)name;
 		}
 
@@ -36,7 +36,7 @@ namespace Lumen.Lang.Std {
 					}
 
 					if (args.Length != 0) {
-						if(i.Attributes != null && i.Attributes.TryGetValue("type", out var t)) {
+						if(i.Attributes != null && i.Attributes.TryGetValue("type", out Value t)) {
 							if(t != args[counter].Type) {
 								throw new Exception("type error ");
 							}
@@ -82,7 +82,7 @@ namespace Lumen.Lang.Std {
 
 			Value result = null;
 			try {
-				result = value(e, args);
+				result = this.value(e, args);
 			}
 			catch (Return rt) {
 				result = rt.Result;
@@ -90,11 +90,11 @@ namespace Lumen.Lang.Std {
 			return result;
 		}
 
-		public bool ToBool(Scope e) {
+		public Boolean ToBool(Scope e) {
 			throw new NotImplementedException();
 		}
 
-		public double ToDouble(Scope e) {
+		public Double ToDouble(Scope e) {
 			throw new NotImplementedException();
 		}
 
@@ -102,7 +102,7 @@ namespace Lumen.Lang.Std {
 
 		public List<FunctionArgument> Arguments { get; set; } = new List<FunctionArgument>();
 
-		public int CompareTo(object obj) {
+		public Int32 CompareTo(Object obj) {
 			return 0;
 		}
 
@@ -120,16 +120,17 @@ namespace Lumen.Lang.Std {
 			}
 
 			if (this.Type.AttributeExists("get_" + name) && this.Type.GetAttribute("get_" + name, e) is Fun property) {
-				Scope s = new Scope(e);
-				s.This = this;
+				Scope s = new Scope(e) {
+					This = this
+				};
 				return property.Run(s);
 			}
 
 			throw new Exception($"value of type {this.Type.meta.Name} not contains a field {name}", stack: e);
 		}
 
-		public void Set(string name, Value value, AccessModifiers mode, Scope e) {
-			Attributes[name] = value;
+		public void Set(String name, Value value, AccessModifiers mode, Scope e) {
+			this.Attributes[name] = value;
 		}
 
 		public String ToString(Scope e) {

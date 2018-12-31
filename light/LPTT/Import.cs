@@ -12,7 +12,7 @@ namespace Stereotype {
 		public String v;
 		public String directoryName;
 		public Int32 line;
-		private String fileName;
+		private readonly String fileName;
 
 		public Expression Optimize(Scope scope) {
 			return this;
@@ -29,7 +29,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			String path = /*IK.path == null ? */v/* : IK.path + "\\" + v*/;
+			String path = /*IK.path == null ? */this.v/* : IK.path + "\\" + v*/;
 
 			path += System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + path + ".dll") || System.IO.File.Exists(path + ".dll") ? ".dll" : ".ks";
 
@@ -56,8 +56,8 @@ namespace Stereotype {
 			// TODO
 			Scope x = new Scope(e);
 			x.AddUsing(Lumen.Lang.Std.StandartModule.__Kernel__);
-			Parser p = new Parser(new Lexer(System.IO.File.ReadAllText(fullPath), fileName).Tokenization());
-			p.Parsing(x, fullPath);
+			Parser p = new Parser(new Lexer(System.IO.File.ReadAllText(fullPath), this.fileName).Tokenization(), fileName);
+			p.Parsing(x);
 
 			/*	if (x.IsExsists("this")) {
 					new Applicate(new ValueE(x["this"]), expressions).Eval(x);

@@ -6,9 +6,9 @@ using Lumen.Lang.Std;
 
 namespace Stereotype {
 	internal class RaiseE : Expression {
-		private Expression expression;
-		private String file;
-		private Int32 line;
+		private readonly Expression expression;
+		private readonly String file;
+		private readonly Int32 line;
 
 		public Expression Optimize(Scope scope) {
 			return this;
@@ -25,8 +25,10 @@ namespace Stereotype {
 			if (v is Lumen.Lang.Std.Exception hex) {
 				hex.line = this.line;
 				hex.file = this.file;
-				if (hex.stack == null)
+				if (hex.stack == null) {
 					hex.stack = e;
+				}
+
 				e.Set("$!", hex); // to global
 				throw v as Lumen.Lang.Std.Exception;
 			}

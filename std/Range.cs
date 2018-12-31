@@ -5,9 +5,9 @@ using System.Collections.Generic;
 namespace Lumen.Lang.Std {
 	[Serializable]
 	public class Range : IEnumerator<Value> {
-		Value begin;
-		Value end;
-		Value step;
+		readonly Value begin;
+		readonly Value end;
+		readonly Value step;
 		Value current;
 		Boolean flag;
 
@@ -19,20 +19,21 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Value Current {
-			get => current;
+			get => this.current;
 		}
 
 		Object IEnumerator.Current {
-			get => current;
+			get => this.current;
 		}
 
 		public void Dispose() {
 
 		}
 
-		public bool MoveNext() {
-			Scope s = new Scope(null);
-			s.This = this.current;
+		public Boolean MoveNext() {
+			Scope s = new Scope(null) {
+				This = this.current
+			};
 
 			if (!this.flag) {
 				this.flag = true;
@@ -50,7 +51,7 @@ namespace Lumen.Lang.Std {
 		}
 
 		public void Reset() {
-			current = begin;
+			this.current = this.begin;
 		}
 	}
 }

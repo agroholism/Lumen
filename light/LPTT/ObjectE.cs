@@ -15,7 +15,7 @@ namespace Stereotype {
 		}
 
 		public Expression Closure(List<String> visible, Scope thread) {
-			return new ObjectE(expression.Closure(visible, thread));
+			return new ObjectE(this.expression.Closure(visible, thread));
 		}
 		public Expression Optimize(Scope scope) {
 			return this;
@@ -29,15 +29,17 @@ namespace Stereotype {
 		public Value Eval(Scope e) {
 			Expando result = null;
 
-			if (p == null)
+			if (this.p == null) {
 				result = new Expando();
-			else
-				result = new Expando(p.Eval(e));
+			}
+			else {
+				result = new Expando(this.p.Eval(e));
+			}
 
 			Scope x = new Scope(e);
 
-			if (expression is BlockE) {
-				foreach (var exp in (expression as BlockE).expressions) {
+			if (this.expression is BlockE) {
+				foreach (Expression exp in (this.expression as BlockE).expressions) {
 					if (exp is Assigment ass) {
 						result.Set(ass.id, ass.exp.Eval(e), AccessModifiers.PUBLIC, e);
 					}
@@ -47,10 +49,10 @@ namespace Stereotype {
 				}
 			}
 			else {
-				if (expression is Assigment ass) {
+				if (this.expression is Assigment ass) {
 					result.Set(ass.id, ass.exp.Eval(e), AccessModifiers.PUBLIC, e);
 				}
-				else if (expression is FunctionDefineStatement fds) {
+				else if (this.expression is FunctionDefineStatement fds) {
 					result.Set(fds.NameFunction, new AnonymeDefine(fds.Args, fds.Body, fds.returnedType, fds.otherContacts).Eval(e), AccessModifiers.PUBLIC, e);
 				}
 			}

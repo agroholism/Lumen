@@ -19,14 +19,14 @@ namespace Stereotype {
 		}
 
 		public Expression Closure(List<String> visible, Scope thread) {
-			return new DotApplicate(res.Closure(visible, thread), exps.Select(i => i.Closure(visible, thread)).ToList());
+			return new DotApplicate(this.res.Closure(visible, thread), this.exps.Select(i => i.Closure(visible, thread)).ToList());
 		}
 
 		public Value Eval(Scope e) {
 			Value obj = ((DotExpression)this.res).expression.Eval(e);
 
 			if (obj is Expando) {
-				Value v = ((Expando)obj).Get(((DotExpression)res).nameVariable, AccessModifiers.PUBLIC, e);
+				Value v = ((Expando)obj).Get(((DotExpression)this.res).nameVariable, AccessModifiers.PUBLIC, e);
 
 				if (v is Fun) {
 					List<Value> Objects = new List<Value>();
@@ -35,43 +35,51 @@ namespace Stereotype {
 					x.Set("this", obj);
 					x.Set("self", v);
 
-					foreach (Expression i in exps)
+					foreach (Expression i in this.exps) {
 						if (i is Assigment) {
 							x.Set(((Assigment)i).id, ((Assigment)i).exp.Eval(e));
 						}
 						else {
-							if (i is SpreadE)
-								foreach (Value j in Converter.ToList(i.Eval(e)))
+							if (i is SpreadE) {
+								foreach (Value j in Converter.ToList(i.Eval(e))) {
 									Objects.Add(j);
-							else
+								}
+							}
+							else {
 								Objects.Add(i.Eval(e));
+							}
 						}
+					}
 
 					return ((Fun)v).Run(x, Objects.ToArray());
 				}
 				return new Null();
 			}
 			else if (obj is Module module) {
-				if (!module.Contains(((DotExpression)res).nameVariable))
+				if (!module.Contains(((DotExpression)this.res).nameVariable)) {
 					throw new Lumen.Lang.Std.Exception("модуль не содержит функцию '" + ((DotExpression)this.res).nameVariable + "'", stack: e);
+				}
 
-				Value v = module.Get(((DotExpression)res).nameVariable);
+				Value v = module.Get(((DotExpression)this.res).nameVariable);
 
 				if (v is Fun func) {
 					List<Value> Objects = new List<Value>();
 
 					Scope x = new Scope(module.isNotScope ? e : module.scope);
 
-					foreach (Expression i in exps) {
+					foreach (Expression i in this.exps) {
 						if (i is Assigment) {
 							x.Set(((Assigment)i).id, ((Assigment)i).exp.Eval(e));
 						}
 						else {
-							if (i is SpreadE)
-								foreach (Value j in Converter.ToList(i.Eval(e), e))
+							if (i is SpreadE) {
+								foreach (Value j in Converter.ToList(i.Eval(e), e)) {
 									Objects.Add(j);
-							else
+								}
+							}
+							else {
 								Objects.Add(i.Eval(e));
+							}
 						}
 					}
 					//	MessageBox.Show((Objects == null).ToString());
@@ -105,17 +113,21 @@ namespace Stereotype {
 
 					Scope x = new Scope(e) { ["this"] = obj };
 
-					foreach (Expression i in this.exps)
+					foreach (Expression i in this.exps) {
 						if (i is Assigment) {
 							x.Set(((Assigment)i).id, ((Assigment)i).exp.Eval(e));
 						}
 						else {
-							if (i is SpreadE)
-								foreach (dynamic j in Converter.ToList(i.Eval(e)))
+							if (i is SpreadE) {
+								foreach (dynamic j in Converter.ToList(i.Eval(e))) {
 									args.Add(j);
-							else
+								}
+							}
+							else {
 								args.Add(i.Eval(e));
+							}
 						}
+					}
 
 					return ((Fun)fun).Run(x, args.ToArray());
 				}
@@ -148,11 +160,14 @@ namespace Stereotype {
 						Objects.Add((KString)dec.id);
 					}
 					else {
-						if (i is SpreadE)
-							foreach (dynamic j in Converter.ToList(i.Eval(e), e))
+						if (i is SpreadE) {
+							foreach (dynamic j in Converter.ToList(i.Eval(e), e)) {
 								Objects.Add(j);
-						else
+							}
+						}
+						else {
 							Objects.Add(i.Eval(e));
+						}
 					}
 				}
 
@@ -213,10 +228,10 @@ namespace Stereotype {
 		}
 
 		public override String ToString() {
-			if(res is DotExpression de && de.nameVariable == "[]") {
-				return de.expression + "[" + String.Join(", ", exps) + "]";
+			if(this.res is DotExpression de && de.nameVariable == "[]") {
+				return de.expression + "[" + String.Join(", ", this.exps) + "]";
 			}
-			return res.ToString() + "(" + String.Join(", ", exps) + ")";
+			return this.res.ToString() + "(" + String.Join(", ", this.exps) + ")";
 		}
 	}
 }
