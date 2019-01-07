@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
-	public class Null : Value {
+	public class Void : Value {
 		public Value Clone() {
 			return this;
 		}
 
-		public Record Type => StandartModule.Null;
+		public IObject Type => StandartModule.Null;
 
 		public override String ToString() {
 			return this.ToString(null);

@@ -9,7 +9,16 @@ namespace Lumen.Lang.Std {
 		public Expression body;
 		public Expression condition;
 		public Dictionary<String, Value> Attributes { get; set; }
-		public Boolean isInline;
+
+		public IObject returned;
+
+		public IObject Prototype {
+			get {
+				this.Attributes.TryGetValue("@prototype", out Value result);
+				return result as IObject;
+			}
+			set => this.Attributes["@prototype"] = value;
+		}
 
 		public UserFun() {
 			this.Attributes = new Dictionary<String, Value>();
@@ -24,35 +33,16 @@ namespace Lumen.Lang.Std {
 			this.condition = condition;
 		}
 
-		public Record Type => StandartModule.Function;
+		public IObject Type => this.Prototype;
 
 		public List<FunctionArgument> Arguments { get; set; }
 
-		public Boolean ToBool(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public Double ToDouble(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public String ToString(Scope e) {
-			StringBuilder result = new StringBuilder();
-			result.Append($"fun {this.Attributes["name"]}(");
-			foreach (FunctionArgument arg in this.Arguments) {
-				result.Append(arg.name);
-				if (arg.defaultValue != null) {
-					result.Append("=" + arg.defaultValue.ToString());
-				}
-				result.Append(", ");
+		public String ToString(Scope scope) {
+			if (this.TryGet("@name", out Value result)) {
+				return result.ToString(scope);
 			}
-			result.Remove(result.Length - 2, 2);
-			String str = this.body.ToString();
-			result.Append(")");
-			result.Append(str.StartsWith("{") ? "" : " {\n\t");
-			result.Append(str);
-			result.Append(str.StartsWith("{") ? "" : "\n}");
-			return result.ToString();
+
+			return "";
 		}
 
 		public override String ToString() {
@@ -83,8 +73,8 @@ tail_recursion:
 
 					if (args.Length != 0) {
 						if (i.Attributes != null && i.Attributes.TryGetValue("type", out Value t)) {
-							if (t != args[counter].Type) {
-								throw new Exception("type error ");
+							if (t is IObject iobject && !iobject.IsParentOf(args[counter])) {
+								throw new Exception($"type error: wait {iobject} given ?");
 							}
 						}
 
@@ -101,7 +91,7 @@ tail_recursion:
 							}
 						}
 						else {
-							e.Set(i.name, Const.NULL);
+							e.Set(i.name, Const.VOID);
 						}
 
 						counter++;
@@ -117,7 +107,7 @@ tail_recursion:
 						}
 					}
 					else {
-						e.Set(i.name, Const.NULL);
+						e.Set(i.name, Const.VOID);
 					}
 				}
 			}
@@ -141,8 +131,8 @@ tail_recursion:
 				goto tail_recursion;
 			}
 
-			if(this.Attributes.TryGetValue("returned", out Value ret)) {
-				if(!(result.Type == ret)) {
+			if(this.returned != null) {
+				if(!this.returned.IsParentOf(result)) {
 					throw new Exception("wrong ret type");
 				}
 			}
@@ -150,20 +140,63 @@ tail_recursion:
 			return result;
 		}
 
+		public Boolean IsParentOf(Value value) {
+			if (value is IObject parent) {
+				while (true) {
+					if (parent.TryGet("@prototype", out var v)) {
+						parent = v as IObject;
+						if (parent == this) {
+							return true;
+						}
+					}
+					else {
+						break;
+					}
+				}
+			}
+			return false;
+		}
+
 		public Int32 CompareTo(Object obj) {
 			return 0;
 		}
 
-		public Value Get(String name, AccessModifiers mode, Scope e) {
-			return this.Attributes[name];
+		public Value Clone() {
+			return (Value)this.MemberwiseClone();
 		}
 
-		public void Set(String name, Value value, AccessModifiers mode, Scope e) {
+		public Value Get(String name, Scope e) {
+			if (this.Attributes.TryGetValue(name, out var result)) {
+				return result;
+			}
+
+			if (this.Prototype != null) {
+				if (this.Prototype.TryGet(name, out result)) {
+					return result;
+				}
+			}
+
+			throw new Exception($"record does not contains a field {name}", stack: e);
+		}
+
+		public void Set(String name, Value value, Scope e) {
 			this.Attributes[name] = value;
 		}
 
-		public Value Clone() {
-			return (Value)this.MemberwiseClone();
+		public Boolean TryGet(String name, out Value result) {
+			result = null;
+
+			if (this.Attributes.TryGetValue(name, out result)) {
+				return true;
+			}
+
+			if (this.Prototype != null) {
+				if (this.Prototype.TryGet(name, out result)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 }

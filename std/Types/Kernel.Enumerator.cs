@@ -42,7 +42,7 @@ namespace Lumen.Lang.Std {
 				Fun func = scope["func"].ToFunction(scope);
 				Value seed = scope["seed"];
 
-				if (seed is Null) {
+				if (seed is Void) {
 					return value.Aggregate((x, y) => func.Run(new Scope(scope), x, y));
 				}
 				else {
@@ -51,7 +51,7 @@ namespace Lumen.Lang.Std {
 			}) {
 				Arguments = new List<FunctionArgument> {
 						new FunctionArgument("func"),
-						new FunctionArgument("seed", Const.NULL)
+						new FunctionArgument("seed", Const.VOID)
 					}
 			});
 

@@ -9,35 +9,33 @@ namespace Lumen.Lang.Std {
 	internal sealed class StringClass : Record {
 		internal StringClass() {
 			this.meta = new TypeMetadata {
-				Name = "Kernel.String"
+				Name = "std.str"
 			};
 
 			#region operators
 
-			SetAttribute(Op.PLUS, new LambdaFun((e, args) => {
-				return new KString(e.Get("this").ToString(e) + args[0].ToString(e));
+			SetAttribute(Op.USTAR, new LambdaFun((e, args) => {
+				return new Num(e.This.ToString(e).Length);
 			}));
-			SetAttribute("<<", new LambdaFun((e, args) => {
-				KString obj = e.Get("this") as KString;
+
+			SetAttribute(Op.PLUS, new LambdaFun((e, args) => {
+				return new Str(e.This.ToString(e) + args[0].ToString(e));
+			}));
+
+			SetAttribute(Op.LSH, new LambdaFun((e, args) => {
+				Str obj = e.This as Str;
 				obj.innerValue = obj.innerValue + args[0].ToString(e);
 				return obj;
 			}));
-		/*	SetAttribute("@~", new LambdaFun((e, args) => {
-				return new Regex(new System.Text.RegularExpressions.Regex(e.Get("this").ToString(e)));
-			}));*/
-			SetAttribute("*", new LambdaFun((e, args) => {
-				String str = e.Get("this").ToString(e);
-				Int32 count = (Int32)Converter.ToDouble(args[0], e);
+			SetAttribute(Op.STAR, new LambdaFun((e, args) => {
+				String str = e.This.ToString(e);
+				Int32 count = (Int32)args[0].ToDouble(e);
 				StringBuilder buffer = new StringBuilder();
-
 				for (Int32 i = 0; i < count; i++) {
 					buffer.Append(str);
 				}
 
-				return new KString(buffer.ToString());
-			}));
-			SetAttribute("@*", new LambdaFun((e, args) => {
-				return new Num(e.Get("this").ToString(e).Length);
+				return new Str(buffer.ToString());
 			}));
 			SetAttribute("++", new LambdaFun((e, args) => {
 				String value = e.Get("this").ToString();
@@ -48,7 +46,7 @@ namespace Lumen.Lang.Std {
 					if (index == -1) {
 						last_char--;
 						if (last_char == -1) {
-							return new KString(value.Substring(0, value.Length - 1) + (Char)(1 + value[value.Length - 1]));
+							return new Str(value.Substring(0, value.Length - 1) + (Char)(1 + value[value.Length - 1]));
 						}
 						continue;
 					}
@@ -85,7 +83,7 @@ namespace Lumen.Lang.Std {
 					}
 					break;
 				}
-				return new KString(value);
+				return new Str(value);
 			}));
 			SetAttribute("[]", new LambdaFun((e, args) => {
 				String value = e.Get("this").ToString();
@@ -99,9 +97,9 @@ namespace Lumen.Lang.Std {
 						if (index >= value.Length || index < 0) {
 							throw new Exception("выход за пределы строки при срезе вида [i]. Требуемый индекс [" + i + "] превышает длину строки [" + value.Length + "]", stack: e);
 						}
-						return new KString(GlobalizationEach(value).Skip(index).First().ToString());
+						return new Str(GlobalizationEach(value).Skip(index).First().ToString());
 					}
-					else if (args[0] is KString) {
+					else if (args[0] is Str) {
 						Int32 position = value.IndexOf(args[0].ToString());
 						if (position == -1) {
 							return Const.FALSE;
@@ -110,17 +108,17 @@ namespace Lumen.Lang.Std {
 							return new Num(position);
 						}
 					}
-				/*	else if (args[0].Type.includedModules.IndexOf(StandartModule.Enumerable) != -1) {
-						IEnumerable<Value> enumerator = Converter.ToIterator(args[0], 1, e);
-						StringBuilder sb = new StringBuilder();
-						foreach (Value i in enumerator) {
-							if (i is Number fix) {
-								sb.Append(value[(Int32)fix]);
+					/*	else if (args[0].Type.includedModules.IndexOf(StandartModule.Enumerable) != -1) {
+							IEnumerable<Value> enumerator = Converter.ToIterator(args[0], 1, e);
+							StringBuilder sb = new StringBuilder();
+							foreach (Value i in enumerator) {
+								if (i is Number fix) {
+									sb.Append(value[(Int32)fix]);
+								}
 							}
-						}
 
-						return new KString(sb.ToString());
-					}*/
+							return new KString(sb.ToString());
+						}*/
 				}
 				else if (args.Length == 2) {
 
@@ -130,17 +128,24 @@ namespace Lumen.Lang.Std {
 			SetAttribute("@!", new LambdaFun((e, args) => {
 				Char[] a = e.Get("this").ToString().ToCharArray();
 				Array.Reverse(a);
-				return new KString(new String(a));
+				return new Str(new String(a));
 			}));
 			SetAttribute("=~", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
 
 				return new Bool(args[0].ToString() == e.Get("this").ToString());
 			}));
+
+
+
+			/*	SetAttribute("@~", new LambdaFun((e, args) => {
+					return new Regex(new System.Text.RegularExpressions.Regex(e.Get("this").ToString(e)));
+				}));*/
+
 			SetAttribute("==", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString)) {
+				if (!(args[0] is Str)) {
 					return new Bool(false);
 				}
 
@@ -149,7 +154,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("!=", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString)) {
+				if (!(args[0] is Str)) {
 					return new Bool(true);
 				}
 
@@ -168,7 +173,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute(">=", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString)) {
+				if (!(args[0] is Str)) {
 					throw new Exception("правый операнд должен иметь тип Kernel.String", stack: e);
 				}
 
@@ -177,7 +182,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("<=>", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
-				if (!(args[0] is KString)) {
+				if (!(args[0] is Str)) {
 					throw new Exception("правый операнд должен иметь тип Kernel.String", stack: e);
 				}
 
@@ -189,15 +194,8 @@ namespace Lumen.Lang.Std {
 			SetAttribute("...", new LambdaFun((e, args) => {
 				return Range.RANGE_CREATOR.Run(new Scope(e), e.Get("this"), args[0]);
 			}));*/
-			SetAttribute("%", new LambdaFun((e, args) => {
-				//Checker.ExistsThis(e);
-
-				/*if (args[0].Type.includedModules.Contains(StandartModule.Enumerable)) {
-					return new KString(String.Format(e.Get("this").ToString(), Converter.ToList(args[0], e).ToArray()));
-				}
-				else {*/
-					return new KString(String.Format(e.Get("this").ToString(), args));
-				//}
+			SetAttribute(Op.MOD, new LambdaFun((e, args) => {
+				return new Str(String.Format(e.This.ToString(e), args[0].ToList(e).ToArray()));
 			}));
 			SetAttribute("/", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
@@ -206,7 +204,7 @@ namespace Lumen.Lang.Std {
 					e.Get("this").ToString().Split(
 						args[0].ToString().ToCharArray(),
 						StringSplitOptions.RemoveEmptyEntries
-					).Select(x => (Value)new KString(x)).ToList());
+					).Select(x => (Value)new Str(x)).ToList());
 			}));
 
 			#endregion
@@ -221,7 +219,7 @@ namespace Lumen.Lang.Std {
 					index++;
 				}
 
-				return new KString(String.Concat(z));
+				return new Str(String.Concat(z));
 			}));
 			SetAttribute("to_i", new LambdaFun((e, args) => {
 				String v = e.Get("this").ToString();
@@ -246,10 +244,10 @@ namespace Lumen.Lang.Std {
 				return (Bool)e.Get("this").ToString(e).All(i => (Int32)i < 255);
 			}));
 			SetAttribute("get_upper", new LambdaFun((e, args) => {
-				return new KString(e.Get("this").ToString().ToUpper());
+				return new Str(e.Get("this").ToString().ToUpper());
 			}));
 			SetAttribute("get_lower", new LambdaFun((e, args) => {
-				return new KString(e.Get("this").ToString().ToLower());
+				return new Str(e.Get("this").ToString().ToLower());
 			}));
 			SetAttribute("encode", new LambdaFun((e, args) => {
 
@@ -265,7 +263,7 @@ namespace Lumen.Lang.Std {
 				return new Num(e.Get("this").ToString().IndexOfAny(args[0].ToString().ToCharArray()));
 			}));
 			SetAttribute("sub", new LambdaFun((e, args) => {
-				return new KString(e.Get("this").ToString().Replace(args[0].ToString(), args[1].ToString()));
+				return new Str(e.Get("this").ToString().Replace(args[0].ToString(), args[1].ToString()));
 			}));
 			SetAttribute("start_with?", new LambdaFun((e, args) => {
 				return new Bool(e.Get("this").ToString().StartsWith(args[0].ToString()));
@@ -424,7 +422,7 @@ namespace Lumen.Lang.Std {
 						buff.Append(s[i]);
 					}
 				}
-				return new KString(buff.ToString());
+				return new Str(buff.ToString());
 			}));
 			SetAttribute("white_space?", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
@@ -436,12 +434,12 @@ namespace Lumen.Lang.Std {
 			}));
 			SetAttribute("capitalize", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString().ToLower();
-				return new KString(Char.ToUpper(s[0]) + s.Substring(1));
+				return new Str(Char.ToUpper(s[0]) + s.Substring(1));
 			}));
 			SetAttribute("title_case", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
 				TextInfo t = CultureInfo.CurrentCulture.TextInfo;
-				return new KString(t.ToTitleCase(s));
+				return new Str(t.ToTitleCase(s));
 			}));
 			SetAttribute("swap_caze", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
@@ -455,7 +453,7 @@ namespace Lumen.Lang.Std {
 					}
 				}
 
-				return new KString(result);
+				return new Str(result);
 			}));
 			/*SetAttribute("ljust", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
@@ -474,34 +472,34 @@ namespace Lumen.Lang.Std {
 			SetAttribute("chomp", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
 				if (args.Length == 0) {
-					return new KString(s.Trim());
+					return new Str(s.Trim());
 				}
 				else {
-					return new KString(s.Trim(args[0].ToString().ToCharArray()));
+					return new Str(s.Trim(args[0].ToString().ToCharArray()));
 				}
 			}));
 			SetAttribute("rchomp", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
 				if (args.Length == 0) {
-					return new KString(s.TrimEnd());
+					return new Str(s.TrimEnd());
 				}
 				else {
-					return new KString(s.TrimEnd(args[0].ToString().ToCharArray()));
+					return new Str(s.TrimEnd(args[0].ToString().ToCharArray()));
 				}
 			}));
 			SetAttribute("lchomp", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
 				if (args.Length == 0) {
-					return new KString(s.TrimStart());
+					return new Str(s.TrimStart());
 				}
 				else {
-					return new KString(s.TrimStart(args[0].ToString().ToCharArray()));
+					return new Str(s.TrimStart(args[0].ToString().ToCharArray()));
 				}
 			}));
 			SetAttribute("reverse", new LambdaFun((e, args) => {
 				Char[] a = e.Get("this").ToString().ToCharArray();
 				Array.Reverse(a);
-				return new KString(new String(a));
+				return new Str(new String(a));
 			}));
 			/*SetAttribute("scan", new LambdaFun((e, args) => {
 				String str = e.Get("this").ToString();
@@ -514,15 +512,15 @@ namespace Lumen.Lang.Std {
 			}));*/
 			SetAttribute("squeeze", new LambdaFun((e, args) => {
 				String str = e.Get("this").ToString();
-				return new KString(String.Join("", str.Distinct()));
+				return new Str(String.Join("", str.Distinct()));
 			}));
 			SetAttribute("delete", new LambdaFun((e, args) => {
-				return new KString(e.Get("this").ToString().Replace(args[0].ToString(), ""));
+				return new Str(e.Get("this").ToString().Replace(args[0].ToString(), ""));
 			}));
 			SetAttribute("split", new LambdaFun((e, args) => {
 				return new Vec(e.Get("this").ToString()
 					.Split(args[0].ToString()[0])
-					.Select(x => (Value)new KString(x)).ToList());
+					.Select(x => (Value)new Str(x)).ToList());
 			}));
 
 			SetAttribute("get_bytesize", new LambdaFun((e, args) => {
@@ -533,7 +531,7 @@ namespace Lumen.Lang.Std {
 				//Checker.ExistsThis(e);
 
 				String v = e.Get("this").ToString();
-				return new KString(v.Normalize());
+				return new Str(v.Normalize());
 			}));
 
 			SetAttribute("casecmp", new LambdaFun((e, args) => {
@@ -594,10 +592,16 @@ namespace Lumen.Lang.Std {
 
 			SetAttribute("num", new LambdaFun((e, args) => {
 				String v = e.Get("this").ToString();
-				return new Num(Double.Parse(v));
-			}));
+				try {
+					return new Num(Double.Parse(v));
+				}
+				catch {
+					return Const.VOID;
+				}
+			}) {
+				returned = Optional.Create(StandartModule.Num)
+			});
 
-			SetAttribute("format", GetAttribute("%", null));
 			// Add: method String#count [ref: Ruby]
 			// Add: class FreezzeString, methods String#freeze and String#get_freeze?
 			// Modified: String#index with regex
@@ -607,7 +611,7 @@ namespace Lumen.Lang.Std {
 		public IEnumerable<Value> GlobalizationEach(String str) {
 			TextElementEnumerator iterator = StringInfo.GetTextElementEnumerator(str);
 			while (iterator.MoveNext()) {
-				yield return new KString(iterator.Current.ToString());
+				yield return new Str(iterator.Current.ToString());
 			}
 		}
 	}

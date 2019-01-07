@@ -71,7 +71,7 @@ namespace Lumen.Lang.Std {
 			throw new NotImplementedException();
 		}
 
-		public Record Type => throw new NotImplementedException();
+		public IObject Type => throw new NotImplementedException();
 
 		public Int32 CompareTo(Object obj) {
 			return 0;
@@ -89,9 +89,9 @@ namespace Lumen.Lang.Std {
 			return this.name;
 		}
 
-		public Boolean Match(Value value) {
+		/*public Boolean Match(Value value) {
 			return value.Type.includedModules.Contains(this);
-		}
+		}*/
 
 		public Boolean Implicit(Value input, Scope scope, out Value output) {
 			throw new NotImplementedException();

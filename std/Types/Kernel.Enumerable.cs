@@ -7,7 +7,7 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lang.Std {
 	internal class Enumerable : Module {
 		private IEnumerable<Value> ToEnumerator(Value obj, Scope e) {
-			Fun function = (Fun)obj.Type.GetAttribute("next", e);
+			Fun function = (Fun)obj.Type.Get("next", e);
 			while (true) {
 				Value current = null;
 				try {
@@ -40,7 +40,7 @@ namespace Lumen.Lang.Std {
 				Fun func = scope["func"].ToFunction(scope);
 				Value seed = scope["seed"];
 
-				if (seed is Null) {
+				if (seed is Void) {
 					return value.Aggregate((x, y) => func.Run(new Scope(scope), x, y));
 				}
 				else {
@@ -49,7 +49,7 @@ namespace Lumen.Lang.Std {
 			}) {
 				Arguments = new List<FunctionArgument> {
 						new FunctionArgument("func"),
-						new FunctionArgument("seed", Const.NULL)
+						new FunctionArgument("seed", Const.VOID)
 					}
 			});
 
@@ -132,7 +132,7 @@ namespace Lumen.Lang.Std {
 				foreach (Value i in v) {
 					f.Run(new Scope(e), i);
 				}
-				return Const.NULL;
+				return Const.VOID;
 			}));
 
 			// Kernel.Function => Kernel.List
@@ -158,7 +158,7 @@ namespace Lumen.Lang.Std {
 					return e["none"];
 				}
 				else {
-					return Const.NULL;
+					return Const.VOID;
 				}
 			}));
 			// Возвращает массив, содержащий все элементы из перечисления для которых переданный блок возвращает значение true
@@ -196,7 +196,7 @@ namespace Lumen.Lang.Std {
 					Scope s = new Scope(e) {
 						This = x
 					};
-					return Converter.ToBoolean(x.Type.GetAttribute("<", e).Run(s, y)) ? x : y;
+					return Converter.ToBoolean((x.Type.Get("<", e) as Fun).Run(s, y)) ? x : y;
 				});
 			}));
 			this.scope.Set("max", new LambdaFun((e, args) => {
@@ -205,7 +205,7 @@ namespace Lumen.Lang.Std {
 					Scope s = new Scope(e) {
 						This = x
 					};
-					return Converter.ToBoolean(x.Type.GetAttribute(">", e).Run(s, y)) ? x : y;
+					return Converter.ToBoolean((x.Type.Get(">", e) as Fun).Run(s, y)) ? x : y;
 				});
 			}));
 
@@ -272,10 +272,10 @@ namespace Lumen.Lang.Std {
 
 			this.scope.Set("join", new LambdaFun((e, args) => {
 				if (args.Length > 0) {
-					return new KString(System.String.Join(args[0].ToString(), Converter.ToIterator(e.Get("this"), e)));
+					return new Str(System.String.Join(args[0].ToString(), Converter.ToIterator(e.Get("this"), e)));
 				}
 				else {
-					return new KString(System.String.Join("", Converter.ToIterator(e.Get("this"), e)));
+					return new Str(System.String.Join("", Converter.ToIterator(e.Get("this"), e)));
 				}
 			}));
 

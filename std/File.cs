@@ -8,7 +8,7 @@ namespace Lumen.Lang.Std {
 			this.Inner = value;
 		}
 
-		public Record Type => StandartModule.File;
+		public IObject Type => StandartModule.File;
 
 		public Value Clone() {
 			throw new NotImplementedException();

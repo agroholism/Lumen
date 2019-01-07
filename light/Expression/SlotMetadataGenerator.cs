@@ -20,17 +20,15 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public FunctionArgument EvalArgumnet(Scope e) {
 			FunctionArgument res = new FunctionArgument(this.name, this.defaultValue == null ? null : (this.defaultValue is ExpressionE expe ? (Object)expe.expression : this.defaultValue.Eval(e)));
 
-			if(this.type != null) {
+			if (this.type != null) {
 				Value t = this.type.Eval(e);
-				if(t is Record kt) {
-					res.Attributes = new Dictionary<String, Value> { ["type"] = kt };
-				}
+				res.Attributes = new Dictionary<String, Value> { ["type"] = t };
 			}
 
 			return res;

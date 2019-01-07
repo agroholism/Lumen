@@ -8,28 +8,36 @@ using Lumen.Lang.Std;
 namespace Stereotype {
 	public class ObjectE : Expression {
 		public Expression expression;
-		public Expression p;
-
-		public ObjectE(Expression expression) {
-			this.expression = expression;
-		}
+		private Dictionary<String, Expression> items;
 
 		public Expression Closure(List<String> visible, Scope thread) {
-			return new ObjectE(this.expression.Closure(visible, thread));
+			return this;//new ObjectE(this.expression.Closure(visible, thread));
 		}
 		public Expression Optimize(Scope scope) {
 			return this;
 		}
 
-		public ObjectE(Expression expression, Expression p) {
+		public ObjectE(Dictionary<String, Expression> items, Expression expression) {
+			this.items = items;
 			this.expression = expression;
-			this.p = p;
+		}
+
+		public ObjectE(Dictionary<String, Expression> items) {
+			this.items = items;
 		}
 
 		public Value Eval(Scope e) {
-			Expando result = null;
+			RecordValue result = new RecordValue();
 
-			if (this.p == null) {
+			if(this.expression != null) {
+				result.Prototype = this.expression.Eval(e) as IObject;
+			}
+
+			foreach(var i in this.items) {
+				result.Set(i.Key, i.Value.Eval(e), e);
+			}
+
+			/*if (this.p == null) {
 				result = new Expando();
 			}
 			else {
@@ -55,7 +63,7 @@ namespace Stereotype {
 				else if (this.expression is FunctionDefineStatement fds) {
 					result.Set(fds.NameFunction, new AnonymeDefine(fds.Args, fds.Body, fds.returnedType, fds.otherContacts).Eval(e), AccessModifiers.PUBLIC, e);
 				}
-			}
+			}*/
 			return result;
 		}
 	}

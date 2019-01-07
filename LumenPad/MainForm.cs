@@ -2,8 +2,10 @@
 using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Drawing;
 
 using FastColoredTextBoxNS;
+using System.Text;
 
 namespace LumenPad {
 	public partial class MainForm : Form {
@@ -35,6 +37,29 @@ namespace LumenPad {
 
 			Console.SetOut(ConsoleWriter.Instance);
 			Console.SetIn(ConsoleReader.Instance);
+
+
+			this.textBox.BackColor = Color.White;
+			this.textBox.ForeColor = Color.Black;
+			this.textBox.IndentBackColor = Color.White;
+			this.textBox.LineNumberColor = Color.Black;
+			this.textBox.PaddingBackColor = Color.White;
+			this.textBox.TextAreaBorderColor = Color.White;
+			this.textBox.ServiceLinesColor = Color.White;
+
+			this.menuStrip1.BackColor = Color.White;
+			this.BackColor = Color.Silver;
+			this.splitContainer2.Panel2Collapsed = true;
+			this.splitContainer3.Panel2Collapsed = true;
+			this.output.BackColor = Color.White;
+			this.output.ForeColor = Color.Black;
+			this.errorTable.ForeColor = Color.Black;
+			this.errorTable.GridColor = Color.Silver;
+			this.errorTable.BackgroundColor = Color.White;
+			this.splitContainer1.BackColor = Color.Silver;
+			this.splitContainer2.BackColor = Color.Silver;
+			this.splitContainer3.BackColor = Color.Silver;
+			//this.textBox.Font = new Font("Courier New", 10);
 		}
 
 		private void Run(Object sender, EventArgs e) {
@@ -63,7 +88,7 @@ namespace LumenPad {
 
 			//p.Start();
 
-			
+
 		}
 
 		internal void RaiseError(IRunResult result) {
@@ -146,6 +171,95 @@ namespace LumenPad {
 
 		private void splitContainer3_SplitterMoved(Object sender, SplitterEventArgs e) {
 
+		}
+
+		private void hTMLToolStripMenuItem_Click(Object sender, EventArgs e) {
+			new HTMLParser(this.textBox.Text).Run();
+			Stereotype.Interpriter.Start("out.lm");
+		}
+	}
+
+	public class HTMLParser {
+		private readonly String source;
+
+		private readonly StringBuilder builder;
+		private Int32 position;
+
+		private readonly StringBuilder finalBuilder;
+
+		public HTMLParser(String code) {
+			this.source = code;
+			this.builder = new StringBuilder();
+			this.position = 0;
+			this.finalBuilder = new StringBuilder("let res := vec()" + Environment.NewLine);
+		}
+
+		public void Run() {
+			System.Char current = Current();
+			while (current != '\0') {
+				if (current == '<' && At(1) == '%') {
+					current = Next();
+					current = Next();
+					this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"") + "\"").Append(Environment.NewLine);
+					this.builder.Clear();
+
+					BuildCode();
+				} else {
+					this.builder.Append(current);
+				}
+				current = Next();
+			}
+
+			this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"") + "\"").Append(Environment.NewLine);
+
+			this.finalBuilder.Append("fwrite(\"out.html\", res * \"\")");
+
+			File.WriteAllText("out.lm", this.finalBuilder.ToString());
+		}
+
+		private void BuildCode() {
+			System.Char current = Current();
+
+			Boolean os = false;
+			if(current == '=') {
+				current = Next();
+				os = true;
+			}
+
+			while(true) {
+				if (current == '%' && At(1) == '>')
+					break;
+
+				builder.Append(current);
+				current = Next();
+			}
+
+			Next();
+			if (os) {
+				this.finalBuilder.Append("res += " + builder.ToString()).Append(Environment.NewLine);
+			} else {
+				this.finalBuilder.Append(builder.ToString()).Append(Environment.NewLine);
+			}
+			this.builder.Clear();
+		}
+
+		public System.Char At(Int32 position) {
+			return this.source[this.position + position];
+		}
+
+		public System.Char Next() {
+			if (this.position == this.source.Length) {
+				return '\0';
+			}
+			this.position++;
+			return Current();
+		}
+
+		private System.Char Current() {
+			if (this.position == this.source.Length) {
+				return '\0';
+			}
+			return this.source[this.position];
 		}
 	}
 }

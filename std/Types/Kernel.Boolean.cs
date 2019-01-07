@@ -91,10 +91,10 @@ namespace Lumen.Lang.Std {
 			}) { Arguments = new List<FunctionArgument> { new FunctionArgument("other") } });
 			#endregion
 
-			SetAttribute("str", new LambdaFun((e, args) => new KString(e.This.ToString(e))));
+			SetAttribute("str", new LambdaFun((e, args) => new Str(e.This.ToString(e))));
 			SetAttribute("num", new LambdaFun((e, args) => (Num)(Converter.ToBoolean(e.This) ? 1 : 0)));
 
-			Set("new", new LambdaFun((e, args) => {
+			SetAttribute("new", new LambdaFun((e, args) => {
 				return new Bool(Converter.ToBoolean(e["obj"]));
 			}) { Arguments = new List<FunctionArgument> { new FunctionArgument("obj", Const.FALSE) } });
 		}

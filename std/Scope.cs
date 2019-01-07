@@ -14,7 +14,12 @@ namespace Lumen.Lang.Std {
 		}
 
 		public Value This {
-			get => Get("this");
+			get {
+				if (IsExsists("this")) {
+					return Get("this");
+				}
+				return null;
+			}
 			set => Set("this", value);
 		}
 

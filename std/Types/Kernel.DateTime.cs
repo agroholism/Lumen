@@ -7,7 +7,7 @@ namespace Lumen.Lang.Std {
 				Name = "Kernel.DateTime"
 			};
 
-			Set("get_now", new LambdaFun((e, args) => {
+			SetAttribute("get_now", new LambdaFun((e, args) => {
 				return new DateTime(System.DateTime.Now);
 			}));
 		}

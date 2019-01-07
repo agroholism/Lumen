@@ -29,7 +29,7 @@ namespace Stereotype {
 				}
 			}
 
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public Expression Optimize(Scope scope) {

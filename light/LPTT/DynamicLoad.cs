@@ -41,11 +41,11 @@ namespace Stereotype {
 			 }
 			 else*/
 		//	e.Set(name, new NETModule(Assembly.Load(name), name));
-			return Const.NULL;
+			return Const.VOID;
 		}
 	}
 
-	internal class NETModule : Lumen.Lang.Std.IObject {
+	/*internal class NETModule : Lumen.Lang.Std.IObject {
 		public Assembly module;
 		public String name;
 		readonly Dictionary<String, Value> cache = new Dictionary<String, Value>();
@@ -84,8 +84,8 @@ namespace Stereotype {
 			throw new NotImplementedException();
 		}
 	}
-
-	internal class Dynamic : Value {
+	*/
+	/*internal class Dynamic : Value {
 		public Object Value;
 
 		public Record Type => new NETType(this.Value.GetType());
@@ -106,8 +106,8 @@ namespace Stereotype {
 			throw new NotImplementedException();
 		}
 	}
-
-	internal class NETType : Record {
+	*/
+	/*internal class NETType : Record {
 		readonly Type type;
 
 		public NETType(Type type) {
@@ -140,14 +140,14 @@ namespace Stereotype {
 			/*	foreach (Type i in Type.GetNestedTypes())
 					if (i.Name == Name)
 						return new DynamicType(i);
-	*/
+	*
 			try {
 				MethodInfo x = this.type.GetMethod(Name);
 				if (x != null) {
 					return new LambdaFun((e, args) => {
 						Object[] margs = new Object[args.Length];
 						for (Int32 i = 0; i < args.Length; i++) {
-		margs[i] = /*C.Unpack(*/args[i]/*)*/;
+		margs[i] = /*C.Unpack(*args[i]/*)*;
 	}
 
 	return new Dynamic(x.Invoke(null, margs));
@@ -157,23 +157,23 @@ namespace Stereotype {
 					PropertyInfo a = this.type.GetProperty(Name);
 					/*if (a == null)
 						return new FunDelegate(type, Name);
-					else return new Dynamic(a.GetValue(type, new object[] { }));*/
+					else return new Dynamic(a.GetValue(type, new object[] { }));*
 				}
 			}
 			catch {
 				/*var a = type.GetProperty(Name);
 				if (a == null)
 					return new FunDelegate(type, Name);
-				else return new Dynamic(a.GetValue(type, new object[] { }));*/
+				else return new Dynamic(a.GetValue(type, new object[] { }));*
 			}
 			return null;
 		}
 
 		/*public void Set(string Name, dynamic Value) {
 			type.GetProperty(Name).SetValue(type, Value);
-		}*/
+		}*
 	}
-
+*/
 	/* internal class DynamicModule : Core.Module
 	 {
 		 public Assembly Namespace;

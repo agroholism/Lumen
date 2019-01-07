@@ -4,9 +4,7 @@ namespace Lumen.Lang.Std {
 	public class Num : Value {
 		internal Double value;
 
-		public Record Type {
-			get => StandartModule.Number;
-		}
+		public IObject Type => StandartModule.Num;
 
 		public Num(Double value) {
 			this.value = value;
@@ -121,6 +119,10 @@ namespace Lumen.Lang.Std {
 				return this.value == num.value;
 			}
 
+			if (obj is BigNum bigNum) {
+				return bigNum.value == this.value;
+			}
+
 			return false;
 		}
 
@@ -131,6 +133,10 @@ namespace Lumen.Lang.Std {
 		public Int32 CompareTo(Object obj) {
 			if (obj is Num num) {
 				return this.value.CompareTo(num.value);
+			}
+
+			if(obj is BigNum bigNum) {
+				return bigNum.value.CompareTo(new BigFloat(this.value));
 			}
 
 			throw new Exception("expected value of type 'Kernel.Number'", stack: null);

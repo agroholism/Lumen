@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Lumen.Lang.Std {
-	[Serializable]
 	public class Map : Value {
 		public Dictionary<Value, Value> value;
 
@@ -31,7 +30,7 @@ namespace Lumen.Lang.Std {
 			throw new NotImplementedException();
 		}
 
-		public Record Type => StandartModule.Map;
+		public IObject Type => StandartModule.Map;
 
 		public Boolean ToBool(Scope e) {
 			throw new NotImplementedException();

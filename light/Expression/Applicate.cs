@@ -42,7 +42,7 @@ namespace Stereotype {
 						pos++;
 					}
 					else {
-						kwargs[new KString(ass_e.id)] = ass_e.exp.Eval(e);
+						kwargs[new Str(ass_e.id)] = ass_e.exp.Eval(e);
 					}
 
 				}
@@ -55,7 +55,7 @@ namespace Stereotype {
 					if (container is Map map) {
 						UserFun userFunction = function as UserFun;
 						foreach (KeyValuePair<Value, Value> item in map.value) {
-							if (item.Key is KString str && (userFunction != null && userFunction.Arguments.Exists(arg => arg.name == str.ToString()))) {
+							if (item.Key is Str str && (userFunction != null && userFunction.Arguments.Exists(arg => arg.name == str.ToString()))) {
 								innerScope.Set(str.ToString(e), item.Value);
 								args.Add(item.Value);
 								pos++;
@@ -105,7 +105,7 @@ namespace Stereotype {
 				}
 
 				UserFun f = new UserFun(fmtd, new Applicate(new ValueE(function), nexps, this.Line));
-				f.Attributes["name"] = (KString)(function.Attributes["name"] + "'");
+				f.Attributes["name"] = (Str)(function.Attributes["name"] + "'");
 				return f;
 			}
 
@@ -113,14 +113,14 @@ namespace Stereotype {
 			innerScope["args"] = new Vec(args);
 
 			if (!Provider.isRelease) {
-				Value name = (KString)String.Empty;
+				Value name = (Str)String.Empty;
 				if (function is UserFun sfn) {
 					if (sfn.Attributes.ContainsKey("name")) {
 						name = sfn.Attributes["name"];
 					}
 
 					if (name.ToString() == "") {
-						name = (KString)this.callable.ToString();
+						name = (Str)this.callable.ToString();
 					}
 				}
 				else if (function is LambdaFun lfun) {
@@ -128,11 +128,11 @@ namespace Stereotype {
 						name = lfun.Attributes["name"];
 					}
 					if (name.ToString() == "") {
-						name = (KString)this.callable.ToString();
+						name = (Str)this.callable.ToString();
 					}
 				}
 				else {
-					name = (KString)this.callable.ToString();
+					name = (Str)this.callable.ToString();
 				}
 
 				Stopwatch s = new Stopwatch();
@@ -184,17 +184,15 @@ namespace Stereotype {
 			switch (callable) {
 				case Module m:
 					return ExecuteCasual((Fun)m.Get("()"), e);
+				case Record y:
+					return ExecuteCasual((Fun)y.Get("()", e), e);
 				case Fun _:
 					return ExecuteCasual((Fun)callable, e);
-				case Expando h:
-					return ExecuteCasual((Fun)h.Get("call", AccessModifiers.PUBLIC, e), new Scope(e) { ["this"] = h });
 				case IObject y:
-					return ExecuteCasual((Fun)y.Type.GetAttribute("call", e), new Scope(e) { ["this"] = y });
-				case Record x:
-					return this.ExecuteCasual((Fun)x.Get("()", e), e);
+					return ExecuteCasual((Fun)y.Get("()", e), new Scope(e) { ["this"] = y });
 			}
 
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public Expression Closure(List<String> visible, Scope thread) {

@@ -89,7 +89,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="settings.cdl" />
+    <None Include="settings\settings.cdl" />
+    <None Include="types.lm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\source\repos\KVM\FastColoredTextBox\FastColoredTextBox.csproj">
@@ -107,6 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Starter.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="settings\color-schemes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

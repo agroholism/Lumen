@@ -7,7 +7,7 @@ namespace Lumen.Lang.Std {
 		public Record type;
 		public Dictionary<String, Value> Fields { get; set; }
 		public List<String> Final { get; set; }
-		public Record Type => this.type;
+		public IObject Type => this.type;
 		public Expando Prototype => this["prototype", null] as Expando;
 
 		public Value this[String key, Scope e] {
@@ -78,7 +78,7 @@ namespace Lumen.Lang.Std {
 				This = this
 			};
 
-			return ((Fun)Get("missing", AccessModifiers.PUBLIC, e)).Run(s, new KString(name));
+			return ((Fun)Get("missing", AccessModifiers.PUBLIC, e)).Run(s, new Str(name));
 		}
 
 		public void Set(String name, Value value, AccessModifiers mode, Scope e) {
@@ -139,6 +139,22 @@ namespace Lumen.Lang.Std {
 
 		public override String ToString() {
 			return this.ToString(null);
+		}
+
+		public Value Get(String name, Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public void Set(String name, Value value, Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public Boolean TryGet(String name, out Value result) {
+			throw new NotImplementedException();
+		}
+
+		public Boolean IsParentOf(Value value) {
+			throw new NotImplementedException();
 		}
 	}
 }

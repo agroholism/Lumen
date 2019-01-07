@@ -31,7 +31,7 @@ namespace Lumen.Lang.Std {
 			BuildCallStack(e.parent, result);
 		}
 
-		public Record Type => this.type;
+		public IObject Type => this.type;
 
 		public Int32 CompareTo(Object obj) {
 			if (obj is Value) {
@@ -56,7 +56,7 @@ namespace Lumen.Lang.Std {
 
 		public Value Get(String name, AccessModifiers mode, Scope e) {
 			if(name == "message") {
-				return (KString)this.Message;
+				return (Str)this.Message;
 			}
 			return this.DATA.Get(name, mode, e);
 		}
@@ -67,6 +67,22 @@ namespace Lumen.Lang.Std {
 				return;
 			}
 			this.DATA.Set(name, value, mode, e);
+		}
+
+		public Value Get(String name, Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public void Set(String name, Value value, Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public Boolean TryGet(String name, out Value result) {
+			throw new NotImplementedException();
+		}
+
+		public Boolean IsParentOf(Value value) {
+			throw new NotImplementedException();
 		}
 	}
 }

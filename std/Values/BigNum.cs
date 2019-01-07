@@ -4,8 +4,8 @@ namespace Lumen.Lang.Std {
 	public class BigNum : Value {
 		internal BigFloat value;
 
-		public Record Type {
-			get => StandartModule.Number;
+		public IObject Type {
+			get => StandartModule.BigNum;
 		}
 
 		public BigNum(BigFloat value) {

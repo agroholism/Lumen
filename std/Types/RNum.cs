@@ -5,7 +5,7 @@ namespace Lumen.Lang.Std {
 	internal sealed class RNum : Record {
 		internal RNum() {
 			this.meta = new TypeMetadata {
-				Name = "num"
+				Name = "std.num"
 			};
 
 			IEnumerable<Value> Range(Num from, Num to) {
@@ -42,26 +42,23 @@ namespace Lumen.Lang.Std {
 
 			#region operators
 
-			SetAttribute(Op.BNOT, new LambdaFun((scope, args) => {
-				if (scope.This is Num num) {
-					return new Enumerator(Range(0, num - 1));
-				}
+			SetAttribute(Op.BXOR, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
 
-				if (scope.This is BigNum bigNum) {
-					return new Enumerator(BigRange(0, bigNum - 1));
-				}
-
-				throw new Exception(Exceptions.TYPE_ERROR.F(this, scope.This.Type), stack: scope);
+				Num value = scope.This as Num;
+				return new Enumerator(Range(0, value - 1));
 			}));
 
 			SetAttribute(Op.DOTI, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Enumerator(Range(scope.This.ToNum(scope), other.ToNum(scope)));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Enumerator(BigRange(scope.This.ToBigNum(scope), other.ToBigNum(scope)));
 				}
 
@@ -71,13 +68,15 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.DOTE, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Enumerator(Range(scope.This.ToNum(scope), other.ToNum(scope) - 1));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Enumerator(BigRange(scope.This.ToBigNum(scope), other.ToBigNum(scope) - 1));
 				}
 
@@ -87,13 +86,15 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.SHIP, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Num(scope.This.ToNum(scope).CompareTo(other.ToNum(scope)));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Num(scope.This.ToBigNum(scope).CompareTo(other.ToBigNum(scope)));
 				}
 
@@ -103,13 +104,15 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.LTEQ, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Bool(scope.This.ToNum(scope) <= other.ToNum(scope));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Bool(scope.This.ToBigNum(scope) <= other.ToBigNum(scope));
 				}
 
@@ -119,13 +122,15 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.GTEQ, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Bool(scope.This.ToNum(scope) >= other.ToNum(scope));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Bool(scope.This.ToBigNum(scope) >= other.ToBigNum(scope));
 				}
 
@@ -135,13 +140,15 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.GT, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Bool(scope.This.ToNum(scope) > other.ToNum(scope));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Bool(scope.This.ToBigNum(scope) > other.ToBigNum(scope));
 				}
 
@@ -151,13 +158,15 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.LT, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Bool(scope.This.ToNum(scope) < other.ToNum(scope));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Bool(scope.This.ToBigNum(scope) < other.ToBigNum(scope));
 				}
 
@@ -167,13 +176,15 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.EQL, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
 					return new Bool(scope.This.ToNum(scope) == other.ToNum(scope));
 				}
 
-				if (scope.This is BigNum || other is BigNum) {
+				if (other is BigNum) {
 					return new Bool(scope.This.ToBigNum(scope) == other.ToBigNum(scope));
 				}
 
@@ -183,6 +194,8 @@ namespace Lumen.Lang.Std {
 			});
 
 			SetAttribute(Op.NOT_EQL, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (other is Num) {
@@ -197,7 +210,10 @@ namespace Lumen.Lang.Std {
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
+
 			SetAttribute(Op.PLUS, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
 				if (scope.This is BigNum || other is BigNum) {
@@ -208,8 +224,8 @@ namespace Lumen.Lang.Std {
 					return scope.This.ToNum(scope) + other.ToNum(scope);
 				}
 
-				if (other is KString) {
-					return new KString(scope.This.ToString(scope) + other.ToString(scope));
+				if (other is Str) {
+					return new Str(scope.This.ToString(scope) + other.ToString(scope));
 				}
 
 				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
@@ -217,6 +233,8 @@ namespace Lumen.Lang.Std {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") { Attributes = new Dictionary<String, Value> { ["type"] = this } } }
 			});
 			SetAttribute(Op.UPLUS, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				return scope.This;
 			}));
 			SetAttribute(Op.MINUS, new LambdaFun((scope, args) => {
@@ -235,7 +253,7 @@ namespace Lumen.Lang.Std {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
 			SetAttribute(Op.UMINUS, new LambdaFun((scope, args) => {
-				if (scope.This is BigNum ) {
+				if (scope.This is BigNum) {
 					return -scope.This.ToBigNum(scope);
 				}
 
@@ -274,41 +292,24 @@ namespace Lumen.Lang.Std {
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
-			/*SetAttribute("**", new LambdaFun((scope, args) => {
+			SetAttribute(Op.POW, new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value other = scope["other"];
 
+				if (scope.This is BigNum || other is BigNum) {
+					return new BigNum(BigFloat.Pow(scope.This.ToBigFloat(scope), (Int32)other.ToDouble(scope)));
+				}
+
 				if (other is Num) {
-					Double numberOne = Converter.ToDouble(scope.This, scope);
-					Double numberTwo = Converter.ToDouble(other, scope);
-
-					if (numberOne == Double.NaN || numberTwo == Double.NaN) {
-						return (Num)Double.NaN;
-					}
-
-					if (numberOne == Double.PositiveInfinity || numberTwo == Double.PositiveInfinity) {
-						return (Num)Double.PositiveInfinity;
-					}
-
-					if (numberOne == Double.NegativeInfinity || numberTwo == Double.NegativeInfinity) {
-						return (Num)Double.NegativeInfinity;
-					}
-
-					Double result = Math.Pow(numberOne, numberTwo);
-
-					return (Num)result;
+					return (Num)Math.Pow(scope.This.ToDouble(scope), other.ToDouble(scope));
 				}
 
-				if (other.Type.AttributeExists("**")) {
-					args[0] = scope.This;
-					scope.This = other;
-					return other.Type.GetAttribute("**", scope).Run(scope, args);
-				}
-
-				throw new Exception($"expected value of type '{this}', passed value of type '{other.Type}'", stack: scope);
+				throw new Exception(Exceptions.TYPE_ERROR.F(this, other.Type), stack: scope);
 			}) {
 				Arguments = new List<FunctionArgument> { new FunctionArgument("other") }
 			});
-			SetAttribute("//", new LambdaFun((scope, args) => {
+			/*SetAttribute("//", new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other is Num) {
@@ -549,6 +550,8 @@ namespace Lumen.Lang.Std {
 			#endregion
 
 			SetAttribute("times", new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Num n = (Num)scope.This;
 				Value action = scope["action"];
 
@@ -556,11 +559,11 @@ namespace Lumen.Lang.Std {
 					StandartModule.Call(action, new Scope(scope), x);
 				}
 
-				return Const.NULL;
+				return Const.VOID;
 			}) {
 				Arguments = new List<FunctionArgument> {
-						new FunctionArgument("action")
-					}
+					new FunctionArgument("action")
+				}
 			});
 			SetAttribute("count", new LambdaFun((scope, args) => {
 				Num n = (Num)scope.This;
@@ -577,6 +580,11 @@ namespace Lumen.Lang.Std {
 				Arguments = new List<FunctionArgument> {
 						new FunctionArgument("func")
 					}
+			});
+
+			SetAttribute("sin", new LambdaFun((e, args) => {
+				return new Num(Math.Sin(Converter.ToDouble(e.This, e)));
+			}, "Kernel.Math.sin") {
 			});
 
 			/*SetAttribute("round", new LambdaFun((scope, args) => {
@@ -680,29 +688,19 @@ namespace Lumen.Lang.Std {
 					return new List(new BitArray(BitConverter.GetBytes(num)).Cast<Boolean>().Select(x => (Value)new Num(x ? 1 : 0)).ToList());
 				}));*/
 			SetAttribute("to_s", new LambdaFun((scope, args) => {
+				Checker.OfType(scope.This, StandartModule.Num, scope);
+
 				Value num = scope.This;
 				Double basis = Converter.ToDouble(scope["base"], scope);
-				Boolean rat = Converter.ToBoolean(scope["rat"]);
-				Value ct = scope["ct"];
-
-				if(rat) {
-					return new KString(num.ToBigFloat(scope).ToRationalString());
-				}
-
-				if(ct != null) {
-					return new KString(num.ToBigFloat(scope).ToString((Int32)ct.ToDouble(scope)));
-				}
 
 				if (basis == 10) {
-					return new KString(num.ToString(scope));
+					return new Str(num.ToString(scope));
 				}
 
-				return new KString(Converter.FromTo(num.ToString(scope), "10", basis.ToString()));
+				return new Str(Converter.FromTo(num.ToString(scope), "10", basis.ToString()));
 			}) {
 				Arguments = new List<FunctionArgument> {
-						new FunctionArgument("base", (Num)10),
-						new FunctionArgument("ct", Const.NULL),
-						new FunctionArgument("rat", Const.FALSE),
+						new FunctionArgument("base", (Num)10)
 					}
 			});
 		}

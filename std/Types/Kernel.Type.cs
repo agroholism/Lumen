@@ -3,39 +3,11 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
-	[Serializable]
 	internal class TypeType : Record {
-		public new Dictionary<String, Value> Attributes {
-			get {
-				Dictionary<String, Value> result = new Dictionary<String, Value>();
-				foreach(KeyValuePair<String, Value> i in this.typeAttributes) {
-					result.Add(i.Key, i.Value);
-				}
-				foreach (KeyValuePair<String, Fun> i in this.attributes) {
-					result.Add(i.Key, i.Value);
-				}
-				return result;
-			}
-		}
-
 		public TypeType() {
 			this.meta = new TypeMetadata {
 				Name = "Kernel.Type"
 			};
-
-			Set("new", new LambdaFun((e, args) => {
-				Record result = new Record();
-
-				String name = args[0].ToString(e);
-				List<String> fields = Converter.ToList(args[1], e).Select(i => i.ToString(e)).ToList();
-
-				/*result.meta = new TypeMetadata {
-					Name = name,
-					BaseType = 
-				};
-				*/
-				return result;
-			}));
 
 			/*SetAttribute("get_superclass", new LambdaFun((e, args) => {
 				KType one = (KType)e.This;

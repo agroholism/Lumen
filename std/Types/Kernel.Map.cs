@@ -11,7 +11,7 @@ namespace Lumen.Lang.Std {
 				//BaseType = StandartModule.Object
 			};
 
-			Set("[]", new LambdaFun((e, args) => {
+			SetAttribute("[]", new LambdaFun((e, args) => {
 				Record sub = args[0] as Record;
 				Record V = args[1] as Record;
 				Record type = new Record {
@@ -21,17 +21,17 @@ namespace Lumen.Lang.Std {
 					}
 				};
 				type.SetAttribute("initialize", new LambdaFun((scope, argsx) => {
-					(scope.Get("this") as IObject).Set("_dictionary", new Map(new Dictionary<Value, Value>()), AccessModifiers.PRIVATE, scope);
-					return Const.NULL;
+				//	(scope.Get("this") as IObject).Set("_dictionary", new Map(new Dictionary<Value, Value>()), AccessModifiers.PRIVATE, scope);
+					return Const.VOID;
 				}));
 				/*type.Set("new", new LambdaFun((scope, argsx) => {
 					var exe = new Object1(type);
 					exe.element = new Map(new Dictionary<Value, Value>());
 					return exe;
 				}));*/
-				type.SetAttribute("to_m", new LambdaFun((scope, argsx) => {
+			/*	type.SetAttribute("to_m", new LambdaFun((scope, argsx) => {
 					return (scope["this"] as IObject).Get("_dictionary", AccessModifiers.PRIVATE, scope);
-				}));
+				}));*/
 				SetAttribute("[]", new LambdaFun((ex, argsx) => {
 					IDictionary<Value, Value> dict = Converter.ToMap(ex.Get("this"), ex);
 					if (dict.TryGetValue(args[0], out Value result)) {
@@ -47,7 +47,7 @@ namespace Lumen.Lang.Std {
 
 					dict.Add(argsx[0], argsx[1]);
 
-					return Const.NULL;
+					return Const.VOID;
 				}));
 				return type;
 			}));
@@ -87,7 +87,7 @@ namespace Lumen.Lang.Std {
 
 			SetAttribute("to_s", new LambdaFun((e, args) => {
 				IDictionary<Value, Value> dict = Converter.ToMap(e.Get("this"), e);
-				return new KString("[" + String.Join(", ", dict) + "]");
+				return new Str("[" + String.Join(", ", dict) + "]");
 			}));
 			SetAttribute("contains", new LambdaFun((e, args) => {
 				IDictionary<Value, Value> dict = ((Map)e.Get("this")).value;
@@ -97,10 +97,10 @@ namespace Lumen.Lang.Std {
 				IDictionary<Value, Value> dict = ((Map)e.Get("this")).value;
 				IObject obj = args[1] as IObject;
 				if (dict.TryGetValue(args[0], out Value res)) {
-					(obj.Get("=", AccessModifiers.PRIVATE, e) as Fun).Run(new Scope(e), res);
+					(obj.Get("=", e) as Fun).Run(new Scope(e), res);
 					return (Bool)true;
 				}
-				(obj.Get("=", AccessModifiers.PRIVATE, e) as Fun).Run(new Scope(e), Const.NULL);
+				(obj.Get("=", e) as Fun).Run(new Scope(e), Const.VOID);
 				return (Bool)false;
 			}));
 		}

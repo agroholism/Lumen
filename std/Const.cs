@@ -4,7 +4,7 @@ namespace Lumen.Lang.Std {
 	/// <summary> Contains more important Kernel constants. </summary>
 	public static class Const {
 		/// <summary> const null </summary>
-		public static Null NULL { get; } = new Null();
+		public static Void VOID { get; } = new Void();
 
 		/// <summary> const true </summary>
 		public static Bool TRUE { get; } = new Bool(true);

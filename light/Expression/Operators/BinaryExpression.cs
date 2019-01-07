@@ -57,23 +57,19 @@ namespace Stereotype {
 				return (Bool)!Converter.ToBoolean(operandOne);
 			}
 
-			Value operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.NULL;
+			Value operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.VOID;
 
 			// SOLVE
-			if (operandOne is Expando typ) {
+			if (operandOne is RecordValue typ) {
 				Scope a = new Scope();
 				a.Set("this", operandOne);
-				if (typ.IsExists(this.operation)) {
-					return ((Fun)typ.Get(this.operation, AccessModifiers.PUBLIC, e)).Run(a, operandTwo);
-				}
-
-				return ((Fun)((Expando)operandOne).Get(this.operation, AccessModifiers.PUBLIC, e)).Run(a, operandTwo);
+				return ((Fun)typ.Get(this.operation, e)).Run(a, operandTwo);
 			}
 
-			Record type = operandOne.Type;
-			if (type.AttributeExists(this.operation)) {
+			IObject type = operandOne.Type;
+			if (type.TryGet(operation, out var prf) && prf is Fun fun) {
 				try {
-					return type.GetAttribute(this.operation, e).Run(new Scope(e) { ["this"] = operandOne }, operandTwo);
+					return fun.Run(new Scope(e) { ["this"] = operandOne }, operandTwo);
 				}
 				catch (Lumen.Lang.Std.Exception hex) {
 					if (hex.line == -1) {
@@ -88,7 +84,7 @@ namespace Stereotype {
 				}
 			}
 			else {
-				throw new Lumen.Lang.Std.Exception($"value of type {type.meta.Name} does hot have a operator {this.operation}", stack: e) {
+				throw new Lumen.Lang.Std.Exception($"value of type {type} does hot have a operator {this.operation}", stack: e) {
 					line = this.line,
 					file = this.file
 				};
@@ -112,12 +108,12 @@ namespace Stereotype {
 
 			}
 			*/
-		/*	if (opt1 is ValueE ve1 && opt2 is ValueE ve2) {
-				if (ve1.val is Num n1 && ve2.val is Num n2 && operation == "+") {
-					return new ValueE((Double)n1 + n2);
+			/*	if (opt1 is ValueE ve1 && opt2 is ValueE ve2) {
+					if (ve1.val is Num n1 && ve2.val is Num n2 && operation == "+") {
+						return new ValueE((Double)n1 + n2);
+					}
 				}
-			}
-			*/
+				*/
 			/*if (opt1 is StringE && opt2 is StringE se2) {
 				se1 = (StringE)opt1;
 				return new StringE(se1.text + se2.text);

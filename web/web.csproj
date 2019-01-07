@@ -50,6 +50,10 @@
       <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
       <Name>std</Name>
     </ProjectReference>
+    <ProjectReference Include="..\light\light.csproj">
+      <Project>{823c41cd-2bbd-456e-bcb9-90578498c60d}</Project>
+      <Name>light</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

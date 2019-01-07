@@ -28,7 +28,7 @@ namespace Stereotype {
 			};
 
 			foreach (Expression expression in this.expressions) {
-				if (expression is FunctionDefineStatement fun && fun.Body == null) {
+				if (expression is FunctionDeclaration fun && fun.Body == null) {
 					List<FunctionArgument> args = new List<FunctionArgument>();
 
 					Record exte = null;
@@ -54,7 +54,7 @@ namespace Stereotype {
 
 			e.Set(this.name, mod);
 
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public static void Rename(Module m, Scope e) {
@@ -64,21 +64,21 @@ namespace Stereotype {
 					foreach(KeyValuePair<String, Fun> j in type.attributes) {
 						if(j.Value is LambdaFun lfun) {
 							if(lfun.Attributes.ContainsKey("name")) {
-								lfun.Set("name", (KString)(type.meta.Name.Split('.')[0] + "." + lfun.Get("name", AccessModifiers.PRIVATE, e)), AccessModifiers.PRIVATE, e);
+								lfun.Set("name", (Str)(type.meta.Name.Split('.')[0] + "." + lfun.Get("name", e)), e);
 							}
 						}
 						else if (j.Value is UserFun sfun) {
 							if (sfun.Attributes.ContainsKey("name")) {
-								sfun.Set("name", (KString)(type.meta.Name.Split('.')[0] + "." + sfun.Get("name", AccessModifiers.PRIVATE, e)), AccessModifiers.PRIVATE, e);
+								sfun.Set("name", (Str)(type.meta.Name.Split('.')[0] + "." + sfun.Get("name", e)), e);
 							}
 						}
 					}
 				}
 				else if (i.Value is UserFun sfun) {
-					sfun.Set("name", (KString)(m.name.Split('.')[0] + "." + sfun.Get("name", AccessModifiers.PRIVATE, e)), AccessModifiers.PRIVATE, e);
+					sfun.Set("name", (Str)(m.name.Split('.')[0] + "." + sfun.Get("name",  e)),  e);
 				}
 				else if (i.Value is LambdaFun lfun) {
-					lfun.Set("name", (KString)(m.name.Split('.')[0] + "." + lfun.Get("name", AccessModifiers.PRIVATE, e)), AccessModifiers.PRIVATE, e);
+					lfun.Set("name", (Str)(m.name.Split('.')[0] + "." + lfun.Get("name", e)), e);
 				}
 				else if (i.Value is Module md) {
 					md.name = m.name.Split('.')[0] + "." + md.name;

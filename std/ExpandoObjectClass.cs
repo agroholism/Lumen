@@ -62,7 +62,7 @@ namespace Lumen.Lang.Std {
 					return Const.TRUE;
 				});
 				this["to_s", null] = new LambdaFun((e, args) => {
-					return (KString)"";
+					return (Str)"";
 				});
 				this["missing", null] = new LambdaFun((e, args) => {
 					throw new Exception("объект не содержит поля " + e["name"], stack: e);

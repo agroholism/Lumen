@@ -3,7 +3,6 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang.Std;
 
 namespace Stereotype {
-	[Serializable]
 	internal class StringE : Expression {
 		internal String text;
 
@@ -17,7 +16,7 @@ namespace Stereotype {
 			return this;
 		}
 		public Value Eval(Scope e) {
-			return (KString)this.text;
+			return (Str)this.text;
 		}
 
 		public override String ToString() {

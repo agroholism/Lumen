@@ -25,14 +25,20 @@ namespace Stereotype {
 		public Value Eval(Scope e) {
 			Value obj = ((DotExpression)this.res).expression.Eval(e);
 
-			if (obj is Expando) {
-				Value v = ((Expando)obj).Get(((DotExpression)this.res).nameVariable, AccessModifiers.PUBLIC, e);
+			if (obj is IObject iob) {
+				Value v = iob.Get(((DotExpression)this.res).nameVariable, e);
 
-				if (v is Fun) {
+				if (v is Fun fn) {
 					List<Value> Objects = new List<Value>();
 
 					Scope x = new Scope(e);
-					x.Set("this", obj);
+
+					if (fn.TryGet("@constructor", out Value value)) {
+					}
+					else {
+						x.Set("this", obj);
+					}
+
 					x.Set("self", v);
 
 					foreach (Expression i in this.exps) {
@@ -41,7 +47,7 @@ namespace Stereotype {
 						}
 						else {
 							if (i is SpreadE) {
-								foreach (Value j in Converter.ToList(i.Eval(e))) {
+								foreach (Value j in Converter.ToList(i.Eval(e), e)) {
 									Objects.Add(j);
 								}
 							}
@@ -51,9 +57,52 @@ namespace Stereotype {
 						}
 					}
 
-					return ((Fun)v).Run(x, Objects.ToArray());
+					return fn.Run(x, Objects.ToArray());
 				}
-				return new Null();
+				return new Lumen.Lang.Std.Void();
+			}
+
+
+			if (obj is RecordValue rv) {
+				Value v = rv.Get(((DotExpression)this.res).nameVariable, e);
+
+				if (v is Fun fn) {
+					List<Value> Objects = new List<Value>();
+
+					Scope x = new Scope(e);
+					x.Set("this", obj);
+					x.Set("self", v);
+
+					if (rv.TryGet("@prototype", out var proto)) {
+						if ((proto as IObject).TryGet("@prototype", out proto)) {
+							if ((proto as IObject).TryGet(((DotExpression)this.res).nameVariable, out proto)) {
+								x.Set("base", new LambdaFun((is3, arg3) => {
+									is3.This = obj;
+									return (proto as Fun).Run(is3, arg3);
+								}));
+							}
+						}
+					}
+
+					foreach (Expression i in this.exps) {
+						if (i is Assigment) {
+							x.Set(((Assigment)i).id, ((Assigment)i).exp.Eval(e));
+						}
+						else {
+							if (i is SpreadE) {
+								foreach (Value j in Converter.ToList(i.Eval(e), e)) {
+									Objects.Add(j);
+								}
+							}
+							else {
+								Objects.Add(i.Eval(e));
+							}
+						}
+					}
+
+					return fn.Run(x, Objects.ToArray());
+				}
+				return new Lumen.Lang.Std.Void();
 			}
 			else if (obj is Module module) {
 				if (!module.Contains(((DotExpression)this.res).nameVariable)) {
@@ -85,27 +134,12 @@ namespace Stereotype {
 					//	MessageBox.Show((Objects == null).ToString());
 					return func.Run(x, Objects.ToArray());
 				}
-				return new Null();
+				return new Lumen.Lang.Std.Void();
 			}
 			else if (obj is Record type) {
 				Value fun = null;
-				if (!type.Contains(((DotExpression)this.res).nameVariable)) {
-					if (type.AttributeExists(((DotExpression)this.res).nameVariable)) {
-						Fun attr = (Fun)type.GetAttribute(((DotExpression)this.res).nameVariable, e);
-						fun = new LambdaFun((ex, args) => {
-							Value ths = args[0];
-							if (ths.Type != type) {
-								throw new Lumen.Lang.Std.Exception("wrong type",stack: ex);
-							}
-							ex.Set("this", ths);
-							Value[] newArgs = new Value[args.Length - 1];
-							Array.Copy(args, 1, newArgs, 0, args.Length - 1);
-							return attr.Run(ex, newArgs);
-						});
-					}
-				}
-				else {
-					fun = type.Get(((DotExpression)this.res).nameVariable, e);
+				if (type.AttributeExists(((DotExpression)this.res).nameVariable)) {
+					fun = (Fun)type.GetAttribute(((DotExpression)this.res).nameVariable, e);
 				}
 
 				if (fun is Fun) {
@@ -119,7 +153,7 @@ namespace Stereotype {
 						}
 						else {
 							if (i is SpreadE) {
-								foreach (dynamic j in Converter.ToList(i.Eval(e))) {
+								foreach (dynamic j in Converter.ToList(i.Eval(e), e)) {
 									args.Add(j);
 								}
 							}
@@ -131,13 +165,13 @@ namespace Stereotype {
 
 					return ((Fun)fun).Run(x, args.ToArray());
 				}
-				return new Null();
+				return new Lumen.Lang.Std.Void();
 			}
 			else {
 				String name = ((DotExpression)this.res).nameVariable;
-				Lumen.Lang.Std.Record cls = obj.Type;
+				IObject cls = obj.Type;
 
-				if (!cls.AttributeExists(name)) {
+				if (!cls.TryGet(name, out var prf)) {
 					try {
 						return new Applicate(this.res, this.exps, -1).Eval(e);
 					}
@@ -146,7 +180,7 @@ namespace Stereotype {
 					}
 				}
 
-				Fun v = cls.GetAttribute(((DotExpression)this.res).nameVariable, e) as Fun;
+				Fun v = cls.Get(((DotExpression)this.res).nameVariable, e) as Fun;
 
 				List<Value> Objects = new List<Value>();
 
@@ -157,7 +191,7 @@ namespace Stereotype {
 						x.Set(((Assigment)i).id, ((Assigment)i).exp.Eval(e));
 					}
 					else if (i is VariableDeclaration dec) {
-						Objects.Add((KString)dec.id);
+						Objects.Add((Str)dec.id);
 					}
 					else {
 						if (i is SpreadE) {
@@ -228,7 +262,7 @@ namespace Stereotype {
 		}
 
 		public override String ToString() {
-			if(this.res is DotExpression de && de.nameVariable == "[]") {
+			if (this.res is DotExpression de && de.nameVariable == "[]") {
 				return de.expression + "[" + String.Join(", ", this.exps) + "]";
 			}
 			return this.res.ToString() + "(" + String.Join(", ", this.exps) + ")";

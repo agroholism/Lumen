@@ -5,7 +5,6 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang.Std;
 
 namespace Stereotype {
-	[Serializable]
 	class IsExpression : Expression {
 		internal Expression Expression;
 		internal Expression type;
@@ -23,20 +22,26 @@ namespace Stereotype {
 
 		public Value Eval(Scope e) {
 			Value v = this.Expression.Eval(e);
+
 			if (this.type is IdExpression) {
 				String nametype = ((IdExpression)this.type).id;
-				if (nametype == "null") {
-					return new Bool(v is Null);
+				if (nametype == "void") {
+					return new Bool(v is Lumen.Lang.Std.Void);
 				}
 			}
+
 			Value p = this.type.Eval(e);
 
-			if (p is Null) {
-				return new Bool(v is Null);
+			if (p is Lumen.Lang.Std.Void) {
+				return new Bool(v is Lumen.Lang.Std.Void);
 			}
 
 			if (v is Expando && p is Expando) {
 				return new Bool(((Expando)v).IsChildOf((Expando)p));
+			}
+
+			if(v is IObject && p is IObject io) {
+				return (Bool)io.IsParentOf(v);
 			}
 
 			if (v.Equals(p)) {

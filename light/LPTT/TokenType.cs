@@ -3,7 +3,7 @@
 namespace Stereotype {
 	[Serializable]
 	public enum TokenType {
-		USING,
+		OPEN,
 
 		NUMBER,
 		HARDNUMBER,

@@ -7,7 +7,7 @@ namespace Lumen.Lang.Std {
 		internal List<Value> value;
 
 		public Int32 Count => this.value.Count;
-		public Record Type => StandartModule.Vector;
+		public IObject Type => StandartModule.Vector;
 		
 		public virtual Value this[Int32 index] {
 			get {
@@ -25,7 +25,7 @@ namespace Lumen.Lang.Std {
 
 				if (index >= this.value.Count) {
 					for (Int32 j = this.value.Count; j < index; j++) {
-						this.value.Add(Const.NULL);
+						this.value.Add(Const.VOID);
 					}
 
 					this.value.Add(value);
@@ -105,7 +105,7 @@ namespace Lumen.Lang.Std {
 		public Vec(Int32 size) {
 			this.value = new List<Value>(size);
 			for (Int32 i = 0; i < size; i++) {
-				this.value.Add(Const.NULL);
+				this.value.Add(Const.VOID);
 			}
 		}
 

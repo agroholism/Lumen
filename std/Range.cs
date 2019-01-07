@@ -3,27 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Std {
-	[Serializable]
 	public class Range : IEnumerator<Value> {
 		readonly Value begin;
 		readonly Value end;
 		readonly Value step;
-		Value current;
 		Boolean flag;
 
 		public Range(Value begin, Value end, Value step) {
 			this.begin = begin;
 			this.end = end;
 			this.step = step;
-			this.current = begin;
+			this.Current = begin;
 		}
 
-		public Value Current {
-			get => this.current;
-		}
+		public Value Current { get; private set; }
 
 		Object IEnumerator.Current {
-			get => this.current;
+			get => this.Current;
 		}
 
 		public void Dispose() {
@@ -32,26 +28,26 @@ namespace Lumen.Lang.Std {
 
 		public Boolean MoveNext() {
 			Scope s = new Scope(null) {
-				This = this.current
+				This = this.Current
 			};
 
 			if (!this.flag) {
 				this.flag = true;
-				return Converter.ToBoolean(((Fun)this.current.Type.GetAttribute("!=", null)).Run(s, this.end));
+				return Converter.ToBoolean(((Fun)this.Current.Type.Get("!=", null)).Run(s, this.end));
 			}
 
 			if (this.step == null) {
-				this.current = ((Fun)this.current.Type.GetAttribute("++", null)).Run(s);
+				this.Current = ((Fun)this.Current.Type.Get("++", null)).Run(s);
 			}
 			else {
-				this.current = ((Fun)this.current.Type.GetAttribute("+", null)).Run(s, this.step);
+				this.Current = ((Fun)this.Current.Type.Get("+", null)).Run(s, this.step);
 			}
 
-			return Converter.ToBoolean(((Fun)this.current.Type.GetAttribute("!=", null)).Run(s, this.end));
+			return Converter.ToBoolean(((Fun)this.Current.Type.Get("!=", null)).Run(s, this.end));
 		}
 
 		public void Reset() {
-			this.current = this.begin;
+			this.Current = this.begin;
 		}
 	}
 }

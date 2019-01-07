@@ -9,115 +9,112 @@ namespace Lumen.Lang.Std {
 				Name = "vec"
 			};
 
-			Set("()", new LambdaFun((e, args) => {
-				if (e.ExistsInThisScope("to")) {
-					Num from = e.ExistsInThisScope("from") ? (Num)e["from"] : (Num)0;
-					Num step = e.ExistsInThisScope("step") ? (Num)e["step"] : null;
+			Dictionary<Value, Value> genericMemory = new Dictionary<Value, Value>();
 
-					Num to = (Num)e["to"];
-
-					if (step is null) {
-						if (e.ExistsInThisScope("len")) {
-							step = (to - from) / ((Num)e["len"]).value;
-						}
-						else {
-							step = 1;
-						}
-					}
-
-					List<Value> res = new List<Value>();
-
-					for (Num i = from; i <= to; i += step) {
-						res.Add(i);
-					}
-
-					return new Vec(res);
+			SetAttribute("@generic", new LambdaFun((e, args) => {
+				if(genericMemory.TryGetValue(args[0], out var resa)) {
+					return resa;
 				}
 
-				return new Vec(args);
+				LambdaFun res = new LambdaFun((innerScope, innerArgs) => {
+					RecordValue result = new RecordValue();
+					result.Prototype = innerScope["self"] as IObject;
+					result.Set("@value", new Vec(innerArgs), innerScope);
+					return result;
+				}) {
+					Prototype = this
+				};
+
+				res.Set("vec", new LambdaFun((innerScope, arguments) => (innerScope.This as IObject).Get("@value", innerScope)), e);
+
+				res.Set("add", new LambdaFun((innerScope, innerArgs) => {
+					List<Value> list = Converter.ToList(innerScope.This, innerScope);
+
+					list.Add(innerArgs[0]);
+
+					return (Num)list.Count;
+				}) { Arguments = new List<FunctionArgument> { new FunctionArgument("element") {  Attributes = new Dictionary<string, Value> { ["type"] = args[0] } } } }, e);
+
+				res.Set("name", new Str($"std.vec[{args[0]}]"), e);
+
+				genericMemory[args[0]] = res;
+
+				return res;
+			}));
+
+			// constructor
+			SetAttribute("()", new LambdaFun((e, args) => new Vec(args)));
+
+			SetAttribute("@constructor", new LambdaFun((e, args) => {
+				RecordValue result;
+				if (e.This == null) {
+					result = new RecordValue();
+				}
+				else {
+					result = e.This as RecordValue;
+				}
+				result.Set("@value", new Vec(args), e);
+				return result;
+			}));
+
+			SetAttribute("on_deriving", new LambdaFun((e, args) => {
+				IObject f = args[0] as IObject;
+				f.Set("vec", new LambdaFun((innerScope, arguments) => (innerScope.This as IObject).Get("@value", innerScope)), e);
+				return Const.VOID;
 			}));
 
 			#region operators
-			SetAttribute(Op.SLASH, new LambdaFun((scope, args) => {
-				IEnumerable<Value> value = scope.This.ToIterator(scope);
-				Fun func = scope["func"].ToFunction(scope);
-				Value seed = scope["seed"];
 
-				if (seed is Null) {
-					return value.Aggregate((x, y) => func.Run(new Scope(scope), x, y));
-				}
-				else {
-					return value.Aggregate(seed, (x, y) => func.Run(new Scope(scope), x, y));
-				}
-			}) {
-				Arguments = new List<FunctionArgument> {
-						new FunctionArgument("func"),
-						new FunctionArgument("seed", Const.NULL)
-					}
-			});
-
-			// vec + obj 
-			SetAttribute(Op.PLUS, new LambdaFun((scope, args) => {
-				List<Value> exemplare = scope.This.Clone().ToList(scope);
-				exemplare.Add(scope["other"]);
-				return new Vec(exemplare);
-			}) { Arguments = Const.OTHER });
-			// vec - obj
-			SetAttribute(Op.MINUS, new LambdaFun((scope, args) => {
-				List<Value> exemplare = scope.This.Clone().ToList(scope);
-				IEnumerable<Value> other = scope["other"].ToIterator(scope);
-
-				return new Vec(exemplare.Except(other).ToList());
-			}) { Arguments = Const.OTHER });
-			// *vec
+			// *vec<?> := num
 			SetAttribute(Op.USTAR, new LambdaFun((scope, args) => {
 				return (Num)scope.This.ToList(scope).Count;
 			}));
-			// vec == obj
-			SetAttribute(Op.EQL, new LambdaFun((scope, args) => {
-				return new Bool(scope.This.Equals(scope["other"].ToList(scope)));
-			}) { Arguments = Const.OTHER });
-			// vec != obj
-			SetAttribute(Op.NOT_EQL, new LambdaFun((scope, args) => {
-				return new Bool(!scope.This.Equals(scope["other"].ToList(scope)));
-			}) { Arguments = Const.OTHER });
-			// vec & (seq | vec)
-			SetAttribute(Op.BAND, new LambdaFun((scope, args) => {
-				List<Value> exemplare = Converter.ToList(scope.Get("this"), scope);
-				List<Value> other = scope["other"].ToList(scope);
 
-				return new Vec(exemplare.Union(other).ToList());
-			}) { Arguments = Const.OTHER });
-			// vec | (seq | vec)
-			SetAttribute(Op.BOR, new LambdaFun((e, args) => {
-				List<Value> list = Converter.ToList(e.Get("this"), e);
-				List<Value> other = Converter.ToList(args[0], e);
+			// vec<?> / fun<?, ?> := ?
+			SetAttribute(Op.SLASH, new LambdaFun((scope, args) => {
+				List<Value> value = scope.This.ToList(scope);
+				Fun func = scope["func"].ToFunction(scope);
 
-				return new Vec(list.Intersect(other).ToList());
-			}));
-			// vec += obj
-			SetAttribute(Op.APLUS, new LambdaFun((e, args) => {
-				List<Value> list = e.This.ToList(e);
+				return value.Aggregate((x, y) => func.Run(new Scope(scope), x, y));
+			}) {
+				Arguments = new List<FunctionArgument> {
+						new FunctionArgument("func")
+					}
+			});
 
-				// or clone?
-				list.Add(e["other"]);
+			// vec<?> + ? := vec<?> { can be slow - makes copy } 
+			SetAttribute(Op.PLUS, new LambdaFun((scope, args) => {
+				List<Value> value = scope.This.Clone().ToList(scope);
+				value.Add(scope["other"]);
+				return new Vec(value);
+			}) {
+				Arguments = Const.OTHER
+			});
 
-				return e.This;
-			}) { Arguments = Const.OTHER });
+			// vec<?> - (vec<?> | seq<?>) := vec<?>
+			SetAttribute(Op.MINUS, new LambdaFun((scope, args) => {
+				List<Value> value = scope.This.ToList(scope);
+				IEnumerable<Value> other = scope["other"].ToIterator(scope);
 
+				return new Vec(value.Except(other).ToList());
+			}) {
+				Arguments = Const.OTHER
+			});
+
+			// vec<?> * (str | fun<?> | num) := str | vec<?> | vec<?>
 			SetAttribute(Op.STAR, new LambdaFun((scope, args) => {
 				List<Value> value = scope.This.ToList(scope);
 				Value other = scope["other"];
 
 				switch (other) {
-					case KString _:
-						return new KString(String.Join(other.ToString(), value));
+					case Str _:
+						return new Str(String.Join(other.ToString(scope), value));
 					case Fun fun:
 						return new Vec(value.Select((it, i) => fun.Run(new Scope(scope), it, (Num)i)).ToList());
-					case BigFloat bf:
-						return new Vec(Cycle(value, (Int32)(Double)bf).ToList());
+					case Num num:
+						return new Vec(Cycle(value, (Int32)num.ToDouble(scope)).ToList());
 					default:
-						throw new Lumen.Lang.Std.Exception($"operator '*' can not get a value of type {other.Type}");
+						throw new Exception($"operator '*' can not get a value of type {other.Type}");
 				}
 
 				IEnumerable<Value> Cycle(IEnumerable<Value> val, Int32 count) {
@@ -131,11 +128,56 @@ namespace Lumen.Lang.Std {
 				}
 
 			}) {
-				Arguments = new List<FunctionArgument> {
-						new FunctionArgument("other")
-					}
+				Arguments = Const.OTHER
 			});
 
+			// vec<?> = ? := bool
+			SetAttribute(Op.EQL, new LambdaFun((scope, args) => {
+				return new Bool(scope.This.Equals(scope["other"]));
+			}) {
+				Arguments = Const.OTHER
+			});
+
+			// vec<?> <> ? := bool
+			SetAttribute(Op.NOT_EQL, new LambdaFun((scope, args) => {
+				return new Bool(!scope.This.Equals(scope["other"]));
+			}) {
+				Arguments = Const.OTHER
+			});
+
+			// vec<?> & (seq<?> | vec<?>) := vec<?>
+			SetAttribute(Op.BAND, new LambdaFun((scope, args) => {
+				List<Value> value = scope.This.ToList(scope);
+				IEnumerable<Value> other = scope["other"].ToIterator(scope);
+
+				return new Vec(value.Union(other).ToList());
+			}) {
+				Arguments = Const.OTHER
+			});
+
+			// vec<?> | (seq<?> | vec<?>) := vec<?>
+			SetAttribute(Op.BOR, new LambdaFun((scope, args) => {
+				List<Value> value = scope.This.ToList(scope);
+				IEnumerable<Value> other = scope["other"].ToIterator(scope);
+
+				return new Vec(value.Intersect(other).ToList());
+			}) {
+				Arguments = Const.OTHER
+			});
+
+			// vec<?> += ?
+			SetAttribute(Op.APLUS, new LambdaFun((e, args) => {
+				List<Value> list = e.This.ToList(e);
+
+				// or clone?
+				list.Add(e["other"]);
+
+				return e.This;
+			}) {
+				Arguments = Const.OTHER
+			});
+
+			// vec<?>[...args]
 			SetAttribute(Op.GETI, new LambdaFun((e, args) => {
 				List<Value> exemplare = Converter.ToList(e.Get("this"), e);
 
@@ -236,7 +278,7 @@ namespace Lumen.Lang.Std {
 					return new List(result);*/
 				}
 
-				return Const.NULL; //
+				return Const.VOID; //
 			}));
 			SetAttribute(Op.SETI, new LambdaFun((e, args) => {
 				List<Value> exemplare = Converter.ToList(e.Get("this"), e);
@@ -285,7 +327,7 @@ namespace Lumen.Lang.Std {
 					return new List(result);*/
 				}
 
-				return Const.NULL; //
+				return Const.VOID; //
 			}));
 			#endregion
 
@@ -302,7 +344,8 @@ namespace Lumen.Lang.Std {
 				return new Enumerator(v);
 			}));
 			SetAttribute("str", new LambdaFun((e, args) => {
-				return (KString)e.Get("this").ToString(e);
+				Vec v = e.This.ToVec(e);
+				return (Str)v.ToString(e);
 			}));
 			SetAttribute("sort", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
@@ -375,6 +418,11 @@ namespace Lumen.Lang.Std {
 							return new List(list);
 						}, "Kernel.List.sort!"));
 						*/
+			SetAttribute("contains", new LambdaFun((e, args) => {
+				List<Value> value = e.This.ToList(e);
+				Value obj = args[0];
+				return (Bool)value.Contains(obj);
+			}));
 			SetAttribute("pop", new LambdaFun((e, args) => {
 				List<Value> list = Converter.ToList(e.Get("this"), e);
 				Value lastElement = list[list.Count - 1];
@@ -395,7 +443,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("unshift!", new LambdaFun((e, args) => {
 				List<Value> list = Converter.ToList(e.Get("this"), e);
 				list.Insert(0, args[0]);
-				return Const.NULL;
+				return Const.VOID;
 			}));
 			SetAttribute("each!", new LambdaFun((e, args) => {
 				List<Value> v = null;
@@ -420,10 +468,10 @@ namespace Lumen.Lang.Std {
 					}
 				}
 
-				return Const.NULL;
+				return Const.VOID;
 			}));
-			SetAttribute("add!", new LambdaFun((e, args) => {
-				List<Value> list = Converter.ToList(e.Get("this"));
+			SetAttribute("add", new LambdaFun((e, args) => {
+				List<Value> list = Converter.ToList(e.This, e);
 
 				for (Int32 i = 0; i < args.Length; i++) {
 					if (args[i] is Vec lst && lst.value.Equals(list)) {
@@ -455,7 +503,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("clear!", new LambdaFun((e, args) => {
 				List<Value> list = Converter.ToList(e.Get("this"), e);
 				list.Clear();
-				return Const.NULL;
+				return Const.VOID;
 			}));
 			SetAttribute("find_index", new LambdaFun((e, args) => {
 				List<Value> list = Converter.ToList(e.Get("this"), e);
@@ -506,7 +554,7 @@ namespace Lumen.Lang.Std {
 			SetAttribute("insert!", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
 				v.Insert((Int32)Converter.ToDouble(args[0], e), args[1]);
-				return Const.NULL;
+				return Const.VOID;
 			}));
 			SetAttribute("last_index", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
@@ -518,12 +566,12 @@ namespace Lumen.Lang.Std {
 					v.Remove(i);
 				}
 
-				return Const.NULL;
+				return Const.VOID;
 			}));
 			SetAttribute("reject!", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
 				v.RemoveAll(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x)));
-				return Const.NULL;
+				return Const.VOID;
 			}));
 			/*SetAttribute("remove_at!", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);

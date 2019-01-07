@@ -23,25 +23,17 @@ namespace Stereotype {
 			String name = this.left.nameVariable;
 			Value obj = this.left.expression.Eval(e);
 			if (obj is IObject iobj) {
-				AccessModifiers mode = AccessModifiers.PUBLIC;
-			/*	if ((this.left.expression is IdExpression id && id.id == "this") || (e.IsExsists("this") && e.Get("this").Type.Match(iobj))) {
-					mode = AccessModifiers.PRIVATE;
-				}*/
-
-				iobj.Set(name, value, mode, e);
+				iobj.Set(name, value, e);
 			}
 			else if (obj is Module module) {
 				module.Set(name, value);
-			}
-			else if (obj is Record type) {
-				type.Set(name, value, e);
 			}
 			else if (obj is Expando hobj) {
 				hobj.Set(name, value, AccessModifiers.PUBLIC, e);
 			}
 			else {
-				type = obj.Type;
-				if (type.AttributeExists("set_" + name) && type.GetAttribute("set_" + name, e) is Fun property) {
+				var type = obj.Type;
+				if (type.TryGet("set_" + name, out var prf) && prf is Fun property) {
 					property.Run(new Scope(e) { ["this"] = obj }, value);
 				}
 				else {

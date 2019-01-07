@@ -40,6 +40,7 @@
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+			this.hTMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.textBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.output)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -61,6 +62,7 @@
 			// 
 			// textBox
 			// 
+			this.textBox._UnsafeText = "";
 			this.textBox.AutoCompleteBrackets = true;
 			this.textBox.AutoCompleteBracketsList = new char[] {
         '(',
@@ -77,6 +79,7 @@
 			this.textBox.BackBrush = null;
 			this.textBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.textBox.BookmarkColor = System.Drawing.Color.BlueViolet;
+			this.textBox.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.STRATEGY_1;
 			this.textBox.CharHeight = 17;
 			this.textBox.CharWidth = 7;
 			this.textBox.CommentPrefix = "--";
@@ -85,6 +88,8 @@
 			this.textBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.textBox.Font = new System.Drawing.Font("Consolas", 9.75F);
 			this.textBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			this.textBox.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
+			this.textBox.Hotkeys = resources.GetString("textBox.Hotkeys");
 			this.textBox.IndentBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.textBox.IsReplaceMode = false;
 			this.textBox.LineInterval = 2;
@@ -101,12 +106,14 @@
 			this.textBox.TabIndex = 0;
 			this.textBox.TextAreaBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.textBox.WordWrapIndent = 1;
+			this.textBox.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
 			this.textBox.Zoom = 100;
 			this.textBox.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.textBox_ToolTipNeeded);
 			this.textBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.textBox_TextChanged);
 			// 
 			// output
 			// 
+			this.output._UnsafeText = "";
 			this.output.AutoCompleteBracketsList = new char[] {
         '(',
         ')',
@@ -121,6 +128,7 @@
 			this.output.AutoScrollMinSize = new System.Drawing.Size(2, 15);
 			this.output.BackBrush = null;
 			this.output.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.output.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.STRATEGY_1;
 			this.output.CharHeight = 15;
 			this.output.CharWidth = 7;
 			this.output.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -128,6 +136,8 @@
 			this.output.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.output.Font = new System.Drawing.Font("Consolas", 9.75F);
 			this.output.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			this.output.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
+			this.output.Hotkeys = resources.GetString("output.Hotkeys");
 			this.output.IsReadLineMode = false;
 			this.output.IsReplaceMode = false;
 			this.output.Location = new System.Drawing.Point(0, 0);
@@ -139,6 +149,7 @@
 			this.output.Size = new System.Drawing.Size(409, 92);
 			this.output.TabIndex = 1;
 			this.output.TextAreaBorderColor = System.Drawing.Color.SlateGray;
+			this.output.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
 			this.output.Zoom = 100;
 			// 
 			// splitContainer1
@@ -186,6 +197,7 @@
 			// 
 			// fastColoredTextBox1
 			// 
+			this.fastColoredTextBox1._UnsafeText = "";
 			this.fastColoredTextBox1.AutoCompleteBrackets = true;
 			this.fastColoredTextBox1.AutoCompleteBracketsList = new char[] {
         '(',
@@ -202,6 +214,7 @@
 			this.fastColoredTextBox1.BackBrush = null;
 			this.fastColoredTextBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.fastColoredTextBox1.BookmarkColor = System.Drawing.Color.BlueViolet;
+			this.fastColoredTextBox1.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.STRATEGY_1;
 			this.fastColoredTextBox1.CharHeight = 17;
 			this.fastColoredTextBox1.CharWidth = 7;
 			this.fastColoredTextBox1.CommentPrefix = "--";
@@ -210,6 +223,8 @@
 			this.fastColoredTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.fastColoredTextBox1.Font = new System.Drawing.Font("Consolas", 9.75F);
 			this.fastColoredTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			this.fastColoredTextBox1.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
+			this.fastColoredTextBox1.Hotkeys = resources.GetString("fastColoredTextBox1.Hotkeys");
 			this.fastColoredTextBox1.IndentBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.fastColoredTextBox1.IsReplaceMode = false;
 			this.fastColoredTextBox1.LineInterval = 2;
@@ -225,6 +240,7 @@
 			this.fastColoredTextBox1.TabIndex = 1;
 			this.fastColoredTextBox1.TextAreaBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.fastColoredTextBox1.WordWrapIndent = 1;
+			this.fastColoredTextBox1.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
 			this.fastColoredTextBox1.Zoom = 100;
 			this.fastColoredTextBox1.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.fastColoredTextBox1_TextChanged);
 			// 
@@ -290,7 +306,7 @@
 			this.errorTable.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
 			this.errorTable.RowHeadersVisible = false;
 			this.errorTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-			this.errorTable.Size = new System.Drawing.Size(204, 92);
+			this.errorTable.Size = new System.Drawing.Size(210, 92);
 			this.errorTable.TabIndex = 0;
 			// 
 			// errorName
@@ -309,7 +325,8 @@
 			// 
 			this.menuStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.runToolStripMenuItem});
+            this.runToolStripMenuItem,
+            this.hTMLToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
@@ -333,6 +350,13 @@
 			this.imageList1.Images.SetKeyName(0, "func.png");
 			this.imageList1.Images.SetKeyName(1, "type.png");
 			this.imageList1.Images.SetKeyName(2, "var.png");
+			// 
+			// hTMLToolStripMenuItem
+			// 
+			this.hTMLToolStripMenuItem.Name = "hTMLToolStripMenuItem";
+			this.hTMLToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+			this.hTMLToolStripMenuItem.Text = "HTML";
+			this.hTMLToolStripMenuItem.Click += new System.EventHandler(this.hTMLToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -383,6 +407,7 @@
 		private System.Windows.Forms.DataGridView errorTable;
 		private System.Windows.Forms.DataGridViewTextBoxColumn errorName;
 		private System.Windows.Forms.DataGridViewTextBoxColumn errorText;
+		private System.Windows.Forms.ToolStripMenuItem hTMLToolStripMenuItem;
 	}
 }
 

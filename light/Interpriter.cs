@@ -27,7 +27,7 @@ namespace Stereotype {
 				Console.Write(ex.Message);
 			}
 			
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public static void Analize(String fileName, Scope scope = null) {

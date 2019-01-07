@@ -36,11 +36,11 @@ namespace Stereotype {
 			}
 
 			Value oldValue = scope[this.id];
-			Record type = oldValue.Type;
+			IObject type = oldValue.Type;
 
 			Value newValue;
 
-			if (type.AttributeExists(this.operation) && type.GetAttribute(this.operation, scope) is Fun fun) {
+			if (type.TryGet(operation, out var prf) && prf is Fun fun) {
 				newValue = fun.Run(new Scope(scope) { This = oldValue }, this.exp.Eval(scope));
 			}
 			else {

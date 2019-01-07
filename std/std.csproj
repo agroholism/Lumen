@@ -43,11 +43,13 @@
   <ItemGroup>
     <Compile Include="AccessModifiers.cs" />
     <Compile Include="BigFloat.cs" />
+    <Compile Include="Checker.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="Types\FileType.cs" />
     <Compile Include="Range.cs" />
+    <Compile Include="Types\RBigNum.cs" />
     <Compile Include="Values\DateTime.cs" />
     <Compile Include="Types\Kernel.DateTime.cs" />
     <Compile Include="Debuggable.cs" />
@@ -68,7 +70,7 @@
     <Compile Include="Expression\GotoE.cs" />
     <Compile Include="Values\Fun\GenericFunc.cs" />
     <Compile Include="Values\Fun\Iterator.cs" />
-    <Compile Include="Values\FixObject.cs" />
+    <Compile Include="Values\RecordValue.cs" />
     <Compile Include="Values\Fun\LambdaFun.cs" />
     <Compile Include="Values\Fun\SystemFun.cs" />
     <Compile Include="Values\Fun\UserFun.cs" />

@@ -28,9 +28,9 @@ namespace LumenPad {
 
 			this.Styles.Add("\".*?[^\\\\]\"", Settings.String);
 			this.Styles.Add("#.*", Settings.Comment);
-			this.Styles.Add("\\[[a-zA-Z$._]+(\\(.*\\))?\\]", Settings.String);
-			this.Styles.Add("\\b(raise|record|next|try|except|finally|global|break|not|self|and|is|let|module|or|xor|where|new|do|end|this|if|else|for|in|while|from|return|true|false|void|(:(\\s+)?(?<range>auto)))\\b", Settings.Keyword);
-			this.Styles.Add("\\b(num|exception|seq|expando|file|str|vec|bool|map)\\b", Settings.Type);
+		//	this.Styles.Add("\\[[a-zA-Z$._]+(\\(.*\\))?\\]", Settings.String);
+			this.Styles.Add("\\b(open|base|raise|record|next|try|except|finally|global|break|not|self|and|is|let|module|or|xor|where|new|do|end|this|if|else|for|in|while|from|return|true|false|void|(:(\\s+)?(?<range>auto)))\\b", Settings.Keyword);
+			this.Styles.Add("\\b(comparable|const|derived|enum|optional|bignum|constructor|num|exception|seq|expando|file|str|vec|bool|map)\\b", Settings.Type);
 		}
 
 		internal override void OnTextChanged(TextBoxManager manager) {
@@ -175,48 +175,53 @@ namespace LumenPad {
 				new AutocompleteItem("else", (Int32)Images.VARIABLE, "else", "else", "else keyword"),
 				new AutocompleteItem("for", (Int32)Images.VARIABLE, "for", "for", "for keyword"),
 				new AutocompleteItem("while", (Int32)Images.VARIABLE, "while", "while", "while keyword"),
-				new AutocompleteItem("record", (Int32)Images.VARIABLE, "record", "record", "record keyword"),
+				new AutocompleteItem("return", (Int32)Images.VARIABLE, "return", "return", "return keyword"),
+				new AutocompleteItem("where", (Int32)Images.VARIABLE, "where", "where", "where keyword"),
 
 				new AutocompleteItem("[const]", (Int32)Images.VARIABLE, "[const]", "[const]", "let const()"),
+				new AutocompleteItem("[constructor]", (Int32)Images.VARIABLE, "[constructor]", "[constructor]", "let constructor()"),
+				new AutocompleteItem("[derived]", (Int32)Images.VARIABLE, "[derived]", "[derived()]", "let derived()"),
 
-				new AutocompleteItem("print", (Int32)Images.FUNCTION, "print", "fun print(...args, sep=\" \", onend=NL)", "Выводит аргументы в стандартный поток вывода"),
+				new AutocompleteItem("print", (Int32)Images.FUNCTION, "print", "let print()", "Выводит аргументы в стандартный поток вывода"),
 
-				new AutocompleteItem("num", (Int32)Images.TYPE, "num", "record num(): num", "[description not founded]"),
-				new AutocompleteItem("str", (Int32)Images.TYPE, "str", "record str(): str", "[description not founded]"),
-				new AutocompleteItem("map", (Int32)Images.TYPE, "map", "record map(): map", "[description not founded]"),
-				new AutocompleteItem("bool", (Int32)Images.TYPE, "bool", "record bool(): bool", "[description not founded]"),
-				new AutocompleteItem("seq", (Int32)Images.TYPE, "seq", "record seq(): seq", "[description not founded]"),
-				new AutocompleteItem("nil", (Int32)Images.TYPE, "nil", "record nil(): nil", "[description not founded]"),
-				new AutocompleteItem("exception", (Int32)Images.TYPE, "exception", "record exception(message): exception", "[description not founded]"),
-				new AutocompleteItem("fun", (Int32)Images.TYPE, "fun", "record fun(): fun", "[description not founded]"),
+				new AutocompleteItem("base", (Int32)Images.FUNCTION, "base", "let base()", "[description not founded]"),
 
-				new AutocompleteItem("vec", (Int32)Images.TYPE, "vec", "record vec(...args, from=nil, to=nil, step=nil, len=nil): vec", "Стандартный тип вектор"),
-				new Mod("vec.op_plus", (Int32)Images.FUNCTION, "op_plus", "fun vec.op_plus(other: seq | vec): vec", "Делает поверхностную копию вектора, добавляет other в его конец и возвращает его"),
-				new Mod("vec.op_minus", (Int32)Images.FUNCTION, "op_minus", "fun vec.op_minus(other: seq | vec): vec", "Находит разность векторов как разность множеств"),
+				new AutocompleteItem("num", (Int32)Images.TYPE, "num", "let num(): num", "[description not founded]"),
+				new AutocompleteItem("str", (Int32)Images.TYPE, "str", "let str(): str", "[description not founded]"),
+				new AutocompleteItem("map", (Int32)Images.TYPE, "map", "let map(): map", "[description not founded]"),
+				new AutocompleteItem("bool", (Int32)Images.TYPE, "bool", "let bool(): bool", "[description not founded]"),
+				new AutocompleteItem("seq", (Int32)Images.TYPE, "seq", "let seq(): seq", "[description not founded]"),
+				new AutocompleteItem("void", (Int32)Images.TYPE, "void", "let void(): void", "[description not founded]"),
+				new AutocompleteItem("exception", (Int32)Images.TYPE, "exception", "let exception(message): exception", "[description not founded]"),
+				new AutocompleteItem("fun", (Int32)Images.TYPE, "fun", "let fun(): fun", "[description not founded]"),
 
-				new Mod("vec.op_ustar", (Int32)Images.FUNCTION, "op_ustar", "fun vec.op_ustar(): vec", "Возвращает длину вектора"),
+				new AutocompleteItem("vec", (Int32)Images.TYPE, "vec", "let vec(...args, from=nil, to=nil, step=nil, len=nil): vec", "Стандартный тип вектор"),
+				new Mod("vec.op_plus", (Int32)Images.FUNCTION, "op_plus", "let vec.op_plus(other: seq | vec): vec", "Делает поверхностную копию вектора, добавляет other в его конец и возвращает его"),
+				new Mod("vec.op_minus", (Int32)Images.FUNCTION, "op_minus", "let vec.op_minus(other: seq | vec): vec", "Находит разность векторов как разность множеств"),
 
-				new Mod("vec.op_eql", (Int32)Images.FUNCTION, "op_eql", "fun vec.op_eql(other): bool", "Проверяет объекты на идентичность"),
+				new Mod("vec.op_ustar", (Int32)Images.FUNCTION, "op_ustar", "let vec.op_ustar(): vec", "Возвращает длину вектора"),
 
-				new Mod("vec.op_not_eql", (Int32)Images.FUNCTION, "op_not_eql", "fun vec.op_not_eql(other): bool", "Проверяет объекты на идентичность"),
+				new Mod("vec.op_eql", (Int32)Images.FUNCTION, "op_eql", "let vec.op_eql(other): bool", "Проверяет объекты на идентичность"),
 
-				new Mod("vec.op_band", (Int32)Images.FUNCTION, "op_band", "fun vec.op_band(other: seq | vec)", "Находит объединение векторов как объединение множеств"),
-				new Mod("vec.op_bor", (Int32)Images.FUNCTION, "op_bor", "fun vec.op_bor(other: seq | vec)", "Находит пересечение векторов как пересечение множеств"),
+				new Mod("vec.op_not_eql", (Int32)Images.FUNCTION, "op_not_eql", "let vec.op_not_eql(other): bool", "Проверяет объекты на идентичность"),
 
-				new Mod("vec.op_aplus", (Int32)Images.FUNCTION, "op_aplus", "fun vec.op_aplus(other)", "[description not founded]"),
+				new Mod("vec.op_band", (Int32)Images.FUNCTION, "op_band", "let vec.op_band(other: seq | vec)", "Находит объединение векторов как объединение множеств"),
+				new Mod("vec.op_bor", (Int32)Images.FUNCTION, "op_bor", "let vec.op_bor(other: seq | vec)", "Находит пересечение векторов как пересечение множеств"),
 
-				new Mod("vec.op_geti", (Int32)Images.FUNCTION, "op_geti", "fun vec.op_geti(x: num | seq | vec | fun=nil, y=nil, z=nil)", "[description not founded]"),
-				new Mod("vec.op_seti", (Int32)Images.FUNCTION, "op_seti", "fun vec.op_seti(x: num=nil)", "[description not founded]"),
+				new Mod("vec.op_aplus", (Int32)Images.FUNCTION, "op_aplus", "let vec.op_aplus(other)", "[description not founded]"),
 
-				new Mod("vec.seq", (Int32)Images.FUNCTION, "seq", "fun vec.seq(): seq", "[description not founded]"),
-				new Mod("vec.str", (Int32)Images.FUNCTION, "str", "fun vec.str(): str", "[description not founded]"),
+				new Mod("vec.op_geti", (Int32)Images.FUNCTION, "op_geti", "let vec.op_geti(x: num | seq | vec | fun=nil, y=nil, z=nil)", "[description not founded]"),
+				new Mod("vec.op_seti", (Int32)Images.FUNCTION, "op_seti", "let vec.op_seti(x: num=nil)", "[description not founded]"),
 
-				new Mod("vec.sort", (Int32)Images.FUNCTION, "sort", "fun vec.sort(by=nil): vec", "[description not founded]"),
-				new Mod("vec.sort_w", (Int32)Images.FUNCTION, "sort_w", "fun vec.sort_w(by=nil): nil", "[description not founded]"),
+				new Mod("vec.seq", (Int32)Images.FUNCTION, "seq", "let vec.seq(): seq", "[description not founded]"),
+				new Mod("vec.str", (Int32)Images.FUNCTION, "str", "let vec.str(): str", "[description not founded]"),
 
-				new Mod("vec.pop", (Int32)Images.FUNCTION, "pop", "fun vec.pop(by=nil)", "[description not founded]"),
+				new Mod("vec.sort", (Int32)Images.FUNCTION, "sort", "let vec.sort(by=nil): vec", "[description not founded]"),
+				new Mod("vec.sort_w", (Int32)Images.FUNCTION, "sort_w", "let vec.sort_w(by=nil): nil", "[description not founded]"),
 
-				new Mod("vec.remove_at", (Int32)Images.FUNCTION, "remove_at", "fun vec.remove_at(index)", "[description not founded]"),
+				new Mod("vec.pop", (Int32)Images.FUNCTION, "pop", "let vec.pop(by=nil)", "[description not founded]"),
+
+				new Mod("vec.remove_at", (Int32)Images.FUNCTION, "remove_at", "let vec.remove_at(index)", "[description not founded]"),
 			};
 
 			return items;

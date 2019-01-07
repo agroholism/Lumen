@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lumen.Lang.Std {
-	public class Record : Value {
-		public IDictionary<String, Value> typeAttributes;
+	public class Record : IObject {
 		public IDictionary<String, Fun> attributes;
-		public String[] variables;
 		public List<Module> includedModules;
 		public TypeMetadata meta;
 
 		public Record() {
 			this.includedModules = new List<Module>();
-			this.typeAttributes = new Dictionary<String, Value>();
 			this.attributes = new Dictionary<String, Fun>();
-			this.variables = new String[0];
 		}
 
 		/// <summary> Возвращает аттрибут экземпляра </summary>
@@ -36,41 +31,7 @@ namespace Lumen.Lang.Std {
 			return this.attributes.ContainsKey(name);
 		}
 
-		public Value Get(String name, Scope e) {
-			if (this.typeAttributes.TryGetValue(name, out Value result)) {
-				return result;
-			}
-
-			if (this.typeAttributes.ContainsKey("get_" + name) && this.typeAttributes["get_" + name] is Fun property) {
-				Scope s = new Scope(e) {
-					This = this
-				};
-				return property.Run(s);
-			}
-
-			if (this.Contains("name_missing") && this.Get("name_missing", e) is Fun func) {
-				Scope s = new Scope(e) {
-					This = e.This
-				};
-				return func.Run(s, (KString)name);
-			}
-
-			throw new System.Exception($"type '{this.meta.Name}' does not have a field '{name}'");
-		}
-
-		public void Set(String name, Value obj, Scope e = null) {
-			this.typeAttributes[name] = obj;
-		}
-
-		public Boolean Contains(String Name) {
-			if (this.variables.Contains(Name) || this.typeAttributes.ContainsKey(Name)) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public virtual Record Type => StandartModule._Type;
+		public virtual IObject Type => StandartModule._Type;
 
 		public Boolean ToBool(Scope e) {
 			throw new NotImplementedException();
@@ -96,21 +57,45 @@ namespace Lumen.Lang.Std {
 			return this;
 		}
 
-		public Boolean Implicit(Value input, Scope scope, out Value output) {
-			output = null;
+		public Value Get(String name, Scope e) {
+			return this.GetAttribute(name, e);
+		}
 
-			if (!this.Contains("implicit")) {
-				return false;
+		public void Set(String name, Value value, Scope e) {
+			this.SetAttribute(name, value as Fun);
+		}
+
+		public Boolean IsParentOf(Value value) {
+			if (value is IObject parent) {
+				while (true) {
+					if (parent.TryGet("@prototype", out var v)) {
+						parent = v as IObject;
+						if (parent == this) {
+							return true;
+						}
+					}
+					else {
+						break;
+					}
+				}
 			}
 
-			try {
-				output = (this.Get("implicit", scope) as Fun).Run(new Scope(scope), input);
-
+			if(value.Type == this) {
 				return true;
 			}
-			catch (System.Exception e) {
-				return false;
+
+			return false;
+		}
+
+		public Boolean TryGet(String name, out Value result) {
+			result = null;
+
+			if (this.AttributeExists(name)) {
+				result = Get(name, null);
+				return true;
 			}
+
+			return false;
 		}
 	}
 }

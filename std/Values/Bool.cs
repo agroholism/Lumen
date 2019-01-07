@@ -3,7 +3,7 @@
 namespace Lumen.Lang.Std {
 	public struct Bool : Value {
 		internal Boolean value;
-		public Record Type => StandartModule.Boolean;
+		public IObject Type => StandartModule.Boolean;
 
 		public Bool(Boolean value) {
 			this.value = value;

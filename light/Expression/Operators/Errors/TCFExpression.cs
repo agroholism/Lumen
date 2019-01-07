@@ -52,7 +52,7 @@ namespace Stereotype {
 				}
 			}
 
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public override String ToString() {

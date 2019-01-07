@@ -77,7 +77,7 @@ namespace Stereotype {
 				body = this.Body.Closure(s, e),
 				condition = this.otherContacts != null ? (this.otherContacts.Count > 0 ? this.otherContacts[0] : null) : null
 			};
-			v.Attributes["name"] = (KString)"[lambda]";
+			v.Attributes["name"] = (Str)"[lambda]";
 			return v;
 		}
 

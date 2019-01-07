@@ -49,7 +49,7 @@ namespace Stereotype {
 				}
 			}
 
-			Value v = Const.NULL;
+			Value v = Const.VOID;
 
 			if (this.expressions.Count > 0) {
 				if (this.saved && this.expressions[this.expressions.Count - 1] is VariableDeclaration decvar) {

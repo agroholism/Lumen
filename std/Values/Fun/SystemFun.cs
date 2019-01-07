@@ -9,12 +9,21 @@ namespace Lumen.Lang.Std {
 			this.Attributes = new Dictionary<String, Value>();
 		}
 
-		public Value Get(String name, AccessModifiers mode, Scope e) {
-			return this.Attributes[name];
-		}
-
-		public void Set(String name, Value value, AccessModifiers mode, Scope e) {
-			this.Attributes[name] = value;
+		public virtual Boolean IsParentOf(Value value) {
+			if (value is IObject parent) {
+				while (true) {
+					if (parent.TryGet("@prototype", out var v)) {
+						parent = v as IObject;
+						if (parent == this) {
+							return true;
+						}
+					}
+					else {
+						break;
+					}
+				}
+			}
+			return false;
 		}
 
 		public Int32 CompareTo(Object obj) {
@@ -25,7 +34,13 @@ namespace Lumen.Lang.Std {
 			return this;
 		}
 
-		public Record Type => StandartModule.Function;
+		public IObject Type {
+			get {
+				this.Attributes.TryGetValue("@prototype", out Value result);
+				return result as IObject;
+			}
+			set => this.Attributes["@prototype"] = value;
+		}
 
 		public abstract List<FunctionArgument> Arguments { get; set; }
 
@@ -41,6 +56,40 @@ namespace Lumen.Lang.Std {
 
 		public String ToString(Scope e) {
 			return "";
+		}
+
+		public Value Get(String name, Scope e) {
+			if (this.Attributes.TryGetValue(name, out var result)) {
+				return result;
+			}
+
+			if (this.Type != null) {
+				if (this.Type.TryGet(name, out result)) {
+					return result;
+				}
+			}
+
+			throw new Exception($"record does not contains a field {name}", stack: e);
+		}
+
+		public void Set(String name, Value value, Scope e) {
+			this.Attributes[name] = value;
+		}
+
+		public Boolean TryGet(String name, out Value result) {
+			result = null;
+
+			if (this.Attributes.TryGetValue(name, out result)) {
+				return true;
+			}
+
+			if (this.Type != null) {
+				if (this.Type.TryGet(name, out result)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 }

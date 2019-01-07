@@ -12,13 +12,13 @@ namespace Lumen.Lang.Std {
 				//BaseType = StandartModule.Object
 			};
 
-			Set("new", new LambdaFun((scope, args) => {
+			SetAttribute("()", new LambdaFun((scope, args) => {
 				return new Exception(args[0].ToString(scope), this, null);
 			}));
 
-			SetAttribute("get_message", new LambdaFun((e, args) => (KString)(e.This as Exception).Message));
+			SetAttribute("get_message", new LambdaFun((e, args) => (Str)(e.This as Exception).Message));
 
-			SetAttribute("to_s", new LambdaFun((e, args) => (KString)(e.This as Exception).ToString(e)));
+			SetAttribute("to_s", new LambdaFun((e, args) => (Str)(e.This as Exception).ToString(e)));
 		}
 	}
 
@@ -29,7 +29,7 @@ namespace Lumen.Lang.Std {
 				//BaseType = StandartModule.Exception
 			};
 
-			Set("new", new LambdaFun((scope, args) => {
+			SetAttribute("new", new LambdaFun((scope, args) => {
 				return new Exception(args[0].ToString(scope), this, null);
 			}));
 		}
@@ -42,7 +42,7 @@ namespace Lumen.Lang.Std {
 				//BaseType = StandartModule.Exception
 			};
 
-			Set("new", new LambdaFun((scope, args) => {
+			SetAttribute("new", new LambdaFun((scope, args) => {
 				return new Exception(args[0].ToString(scope), this, null);
 			}));
 		}
@@ -55,7 +55,7 @@ namespace Lumen.Lang.Std {
 				//BaseType = StandartModule.Exception
 			};
 
-			Set("new", new LambdaFun((scope, args) => {
+			SetAttribute("new", new LambdaFun((scope, args) => {
 				return new Exception($"expected value of type {args[0]} given {args[1]}", this, null);
 			}));
 		}
@@ -68,7 +68,7 @@ namespace Lumen.Lang.Std {
 				//BaseType = StandartModule.Exception
 			};
 
-			Set("new", new LambdaFun((scope, args) => {
+			SetAttribute("new", new LambdaFun((scope, args) => {
 				return new Exception($"expected value of type {args[0]} given {args[1]}", this, null);
 			}));
 		}

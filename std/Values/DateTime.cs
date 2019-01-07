@@ -1,7 +1,6 @@
 ﻿using System;
 
 namespace Lumen.Lang.Std {
-	[Serializable]
 	class DateTime : Value {
 		readonly System.DateTime value;
 
@@ -9,7 +8,7 @@ namespace Lumen.Lang.Std {
 			this.value = value;
 		}
 
-		public Record Type => StandartModule.DateTime;
+		public IObject Type => StandartModule.DateTime;
 
 		public Value Clone() {
 			throw new NotImplementedException();

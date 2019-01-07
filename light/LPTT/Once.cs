@@ -22,7 +22,7 @@ namespace Stereotype {
 		}
 		public Value Eval(Scope e) { 
 			if(this.isDepricated) {
-				return Const.NULL;
+				return Const.VOID;
 			}
 			this.isDepricated = true;
 			return this.expression.Eval(e);

@@ -23,7 +23,7 @@ namespace Lumen.Lang.Std {
 			return this.innerValue.GetEnumerator();
 		}
 
-		public Record Type => StandartModule.Enumerator;
+		public IObject Type => StandartModule.Enumerator;
 
 		IEnumerator IEnumerable.GetEnumerator() {
 			return this.innerValue.GetEnumerator();

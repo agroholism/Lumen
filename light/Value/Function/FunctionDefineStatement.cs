@@ -6,7 +6,7 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang.Std;
 
 namespace Stereotype {
-	public class FunctionDefineStatement : Expression {
+	public class FunctionDeclaration : Expression {
 		public String NameFunction;
 		public List<ArgumentMetadataGenerator> Args;
 		public Expression Body;
@@ -20,14 +20,14 @@ namespace Stereotype {
 			return this;
 		}
 
-		public FunctionDefineStatement(String NameFunction, List<ArgumentMetadataGenerator> Args, Expression Body, Expression returnedType) {
+		public FunctionDeclaration(String NameFunction, List<ArgumentMetadataGenerator> Args, Expression Body, Expression returnedType) {
 			this.NameFunction = NameFunction;
 			this.Args = Args;
 			this.Body = Body;
 			this.returnedType = returnedType;
 		}
 
-		public FunctionDefineStatement(String NameFunction, List<ArgumentMetadataGenerator> Args, Expression Body, Expression returnedType, List<Expression> otherContacts, Int32 line, String file) : this(NameFunction, Args, Body, returnedType) {
+		public FunctionDeclaration(String NameFunction, List<ArgumentMetadataGenerator> Args, Expression Body, Expression returnedType, List<Expression> otherContacts, Int32 line, String file) : this(NameFunction, Args, Body, returnedType) {
 			this.otherContacts = otherContacts;
 			this.line = line;
 			this.file = file;
@@ -41,24 +41,19 @@ namespace Stereotype {
 		public Value Eval(Scope e) {
 			List<FunctionArgument> args = new List<FunctionArgument>();
 
-			Record extendableRecord = null;
-
 			foreach (ArgumentMetadataGenerator i in this.Args) {
-				FunctionArgument arg = i.EvalArgumnet(e);
-
-				// It's extension?
-				if (arg.name == "this"
-					&& arg.Attributes != null
-					&& arg.Attributes.TryGetValue("type", out Value value)
-					&& value is Record record) {
-					extendableRecord = record;
-					continue;
-				}
-
-				args.Add(arg);
+				args.Add(i.EvalArgumnet(e));
 			}
 
-			List<String> notClosurableVariables = new List<String> { "self", "_", "this", "base", "value", "kwargs", "args" };
+			List<String> notClosurableVariables = new List<String> {
+				"self",
+				"_",
+				"this",
+				"base",
+				"value",
+				"kwargs",
+				"args"
+			};
 
 			foreach (FunctionArgument i in args) {
 				String mutname = i.name.Replace("*", "");
@@ -77,23 +72,17 @@ namespace Stereotype {
 			};
 
 
-			v.Set("name", (KString)this.NameFunction, AccessModifiers.PRIVATE, e);
+			v.Set("@name", (Str)this.NameFunction, e);
 
-			if(this.returnedType != null) {
-				v.Set("type", this.returnedType.Eval(e), AccessModifiers.PRIVATE, e);
+			if (this.returnedType != null) {
+				v.returned = this.returnedType.Eval(e) as IObject;
 			}
 
-
-			if (extendableRecord != null) {
-				extendableRecord.SetAttribute(this.NameFunction, v);
+			if (e.ExistsInThisScope(this.NameFunction) && e[this.NameFunction] is UserFun uf) {
+				uf.body = v.body;
 			}
 			else {
-				if (e.ExistsInThisScope(this.NameFunction) && e[this.NameFunction] is UserFun uf) {
-					uf.body = v.body;
-				}
-				else {
-					e.Set(this.NameFunction, v);
-				}
+				e.Set(this.NameFunction, v);
 			}
 
 			return v;
@@ -101,7 +90,7 @@ namespace Stereotype {
 
 		public Expression Closure(List<String> visible, Scope thread) {
 			visible.Add(this.NameFunction);
-			return new FunctionDefineStatement(this.NameFunction, this.Args.Select(i => new ArgumentMetadataGenerator(i.name, i.type?.Closure(visible, thread), i.defaultValue?.Closure(visible, thread))).ToList(), this.Body.Closure(visible, thread), this.returnedType?.Closure(visible, thread));
+			return new FunctionDeclaration(this.NameFunction, this.Args.Select(i => new ArgumentMetadataGenerator(i.name, i.type?.Closure(visible, thread), i.defaultValue?.Closure(visible, thread))).ToList(), this.Body.Closure(visible, thread), this.returnedType?.Closure(visible, thread));
 		}
 	}
 }

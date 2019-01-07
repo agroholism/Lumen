@@ -7,7 +7,7 @@ using Lumen.Lang.Std;
 namespace Stereotype {
 	internal class Auto : Expression {
 		public Value Eval(Scope e) {
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public Expression Closure(List<String> visible, Scope scope) {

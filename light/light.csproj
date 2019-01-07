@@ -47,7 +47,7 @@
     <Compile Include="Expression\IdExpression.cs" />
     <Compile Include="Expression\DotApplicate.cs" />
     <Compile Include="Expression\DotExpression.cs" />
-    <Compile Include="Expression\FunctionDefineDotStatement.cs" />
+    <Compile Include="Expression\SlotMetadataGenerator.cs" />
     <Compile Include="Expression\ListForGen.cs" />
     <Compile Include="Expression\Namespace.cs" />
     <Compile Include="Expression\Operators\BinaryExpression.cs" />
@@ -67,21 +67,18 @@
     <Compile Include="LPTT\DecoratorE.cs" />
     <Compile Include="LPTT\DocE.cs" />
     <Compile Include="LPTT\DynamicLoad.cs" />
-    <Compile Include="LPTT\EnumE.cs" />
     <Compile Include="LPTT\ExpressionE.cs" />
+    <Compile Include="LPTT\FunctionDefineDotStatement.cs" />
     <Compile Include="LPTT\GenericFunctionMaker.cs" />
+    <Compile Include="LPTT\GetIndexE.cs" />
     <Compile Include="LPTT\Import.cs" />
-    <Compile Include="LPTT\InstanceCreateE.cs" />
     <Compile Include="LPTT\IsMatching.cs" />
     <Compile Include="LPTT\Lexer.cs" />
-    <Compile Include="LPTT\LigthType.cs" />
-    <Compile Include="LPTT\LigthTypeGeneric.cs" />
     <Compile Include="LPTT\ObjectE.cs" />
     <Compile Include="LPTT\Once.cs" />
-    <Compile Include="LPTT\OptionalDotExpression.cs" />
+    <Compile Include="LPTT\OptionalE.cs" />
     <Compile Include="LPTT\Parser.cs" />
     <Compile Include="LPTT\StringE.cs" />
-    <Compile Include="LPTT\StructE.cs" />
     <Compile Include="LPTT\Token.cs" />
     <Compile Include="LPTT\TokenType.cs" />
     <Compile Include="Provider.cs" />
@@ -135,7 +132,7 @@
     <None Include="examples\switch.ks">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="std.ks">
+    <None Include="std.lm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

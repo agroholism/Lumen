@@ -4,20 +4,22 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang.Std;
 
 namespace Stereotype {
-	[Serializable]
 	internal class DecoratorE : Expression {
 		internal List<Expression> expsOfDecos;
 		internal Expression func;
 		internal Expression hightestExpression;
+
 		public Expression Optimize(Scope scope) {
 			return this;
 		}
+
 		public DecoratorE(List<Expression> expsOfDecos, Expression func) {
 			this.expsOfDecos = expsOfDecos;
 			this.func = func;
-			if(func is DecoratorE dece) {
+			if (func is DecoratorE dece) {
 				this.hightestExpression = dece.hightestExpression;
-			} else {
+			}
+			else {
 				this.hightestExpression = func;
 			}
 		}
@@ -27,17 +29,67 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			Value val = this.expsOfDecos[0].Eval(e);
-			if (this.func is FunctionDefineStatement fds) {
-				this.func.Eval(e);
-				Fun v = e.Get(fds.NameFunction) as Fun;
+			Fun val = null;
 
-				if(val is Record type) {
-					v.Attributes["returned"] = type;
+			/*if(val.TryGet("@gm", out Value res)) {
+				if (this.func is FunctionDeclaration fds1) {
+					Fun f =  new LambdaFun((ex, argsx) => {
+						return Const.VOID;
+					});
+
+					f.Set("@generic", new LambdaFun((ex, argsx) => {
+						Scope s = new Scope(e);
+
+						Int32 index = 0;
+						foreach(var i in val.Get("x", e).ToList(e)) {
+							s[i.ToString(e)] = argsx[index];
+							index++;
+						}
+
+						Fun r = this.func.Eval(s) as Fun;
+						r.Attributes = f.Attributes;
+						return r;
+					}), e);
+
+					e.Set(fds1.NameFunction, f);
+
+					return Const.VOID;
 				}
-				else if (val == Const.NULL) {
-					v.Attributes["returned"] = StandartModule.Null;
+			}
+			*/
+			if (this.func is FunctionDeclaration fds) {
+				this.func.Eval(e);
+
+				Value v = e.Get(fds.NameFunction);
+				for (Int32 i = this.expsOfDecos.Count - 1; i > -1; i--) {
+					val = this.expsOfDecos[i].Eval(e) as Fun;
+
+					v = val.Run(new Scope(e) { }, v);
 				}
+				e.Set(fds.NameFunction, v);
+
+				return Const.VOID;
+			}
+
+			if (this.func is FunctionDefineDotStatement fdds) {
+				this.func.Eval(e);
+
+				IObject v = e.Get(fdds.helper[0]) as IObject;
+
+				for (Int32 i = 1; i < fdds.helper.Count; i++) {
+					v = v.Get(fdds.helper[i], e) as IObject;
+				}
+
+				Value f = v.Get(fdds.name, e) as Fun;
+
+				for (Int32 i = this.expsOfDecos.Count - 1; i > -1; i--) {
+					val = expsOfDecos[i].Eval(e) as Fun;
+
+					f = val.Run(new Scope(e) { }, f);
+				}
+
+				v.Set(fdds.name, f, e);
+				return Const.VOID;
 			}
 
 			if (this.func is VariableDeclaration vd) {
@@ -81,29 +133,7 @@ namespace Stereotype {
 				}
 				return v;
 			}
-			else if (this.func is StructE classCreator) {
-				classCreator.Eval(e);
-				Value v = e[classCreator.name];
-			/*	Value v = new HObject {
-					["final?", e] = (Bool)false,
-				//	["fields", e] = new KList(classCreator.)
-				};
-				*/
-				for (Int32 i = this.expsOfDecos.Count - 1; i > -1; i--) {
-					if (this.expsOfDecos[i] is IdExpression || this.expsOfDecos[i] is DotExpression) {
-						v = new Applicate(this.expsOfDecos[i], new List<Expression> { new ValueE(v) }, -1).Eval(e);
-					}
-					else if (this.expsOfDecos[i] is Applicate app) {
-						List<Expression> args = new List<Expression> { new ValueE(v) };
-						foreach (Expression x in app.argse) {
-							args.Add(x);
-						}
-						v = new Applicate(app.callable, args, -1).Eval(e);
-					}
-				}
-				return v;
-			}
-			return Const.NULL;
+			return Const.VOID;
 		}
 	}
 }

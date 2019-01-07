@@ -17,7 +17,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public Expression Optimize(Scope scope) {

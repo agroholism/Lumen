@@ -45,7 +45,7 @@ namespace Stereotype {
 					continue;
 				}
 
-				if(current is Null) {
+				if(current is Lumen.Lang.Std.Void) {
 					continue;
 				}
 

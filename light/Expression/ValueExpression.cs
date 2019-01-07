@@ -29,7 +29,7 @@ namespace Stereotype {
 		}
 
 		public ValueE(String Object) {
-			this.val = new KString(Object);
+			this.val = new Str(Object);
 		}
 
 		public Value Eval(Scope e) {

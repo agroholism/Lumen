@@ -54,7 +54,7 @@ namespace Lumen.Lang.Std {
 			this.exp.Eval(scope);
 
 			Fun re = scope[this.name] as Fun;
-			re.Attributes["name"] = (KString)(this.name + $"[{String.Join(", ", @params)}]");
+			re.Attributes["name"] = (Str)(this.name + $"[{String.Join(", ", @params)}]");
 			this.memo[@params] = re;
 			return re;
 		}

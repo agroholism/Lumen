@@ -6,6 +6,15 @@ namespace Lumen.Lang.Std {
 	public sealed class LambdaFun : Fun, IObject {
 		public HFun value;
 		public Dictionary<String, Value> Attributes { get; set; }
+		public IObject returned;
+
+		public IObject Prototype {
+			get {
+				this.Attributes.TryGetValue("@prototype", out Value result);
+				return result as IObject;
+			}
+			set => this.Attributes["@prototype"] = value;
+		}
 
 		public LambdaFun(HFun value) {
 			this.value = value;
@@ -15,7 +24,7 @@ namespace Lumen.Lang.Std {
 		public LambdaFun(HFun value, String name) {
 			this.value = value;
 			this.Attributes = new Dictionary<String, Value>();
-			this.Attributes["name"] = (KString)name;
+			this.Attributes["name"] = (Str)name;
 		}
 
 		public Value Run(Scope e, params Value[] args) {
@@ -36,8 +45,8 @@ namespace Lumen.Lang.Std {
 					}
 
 					if (args.Length != 0) {
-						if(i.Attributes != null && i.Attributes.TryGetValue("type", out Value t)) {
-							if(t != args[counter].Type) {
+						if (i.Attributes != null && i.Attributes.TryGetValue("type", out Value t)) {
+							if (t is IObject iobject && !iobject.IsParentOf(args[counter])) {
 								throw new Exception("type error ");
 							}
 						}
@@ -56,7 +65,7 @@ namespace Lumen.Lang.Std {
 								}
 							}
 							else {
-								e.Set(i.name, Const.NULL);
+								e.Set(i.name, Const.VOID);
 							}
 						}
 						counter++;
@@ -73,7 +82,7 @@ namespace Lumen.Lang.Std {
 							}
 						}
 						else {
-							e.Set(i.name, Const.NULL);
+							e.Set(i.name, Const.VOID);
 						}
 					}
 				}
@@ -90,15 +99,7 @@ namespace Lumen.Lang.Std {
 			return result;
 		}
 
-		public Boolean ToBool(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public Double ToDouble(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public Record Type => StandartModule.Function;
+		public IObject Type => this.Prototype;
 
 		public List<FunctionArgument> Arguments { get; set; } = new List<FunctionArgument>();
 
@@ -110,35 +111,66 @@ namespace Lumen.Lang.Std {
 			return this;
 		}
 
-		public Value Get(String name, AccessModifiers mode, Scope e) {
-			if (this.Attributes.TryGetValue(name, out Value result)) {
+		public Value Get(String name, Scope e) {
+			if (this.Attributes.TryGetValue(name, out var result)) {
 				return result;
 			}
 
-			if (this.Attributes.TryGetValue("get_" + name, out result)) {
-				return result;
+			if (this.Prototype != null) {
+				if (this.Prototype.TryGet(name, out result)) {
+					return result;
+				}
 			}
 
-			if (this.Type.AttributeExists("get_" + name) && this.Type.GetAttribute("get_" + name, e) is Fun property) {
-				Scope s = new Scope(e) {
-					This = this
-				};
-				return property.Run(s);
-			}
-
-			throw new Exception($"value of type {this.Type.meta.Name} not contains a field {name}", stack: e);
+			throw new Exception($"record does not contains a field {name}", stack: e);
 		}
 
-		public void Set(String name, Value value, AccessModifiers mode, Scope e) {
+		public void Set(String name, Value value, Scope e) {
 			this.Attributes[name] = value;
 		}
 
-		public String ToString(Scope e) {
-			if (this.Attributes.ContainsKey("name")) {
-				return this.Attributes["name"].ToString(e);
+		public Boolean TryGet(String name, out Value result) {
+			result = null;
+
+			if (this.Attributes.TryGetValue(name, out result)) {
+				return true;
+			}
+
+			if (this.Prototype != null) {
+				if (this.Prototype.TryGet(name, out result)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public String ToString(Scope scope) {
+			if (this.TryGet("@name", out Value result)) {
+				return result.ToString(scope);
 			}
 
 			return "";
+		}
+
+		public override String ToString() {
+			return this.ToString(null);
+		}
+
+		public Boolean IsParentOf(Value value) {
+			if (value is IObject parent) {
+				while(true) {
+					if (parent.TryGet("@prototype", out Value v)) {
+						parent = v as IObject;
+						if (parent == this) {
+							return true;
+						}
+					} else {
+						break;
+					}
+				}
+			}
+			return false;
 		}
 	}
 }

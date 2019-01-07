@@ -10,7 +10,7 @@ namespace Stereotype {
 		public Dictionary<String, Expression> constsValues = new Dictionary<String, Lumen.Lang.Expressions.Expression> {
 			["true"] = new ValueE(Const.TRUE),
 			["false"] = new ValueE(Const.FALSE),
-			["null"] = new ValueE(Const.NULL)
+			["null"] = new ValueE(Const.VOID)
 		};
 		public List<String> notUsed = new List<String>();
 		public Boolean isPrimary = true;
@@ -24,7 +24,7 @@ namespace Stereotype {
 
 		public static void SetPath(String path) {
 			Provider.path = path;
-			Lumen.Lang.Std.StandartModule.__Kernel__.Set("$:", (KString)path);
+			Lumen.Lang.Std.StandartModule.__Kernel__.Set("$:", (Str)path);
 		}
 
 		public static Value Eval(String code) {
@@ -197,7 +197,7 @@ namespace Stereotype {
 						return false;
 					case TokenType.TRY:
 						return false;
-					case TokenType.USING:
+					case TokenType.OPEN:
 						return false;
 					case TokenType.XOR:
 						return false;

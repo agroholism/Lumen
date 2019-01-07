@@ -52,11 +52,21 @@ namespace Stereotype {
 			}
 
 			if (Match(TokenType.LBRACKET)) {
-				Expression exp = Expression();
+				List<Expression> exps = new List<Expression> {
+					Expression()
+				};
 				Match(TokenType.RBRACKET);
+				Match(TokenType.EOC);
+
+				while (Match(TokenType.LBRACKET)) {
+					exps.Add(Expression());
+					Match(TokenType.RBRACKET);
+					Match(TokenType.EOC);
+				}
+
 				Expression decl = Expression();
 
-				return new DecoratorE(new List<Expression> { exp }, decl);
+				return new DecoratorE(exps, decl);
 			}
 
 			if (Match(TokenType.RAISE)) {
@@ -72,10 +82,7 @@ namespace Stereotype {
 			else if (Match(TokenType.RETURN)) {
 				result = new Return(Expression());
 			}
-			else if (Match(TokenType.TYPE)) {
-				result = ParseTypeDeclaration();
-			}
-			else if (Match(TokenType.USING)) {
+			else if (Match(TokenType.OPEN)) {
 				result = ParseUsing();
 			}
 			else if (Match(TokenType.TRY)) {
@@ -129,7 +136,7 @@ namespace Stereotype {
 				return new DynamicLoad(sb.ToString());
 			}
 
-			return new Import(sb.ToString(), this.fileName, this.line);
+			return new Open(sb.ToString(), this.fileName, this.line);
 		}
 
 		private Expression ParseRaise() {
@@ -192,37 +199,17 @@ namespace Stereotype {
 			return res;
 		}
 
-		private Expression ParseTypeDeclaration() {
-			Int32 line = this.line;
-
-			String nameType = Consume(TokenType.WORD).Text;
-
-			// Generic only
-			Dictionary<String, Expression> generic = null;
-
-			if (Match(TokenType.LBRACKET)) {
-				generic = new Dictionary<String, Expression>();
-				while (!Match(TokenType.RBRACKET)) {
-					String id = Consume(TokenType.WORD).Text;
-					Expression defaultValue = null;
-					if (Match(TokenType.EQ)) {
-						defaultValue = Expression();
-					}
-					generic[id] = defaultValue;
-					Match(TokenType.SPLIT);
-				}
-			}
-
-			Match(TokenType.LPAREN);
-			var fields = ParseArgs(TokenType.RPAREN);
-
-			return new StructE(nameType, fields, line, this.fileName);
-		}
-
 		#region
 		/// <summary> Declaration with let </summary>
 		private Expression ParseDeclaration() {
 			Int32 line = this.line;
+
+			List<String> helper = new List<String>();
+
+			while (LookMatch(1, TokenType.DOT)) {
+				helper.Add(Consume(TokenType.WORD).Text);
+				Match(TokenType.DOT);
+			}
 
 			String name = null;
 			List<ArgumentMetadataGenerator> arguments = null;
@@ -238,12 +225,16 @@ namespace Stereotype {
 			}
 
 			// It's variable
-			if (!LookMatch(0, TokenType.LPAREN)) {
+			if (LookMatch(0, TokenType.EQ) && !LookMatch(0, TokenType.DO)) {
 				return ParseVariableDeclaration(name);
 			}
 			else {
-				Match(TokenType.LPAREN);
-				arguments = ParseArgs(TokenType.RPAREN);
+				if (Match(TokenType.LPAREN)) {
+					arguments = ParseArgs(TokenType.RPAREN);
+				}
+				else {
+					arguments = new List<ArgumentMetadataGenerator>();
+				}
 			}
 
 			Expression returnedType = null;
@@ -268,7 +259,12 @@ namespace Stereotype {
 				body = Expression();
 			}
 
-			return new FunctionDefineStatement(name, arguments, body, returnedType, contracts, line, this.fileName);
+			if (helper.Count > 0) {
+				return new FunctionDefineDotStatement(name, arguments, body, returnedType, contracts, line, this.fileName, helper);
+			}
+
+
+			return new FunctionDeclaration(name, arguments, body, returnedType, contracts, line, this.fileName);
 		}
 
 		/// <summary> For cycle </summary>
@@ -328,6 +324,30 @@ namespace Stereotype {
 		private Expression AloneORBlock() {
 			BlockE Block = new BlockE();
 			Match(TokenType.DO);
+
+			Dictionary<String, Expression> items = new Dictionary<string, Expression>();
+
+			if (LookMatch(1, TokenType.COLON) || LookMatch(1, TokenType.SPLIT)) {
+				while (!Match(TokenType.END)) {
+					String name = Consume(TokenType.WORD).Text;
+					Expression exp;
+					if (Match(TokenType.COLON)) {
+						exp = Expression();
+					}
+					else {
+						exp = new UnknownExpression();
+					}
+					items.Add(name, exp);
+					Match(TokenType.SPLIT);
+				}
+
+				if (Match(TokenType.COLON)) {
+					return new ObjectE(items, Expression());
+				}
+				else {
+					return new ObjectE(items);
+				}
+			}
 
 			Int32 line = this.line;
 			while (!Match(TokenType.END)) {
@@ -931,54 +951,6 @@ namespace Stereotype {
 		private Expression Primary() {
 			Token Current = GetToken(0);
 
-			// Создание объекта.
-			if (Match(TokenType.NEW)) {
-				Int32 line = this.line;
-				if (LookMatch(0, TokenType.DO)) {
-					if (LookMatch(1, TokenType.END)) {
-						Match(TokenType.DO);
-						Match(TokenType.END);
-						return new ObjectE(new UnknownExpression());
-					}
-
-					Expression e = Expression();
-
-					if (Match(TokenType.COLON)) {
-						return new ObjectE(e, Expression());
-					}
-					else {
-						return new ObjectE(e);
-					}
-				}
-
-				Expression exp = ParseType();
-				List<Expression> args = new List<Lumen.Lang.Expressions.Expression>();
-
-				if (Match(TokenType.LPAREN)) {
-					while (!Match(TokenType.RPAREN)) {
-						args.Add(Expression());
-						Match(TokenType.SPLIT);
-					}
-				}
-
-				if (exp is DotExpression) {
-					exp = new DotApplicate(exp, args);
-				}
-				else {
-					exp = new Applicate(exp, args, this.line);
-				}
-
-				List<Expression> initor = new List<Expression>();
-				if (Match(TokenType.DO)) {
-					while (!Match(TokenType.END)) {
-						initor.Add(Expression());
-						Match(TokenType.SPLIT);
-					}
-				}
-
-				return new InstanceCreateE(exp, initor, line, this.fileName);
-			}
-
 			if (Match(TokenType.NUMBER)) {
 				return new ValueE(Double.Parse(Current.Text));
 			}
@@ -1230,7 +1202,7 @@ namespace Stereotype {
 				}
 			} while (!Match(TokenType.RBRACKET));
 
-			return new DotApplicate(new DotExpression(res, Op.GETI), Indices);
+			return new GetIndexE(res, Indices);
 		}
 
 		private Expression ParseType() {
@@ -1250,7 +1222,11 @@ namespace Stereotype {
 					exps.Add(Expression());
 					Match(TokenType.SPLIT);
 				}
-				result = new DotApplicate(new DotExpression(result, Op.GETI), exps);
+				result = new GetIndexE(result, exps);// new DotApplicate(new DotExpression(result, Op.GETI), exps);
+			}
+
+			if (Match(TokenType.QUESTION)) {
+				result = new OptionalE(result);
 			}
 
 			return result;

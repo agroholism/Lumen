@@ -5,34 +5,47 @@ using System.Linq;
 
 namespace Lumen.Lang.Std {
 	public static class Converter {
-		public static List<Value> ToList(this Value value) {
-			return ToList(value, null);
-		}
-
+		/// <summary> Converts any value to Boolean </summary>
+		/// <param name="value">Value for converting</param>
 		public static Boolean ToBoolean(this Value value) {
 			if(value is Bool b) {
 				return b.value;
 			}
 
-			if(value is Null) {
-				return false;
-			}
-
-			return true;
+			return value is Void ? false : true;
 		}
-
-		public static Fun ToFunction(this Value value, Scope scope) {
-			if(value is Fun fun) {
-				return fun;
-			}
-			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Function", stack: scope);
-		}
-
+		
+		/// <summary> Converts any value to Double </summary>
+		/// <param name="value">Value for converting</param>
 		public static Double ToDouble(this Value value, Scope scope) {
-			if(value is Num n) {
-				return n.value;
+			if (value is Num num) {
+				return num.value;
 			}
-			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
+
+			return ToDouble(ToNum(value, scope), scope);
+		}
+
+		/// <summary> Converts any value to Num </summary>
+		/// <param name="value">Value for converting</param>
+		public static Num ToNum(this Value value, Scope scope) {
+			if (value is Num num) {
+				return num;
+			}
+			else if (value is BigNum bigNum) {
+				return (Double)bigNum.value;
+			}
+
+			IObject type = value.Type;
+
+			if (type.TryGet("num", out Value converterPrototype) 
+					&& converterPrototype is Fun converter) {
+				Scope s = new Scope(scope) {
+					This = value
+				};
+				return ToNum(converter.Run(s), scope);
+			}
+
+			throw new Exception(Exceptions.CONVERT_ERROR.F(value.Type, StandartModule.Num), stack: scope);
 		}
 
 		public static BigFloat ToBigFloat(this Value value, Scope scope) {
@@ -43,7 +56,7 @@ namespace Lumen.Lang.Std {
 				return bigNum.value;
 			}
 
-			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
+			throw new Exception("невозможно преобразовать значение типа " + value.Type + " в значение типа Kernel.Fix", stack: scope);
 		}
 
 		public static BigNum ToBigNum(this Value value, Scope scope) {
@@ -54,18 +67,15 @@ namespace Lumen.Lang.Std {
 				return bigNum;
 			}
 
-			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
+			throw new Exception("невозможно преобразовать значение типа " + value.Type + " в значение типа Kernel.Fix", stack: scope);
 		}
 
-		public static Num ToNum(this Value value, Scope scope) {
-			if (value is Num num) {
-				return num;
-			}
-			else if(value is BigNum bigNum) {
-				return (Double)bigNum.value;
+		public static Fun ToFunction(this Value value, Scope scope) {
+			if(value is Fun fun) {
+				return fun;
 			}
 
-			throw new Exception("невозможно преобразовать значение типа " + value.Type.meta.Name + " в значение типа Kernel.Fix", stack: scope);
+			throw new Exception(Exceptions.CONVERT_ERROR.F(value.Type, StandartModule.Function), stack: scope);
 		}
 
 		public static Dictionary<Value, Value> ToMap(this Value value, Scope e) {
@@ -73,9 +83,9 @@ namespace Lumen.Lang.Std {
 				return klist.value;
 			}
 
-			Record type = value.Type;
+			IObject type = value.Type;
 
-			if (type.AttributeExists("map") && type.GetAttribute("map", e) is Fun fun) {
+			if (type.TryGet("map", out var prf) && prf is Fun fun) {
 				Scope s = new Scope(e) {
 					This = value
 				};
@@ -83,7 +93,35 @@ namespace Lumen.Lang.Std {
 				return ToMap(fun.Run(s), e);
 			}
 
-			throw new Exception($"невозможно преобразовать объект типа {type.meta.Name} к объекту типа Kernel.List", stack: e);
+			throw new Exception($"невозможно преобразовать объект типа {type} к объекту типа Kernel.List", stack: e);
+		}
+
+		public static Vec ToVec(this Value value, Scope e) {
+			if (value is Vec klist) {
+				return klist;
+			}
+
+			if(value is IObject iobj) {
+				if (iobj.TryGet("vec", out Value f)) {
+					Scope s = new Scope(e) {
+						This = value
+					};
+					return ToVec((f as Fun).Run(s), e);
+				}
+
+				throw new Exception($"невозможно преобразовать объект к объекту типа Kernel.List", stack: e);
+			}
+
+			IObject type = value.Type;
+
+			if (type.TryGet("vec", out var prf) && prf is Fun fun) {
+				Scope s = new Scope(e) {
+					This = value
+				};
+				return ToVec(fun.Run(s), e);
+			}
+
+			throw new Exception($"невозможно преобразовать объект типа {type} к объекту типа Kernel.List", stack: e);
 		}
 
 		public static List<Value> ToList(this Value value, Scope e) {
@@ -91,22 +129,22 @@ namespace Lumen.Lang.Std {
 				return klist.value;
 			}
 
-			Record type = value.Type;
+			IObject type = value.Type;
 
-			if (type.AttributeExists("vec") && type.GetAttribute("vec", e) is Fun fun) {
+			if (type.TryGet("vec", out var prf) && prf is Fun fun) {
 				Scope s = new Scope(e) {
 					This = value
 				};
 				return ToList(fun.Run(s), e);
 			}
-			else if (type.AttributeExists("seq") && type.GetAttribute("seq", e) is Fun fun1) {
+			else if (type.TryGet("seq", out var prf1) && prf1 is Fun fun1) {
 				Scope s = new Scope(e) {
 					This = value
 				};
 				return ToIterator(fun1.Run(s), e).ToList();
 			}
 
-			throw new Exception($"невозможно преобразовать объект типа {type.meta.Name} к объекту типа Kernel.List", stack: e);
+			throw new Exception($"невозможно преобразовать объект типа {type} к объекту типа Kernel.List", stack: e);
 		}
 
 		public static IEnumerable<Value> ToIterator(this Value val, Int32 count, Scope e) {
@@ -116,10 +154,24 @@ namespace Lumen.Lang.Std {
 				}
 			}
 			else {
-				if (val.Type.AttributeExists("seq") && val.Type.GetAttribute("seq", e) is Fun fun) {
+				if (val is IObject iobj) {
+					if (iobj.TryGet("seq", out Value f)) {
+						Scope s = new Scope(e) {
+							This = val
+						};
+
+						foreach (Value i in ToIterator((f as Fun).Run(s), e)) {
+							yield return i;
+						}
+						yield break;
+					}
+				}
+
+				if (val.Type.TryGet("seq", out var prf) && prf is Fun fun) {
 					Scope s = new Scope(e) {
 						This = val
 					};
+
 					foreach (Value i in ToIterator(fun.Run(s, new Num(count)), count, e)) {
 						yield return i;
 					}
@@ -134,7 +186,20 @@ namespace Lumen.Lang.Std {
 				}
 			}
 			else {
-				if (val.Type.AttributeExists("seq") && val.Type.GetAttribute("seq", e) is Fun fun) {
+				if (val is IObject iobj) {
+					if (iobj.TryGet("seq", out Value f)) {
+						Scope s = new Scope(e) {
+							This = val
+						};
+
+						foreach (Value i in ToIterator((f as Fun).Run(s), e)) {
+							yield return i;
+						}
+						yield break;
+					}
+				}
+
+				if (val.Type.TryGet("seq", out var prf) && prf is Fun fun) {
 					Scope s = new Scope(e) {
 						This = val
 					};

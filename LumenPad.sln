@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{880AA778-2EB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "web", "web\web.csproj", "{F5E04269-ACCF-4CE4-81A5-E0012F803184}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "visualization", "visualization\visualization.csproj", "{90C82290-986A-4F67-AACF-8A6683C401D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,12 +43,17 @@ Global
 		{F5E04269-ACCF-4CE4-81A5-E0012F803184}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5E04269-ACCF-4CE4-81A5-E0012F803184}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5E04269-ACCF-4CE4-81A5-E0012F803184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90C82290-986A-4F67-AACF-8A6683C401D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90C82290-986A-4F67-AACF-8A6683C401D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90C82290-986A-4F67-AACF-8A6683C401D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90C82290-986A-4F67-AACF-8A6683C401D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F5E04269-ACCF-4CE4-81A5-E0012F803184} = {880AA778-2EBC-43A1-B162-A34ADEF10385}
+		{90C82290-986A-4F67-AACF-8A6683C401D8} = {880AA778-2EBC-43A1-B162-A34ADEF10385}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF3F3BE2-8521-4C91-99D7-8DDA3FB5AB5F}

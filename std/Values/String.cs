@@ -2,11 +2,11 @@
 
 namespace Lumen.Lang.Std {
 	/// <summary> Экземпляр типа Kernel.String. </summary>
-	public class KString : Value, IFormattable {
+	public class Str : Value, IFormattable {
 		internal String innerValue;
 
 		/// <summary> Empty string. </summary>
-		public static KString Empty => String.Empty;
+		public static Str Empty => String.Empty;
 
 		public override String ToString() {
 			return this.ToString(null);
@@ -131,24 +131,24 @@ namespace Lumen.Lang.Std {
 		*/
 		#endregion
 
-		public KString(String value) {
+		public Str(String value) {
 			this.innerValue = value;
 		}
 
-		public static implicit operator KString(String value) {
-			return new KString(value);
+		public static implicit operator Str(String value) {
+			return new Str(value);
 		}
 
 		public String ToString(Scope e) {
 			return this.innerValue;
 		}
 
-		public Record Type => StandartModule.String;
+		public IObject Type => StandartModule.String;
 
 		#region Service
 
 		public override Boolean Equals(Object obj) {
-			if (obj is KString str) {
+			if (obj is Str str) {
 				return this.innerValue == str.innerValue;
 			}
 			return false;

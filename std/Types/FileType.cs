@@ -9,11 +9,11 @@ namespace Lumen.Lang.Std {
 				//BaseType = StandartModule.Object
 			};
 
-			Set("new", new LambdaFun((e, args) => {
+			SetAttribute("()", new LambdaFun((e, args) => {
 				return new File(new System.IO.FileInfo(args[0].ToString(e)));
 			}));
 
-			Set("atime", new LambdaFun((e, args) => {
+			SetAttribute("atime", new LambdaFun((e, args) => {
 				Value value;
 
 				if (e.ExistsInThisScope("file")) {
@@ -24,7 +24,7 @@ namespace Lumen.Lang.Std {
 					value = args[0];
 				}
 
-				if (value is KString) {
+				if (value is Str) {
 					return new DateTime(new System.IO.FileInfo(value.ToString(e)).LastAccessTime);
 				}
 				else if (value is File file) {
@@ -34,7 +34,7 @@ namespace Lumen.Lang.Std {
 			//	return Checker.RaiseArgumentTypeError("file", "Kernel.String или Kernel.File", e);
 			}));
 
-			Set("birthtime", new LambdaFun((e, args) => {
+			SetAttribute("birthtime", new LambdaFun((e, args) => {
 				Value value;
 
 				if (e.ExistsInThisScope("file")) {
@@ -45,7 +45,7 @@ namespace Lumen.Lang.Std {
 					value = args[0];
 				}
 
-				if (value is KString) {
+				if (value is Str) {
 					return new DateTime(new System.IO.FileInfo(value.ToString(e)).CreationTime);
 				}
 				else if (value is File file) {
@@ -56,7 +56,7 @@ namespace Lumen.Lang.Std {
 				//return Checker.RaiseArgumentTypeError("file", "Kernel.String или Kernel.File", e);
 			}));
 
-			Set("ctime", new LambdaFun((e, args) => {
+			SetAttribute("ctime", new LambdaFun((e, args) => {
 				Value value;
 
 				if (e.ExistsInThisScope("file")) {
@@ -67,7 +67,7 @@ namespace Lumen.Lang.Std {
 					value = args[0];
 				}
 
-				if (value is KString) {
+				if (value is Str) {
 					return new DateTime(new System.IO.FileInfo(value.ToString(e)).LastWriteTime);
 				}
 				else if (value is File file) {
@@ -77,7 +77,7 @@ namespace Lumen.Lang.Std {
 				return null;//Checker.RaiseArgumentTypeError("file", "Kernel.String или Kernel.File", e);
 			}));
 
-			Set("delete", new LambdaFun((e, args) => {
+			SetAttribute("delete", new LambdaFun((e, args) => {
 				Value value;
 
 				if (e.ExistsInThisScope("file")) {
@@ -88,7 +88,7 @@ namespace Lumen.Lang.Std {
 					value = args[0];
 				}
 
-				if (value is KString) {
+				if (value is Str) {
 					System.IO.File.Delete(value.ToString(e));
 
 				}
@@ -96,10 +96,10 @@ namespace Lumen.Lang.Std {
 					System.IO.File.Delete(file.Inner.FullName);
 				}
 
-				return Const.NULL;
+				return Const.VOID;
 			}));
 
-			Set("dir", new LambdaFun((e, args) => {
+			SetAttribute("dir", new LambdaFun((e, args) => {
 				Value value;
 
 				if (e.ExistsInThisScope("file")) {
@@ -110,18 +110,18 @@ namespace Lumen.Lang.Std {
 					value = args[0];
 				}
 
-				if (value is KString) {
-					return (KString)new System.IO.FileInfo(value.ToString(e)).DirectoryName;
+				if (value is Str) {
+					return (Str)new System.IO.FileInfo(value.ToString(e)).DirectoryName;
 				}
 				else if (value is File file) {
-					return (KString)file.Inner.DirectoryName;
+					return (Str)file.Inner.DirectoryName;
 				}
 
 				return null;
 				//return Checker.RaiseArgumentTypeError("file", "Kernel.String или Kernel.File", e);
 			}));
 
-			Set("exist?", new LambdaFun((e, args) => {
+			SetAttribute("exist?", new LambdaFun((e, args) => {
 				Value value;
 
 				if (e.ExistsInThisScope("file")) {
@@ -132,7 +132,7 @@ namespace Lumen.Lang.Std {
 					value = args[0];
 				}
 
-				if (value is KString) {
+				if (value is Str) {
 					return (Bool)new System.IO.FileInfo(value.ToString(e)).Exists;
 				}
 				else if (value is File file) {
@@ -143,23 +143,23 @@ namespace Lumen.Lang.Std {
 				//return Checker.RaiseArgumentTypeError("file", "Kernel.String или Kernel.File", e);
 			}));
 
-			Set("read", new LambdaFun((e, args) => {
-				return new Enumerator(System.IO.File.ReadLines(args[0].ToString(e)).Select(i => (KString)i));
+			SetAttribute("read", new LambdaFun((e, args) => {
+				return new Enumerator(System.IO.File.ReadLines(args[0].ToString(e)).Select(i => (Str)i));
 			}));
 
-			Set("read_all", new LambdaFun((e, args) => {
-				return (KString)System.IO.File.ReadAllText(args[0].ToString(e));
+			SetAttribute("read_all", new LambdaFun((e, args) => {
+				return (Str)System.IO.File.ReadAllText(args[0].ToString(e));
 			}));
 
-			Set("add!", new LambdaFun((e, args) => {
+			SetAttribute("add!", new LambdaFun((e, args) => {
 				System.IO.File.AppendAllText(args[0].ToString(e), args[1].ToString(e));
-				return Const.NULL;
+				return Const.VOID;
 			}));
 
 			SetAttribute("get_dir", new LambdaFun((e, args) => {
 				File value = e.Get("this") as File;
 
-				return (KString)value.Inner.DirectoryName;
+				return (Str)value.Inner.DirectoryName;
 			}));
 
 			SetAttribute("get_exists?", new LambdaFun((e, args) => {
@@ -181,13 +181,13 @@ namespace Lumen.Lang.Std {
 			SetAttribute("to_i", new LambdaFun((e, args) => {
 				File value = e.Get("this") as File;
 
-				return new Enumerator(System.IO.File.ReadLines(value.Inner.FullName).Select(i => (KString)i));
+				return new Enumerator(System.IO.File.ReadLines(value.Inner.FullName).Select(i => (Str)i));
 			}));
 
 			SetAttribute("add!", new LambdaFun((e, args) => {
 				System.IO.FileInfo file = ((e.Get("this") as File).Inner);
 				System.IO.File.AppendAllText(file.FullName, args[0].ToString(e));
-				return Const.NULL;
+				return Const.VOID;
 			}));
 		}
 	}

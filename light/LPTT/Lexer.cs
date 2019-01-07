@@ -305,14 +305,14 @@ namespace Stereotype {
 			current = Next();
 
 			AddToken(TokenType.TEXT, builder.ToString());
-			/*AddToken(TokenType.MOD);
-			AddToken(TokenType.NEW);
-			AddToken(TokenType.WORD, "List");
-			AddToken(TokenType.DO);
+
+			AddToken(TokenType.MOD);
+			AddToken(TokenType.WORD, "vec");
+			AddToken(TokenType.LPAREN);
 			foreach (Token i in new Lexer(System.String.Join(",", substitutes), this.file).Tokenization()) {
 				this.AddToken(i);
 			}
-			AddToken(TokenType.END);*/
+			AddToken(TokenType.RPAREN);
 		}
 
 		private void CheckOutOfRange() {
@@ -402,9 +402,7 @@ namespace Stereotype {
 			while (true) {
 				if (!Char.IsLetterOrDigit(current)
 					&& current != '_'
-					&& current != '$'
-					&& current != '?'
-					&& current != '!') {
+					&& current != '$') {
 					break;
 				}
 
@@ -422,26 +420,11 @@ namespace Stereotype {
 				case "__FILE__":
 					AddToken(TokenType.TEXT, this.file);
 					break;
-				case "record":
-					AddToken(TokenType.TYPE);
-					break;
-				case "final":
-					AddToken(TokenType.FINAL);
-					break;
 				case "but":
 					AddToken(TokenType.BUT);
 					break;
-				case "new":
-					AddToken(TokenType.NEW);
-					break;
 				case "raise":
 					AddToken(TokenType.RAISE);
-					break;
-				case "module":
-					AddToken(TokenType.MODULE);
-					break;
-				case "enum":
-					AddToken(TokenType.ENUM);
 					break;
 				case "for":
 					AddToken(TokenType.FOR);
@@ -461,8 +444,8 @@ namespace Stereotype {
 				case "finally":
 					AddToken(TokenType.FINALLY);
 					break;
-				case "using":
-					AddToken(TokenType.USING);
+				case "open":
+					AddToken(TokenType.OPEN);
 					break;
 				case "in":
 					AddToken(TokenType.IN);
@@ -497,9 +480,6 @@ namespace Stereotype {
 				case "or":
 					AddToken(TokenType.OR);
 					break;
-				case "include":
-					AddToken(TokenType.INCLUDE);
-					break;
 				case "xor":
 					AddToken(TokenType.XOR);
 					break;
@@ -508,12 +488,6 @@ namespace Stereotype {
 					break;
 				case "not":
 					AddToken(TokenType.EXCL);
-					break;
-				case "ref":
-					AddToken(TokenType.REF);
-					break;
-				case "auto":
-					AddToken(TokenType.AUTO);
 					break;
 				default:
 					AddToken(TokenType.WORD, word);

@@ -41,58 +41,8 @@ namespace Stereotype {
 				}
 
 				if (a is Record cls) {
-					if (!cls.Contains(this.nameVariable)) {
-						if (cls.AttributeExists(this.nameVariable)) {
-							Fun fun = (Fun)cls.GetAttribute(this.nameVariable, e);
-							LambdaFun result = new LambdaFun((ex, args) => {
-								Value ths = args[0];
-								ex.Set("this", ths);
-								Array.Copy(args, 1, args, 0, args.Length - 1);
-								return fun.Run(ex, args);
-							});
-
-							if (fun is LambdaFun lfun) {
-								result.Attributes = lfun.Attributes;
-							}
-							else if (fun is UserFun sfun) {
-								result.Attributes = sfun.Attributes;
-							}
-
-							return result;
-						}
-					}
-					return ((Lumen.Lang.Std.Record)a).Get(this.nameVariable, e);
-				}
-
-				if (a is Expando) {
-					return ((Expando)a).Get(this.nameVariable, AccessModifiers.PUBLIC, e);
-				}
-
-				Record type = a.Type;
-
-				Int32 Index(List<FunctionArgument> pairs, String searched) {
-					Int32 result = 0;
-
-					foreach (FunctionArgument pair in pairs) {
-						if (pair.name == searched) {
-							return result;
-						}
-						result++;
-					}
-
-					return -1;
-				}
-
-				if (a is IObject obj) {
-					if (Index(type.meta.Fields, this.nameVariable) != -1 || type.AttributeExists("get_" + this.nameVariable)) {
-						AccessModifiers mode = AccessModifiers.PUBLIC;
-						/*if ((this.expression is IdExpression id && id.id == "this") || (e.IsExsists("this") && e.Get("this").Type.Match(obj))) {
-							mode = AccessModifiers.PRIVATE;
-						}*/
-						return obj.Get(this.nameVariable, mode, e);
-					}
-					else if (type.AttributeExists(this.nameVariable)) {
-						Fun fun = (Fun)type.GetAttribute(this.nameVariable, e);
+					if (cls.AttributeExists(this.nameVariable)) {
+						Fun fun = (Fun)cls.GetAttribute(this.nameVariable, e);
 						LambdaFun result = new LambdaFun((ex, args) => {
 							Value ths = args[0];
 							ex.Set("this", ths);
@@ -109,17 +59,22 @@ namespace Stereotype {
 
 						return result;
 					}
-					return obj.Get(this.nameVariable, AccessModifiers.PRIVATE, e);
 				}
 
-				if (type.AttributeExists("get_" + this.nameVariable)) {
-					if (type.GetAttribute("get_" + this.nameVariable, e) is Fun property) {
-						return property.Run(new Scope { ["this"] = a });
-					}
+				if (a is IObject obj) {
+					return obj.Get(this.nameVariable, e);
 				}
 
-				return Const.NULL;
-			} catch (Lumen.Lang.Std.Exception hex) {
+
+				IObject type = a.Type;
+
+				if (type.TryGet("get_" + this.nameVariable, out var prf) && prf is Fun property) {
+					return property.Run(new Scope { ["this"] = a });
+				}
+
+				return Const.VOID;
+			}
+			catch (Lumen.Lang.Std.Exception hex) {
 				if (hex.file == null) {
 					hex.file = this.fileName;
 				}

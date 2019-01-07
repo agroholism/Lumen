@@ -45,7 +45,7 @@ namespace Stereotype {
 					saver = scope[this.varName];
 				}
 
-				scope.Set(this.varName, Const.NULL);
+				scope.Set(this.varName, Const.VOID);
 
 				if (this.varType != null) {
 					if (scope is Scope tscope) {
@@ -75,7 +75,7 @@ namespace Stereotype {
 				scope[this.varName] = saver;
 			}
 
-			return Const.NULL;
+			return Const.VOID;
 		}
 
 		public override String ToString() {
