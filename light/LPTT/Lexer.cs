@@ -135,7 +135,7 @@ namespace Stereotype {
 							current = Next();
 							builder.Append('"');
 							continue;
-						case '\r':
+						/*case '\r':
 							Next();
 							current = Next();
 							continue;
@@ -209,7 +209,7 @@ namespace Stereotype {
 									builder.Append(Char.ConvertFromUtf32(Convert.ToInt32(j, 16)));
 								}
 							}
-							continue;
+							continue;*/
 						default:
 							builder.Append('\\');
 							continue;

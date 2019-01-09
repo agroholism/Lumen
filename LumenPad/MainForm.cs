@@ -1,31 +1,35 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Forms;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Net.Sockets;
 
 using FastColoredTextBoxNS;
-using System.Text;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	public partial class MainForm : Form {
+		/// <summary> Singleton realization  </summary>
 		public static MainForm Instance { get; private set; }
 
 		public static TextBoxManager MainTextBoxManager { get; set; }
 
 		public static Project Project { get; set; }
+		public static String CurrentFile { get; set; }
 
 		public String err;
 		public Place? b;
 		public Place? e;
 
-		public MainForm() {
+		public MainForm(String[] args) {
 			InitializeComponent();
 
 			Instance = this;
 
 			MainTextBoxManager = new TextBoxManager(this.textBox) {
-				Language = KlischeeLanguage.Instance
+				Language = Settings.Languages[0]
 			};
 
 			this.fastColoredTextBox1.ShowScrollBars = false;
@@ -38,57 +42,115 @@ namespace LumenPad {
 			Console.SetOut(ConsoleWriter.Instance);
 			Console.SetIn(ConsoleReader.Instance);
 
+			this.textBox.BackColor = Settings.BackgroundColor;
+			this.textBox.ForeColor = Settings.ForegroundColor;
+			this.textBox.IndentBackColor = Settings.BackgroundColor;
+			this.textBox.LineNumberColor = Settings.ForegroundColor;
+			this.textBox.PaddingBackColor = Settings.BackgroundColor;
+			this.textBox.TextAreaBorderColor = Settings.BackgroundColor;
+			this.textBox.ServiceLinesColor = Settings.BackgroundColor;
 
-			this.textBox.BackColor = Color.White;
-			this.textBox.ForeColor = Color.Black;
-			this.textBox.IndentBackColor = Color.White;
-			this.textBox.LineNumberColor = Color.Black;
-			this.textBox.PaddingBackColor = Color.White;
-			this.textBox.TextAreaBorderColor = Color.White;
-			this.textBox.ServiceLinesColor = Color.White;
-
-			this.menuStrip1.BackColor = Color.White;
-			this.BackColor = Color.Silver;
+			this.menuStrip1.BackColor = Settings.BackgroundColor;
+			this.BackColor = Settings.LinesColor;
 			this.splitContainer2.Panel2Collapsed = true;
-			this.splitContainer3.Panel2Collapsed = true;
-			this.output.BackColor = Color.White;
-			this.output.ForeColor = Color.Black;
-			this.errorTable.ForeColor = Color.Black;
-			this.errorTable.GridColor = Color.Silver;
-			this.errorTable.BackgroundColor = Color.White;
-			this.splitContainer1.BackColor = Color.Silver;
-			this.splitContainer2.BackColor = Color.Silver;
-			this.splitContainer3.BackColor = Color.Silver;
+			//this.splitContainer3.Panel2Collapsed = true;
+			this.output.BackColor = Settings.BackgroundColor;
+			this.output.ForeColor = Settings.ForegroundColor;
+			this.errorTable.ForeColor = Settings.ForegroundColor;
+			this.errorTable.GridColor = Settings.LinesColor;
+			this.errorTable.BackgroundColor = Settings.BackgroundColor;
+			this.splitContainer1.BackColor = Settings.LinesColor;
+			this.splitContainer2.BackColor = Settings.LinesColor;
+			this.splitContainer3.BackColor = Settings.LinesColor;
 			//this.textBox.Font = new Font("Courier New", 10);
+
+			ColorizeMenu();
+
+			if (args.Length > 0) {
+				LoadFile(args[0]);
+			}
+		}
+
+		private void ColorizeMenu() {
+			foreach (Object i in this.menuStrip1.Items) {
+				if (i is ToolStripMenuItem item) {
+					ColorizeItem(item);
+				}
+			}
+		}
+
+		private void ColorizeItem(ToolStripMenuItem item) {
+			item.BackColor = Settings.BackgroundColor;
+			item.ForeColor = Settings.ForegroundColor;
+
+			if (item.HasDropDownItems) {
+				foreach (Object i in item.DropDownItems) {
+					if (i is ToolStripMenuItem mi) {
+						ColorizeItem(mi);
+					}
+				}
+			}
 		}
 
 		private void Run(Object sender, EventArgs e) {
 			this.output.Clear();
 			this.errorTable.Rows.Clear();
+
+			if (MainTextBoxManager.Language != null) {
+				if (MainTextBoxManager.Language.RunCommand != null) {
+					SavePreviousFile();
+					StartProcess(MainTextBoxManager.Language.RunCommand.Replace("[FILE]", CurrentFile));
+					/*TcpClient cli = new TcpClient("127.0.0.1", 4444);
+
+					var z = cli.GetStream();
+					while (z.CanRead) {
+						byte[] bytes = new byte[1024];
+						z.Read(bytes, 0, 1024);
+						output.Write(Encoding.UTF8.GetString(bytes, 0, 1024));
+					}*/
+
+					return;
+				}
+			}
+
+			/*if(MainTextBoxManager.Language.Name != "Lumen") {
+
+				return;
+			}
+			*/
 			//
 			// Project?.Type?.Build(Project);
-			File.WriteAllText("main.txt", MainTextBoxManager.TextBox.Text);
-			Stereotype.Interpriter.Start("main.txt");
+			//File.WriteAllText("main.txt", MainTextBoxManager.TextBox.Text);
+			//Stereotype.Interpriter.Start("main.txt");
+		}
 
-			/*Process p = new Process {
+		TaskFactory tf = new TaskFactory();
+
+		private void StartProcess(String name) {
+			Tuple<String, String> na = GetNameAndArgs(name);
+
+			Process proc = new Process() {
 				StartInfo = new ProcessStartInfo {
-					Arguments = "main.txt",
-					//CreateNoWindow = true,
-				//	UseShellExecute = false,
-					FileName = "C:\\Ruby24-x64\\bin\\ruby",
-				//	RedirectStandardInput = true,
-				//	RedirectStandardOutput = true,
-					
+					FileName = na.Item1,
+					Arguments = na.Item2
 				}
-			};*/
+			};
 
-			/*p.OutputDataReceived += (subsender, ex) => {
-				Console.Write(ex.Data);
-			};*/
+			this.tf.StartNew(() => {
+				proc.Start();
+				proc.WaitForExit();
+			});
+		}
 
-			//p.Start();
+		private Tuple<String, String> GetNameAndArgs(String command) {
+			String[] src = command.Split(' ');
 
+			StringBuilder builder = new StringBuilder();
+			for (Int32 i = 1; i < src.Length; i++) {
+				builder.Append(src[i]);
+			}
 
+			return new Tuple<String, String>(src[0], builder.ToString());
 		}
 
 		internal void RaiseError(IRunResult result) {
@@ -114,7 +176,7 @@ namespace LumenPad {
 			}
 		}
 
-		private void textBox_TextChanged(Object sender, TextChangedEventArgs e) {
+		private void TextBox_TextChanged(Object sender, TextChangedEventArgs e) {
 			this.err = null;
 			this.b = null;
 			e = null;
@@ -130,16 +192,65 @@ namespace LumenPad {
 		}
 
 		private void Form1_Load(Object sender, EventArgs e) {
-			if (File.Exists("main.txt")) {
-				this.textBox.Text = File.ReadAllText("main.txt");
+			foreach(var i in Settings.Languages) {
+				if(i.Actor != null) {
+					Lang.Std.Scope s = new Lang.Std.Scope();
+					s.AddUsing(Lang.Std.StandartModule.__Kernel__);
+					var op = new Interop.Interop();
+
+					s.Set("studio", Interop.Interop.Module);
+
+					s.Set(i.Name, new Lang.Std.LambdaFun(null));
+
+					Stereotype.Interpriter.Start(i.Actor, s);
+
+					i.Fn = s.Get(i.Name) as Lang.Std.Fun;
+				}
+			}
+
+			if (CurrentFile == null) {
+				LoadFile(Settings.DefaultFileName);
 			}
 		}
 
-		private void fastColoredTextBox1_TextChanged(Object sender, TextChangedEventArgs e) {
+		private void LoadFile(String path) {
+			if (File.Exists(path)) {
+				SavePreviousFile();
+
+				ProcessExtenstion(Path.GetExtension(path));
+
+				MainTextBoxManager.TextBox.Text = File.ReadAllText(path);
+
+				this.Text = path + " - Lumen Studio";
+
+				CurrentFile = path;
+			}
+		}
+
+		private void ProcessExtenstion(String extension) {
+			foreach (Language language in Settings.Languages) {
+				if (language.Extensions.Contains(extension)) {
+					CustomizeForLanguage(language);
+					return;
+				}
+			}
+		}
+
+		private void CustomizeForLanguage(Language language) {
+			MainTextBoxManager.Language = language;
+		}
+
+		private void SavePreviousFile() {
+			if (CurrentFile != null) {
+				File.WriteAllText(CurrentFile, MainTextBoxManager.TextBox.Text);
+			}
+		}
+
+		private void FastColoredTextBox1_TextChanged(Object sender, TextChangedEventArgs e) {
 
 		}
 
-		private void textBox_ToolTipNeeded(Object sender, ToolTipNeededEventArgs e) {
+		private void TextBox_ToolTipNeeded(Object sender, ToolTipNeededEventArgs e) {
 			if (this.b.HasValue) {
 				if (e.Place.iLine == this.b.Value.iLine) {
 					if (e.Place.iChar >= this.b.Value.iChar && e.Place.iChar <= this.e.Value.iChar) {
@@ -169,97 +280,175 @@ namespace LumenPad {
 			}*/
 		}
 
-		private void splitContainer3_SplitterMoved(Object sender, SplitterEventArgs e) {
+		private void SplitContainer3_SplitterMoved(Object sender, SplitterEventArgs e) {
 
 		}
 
-		private void hTMLToolStripMenuItem_Click(Object sender, EventArgs e) {
-			new HTMLParser(this.textBox.Text).Run();
-			Stereotype.Interpriter.Start("out.lm");
-		}
-	}
-
-	public class HTMLParser {
-		private readonly String source;
-
-		private readonly StringBuilder builder;
-		private Int32 position;
-
-		private readonly StringBuilder finalBuilder;
-
-		public HTMLParser(String code) {
-			this.source = code;
-			this.builder = new StringBuilder();
-			this.position = 0;
-			this.finalBuilder = new StringBuilder("let res := vec()" + Environment.NewLine);
+		private void HTMLToolStripMenuItem_Click(Object sender, EventArgs e) {
+			/*new HTMLParser(this.textBox.Text).Run();
+			Stereotype.Interpriter.Start("out.lm");*/
 		}
 
-		public void Run() {
-			System.Char current = Current();
-			while (current != '\0') {
-				if (current == '<' && At(1) == '%') {
-					current = Next();
-					current = Next();
-					this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"") + "\"").Append(Environment.NewLine);
-					this.builder.Clear();
+		private void openToolStripMenuItem_Click(Object sender, EventArgs e) {
+			OpenFileDialog dialog = new OpenFileDialog();
+			if (dialog.ShowDialog() == DialogResult.OK) {
+				LoadFile(dialog.FileName);
+			}
+		}
 
-					BuildCode();
-				} else {
-					this.builder.Append(current);
+		private void saveToolStripMenuItem_Click(Object sender, EventArgs e) {
+			SavePreviousFile();
+		}
+
+		private void pyToolStripMenuItem_Click(Object sender, EventArgs e) {
+			this.output.Clear();
+
+			ProcessStartInfo pi = new ProcessStartInfo("py") {
+				Arguments = $"-m flake8 {CurrentFile}",
+				CreateNoWindow = true,
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				RedirectStandardInput = true
+			};
+
+			Process p = Process.Start(pi);
+
+			output.Write(p.StandardOutput.ReadToEnd());
+		}
+
+		private void MainForm_FormClosed(Object sender, FormClosedEventArgs e) {
+			Application.Exit();
+		}
+
+		public Boolean IsCmdInitialized { get; private set; } = false;
+
+		private void CmdButtonClick(Object sender, EventArgs e) {
+			if (!this.IsCmdInitialized) {
+				CmdInit();
+			}
+
+			CmdInterface.DoInterfaceVisible();
+		}
+
+		private static class CmdInterface {
+			public static FastColoredTextBox CmdOutput { get; private set; }
+			public static ConsoleEmulator CmdInput { get; private set; }
+			public static Process GlobalCmdProcess { get; private set; }
+			private static volatile Boolean isWriteMode;
+
+			public static void InitializeGui() {
+				CmdInput = new ConsoleEmulator {
+					Dock = DockStyle.Bottom,
+					BackColor = Settings.BackgroundColor,
+					ForeColor = Settings.ForegroundColor,
+					ShowLineNumbers = false,
+					Height = 20,
+					Font = new Font("Consolas", 10f),
+					ShowScrollBars = false
+				};
+
+				CmdOutput = new FastColoredTextBox {
+					ForeColor = Settings.BackgroundColor,
+					BackColor = Settings.ForegroundColor,
+					Dock = DockStyle.Fill,
+					ShowLineNumbers = false,
+					Font = new Font("Consolas", 10f),
+					PreferredLineWidth = 10
+				};
+
+				Instance.splitContainer3.Panel2.Controls.Add(CmdInterface.CmdInput);
+				Instance.splitContainer3.Panel2.Controls.Add(CmdInterface.CmdOutput);
+			}
+
+			public static void InitializeProcess() {
+				GlobalCmdProcess = new Process {
+					StartInfo = new ProcessStartInfo {
+						Arguments = "",
+						CreateNoWindow = true,
+						UseShellExecute = false,
+						FileName = Settings.CmdPath,
+						RedirectStandardInput = true,
+						RedirectStandardOutput = true,
+						RedirectStandardError = true,
+						StandardOutputEncoding = Encoding.GetEncoding(Settings.CmdCodePage),
+						StandardErrorEncoding = Encoding.GetEncoding(Settings.CmdCodePage)
+					}
+				};
+
+				GlobalCmdProcess.OutputDataReceived += (sender, e) => {
+					if (e.Data == null) {
+						return;
+					}
+
+					isWriteMode = true;
+					CmdOutput.AppendText(Convert(e.Data) + Environment.NewLine);
+					isWriteMode = false;
+				};
+
+				GlobalCmdProcess.ErrorDataReceived += (sender, e) => {
+					if (e.Data == null) {
+						return;
+					}
+
+					isWriteMode = true;
+					CmdOutput.AppendText(Convert(e.Data) + Environment.NewLine);
+					isWriteMode = false;
+				};
+			}
+
+			private static String Convert(String str) {
+				Byte[] bytes = Encoding.Convert(
+					GlobalCmdProcess.StartInfo.StandardOutputEncoding, 
+					Encoding.Unicode, 
+					GlobalCmdProcess.StartInfo.StandardOutputEncoding.GetBytes(str));
+
+				return Encoding.Unicode.GetString(bytes);
+			}
+
+			public static void RunProcess() {
+				GlobalCmdProcess.Start();
+
+				GlobalCmdProcess.StandardInput.WriteLine("chcp " + Settings.CmdCodePage);
+
+				GlobalCmdProcess.BeginOutputReadLine();
+
+				Boolean IsFirstCommand = true;
+				while (!GlobalCmdProcess.WaitForExit(300)) {
+					if (!isWriteMode) {
+						if(IsFirstCommand) {
+							CmdOutput.Clear();
+							IsFirstCommand = false;
+						}
+						GlobalCmdProcess.StandardInput.WriteLine(CmdInput.ReadLine());
+						CmdInput.Clear();
+					}
 				}
-				current = Next();
 			}
 
-			this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"") + "\"").Append(Environment.NewLine);
+			public static void DoInterfaceVisible() {
+				Instance.BottomPanelHideAll();
 
-			this.finalBuilder.Append("fwrite(\"out.html\", res * \"\")");
-
-			File.WriteAllText("out.lm", this.finalBuilder.ToString());
+				CmdOutput.Visible = true;
+				CmdInput.Visible = true;
+			}
 		}
 
-		private void BuildCode() {
-			System.Char current = Current();
-
-			Boolean os = false;
-			if(current == '=') {
-				current = Next();
-				os = true;
+		private void BottomPanelHideAll() {
+			foreach (Control i in this.splitContainer3.Panel2.Controls) {
+				i.Visible = false;
 			}
-
-			while(true) {
-				if (current == '%' && At(1) == '>')
-					break;
-
-				builder.Append(current);
-				current = Next();
-			}
-
-			Next();
-			if (os) {
-				this.finalBuilder.Append("res += " + builder.ToString()).Append(Environment.NewLine);
-			} else {
-				this.finalBuilder.Append(builder.ToString()).Append(Environment.NewLine);
-			}
-			this.builder.Clear();
 		}
 
-		public System.Char At(Int32 position) {
-			return this.source[this.position + position];
-		}
+		private void CmdInit() {
+			CmdInterface.InitializeGui();
 
-		public System.Char Next() {
-			if (this.position == this.source.Length) {
-				return '\0';
-			}
-			this.position++;
-			return Current();
-		}
+			BottomPanelHideAll();
 
-		private System.Char Current() {
-			if (this.position == this.source.Length) {
-				return '\0';
-			}
-			return this.source[this.position];
+			CmdInterface.InitializeProcess();
+
+			this.tf.StartNew(CmdInterface.RunProcess);
+
+			this.IsCmdInitialized = true;
 		}
 	}
 }

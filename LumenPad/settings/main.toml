@@ -1,0 +1,12 @@
+﻿colorscheme = "classic"
+
+languages = [
+	"lumen",
+	"python",
+	"html",
+	"csharp",
+]
+
+[cmd]
+path = "C:\\WINDOWS\\system32\\cmd.exe"
+cp = 1251

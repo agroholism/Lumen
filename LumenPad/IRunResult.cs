@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	public interface IRunResult {
 		Boolean Success { get; }
 

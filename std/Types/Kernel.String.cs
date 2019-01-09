@@ -590,6 +590,10 @@ namespace Lumen.Lang.Std {
 				return new List(res);
 			}));*/
 
+			SetAttribute("replace", new LambdaFun((e, args) => {
+				return new Str(Regex.Replace(e.This.ToString(), args[0].ToString(), args[1].ToString()));
+			}));
+
 			SetAttribute("num", new LambdaFun((e, args) => {
 				String v = e.Get("this").ToString();
 				try {

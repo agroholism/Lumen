@@ -1,19 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using FastColoredTextBoxNS;
 
-namespace LumenPad {
+using FastColoredTextBoxNS;
+using Lumen.Lang.Std;
+
+namespace Lumen.Studio {
 	public class Language {
+		public String Name { get; set; }
+		public List<String> Extensions { get; set; } = new List<String>();
 		public Dictionary<String, Style> Styles = new Dictionary<String, Style>();
-		public List<(String, String)> Folding { get; private set; } = new List<(String, String)>();
+		public List<(String, String)> Folding { get; set; } = new List<(String, String)>();
+
+		public String RunCommand { get; set; }
+		public Fun Fn { get; internal set; }
+		public String Actor { get; set; }
 
 		internal virtual List<AutocompleteItem> GetAutocompleteItems(TextBoxManager manager) {
-			throw new NotImplementedException();
+			if (this.Fn != null && this.Fn.TryGet("get_autocomplete_items", out Value fn)) {
+				Value res = (fn as Fun).Run(new Scope());
+				List<AutocompleteItem> result = new List<AutocompleteItem>();
+
+				foreach (Value i in res.ToList(null)) {
+					if (i is Vec) {
+						List<Value> lst = i.ToList(null);
+						AutocompleteItem aci = new AutocompleteItem {
+							Text = lst[0].ToString(),
+							ImageIndex = (Int32)lst[1].ToDouble(null),
+							MenuText = lst[2].ToString(),
+							ToolTipTitle = lst[3].ToString(),
+							ToolTipText = lst[4].ToString()
+						};
+
+						result.Add(aci);
+					}
+				}
+
+				return result;
+			}
+
+			return null;
 		}
 
-		internal virtual void OnTextChanged(TextBoxManager textBoxManager) {
-			throw new NotImplementedException();
+		internal virtual void OnTextChanged(TextBoxManager manager) {
+			FastColoredTextBox textBox = manager.TextBox;
+
+			textBox.Range.ClearFoldingMarkers();
+
+			foreach ((String, String) i in this.Folding) {
+				textBox.Range.SetFoldingMarkers(i.Item1, i.Item2);
+			}
+
+			textBox.Range.ClearStyle(StyleIndex.ALL);
+
+			foreach (KeyValuePair<String, Style> i in this.Styles) {
+				textBox.Range.SetStyle(i.Value, i.Key);
+			}
+
+			if (this.Fn != null && Fn.TryGet("on_text_changed", out var fn)) {
+				(fn as Fun).Run(new Scope());
+			}
+
+			manager.RebuildMenu();
 		}
 	}
 
@@ -28,7 +76,7 @@ namespace LumenPad {
 
 			this.Styles.Add("\".*?[^\\\\]\"", Settings.String);
 			this.Styles.Add("#.*", Settings.Comment);
-		//	this.Styles.Add("\\[[a-zA-Z$._]+(\\(.*\\))?\\]", Settings.String);
+			//	this.Styles.Add("\\[[a-zA-Z$._]+(\\(.*\\))?\\]", Settings.String);
 			this.Styles.Add("\\b(open|base|raise|record|next|try|except|finally|global|break|not|self|and|is|let|module|or|xor|where|new|do|end|this|if|else|for|in|while|from|return|true|false|void|(:(\\s+)?(?<range>auto)))\\b", Settings.Keyword);
 			this.Styles.Add("\\b(comparable|const|derived|enum|optional|bignum|constructor|num|exception|seq|expando|file|str|vec|bool|map)\\b", Settings.Type);
 		}
@@ -72,7 +120,7 @@ namespace LumenPad {
 		}
 
 		private void SetDynamicHightliting(FastColoredTextBox textBox) {
-			foreach (Range x in textBox.GetRanges(@"\b(type)\s+(?<range>[\w_]+?)\b")) {
+			foreach (FastColoredTextBoxNS.Range x in textBox.GetRanges(@"\b(type)\s+(?<range>[\w_]+?)\b")) {
 				textBox.Range.SetStyle(Settings.Type, @"\b" + x.Text + @"\b");
 			}
 

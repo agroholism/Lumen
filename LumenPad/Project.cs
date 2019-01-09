@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	public class Project {
 		public String Name { get; set; }
 		public String Path { get; set; }
@@ -14,8 +12,6 @@ namespace LumenPad {
 	}
 
 	public class ProjectType {
-
-
 		public IRunResult Build(Project project) {
 
 			return null;

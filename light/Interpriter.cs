@@ -8,6 +8,8 @@ namespace Stereotype {
 	public static class Interpriter {
 		public static Action<Lumen.Lang.Std.Exception, Scope> OnError;
 
+		public static String Host { get; set; }
+
 		internal static readonly MainScope mainScope = new MainScope();
 
 		public static Value Start(String fileName, Scope scope = null) {

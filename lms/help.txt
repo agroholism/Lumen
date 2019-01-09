@@ -1,0 +1,10 @@
+﻿anatomy new [name="newProject"] [js=true] [skillet="standart/default"]
+
+anatomy init [name] [path=""] [js=true]
+
+anatomy pages
+anatomy pages new [name] [haslm=true] [js=true] [css=false] [skillet="standart/default"]
+anatomy pages delete [name]
+
+anatomy build
+

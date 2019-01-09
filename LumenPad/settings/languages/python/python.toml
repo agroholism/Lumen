@@ -1,0 +1,14 @@
+﻿name = "Python"
+extensions = [".py"]
+
+styles = [
+	["\".*?[^\\\\]\"", "string"],
+	["'.*?[^\\\\]'", "string"],
+	["\#.*", "comment"],
+	["\\b(class|def|if|elif|else|while|for|in|return|lambda|import|from|as|is|True|False|None)\\b", "keyword"],
+	["\\b(ArithmeticError|AssertionError|AttributeError|BlockingIOError|BrokenPipeError|BufferError|BytesWarning|ChildProcessError|ConnectionAbortedError|ConnectionError|ConnectionRefusedError|ConnectionResetError|DeprecationWarning|EOFError|Ellipsis|EnvironmentError|Exception|FileExistsError|AssertionError|FileNotFoundError|FloatingPointError|IOError|GeneratorExit|ImportError|ImportWarning|IndentationError|IndexError|InterruptedError|IsADirectoryError|KeyError|KeyboardInterrupt|LookupError|ModuleNotFoundError|NameError|NotADirectoryError|NotImplemented|NotImplementedError|OverflowError|any|bool|bin|bytearray|callable|dict|dir|float|globals|int|list|iter|object|str|tuple)\\b", "class"]
+]
+
+on_run = "py [FILE]"
+
+actor = "python_actor.lm"

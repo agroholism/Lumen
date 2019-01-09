@@ -251,9 +251,9 @@ namespace Lumen.Lang.Std {
 
 					f.Run(innerScope2, args2);
 					return innerScope2.This;
-				});
-
-				ctor.Attributes = f.Attributes;
+				}) {
+					Attributes = f.Attributes
+				};
 
 				ctor.Set("@constructor", Const.TRUE, e);
 
@@ -295,9 +295,9 @@ namespace Lumen.Lang.Std {
 						innerScope2.This = exemplare;
 						f.Run(innerScope2, args2);
 						return exemplare;
-					});
-
-					res.Attributes = f.Attributes;
+					}) {
+						Attributes = f.Attributes
+					};
 
 					res.Set("@prototype", obj, innerScope);
 

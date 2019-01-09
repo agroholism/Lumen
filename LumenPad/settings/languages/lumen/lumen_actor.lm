@@ -1,0 +1,36 @@
+﻿let Lumen.on_text_changed() {
+	for let i in studio.text_box.range("\b(let)\s+(?<range>[\w_]+?)\b") {
+		studio.text_box.range().set_style(studio.style.class, "\b" + i + "\b")
+	}
+}
+
+let Lumen.get_autocomplete_items() {
+	return vec(
+		vec("let", 2, "let", "let", "let keyword"),
+		vec("if", 2, "if", "if", "if keyword"),
+		vec("else", 2, "else", "else", "else keyword"),
+		vec("for", 2, "for", "for", "for keyword"),
+		vec("while", 2, "while", "while", "while keyword"),
+		vec("return", 2, "return", "return", "return keyword"),
+		vec("where", 2, "where", "where", "where keyword"),
+		
+		vec("[const]", 2, "[const]", "[const]", "let const()"),
+		vec("[constructor]", 2, "[constructor]", "[constructor]", "let constructor()"),
+		vec("[derived]", 2, "[derived]", "[derived()]", "let derived()"),
+		
+		vec("print", 0, "print", "let print()", "Выводит аргументы в стандартный поток вывода"),
+		
+		vec("base", 0, "base", "let base()", "[description not founded]"),
+		
+		vec("num", 1, "num", "let num(): num", "[description not founded]"),
+		vec("str", 1, "str", "let str(): str", "[description not founded]"),
+		vec("map", 1, "map", "let map(): map", "[description not founded]"),
+		vec("bool", 1, "bool", "let bool(): bool", "[description not founded]"),
+		vec("seq", 1, "seq", "let seq(): seq", "[description not founded]"),
+		vec("void", 1, "void", "let void(): void", "[description not founded]"),
+		vec("exception", 1, "exception", "let exception(message): exception", "[description not founded]"),
+		vec("fun", 1, "fun", "let fun(): fun", "[description not founded]"),
+		
+		vec("vec", 1, "vec", "let vec(...args, from=nil, to=nil, step=nil, len=nil): vec", "Стандартный тип вектор"),
+	)
+}

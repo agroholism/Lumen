@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	public class TextBoxManager {
 		public FastColoredTextBox TextBox { get; private set; }
 		public AutocompleteMenu Menu { get; private set; }

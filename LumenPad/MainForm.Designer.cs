@@ -1,4 +1,4 @@
-﻿namespace LumenPad {
+﻿namespace Lumen.Studio {
 	partial class MainForm {
 		/// <summary>
 		/// Обязательная переменная конструктора.
@@ -29,7 +29,7 @@
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.textBox = new FastColoredTextBoxNS.FastColoredTextBox();
-			this.output = new LumenPad.ConsoleEmulator();
+			this.output = new Lumen.Studio.ConsoleEmulator();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
 			this.fastColoredTextBox1 = new FastColoredTextBoxNS.FastColoredTextBox();
@@ -38,9 +38,14 @@
 			this.errorName = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.errorText = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.cmdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-			this.hTMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.textBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.output)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -108,8 +113,8 @@
 			this.textBox.WordWrapIndent = 1;
 			this.textBox.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
 			this.textBox.Zoom = 100;
-			this.textBox.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.textBox_ToolTipNeeded);
-			this.textBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.textBox_TextChanged);
+			this.textBox.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.TextBox_ToolTipNeeded);
+			this.textBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TextBox_TextChanged);
 			// 
 			// output
 			// 
@@ -242,7 +247,7 @@
 			this.fastColoredTextBox1.WordWrapIndent = 1;
 			this.fastColoredTextBox1.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
 			this.fastColoredTextBox1.Zoom = 100;
-			this.fastColoredTextBox1.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.fastColoredTextBox1_TextChanged);
+			this.fastColoredTextBox1.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.FastColoredTextBox1_TextChanged);
 			// 
 			// splitContainer3
 			// 
@@ -261,7 +266,7 @@
 			this.splitContainer3.SplitterDistance = 409;
 			this.splitContainer3.SplitterWidth = 1;
 			this.splitContainer3.TabIndex = 2;
-			this.splitContainer3.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer3_SplitterMoved);
+			this.splitContainer3.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.SplitContainer3_SplitterMoved);
 			// 
 			// errorTable
 			// 
@@ -306,7 +311,7 @@
 			this.errorTable.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
 			this.errorTable.RowHeadersVisible = false;
 			this.errorTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-			this.errorTable.Size = new System.Drawing.Size(210, 92);
+			this.errorTable.Size = new System.Drawing.Size(208, 92);
 			this.errorTable.TabIndex = 0;
 			// 
 			// errorName
@@ -325,8 +330,9 @@
 			// 
 			this.menuStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.runToolStripMenuItem,
-            this.hTMLToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.viewToolStripMenuItem,
+            this.runToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
@@ -334,14 +340,61 @@
 			this.menuStrip1.TabIndex = 1;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
+			// fileToolStripMenuItem
+			// 
+			this.fileToolStripMenuItem.Checked = true;
+			this.fileToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Indeterminate;
+			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.saveToolStripMenuItem,
+            this.saveAsToolStripMenuItem});
+			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+			this.fileToolStripMenuItem.Text = "File";
+			// 
+			// openToolStripMenuItem
+			// 
+			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+			this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+			this.openToolStripMenuItem.Text = "Open";
+			this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+			// 
+			// saveToolStripMenuItem
+			// 
+			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+			this.saveToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+			this.saveToolStripMenuItem.Text = "Save";
+			this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+			// 
+			// saveAsToolStripMenuItem
+			// 
+			this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+			this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+			this.saveAsToolStripMenuItem.Text = "Save as";
+			// 
 			// runToolStripMenuItem
 			// 
 			this.runToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
 			this.runToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
-			this.runToolStripMenuItem.Image = global::LumenPad.Properties.Resources.Starter;
+			this.runToolStripMenuItem.Image = global::Lumen.Studio.Properties.Resources.Starter;
 			this.runToolStripMenuItem.Name = "runToolStripMenuItem";
 			this.runToolStripMenuItem.Size = new System.Drawing.Size(28, 20);
 			this.runToolStripMenuItem.Click += new System.EventHandler(this.Run);
+			// 
+			// viewToolStripMenuItem
+			// 
+			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cmdToolStripMenuItem});
+			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+			this.viewToolStripMenuItem.Text = "View";
+			// 
+			// cmdToolStripMenuItem
+			// 
+			this.cmdToolStripMenuItem.Name = "cmdToolStripMenuItem";
+			this.cmdToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.cmdToolStripMenuItem.Text = "cmd";
+			this.cmdToolStripMenuItem.Click += new System.EventHandler(this.CmdButtonClick);
 			// 
 			// imageList1
 			// 
@@ -350,13 +403,6 @@
 			this.imageList1.Images.SetKeyName(0, "func.png");
 			this.imageList1.Images.SetKeyName(1, "type.png");
 			this.imageList1.Images.SetKeyName(2, "var.png");
-			// 
-			// hTMLToolStripMenuItem
-			// 
-			this.hTMLToolStripMenuItem.Name = "hTMLToolStripMenuItem";
-			this.hTMLToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
-			this.hTMLToolStripMenuItem.Text = "HTML";
-			this.hTMLToolStripMenuItem.Click += new System.EventHandler(this.hTMLToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -369,6 +415,7 @@
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "MainForm";
 			this.Text = "HybridPad";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.Form1_Load);
 			((System.ComponentModel.ISupportInitialize)(this.textBox)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.output)).EndInit();
@@ -407,7 +454,12 @@
 		private System.Windows.Forms.DataGridView errorTable;
 		private System.Windows.Forms.DataGridViewTextBoxColumn errorName;
 		private System.Windows.Forms.DataGridViewTextBoxColumn errorText;
-		private System.Windows.Forms.ToolStripMenuItem hTMLToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem cmdToolStripMenuItem;
 	}
 }
 

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	public class ConsoleEmulator : FastColoredTextBox {
 		private volatile Boolean isReadLineMode;
 		private volatile Boolean isUpdating;

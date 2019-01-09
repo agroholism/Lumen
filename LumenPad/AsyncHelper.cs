@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	public static class AsyncHelper {
 		public static void InvokeNeded(this Control control, Action action) {
 			try {

@@ -4,7 +4,7 @@ using System.IO;
 
 using FastColoredTextBoxNS;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	class ConsoleWriter : TextWriter {
 		public override Encoding Encoding => Encoding.Unicode;
 

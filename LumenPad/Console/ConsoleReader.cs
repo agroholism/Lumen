@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace LumenPad {
+namespace Lumen.Studio {
 	class ConsoleReader : TextReader {
 		public static ConsoleReader Instance;
 

@@ -1,0 +1,20 @@
+﻿let Python.get_autocomplete_items() {
+	return vec(
+		vec("print", 0, "print", "let print()", "Выводит аргументы в стандартный поток вывода"),
+		vec("abs", 0, "abs", "def abs(x)", "[description not founded]"),
+		vec("all", 0, "all", "def all(iterable)", "[description not founded]"),
+		vec("any", 0, "any", "def any(iterable)", "[description not founded]"),
+		vec("ascii", 0, "ascii", "def ascii(object)", "[description not founded]"),
+		vec("bin", 0, "bin", "def bin(x)", "[description not founded]"),
+		vec("bool", 1, "bool", "class bool([x])", "[description not founded]"),
+		vec("breakpoint", 0, "breakpoint", "def breakpoint(*args, **kws)", "[description not founded]"),
+		vec("chr", 0, "chr", "def chr(i)", "[description not founded]"),
+		vec("complex", 1, "complex", "class complex([real[, imag])", "[description not founded]"),
+		vec("delattr", 0, "delattr", "def delattr(object, name)", "[description not founded]"),
+		vec("dict", 1, "dict", "class dict(**kwarg)", "[description not founded]"),
+		vec("dict", 1, "dict", "class dict(mapping, **kwarg)", "[description not founded]"),
+		vec("dict", 1, "dict", "class dict(iterable, **kwarg)", "[description not founded]"),
+		vec("dir", 0, "dir", "def dir(object)", "[description not founded]"),
+		vec("divmod", 0, "divmod", "def divmod(a, b)", "[description not founded]"),
+	)
+}

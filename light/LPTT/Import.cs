@@ -28,7 +28,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			String path = /*IK.path == null ? */this.v/* : IK.path + "\\" + v*/;
+			String path = Interpriter.Host + "\\" + /*IK.path == null ? */this.v/* : IK.path + "\\" + v*/;
 
 			path += System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + path + ".dll") || System.IO.File.Exists(path + ".dll") ? ".dll" : ".lm";
 
