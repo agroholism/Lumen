@@ -71,7 +71,7 @@
     <Compile Include="LPTT\FunctionDefineDotStatement.cs" />
     <Compile Include="LPTT\GenericFunctionMaker.cs" />
     <Compile Include="LPTT\GetIndexE.cs" />
-    <Compile Include="LPTT\Import.cs" />
+    <Compile Include="LPTT\Open.cs" />
     <Compile Include="LPTT\IsMatching.cs" />
     <Compile Include="LPTT\Lexer.cs" />
     <Compile Include="LPTT\ObjectE.cs" />

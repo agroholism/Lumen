@@ -28,7 +28,7 @@ namespace Stereotype {
 		}
 
 		public Value Eval(Scope e) {
-			String path = Interpriter.Host + "\\" + /*IK.path == null ? */this.v/* : IK.path + "\\" + v*/;
+			String path = this.v;
 
 			path += System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + path + ".dll") || System.IO.File.Exists(path + ".dll") ? ".dll" : ".lm";
 
@@ -55,7 +55,7 @@ namespace Stereotype {
 			// TODO
 			Scope x = new Scope(e);
 			x.AddUsing(StandartModule.__Kernel__);
-			Parser p = new Parser(new Lexer(System.IO.File.ReadAllText(fullPath), this.fileName).Tokenization(), fileName);
+			Parser p = new Parser(new Lexer(System.IO.File.ReadAllText(fullPath), this.fileName).Tokenization(), this.fileName);
 			p.Parsing(x);
 
 			/*	if (x.IsExsists("this")) {

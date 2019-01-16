@@ -25,14 +25,15 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.textBox = new FastColoredTextBoxNS.FastColoredTextBox();
 			this.output = new Lumen.Studio.ConsoleEmulator();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-			this.fastColoredTextBox1 = new FastColoredTextBoxNS.FastColoredTextBox();
+			this.treeView1 = new System.Windows.Forms.TreeView();
+			this.projectImages = new System.Windows.Forms.ImageList(this.components);
 			this.splitContainer3 = new System.Windows.Forms.SplitContainer();
 			this.errorTable = new System.Windows.Forms.DataGridView();
 			this.errorName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -40,12 +41,17 @@
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.fileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmdToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+			this.createToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.fileToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+			this.projectToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.textBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.output)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -56,7 +62,6 @@
 			this.splitContainer2.Panel1.SuspendLayout();
 			this.splitContainer2.Panel2.SuspendLayout();
 			this.splitContainer2.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.fastColoredTextBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
 			this.splitContainer3.Panel1.SuspendLayout();
 			this.splitContainer3.Panel2.SuspendLayout();
@@ -194,60 +199,39 @@
 			// 
 			// splitContainer2.Panel2
 			// 
-			this.splitContainer2.Panel2.Controls.Add(this.fastColoredTextBox1);
+			this.splitContainer2.Panel2.Controls.Add(this.treeView1);
 			this.splitContainer2.Size = new System.Drawing.Size(608, 236);
 			this.splitContainer2.SplitterDistance = 409;
 			this.splitContainer2.SplitterWidth = 1;
 			this.splitContainer2.TabIndex = 1;
 			// 
-			// fastColoredTextBox1
+			// treeView1
 			// 
-			this.fastColoredTextBox1._UnsafeText = "";
-			this.fastColoredTextBox1.AutoCompleteBrackets = true;
-			this.fastColoredTextBox1.AutoCompleteBracketsList = new char[] {
-        '(',
-        ')',
-        '{',
-        '}',
-        '[',
-        ']',
-        '\"',
-        '\"',
-        '\'',
-        '\''};
-			this.fastColoredTextBox1.AutoScrollMinSize = new System.Drawing.Size(25, 17);
-			this.fastColoredTextBox1.BackBrush = null;
-			this.fastColoredTextBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			this.fastColoredTextBox1.BookmarkColor = System.Drawing.Color.BlueViolet;
-			this.fastColoredTextBox1.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.STRATEGY_1;
-			this.fastColoredTextBox1.CharHeight = 17;
-			this.fastColoredTextBox1.CharWidth = 7;
-			this.fastColoredTextBox1.CommentPrefix = "--";
-			this.fastColoredTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.fastColoredTextBox1.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-			this.fastColoredTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.fastColoredTextBox1.Font = new System.Drawing.Font("Consolas", 9.75F);
-			this.fastColoredTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-			this.fastColoredTextBox1.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
-			this.fastColoredTextBox1.Hotkeys = resources.GetString("fastColoredTextBox1.Hotkeys");
-			this.fastColoredTextBox1.IndentBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			this.fastColoredTextBox1.IsReplaceMode = false;
-			this.fastColoredTextBox1.LineInterval = 2;
-			this.fastColoredTextBox1.LineNumberColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			this.fastColoredTextBox1.Location = new System.Drawing.Point(0, 0);
-			this.fastColoredTextBox1.Name = "fastColoredTextBox1";
-			this.fastColoredTextBox1.Paddings = new System.Windows.Forms.Padding(0);
-			this.fastColoredTextBox1.ReadOnly = true;
-			this.fastColoredTextBox1.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-			this.fastColoredTextBox1.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("fastColoredTextBox1.ServiceColors")));
-			this.fastColoredTextBox1.ServiceLinesColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			this.fastColoredTextBox1.Size = new System.Drawing.Size(198, 236);
-			this.fastColoredTextBox1.TabIndex = 1;
-			this.fastColoredTextBox1.TextAreaBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			this.fastColoredTextBox1.WordWrapIndent = 1;
-			this.fastColoredTextBox1.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
-			this.fastColoredTextBox1.Zoom = 100;
-			this.fastColoredTextBox1.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.FastColoredTextBox1_TextChanged);
+			this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.treeView1.ImageIndex = 0;
+			this.treeView1.ImageList = this.projectImages;
+			this.treeView1.ItemHeight = 16;
+			this.treeView1.Location = new System.Drawing.Point(0, 0);
+			this.treeView1.Name = "treeView1";
+			this.treeView1.SelectedImageIndex = 0;
+			this.treeView1.ShowPlusMinus = false;
+			this.treeView1.ShowRootLines = false;
+			this.treeView1.Size = new System.Drawing.Size(198, 236);
+			this.treeView1.TabIndex = 0;
+			this.treeView1.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseDoubleClick);
+			// 
+			// projectImages
+			// 
+			this.projectImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("projectImages.ImageStream")));
+			this.projectImages.TransparentColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
+			this.projectImages.Images.SetKeyName(0, "fold.png");
+			this.projectImages.Images.SetKeyName(1, "other.png");
+			this.projectImages.Images.SetKeyName(2, "html.png");
+			this.projectImages.Images.SetKeyName(3, "py.png");
+			this.projectImages.Images.SetKeyName(4, "lm.png");
+			this.projectImages.Images.SetKeyName(5, "css.png");
+			this.projectImages.Images.SetKeyName(6, "img.png");
 			// 
 			// splitContainer3
 			// 
@@ -266,13 +250,12 @@
 			this.splitContainer3.SplitterDistance = 409;
 			this.splitContainer3.SplitterWidth = 1;
 			this.splitContainer3.TabIndex = 2;
-			this.splitContainer3.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.SplitContainer3_SplitterMoved);
 			// 
 			// errorTable
 			// 
-			dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			this.errorTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+			dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.errorTable.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
 			this.errorTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -280,27 +263,27 @@
 			this.errorTable.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.errorTable.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.errorTable.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-			dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-			dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-			this.errorTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+			dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			dataGridViewCellStyle5.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+			this.errorTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
 			this.errorTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.errorTable.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.errorName,
             this.errorText});
 			this.errorTable.Cursor = System.Windows.Forms.Cursors.Arrow;
-			dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-			dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-			dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-			dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-			this.errorTable.DefaultCellStyle = dataGridViewCellStyle3;
+			dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+			dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			dataGridViewCellStyle6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			dataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			dataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+			this.errorTable.DefaultCellStyle = dataGridViewCellStyle6;
 			this.errorTable.EnableHeadersVisualStyles = false;
 			this.errorTable.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.errorTable.Location = new System.Drawing.Point(-1, -1);
@@ -311,7 +294,7 @@
 			this.errorTable.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
 			this.errorTable.RowHeadersVisible = false;
 			this.errorTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-			this.errorTable.Size = new System.Drawing.Size(208, 92);
+			this.errorTable.Size = new System.Drawing.Size(274, 92);
 			this.errorTable.TabIndex = 0;
 			// 
 			// errorName
@@ -346,6 +329,7 @@
 			this.fileToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Indeterminate;
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
+            this.createToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -354,32 +338,39 @@
 			// 
 			// openToolStripMenuItem
 			// 
+			this.openToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem1,
+            this.projectToolStripMenuItem});
 			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-			this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+			this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.openToolStripMenuItem.Text = "Open";
-			this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+			// 
+			// fileToolStripMenuItem1
+			// 
+			this.fileToolStripMenuItem1.Name = "fileToolStripMenuItem1";
+			this.fileToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+			this.fileToolStripMenuItem1.Text = "File";
+			this.fileToolStripMenuItem1.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
+			// 
+			// projectToolStripMenuItem
+			// 
+			this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
+			this.projectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.projectToolStripMenuItem.Text = "Project";
+			this.projectToolStripMenuItem.Click += new System.EventHandler(this.ProjectToolStripMenuItem_Click);
 			// 
 			// saveToolStripMenuItem
 			// 
 			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-			this.saveToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+			this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.saveToolStripMenuItem.Text = "Save";
-			this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+			this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
 			// 
 			// saveAsToolStripMenuItem
 			// 
 			this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-			this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+			this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.saveAsToolStripMenuItem.Text = "Save as";
-			// 
-			// runToolStripMenuItem
-			// 
-			this.runToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.runToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
-			this.runToolStripMenuItem.Image = global::Lumen.Studio.Properties.Resources.Starter;
-			this.runToolStripMenuItem.Name = "runToolStripMenuItem";
-			this.runToolStripMenuItem.Size = new System.Drawing.Size(28, 20);
-			this.runToolStripMenuItem.Click += new System.EventHandler(this.Run);
 			// 
 			// viewToolStripMenuItem
 			// 
@@ -392,9 +383,18 @@
 			// cmdToolStripMenuItem
 			// 
 			this.cmdToolStripMenuItem.Name = "cmdToolStripMenuItem";
-			this.cmdToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.cmdToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
 			this.cmdToolStripMenuItem.Text = "cmd";
 			this.cmdToolStripMenuItem.Click += new System.EventHandler(this.CmdButtonClick);
+			// 
+			// runToolStripMenuItem
+			// 
+			this.runToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.runToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
+			this.runToolStripMenuItem.Image = global::Lumen.Studio.Properties.Resources.Starter;
+			this.runToolStripMenuItem.Name = "runToolStripMenuItem";
+			this.runToolStripMenuItem.Size = new System.Drawing.Size(28, 20);
+			this.runToolStripMenuItem.Click += new System.EventHandler(this.Run);
 			// 
 			// imageList1
 			// 
@@ -403,6 +403,27 @@
 			this.imageList1.Images.SetKeyName(0, "func.png");
 			this.imageList1.Images.SetKeyName(1, "type.png");
 			this.imageList1.Images.SetKeyName(2, "var.png");
+			// 
+			// createToolStripMenuItem
+			// 
+			this.createToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem2,
+            this.projectToolStripMenuItem1});
+			this.createToolStripMenuItem.Name = "createToolStripMenuItem";
+			this.createToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.createToolStripMenuItem.Text = "Create";
+			// 
+			// fileToolStripMenuItem2
+			// 
+			this.fileToolStripMenuItem2.Name = "fileToolStripMenuItem2";
+			this.fileToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+			this.fileToolStripMenuItem2.Text = "File";
+			// 
+			// projectToolStripMenuItem1
+			// 
+			this.projectToolStripMenuItem1.Name = "projectToolStripMenuItem1";
+			this.projectToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+			this.projectToolStripMenuItem1.Text = "Project";
 			// 
 			// MainForm
 			// 
@@ -427,7 +448,6 @@
 			this.splitContainer2.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
 			this.splitContainer2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.fastColoredTextBox1)).EndInit();
 			this.splitContainer3.Panel1.ResumeLayout(false);
 			this.splitContainer3.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
@@ -448,7 +468,6 @@
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem runToolStripMenuItem;
 		private System.Windows.Forms.SplitContainer splitContainer2;
-		private FastColoredTextBoxNS.FastColoredTextBox fastColoredTextBox1;
 		public System.Windows.Forms.ImageList imageList1;
 		private System.Windows.Forms.SplitContainer splitContainer3;
 		private System.Windows.Forms.DataGridView errorTable;
@@ -460,6 +479,13 @@
 		private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem cmdToolStripMenuItem;
+		private System.Windows.Forms.TreeView treeView1;
+		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem projectToolStripMenuItem;
+		private System.Windows.Forms.ImageList projectImages;
+		private System.Windows.Forms.ToolStripMenuItem createToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem2;
+		private System.Windows.Forms.ToolStripMenuItem projectToolStripMenuItem1;
 	}
 }
 

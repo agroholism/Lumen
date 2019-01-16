@@ -42,7 +42,7 @@ namespace Lumen.Studio {
 			return null;
 		}
 
-		internal virtual void OnTextChanged(TextBoxManager manager) {
+		internal virtual void OnTextChanged(TextBoxManager manager, FastColoredTextBoxNS.Range rng) {
 			FastColoredTextBox textBox = manager.TextBox;
 
 			textBox.Range.ClearFoldingMarkers();
@@ -51,14 +51,14 @@ namespace Lumen.Studio {
 				textBox.Range.SetFoldingMarkers(i.Item1, i.Item2);
 			}
 
-			textBox.Range.ClearStyle(StyleIndex.ALL);
+			rng.ClearStyle(StyleIndex.ALL);
 
 			foreach (KeyValuePair<String, Style> i in this.Styles) {
-				textBox.Range.SetStyle(i.Value, i.Key);
+				rng.SetStyle(i.Value, i.Key);
 			}
 
 			if (this.Fn != null && Fn.TryGet("on_text_changed", out var fn)) {
-				(fn as Fun).Run(new Scope());
+				(fn as Fun).Run(new Scope(), new Interop.RangeI(rng));
 			}
 
 			manager.RebuildMenu();
@@ -81,7 +81,7 @@ namespace Lumen.Studio {
 			this.Styles.Add("\\b(comparable|const|derived|enum|optional|bignum|constructor|num|exception|seq|expando|file|str|vec|bool|map)\\b", Settings.Type);
 		}
 
-		internal override void OnTextChanged(TextBoxManager manager) {
+		/*internal override void OnTextChanged(TextBoxManager manager) {
 			FastColoredTextBox textBox = manager.TextBox;
 
 			Indent(textBox);
@@ -110,15 +110,15 @@ namespace Lumen.Studio {
 			/*foreach (Bookmark i in textBox.Bookmarks) {
 				textBox.GetLine(i.LineIndex).ClearStyle(Settings.UnactiveBreakpoint, Settings.Highliting.Type);
 				textBox.GetLine(i.LineIndex).SetStyle(Settings.UnactiveBreakpoint);
-			}*/
+			}*
 
 			/*if (this.previousLine != -1) {
 				BreakpointOnLine(this.previousLine);
-			}*/
+			}*
 
 			manager.RebuildMenu();
 		}
-
+	*/
 		private void SetDynamicHightliting(FastColoredTextBox textBox) {
 			foreach (FastColoredTextBoxNS.Range x in textBox.GetRanges(@"\b(type)\s+(?<range>[\w_]+?)\b")) {
 				textBox.Range.SetStyle(Settings.Type, @"\b" + x.Text + @"\b");

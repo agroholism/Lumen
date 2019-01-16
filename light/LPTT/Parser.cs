@@ -325,7 +325,7 @@ namespace Stereotype {
 			BlockE Block = new BlockE();
 			Match(TokenType.DO);
 
-			Dictionary<String, Expression> items = new Dictionary<string, Expression>();
+			Dictionary<String, Expression> items = new Dictionary<String, Expression>();
 
 			if (LookMatch(1, TokenType.COLON) || LookMatch(1, TokenType.SPLIT)) {
 				while (!Match(TokenType.END)) {
@@ -950,6 +950,49 @@ namespace Stereotype {
 
 		private Expression Primary() {
 			Token Current = GetToken(0);
+
+			if (Match(TokenType.LT)) {
+				String tag = Consume(TokenType.WORD).Text;
+				Int32 deep = 0;
+				String builder = "<";
+				builder += tag;
+				while (deep >= 0) {
+					if (Match(TokenType.LT)) {
+						builder += "<";
+						if (Match(TokenType.SLASH)) {
+							builder += "/";
+							String name = Consume(TokenType.WORD).Text;
+							builder += name;
+							if (Match(TokenType.GT)) {
+								builder += ">";
+							}
+							if (name == tag) {
+								deep--;
+							}
+						} else {
+							String name = Consume(TokenType.WORD).Text;
+							builder += name;
+							if (name == tag) {
+								deep++;
+							}
+						}
+					}
+					else if (Match(TokenType.GT)) {
+						builder += ">";
+					}
+					else if (Match(TokenType.EQEQ)) {
+						builder += "=";
+					}
+					else if (LookMatch(0, TokenType.TEXT)) {
+						builder += "'" + Consume(TokenType.TEXT).Text + "'";
+					}
+					else if (LookMatch(0, TokenType.WORD)) {
+						builder += Consume(TokenType.WORD).Text;
+					}
+				}
+
+				return new StringE(builder);
+			}
 
 			if (Match(TokenType.NUMBER)) {
 				return new ValueE(Double.Parse(Current.Text));

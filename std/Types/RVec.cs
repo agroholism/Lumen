@@ -12,7 +12,7 @@ namespace Lumen.Lang.Std {
 			Dictionary<Value, Value> genericMemory = new Dictionary<Value, Value>();
 
 			SetAttribute("@generic", new LambdaFun((e, args) => {
-				if(genericMemory.TryGetValue(args[0], out var resa)) {
+				if (genericMemory.TryGetValue(args[0], out var resa)) {
 					return resa;
 				}
 
@@ -33,7 +33,7 @@ namespace Lumen.Lang.Std {
 					list.Add(innerArgs[0]);
 
 					return (Num)list.Count;
-				}) { Arguments = new List<FunctionArgument> { new FunctionArgument("element") {  Attributes = new Dictionary<string, Value> { ["type"] = args[0] } } } }, e);
+				}) { Arguments = new List<FunctionArgument> { new FunctionArgument("element") { Attributes = new Dictionary<string, Value> { ["type"] = args[0] } } } }, e);
 
 				res.Set("name", new Str($"std.vec[{args[0]}]"), e);
 
@@ -333,6 +333,7 @@ namespace Lumen.Lang.Std {
 
 			SetAttribute("get_size", new LambdaFun((e, args) => new Num(Converter.ToList(e.Get("this"), e).Count), "Kernel.List.get_size"));
 
+			// Converts vec to std.seq, can get
 			SetAttribute("seq", new LambdaFun((e, args) => {
 				List<Value> v = e.This.ToList(e);
 
@@ -348,40 +349,43 @@ namespace Lumen.Lang.Std {
 				return (Str)v.ToString(e);
 			}));
 			SetAttribute("sort", new LambdaFun((e, args) => {
-				List<Value> v = Converter.ToList(e.Get("this"), e);
-				List<Value> result = v.Select(i => i).ToList();
+				List<Value> value = e.This.Clone().ToList(e);
 
-				if (e.IsExsists("by")) {
-					Value obj1 = e.Get("by");
-					//Checker.CheckType(obj1, Kernel.Function, e);
+				Value by = e["by"];
+				Value descending = e["descending"];
 
-					Fun fun = (Fun)obj1;
+				if (by != Const.VOID) {
+					Fun fun = (Fun)by;
 
-					result.Sort((i, j) => {
-						Scope scope = new Scope(e);
-						scope["self"] = fun;
-						scope["args"] = new Vec(new List<Value> { i, j });
-						scope["kwargs"] = new Map();
-						return (Int32)(Double)Converter.ToDouble(fun.Run(scope, i, j), e);
-					});
+					if (descending.ToBoolean()) {
+						value.Sort((i, j) => {
+							Scope scope = new Scope(e);
+							scope["self"] = fun;
+							return -(Int32)Converter.ToDouble(fun.Run(scope, i, j), e);
+						});
+					}
+					else {
+						value.Sort((i, j) => {
+							Scope scope = new Scope(e);
+							scope["self"] = fun;
+							return (Int32)Converter.ToDouble(fun.Run(scope, i, j), e);
+						});
+					}
 				}
-				else if (args.Length == 0) {
-					result.Sort();
+				else if (descending.ToBoolean()) {
+					value.Sort((i, j) => j.CompareTo(i));
 				}
-				else if (args.Length >= 1) {
-					//Checker.CheckType(args[0], Kernel.Function, e);
-					Fun fun = (Fun)args[0];
-					result.Sort((i, j) => {
-						Scope scope = new Scope(e);
-						scope["self"] = fun;
-						scope["args"] = new Vec(new List<Value> { i, j });
-						scope["kwargs"] = new Map();
-						return (Int32)(Double)Converter.ToDouble(fun.Run(scope, i, j), e);
-					});
+				else {
+					value.Sort();
 				}
 
-				return new Vec(result);
-			}));
+				return new Vec(value);
+			}) {
+				Arguments = new List<FunctionArgument> {
+					new FunctionArgument("descending", Const.FALSE),
+					new FunctionArgument("by", Const.VOID)
+				}
+			});
 			/*
 						SetAttribute("sort!", new LambdaFun((e, args) => {
 							List<Value> list = Converter.ToList(e.Get("this"), e);
@@ -434,28 +438,20 @@ namespace Lumen.Lang.Std {
 				Value lastElement = list[list.Count - 1];
 				return lastElement;
 			}));
-			SetAttribute("shift!", new LambdaFun((e, args) => {
-				List<Value> list = Converter.ToList(e.Get("this"), e);
+			SetAttribute("shift", new LambdaFun((e, args) => {
+				List<Value> list = e.This.ToList(e);
 				Value firstElement = list[0];
 				list.RemoveAt(0);
 				return firstElement;
 			}));
-			SetAttribute("unshift!", new LambdaFun((e, args) => {
-				List<Value> list = Converter.ToList(e.Get("this"), e);
+			SetAttribute("unshift", new LambdaFun((e, args) => {
+				List<Value> list = e.This.ToList(e);
 				list.Insert(0, args[0]);
 				return Const.VOID;
 			}));
-			SetAttribute("each!", new LambdaFun((e, args) => {
-				List<Value> v = null;
-				UserFun f = null;
-
-				if (args[0] is UserFun) {
-					f = (UserFun)args[0];
-					v = Converter.ToList(e.Get("this"), e);
-				}
-				else {
-					throw new Exception("ожидался тип fun", stack: e);
-				}
+			SetAttribute("map_m", new LambdaFun((e, args) => {
+				List<Value> v = e.This.ToList(e);
+				UserFun f = (UserFun)args[0];
 
 				if (f.Arguments.Count == 1) {
 					for (Int32 i = 0; i < v.Count; i++) {
@@ -469,6 +465,24 @@ namespace Lumen.Lang.Std {
 				}
 
 				return Const.VOID;
+			}));
+
+			SetAttribute("map", new LambdaFun((e, args) => {
+				List<Value> v = e.This.Clone().ToList(e);
+				UserFun f = (UserFun)args[0];
+
+				if (f.Arguments.Count == 1) {
+					for (Int32 i = 0; i < v.Count; i++) {
+						v[i] = f.Run(new Scope(e), v[i]);
+					}
+				}
+				else {
+					for (Int32 i = 0; i < v.Count; i++) {
+						v[i] = f.Run(new Scope(e), v[i], new Num(i));
+					}
+				}
+
+				return new Vec(v);
 			}));
 			SetAttribute("add", new LambdaFun((e, args) => {
 				List<Value> list = Converter.ToList(e.This, e);
@@ -500,7 +514,7 @@ namespace Lumen.Lang.Std {
 				}
 				return (Num)result;
 			}));
-			SetAttribute("clear!", new LambdaFun((e, args) => {
+			SetAttribute("clear", new LambdaFun((e, args) => {
 				List<Value> list = Converter.ToList(e.Get("this"), e);
 				list.Clear();
 				return Const.VOID;
@@ -551,7 +565,7 @@ namespace Lumen.Lang.Std {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
 				return new Num(v.FindLastIndex(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x))));
 			}, "Kernel.List.find_last_index"));
-			SetAttribute("insert!", new LambdaFun((e, args) => {
+			SetAttribute("insert", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
 				v.Insert((Int32)Converter.ToDouble(args[0], e), args[1]);
 				return Const.VOID;
@@ -560,7 +574,7 @@ namespace Lumen.Lang.Std {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
 				return new Num(v.LastIndexOf(args[0]));
 			}));
-			SetAttribute("delete!", new LambdaFun((e, args) => {
+			SetAttribute("delete", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
 				foreach (Value i in args) {
 					v.Remove(i);
@@ -568,7 +582,7 @@ namespace Lumen.Lang.Std {
 
 				return Const.VOID;
 			}));
-			SetAttribute("reject!", new LambdaFun((e, args) => {
+			SetAttribute("reject", new LambdaFun((e, args) => {
 				List<Value> v = Converter.ToList(e.Get("this"), e);
 				v.RemoveAll(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x)));
 				return Const.VOID;
@@ -591,11 +605,11 @@ namespace Lumen.Lang.Std {
 				result.Reverse();
 				return new Vec(result);
 			}));
-			SetAttribute("reverse!", new LambdaFun((e, args) => {
+			SetAttribute("reverse", new LambdaFun((e, args) => {
 				List<Value> arv = Converter.ToList(e.Get("this"), e);
 				arv.Reverse();
 				return new Vec(arv);
-			}, "Kernel.List.reverse!"));
+			}, "Kernel.List.reverse"));
 			//SetAttribute("flatten", new Flatten());
 			SetAttribute("partition", new LambdaFun((e, args) => {
 				List<Value> obj = e.This.ToList(e);

@@ -31,8 +31,6 @@ namespace Stereotype {
 				if (expression is FunctionDeclaration fun && fun.Body == null) {
 					List<FunctionArgument> args = new List<FunctionArgument>();
 
-					Record exte = null;
-
 					foreach (ArgumentMetadataGenerator i in fun.Args) {
 						FunctionArgument arg = i.EvalArgumnet(e);
 					/*	if (arg.name == "this" && arg.type != null && arg.type is KType type) {

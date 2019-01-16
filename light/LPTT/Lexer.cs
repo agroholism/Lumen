@@ -7,7 +7,7 @@ using Lumen.Lang.Std;
 
 namespace Stereotype {
 	internal sealed class Lexer {
-		private const String operatorsString = "+-\\*/%(){}=<>!&|;:?,[]^.@~#";
+		private const String operatorsString = "+-\\*/%(){}=<>!&|;:?,[]^.~#";
 		private const String validSymbols = "0123456789abcdef";
 		private static IDictionary<String, Token> operatorsDictionary = new Dictionary<String, Token>() {
 			["+"] = new Token(TokenType.PLUS, Op.PLUS),
@@ -95,6 +95,9 @@ namespace Stereotype {
 				else if (current == '"') {
 					String();
 				}
+				else if (current == '@') {
+					Html();
+				}
 				else if (Char.IsLetter(current) || current == '_' || current == '$') {
 					Word();
 				}
@@ -110,6 +113,134 @@ namespace Stereotype {
 			}
 
 			return this.tokens;
+		}
+
+		private void Html() {
+			Next();
+			Next();
+
+			StringBuilder builder = new StringBuilder();
+
+			Int32 x = 0;
+
+			Char current = Peek(0);
+
+			List<String> substitutes = new List<String>();
+
+			Int32 c = 0;
+
+			while (true) {
+				if (current == '\\') {
+					current = Next();
+					switch (current) {
+						case '#':
+							current = Next();
+							builder.Append('#');
+							continue;
+						default:
+							builder.Append('\\');
+							continue;
+					}
+				}
+
+				if (current == '{') {
+					c++;
+					current = Next();
+					builder.Append("{{");
+				}
+
+				if (current == '}') {
+					c--;
+					if(c < 0) {
+						break;
+					}
+					current = Next();
+					builder.Append("}}");
+				}
+
+				if (current == '#') {
+					current = Next();
+
+					if (current == '"') {
+						builder.Append('#');
+						break;
+					}
+
+					StringBuilder buffer = new StringBuilder();
+					if (current == '{') {
+						current = Next();
+						while (current != '}') {
+							CheckOutOfRange();
+							buffer.Append(current);
+							current = Next();
+							while (current == '}' && !Provider.IsCompleted(buffer.ToString())) {
+								buffer.Append('}');
+								current = Next();
+							}
+						}
+						current = Next();
+					}
+					else {
+						while (true) {
+							CheckOutOfRange();
+
+							while (current == '(') {
+								buffer.Append(current);
+								current = Next();
+								while (!Provider.IsCompleted(buffer.ToString())) {
+									CheckOutOfRange();
+									buffer.Append(current);
+									current = Next();
+								}
+							}
+
+							if (!Char.IsLetterOrDigit(current)
+								&& current != '_'
+								&& current != '$'
+								&& current != '?'
+								&& current != '!'
+								&& current != '.') {
+								break;
+							}
+
+							buffer.Append(current);
+							current = Next();
+						}
+					}
+					String s = buffer.ToString();
+					Int32 position = substitutes.IndexOf(s);
+
+					if (position == -1) {
+						substitutes.Add(s);
+						//if(builder.ToString().EndsWith("}"))
+						//	builder.Append("\b ");
+						builder.Append($"{{{x}}}");
+						x++;
+					}
+					else {
+						builder.Append($"{{{position}}}");
+					}
+					continue;
+				}
+
+				CheckOutOfRange();
+
+				builder.Append(current);
+
+				current = Next();
+			}
+
+			current = Next();
+
+			AddToken(TokenType.TEXT, builder.ToString());
+
+			AddToken(TokenType.MOD);
+			AddToken(TokenType.WORD, "vec");
+			AddToken(TokenType.LPAREN);
+			foreach (Token i in new Lexer(System.String.Join(",", substitutes), this.file).Tokenization()) {
+				this.AddToken(i);
+			}
+			AddToken(TokenType.RPAREN);
 		}
 
 		private void String() {
@@ -142,12 +273,12 @@ namespace Stereotype {
 						case 'f':
 							current = Next();
 							builder.Append('\f');
-							continue;
+							continue;*/
 						case '\\':
 							current = Next();
 							builder.Append('\\');
 							continue;
-						case '0':
+					/*	case '0':
 							current = Next();
 							builder.Append('\0');
 							continue;
@@ -668,8 +799,6 @@ namespace Stereotype {
 				return Convert.ToDouble(Converter.FromN(buffer.ToString(), numberBase));
 			}
 
-			Boolean isScientic = false;
-
 			while (true) {
 				if (current == '.') {
 					// Не, ну логично же.
@@ -683,7 +812,7 @@ namespace Stereotype {
 				}
 				else if (!Char.IsDigit(current)) {
 					if (current == 'e') {
-						isScientic = true;
+
 						buffer.Append(current);
 						current = Next();
 						if (current == '-') {

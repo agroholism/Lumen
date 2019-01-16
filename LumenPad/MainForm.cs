@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Sockets;
 
 using FastColoredTextBoxNS;
 
@@ -13,6 +12,8 @@ namespace Lumen.Studio {
 	public partial class MainForm : Form {
 		/// <summary> Singleton realization  </summary>
 		public static MainForm Instance { get; private set; }
+
+		private static TaskFactory Factory { get; } = new TaskFactory();
 
 		public static TextBoxManager MainTextBoxManager { get; set; }
 
@@ -23,6 +24,9 @@ namespace Lumen.Studio {
 		public Place? b;
 		public Place? e;
 
+		public static Boolean AllowRegistrationChangas = true;
+		public Boolean IsCmdInitialized { get; private set; } = false;
+
 		public MainForm(String[] args) {
 			InitializeComponent();
 
@@ -32,7 +36,6 @@ namespace Lumen.Studio {
 				Language = Settings.Languages[0]
 			};
 
-			this.fastColoredTextBox1.ShowScrollBars = false;
 			this.splitContainer2.SplitterWidth = 1;
 			this.splitContainer3.SplitterWidth = 1;
 
@@ -49,11 +52,11 @@ namespace Lumen.Studio {
 			this.textBox.PaddingBackColor = Settings.BackgroundColor;
 			this.textBox.TextAreaBorderColor = Settings.BackgroundColor;
 			this.textBox.ServiceLinesColor = Settings.BackgroundColor;
+			this.treeView1.BackColor = Settings.BackgroundColor;
+			this.treeView1.ForeColor = Settings.ForegroundColor;
 
 			this.menuStrip1.BackColor = Settings.BackgroundColor;
 			this.BackColor = Settings.LinesColor;
-			this.splitContainer2.Panel2Collapsed = true;
-			//this.splitContainer3.Panel2Collapsed = true;
 			this.output.BackColor = Settings.BackgroundColor;
 			this.output.ForeColor = Settings.ForegroundColor;
 			this.errorTable.ForeColor = Settings.ForegroundColor;
@@ -64,29 +67,38 @@ namespace Lumen.Studio {
 			this.splitContainer3.BackColor = Settings.LinesColor;
 			//this.textBox.Font = new Font("Courier New", 10);
 
-			ColorizeMenu();
+			ColorizeTopMenu();
 
 			if (args.Length > 0) {
-				LoadFile(args[0]);
+				OpenFile(args[0]);
 			}
 		}
 
-		private void ColorizeMenu() {
+		internal void HighlightUnsavedFile() {
+			TreeNode[] nodes = this.treeView1.Nodes.Find(CurrentFile, true);
+
+			if (nodes.Length >= 1) {
+				TreeNode node = nodes[0];
+				node.ForeColor = Color.DarkRed;
+			}
+		}
+
+		private void ColorizeTopMenu() {
 			foreach (Object i in this.menuStrip1.Items) {
 				if (i is ToolStripMenuItem item) {
-					ColorizeItem(item);
+					ColorizeMenuItem(item);
 				}
 			}
 		}
 
-		private void ColorizeItem(ToolStripMenuItem item) {
+		private void ColorizeMenuItem(ToolStripMenuItem item) {
 			item.BackColor = Settings.BackgroundColor;
 			item.ForeColor = Settings.ForegroundColor;
 
 			if (item.HasDropDownItems) {
 				foreach (Object i in item.DropDownItems) {
 					if (i is ToolStripMenuItem mi) {
-						ColorizeItem(mi);
+						ColorizeMenuItem(mi);
 					}
 				}
 			}
@@ -100,43 +112,25 @@ namespace Lumen.Studio {
 				if (MainTextBoxManager.Language.RunCommand != null) {
 					SavePreviousFile();
 					StartProcess(MainTextBoxManager.Language.RunCommand.Replace("[FILE]", CurrentFile));
-					/*TcpClient cli = new TcpClient("127.0.0.1", 4444);
-
-					var z = cli.GetStream();
-					while (z.CanRead) {
-						byte[] bytes = new byte[1024];
-						z.Read(bytes, 0, 1024);
-						output.Write(Encoding.UTF8.GetString(bytes, 0, 1024));
-					}*/
-
-					return;
+				}
+				else {
+					SavePreviousFile();
+					Stereotype.Interpriter.Start(CurrentFile);
 				}
 			}
-
-			/*if(MainTextBoxManager.Language.Name != "Lumen") {
-
-				return;
-			}
-			*/
-			//
-			// Project?.Type?.Build(Project);
-			//File.WriteAllText("main.txt", MainTextBoxManager.TextBox.Text);
-			//Stereotype.Interpriter.Start("main.txt");
 		}
 
-		TaskFactory tf = new TaskFactory();
-
 		private void StartProcess(String name) {
-			Tuple<String, String> na = GetNameAndArgs(name);
+			Tuple<String, String> nameAndArgs = GetNameAndArgs(name);
 
 			Process proc = new Process() {
 				StartInfo = new ProcessStartInfo {
-					FileName = na.Item1,
-					Arguments = na.Item2
+					FileName = nameAndArgs.Item1,
+					Arguments = nameAndArgs.Item2
 				}
 			};
 
-			this.tf.StartNew(() => {
+			Factory.StartNew(() => {
 				proc.Start();
 				proc.WaitForExit();
 			});
@@ -147,13 +141,13 @@ namespace Lumen.Studio {
 
 			StringBuilder builder = new StringBuilder();
 			for (Int32 i = 1; i < src.Length; i++) {
-				builder.Append(src[i]);
+				builder.Append(src[i]).Append(" ");
 			}
 
 			return new Tuple<String, String>(src[0], builder.ToString());
 		}
 
-		internal void RaiseError(IRunResult result) {
+		internal void RaiseError(IError result) {
 			if (result.ErrorLine > 0) {
 				Range range = this.textBox.GetLine(result.ErrorLine - 1);
 
@@ -179,24 +173,17 @@ namespace Lumen.Studio {
 		private void TextBox_TextChanged(Object sender, TextChangedEventArgs e) {
 			this.err = null;
 			this.b = null;
-			e = null;
 			this.errorTable.Rows.Clear();
 
-			MainTextBoxManager?.OnTextChanged();
-		}
-
-		private void SetDynamicHightliting(FastColoredTextBox textBox) {
-			foreach (Range x in textBox.GetRanges(@"\b(type)\s+(?<range>[\w_]+?)\b")) {
-				textBox.Range.SetStyle(Settings.Type, @"\b" + x.Text + @"\b");
-			}
+			MainTextBoxManager?.OnTextChanged(e);
 		}
 
 		private void Form1_Load(Object sender, EventArgs e) {
-			foreach(var i in Settings.Languages) {
-				if(i.Actor != null) {
+			foreach (Language i in Settings.Languages) {
+				if (i.Actor != null) {
 					Lang.Std.Scope s = new Lang.Std.Scope();
 					s.AddUsing(Lang.Std.StandartModule.__Kernel__);
-					var op = new Interop.Interop();
+					Interop.Interop op = new Interop.Interop();
 
 					s.Set("studio", Interop.Interop.Module);
 
@@ -209,21 +196,58 @@ namespace Lumen.Studio {
 			}
 
 			if (CurrentFile == null) {
-				LoadFile(Settings.DefaultFileName);
+				if (!File.Exists("default.lm")) {
+					File.Create("default.lm").Close();
+				}
+
+				OpenFile("default.lm");
 			}
 		}
 
-		private void LoadFile(String path) {
+		#region File System
+
+		private void OpenFile(String path) {
 			if (File.Exists(path)) {
+				if (path.EndsWith(".png")) {
+					OpenImage(path);
+					return;
+				}
+
 				SavePreviousFile();
 
 				ProcessExtenstion(Path.GetExtension(path));
+				AllowRegistrationChangas = false;
 
 				MainTextBoxManager.TextBox.Text = File.ReadAllText(path);
 
-				this.Text = path + " - Lumen Studio";
+				AllowRegistrationChangas = true;
 
 				CurrentFile = path;
+
+				if (Project != null) {
+					this.Text = path.Replace(Project.Path + "\\", "") + " - Lumen Studio";
+				}
+			}
+		}
+
+		private void FileOpenWithoutSave(String path) {
+			if (File.Exists(path)) {
+				if (path.EndsWith(".png")) {
+					OpenImage(path);
+					return;
+				}
+
+				ProcessExtenstion(Path.GetExtension(path));
+
+				AllowRegistrationChangas = false;
+
+				MainTextBoxManager.TextBox.Text = File.ReadAllText(path);
+
+				AllowRegistrationChangas = true;
+
+				CurrentFile = path;
+
+				this.Text = path.Replace(Project.Path + "\\", "") + " - Lumen Studio";
 			}
 		}
 
@@ -243,11 +267,58 @@ namespace Lumen.Studio {
 		private void SavePreviousFile() {
 			if (CurrentFile != null) {
 				File.WriteAllText(CurrentFile, MainTextBoxManager.TextBox.Text);
+				MainTextBoxManager.ChangesSaved = true;
+				TreeNode[] nodes = this.treeView1.Nodes.Find(CurrentFile, true);
+
+				if (nodes.Length == 1) {
+					TreeNode node = nodes[0];
+					node.ForeColor = Settings.ForegroundColor;
+				}
 			}
 		}
 
-		private void FastColoredTextBox1_TextChanged(Object sender, TextChangedEventArgs e) {
+		public void DeleteRecursive(String dir) {
+			foreach (String d in Directory.EnumerateDirectories(dir)) {
+				DeleteRecursive(d);
+			}
 
+			foreach (String f in Directory.EnumerateFiles(dir)) {
+				File.Delete(f);
+			}
+
+			Directory.Delete(dir);
+		}
+
+		public void FileWriteWithCreating(String path) {
+			String[] s = path.Split('\\');
+
+			for (Int32 i = 1; i < s.Length - 1; i++) {
+				String p = "";
+				for (Int32 j = 0; j <= i; j++) {
+					p += s[j] + "\\";
+				}
+
+				if (!Directory.Exists(p)) {
+					Directory.CreateDirectory(p);
+				}
+			}
+
+			File.WriteAllText(path, MainTextBoxManager.TextBox.Text);
+		}
+
+		#endregion
+
+		private void OpenImage(String path) {
+			this.textBox.Visible = false;
+
+			PictureBox z = new PictureBox {
+				Dock = DockStyle.Fill,
+				BorderStyle = BorderStyle.None,
+				ImageLocation = path,
+				WaitOnLoad = false
+			};
+
+			this.splitContainer2.Panel1.Controls.Add(z);
 		}
 
 		private void TextBox_ToolTipNeeded(Object sender, ToolTipNeededEventArgs e) {
@@ -280,47 +351,26 @@ namespace Lumen.Studio {
 			}*/
 		}
 
-		private void SplitContainer3_SplitterMoved(Object sender, SplitterEventArgs e) {
-
-		}
-
-		private void HTMLToolStripMenuItem_Click(Object sender, EventArgs e) {
-			/*new HTMLParser(this.textBox.Text).Run();
-			Stereotype.Interpriter.Start("out.lm");*/
-		}
-
-		private void openToolStripMenuItem_Click(Object sender, EventArgs e) {
+		private void OpenToolStripMenuItem_Click(Object sender, EventArgs e) {
 			OpenFileDialog dialog = new OpenFileDialog();
 			if (dialog.ShowDialog() == DialogResult.OK) {
-				LoadFile(dialog.FileName);
+				OpenFile(dialog.FileName);
 			}
 		}
 
-		private void saveToolStripMenuItem_Click(Object sender, EventArgs e) {
+		private void SaveToolStripMenuItem_Click(Object sender, EventArgs e) {
 			SavePreviousFile();
 		}
 
-		private void pyToolStripMenuItem_Click(Object sender, EventArgs e) {
-			this.output.Clear();
-
-			ProcessStartInfo pi = new ProcessStartInfo("py") {
-				Arguments = $"-m flake8 {CurrentFile}",
-				CreateNoWindow = true,
-				UseShellExecute = false,
-				RedirectStandardOutput = true,
-				RedirectStandardInput = true
-			};
-
-			Process p = Process.Start(pi);
-
-			output.Write(p.StandardOutput.ReadToEnd());
-		}
-
 		private void MainForm_FormClosed(Object sender, FormClosedEventArgs e) {
+			if (Directory.Exists(".tmp")) {
+				DeleteRecursive(".tmp");
+			}
+
 			Application.Exit();
 		}
 
-		public Boolean IsCmdInitialized { get; private set; } = false;
+		#region Cmd 
 
 		private void CmdButtonClick(Object sender, EventArgs e) {
 			if (!this.IsCmdInitialized) {
@@ -398,8 +448,8 @@ namespace Lumen.Studio {
 
 			private static String Convert(String str) {
 				Byte[] bytes = Encoding.Convert(
-					GlobalCmdProcess.StartInfo.StandardOutputEncoding, 
-					Encoding.Unicode, 
+					GlobalCmdProcess.StartInfo.StandardOutputEncoding,
+					Encoding.Unicode,
 					GlobalCmdProcess.StartInfo.StandardOutputEncoding.GetBytes(str));
 
 				return Encoding.Unicode.GetString(bytes);
@@ -415,7 +465,7 @@ namespace Lumen.Studio {
 				Boolean IsFirstCommand = true;
 				while (!GlobalCmdProcess.WaitForExit(300)) {
 					if (!isWriteMode) {
-						if(IsFirstCommand) {
+						if (IsFirstCommand) {
 							CmdOutput.Clear();
 							IsFirstCommand = false;
 						}
@@ -446,9 +496,108 @@ namespace Lumen.Studio {
 
 			CmdInterface.InitializeProcess();
 
-			this.tf.StartNew(CmdInterface.RunProcess);
+			Factory.StartNew(CmdInterface.RunProcess);
 
 			this.IsCmdInitialized = true;
 		}
+
+		#endregion
+
+		#region Project Manager 
+
+		private void ProjectToolStripMenuItem_Click(Object sender, EventArgs e) {
+			FolderBrowserDialog ofd = new FolderBrowserDialog();
+
+			if (ofd.ShowDialog() == DialogResult.OK) {
+				OpenProject(ofd.SelectedPath);
+			}
+		}
+
+		private void OpenProject(String selectedPath) {
+			Project = new Project {
+				Name = GetName(selectedPath),
+				Path = selectedPath
+			};
+
+			Fill(this.treeView1.Nodes.Add(Project.Name), Path.GetFullPath(selectedPath));
+		}
+
+		private void Fill(TreeNode node, String path) {
+			foreach (String i in Directory.EnumerateDirectories(path)) {
+				TreeNode n = node.Nodes.Add(i, i.Replace(path + "\\", ""), 0);
+				Fill(n, i);
+			}
+
+			foreach (String i in Directory.EnumerateFiles(path)) {
+				node.Nodes.Add(i, i.Replace(path + "\\", ""), GetImageIndex(i));
+			}
+		}
+
+		private Int32 GetImageIndex(String i) {
+			if (i.EndsWith(".html")) {
+				return 2;
+			}
+
+			if (i.EndsWith(".py")) {
+				return 3;
+			}
+
+			if (i.EndsWith(".lm")) {
+				return 4;
+			}
+
+			if (i.EndsWith(".css")) {
+				return 5;
+			}
+			if (i.EndsWith(".png")) {
+				return 6;
+			}
+
+
+			/*
+			if (i.EndsWith(".txt")) {
+				return 4;
+			}
+
+			if (i.EndsWith(".cs")) {
+				return 2;
+			}
+			*/
+			return 1;
+		}
+
+		private String GetName(String path) {
+			String[] cons = path.Split('\\');
+
+			return cons[cons.Length - 1];
+		}
+
+		private void TreeView1_NodeMouseDoubleClick(Object sender, TreeNodeMouseClickEventArgs e) {
+			if (Project == null) {
+				return;
+			}
+
+			if (!Directory.Exists(".tmp")) {
+				Directory.CreateDirectory(".tmp");
+			}
+
+			if (CurrentFile != null) {
+				if (!MainTextBoxManager.ChangesSaved) {
+					FileWriteWithCreating(".tmp" + CurrentFile.Replace(Project.Path, ""));
+				}
+			}
+
+			String path = e.Node.Name;
+
+			if (File.Exists(".tmp\\" + path.Replace(Project.Path, ""))) {
+				FileOpenWithoutSave(".tmp\\" + path.Replace(Project.Path, ""));
+				CurrentFile = path;
+			}
+			else {
+				FileOpenWithoutSave(path);
+			}
+		}
+
+		#endregion
 	}
 }

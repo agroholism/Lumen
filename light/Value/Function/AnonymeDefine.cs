@@ -27,7 +27,6 @@ namespace Stereotype {
 
 		public AnonymeDefine(List<ArgumentMetadataGenerator> Args, Expression Body, Expression returnedType, List<Expression> otherContacts) : this(Args, Body, returnedType) {
 			this.otherContacts = otherContacts;
-			this.def = this.def;
 		}
 
 		public Expression Closure(List<String> visible, Scope thread) {

@@ -1,0 +1,82 @@
+﻿let rel(path) {
+    return config.host + "/" + path
+}
+
+let script(name) {
+    if config.enable_script {
+        return "<script type=\"text/javascript\" src=\"#{rel("scripts/#{name}.js")}\"> </script>"
+    } else {
+        return void
+    }
+}
+
+let style(name) {
+    return "<link rel=\"stylesheet\" href=\"#{rel("styles/#{name}.css")}\">"
+}
+
+
+let html(head, body) {
+    return "<html>#head #body</html>"
+}
+
+let head(...content) {
+    return "<head> #{content * ""} </head>"
+}
+
+let body(...content) {
+    return "<body> #{content * ""} </body>"
+}
+
+let div(...content, cls:=void) {
+    if cls is void {
+        return "<div>#{content * ""}</div>"
+    } else {
+        return "<div class=\"#cls\">#{content * ""}</div>"
+    }
+}
+
+let ul(...content, cls:=void) {
+    if cls is void {
+        return "<ul>#{content * ""}</ul>"
+    } else {
+        return "<ul class=\"#cls\">#{content * ""}</ul>"
+    }
+}
+
+let components() {
+    return void
+}
+
+let components.menu(...items, heading:=void) {
+    if heading is void {
+        return div(
+            ul(...components.process_items(items), cls:="anatomy-menu-list"),
+            cls:="anatomy-menu"
+        )
+    } else {
+        return div(
+            components.menu_heading(heading.text, heading.href),
+            ul(...components.process_items(items), cls:="anatomy-menu-list"),
+            cls:="anatomy-menu"
+        )
+    }
+}
+
+let components.menu_heading(content, href:="\#") {
+    return "<a href=\"#href\" class=\"anatomy-menu-heading anatomy-menu-link\">#content</a>"
+}
+
+let components.process_items(items) {
+    let result := vec()
+    for let item in items {
+        result += components.process_item(item)
+    }
+    return result
+}
+
+let components.process_item(item) {
+    return "<li class=\"anatomy-menu-item\"><a href=\"#{item.href}\" class=\"anatomy-menu-link\">#{item.text}</a></li>"
+}
+
+
+

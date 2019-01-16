@@ -1,10 +1,40 @@
-﻿anatomy new [name="newProject"] [js=true] [skillet="standart/default"]
+﻿new [name="newProject"] [allow_script=true] [skillet="default"]
 
-anatomy init [name] [path=""] [js=true]
+init [name] [path=""] [allow_script=true]
 
-anatomy pages
-anatomy pages new [name] [haslm=true] [js=true] [css=false] [skillet="standart/default"]
-anatomy pages delete [name]
+open [name]
 
-anatomy build
+pages
+pages new [name] [helper=true] [script=null] [style=null] [skillet="default"]
+pages delete [name]
 
+config allow_script
+config host
+
+build
+
+[name]
+|__ build*
+|
+|__ tmp*
+|
+|__ model
+|   |__ pages
+|	|	|__ common.lm
+|   |   |__ index.lm
+|	|	|__ index.lmt
+|	|	
+|	|__ scripts
+|	|	|__ index.js
+|	|	
+|	|__ styles
+|	|	|__ default.css
+|	|
+|	|__ resources
+|		|__ images
+|		|
+|		|__ fonts
+|		|
+|		|__ resx.toml
+|
+|__ config.toml

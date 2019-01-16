@@ -43,7 +43,7 @@ namespace Stereotype {
 					}
 				}
 			}
-			catch (System.Exception ex) {
+			catch {
 
 			}
 			finally {

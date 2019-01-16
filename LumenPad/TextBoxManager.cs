@@ -12,6 +12,8 @@ namespace Lumen.Studio {
 		public AutocompleteMenu Menu { get; private set; }
 		public Language Language { get; set; }
 
+		public Boolean ChangesSaved { get; set; }
+
 		public TextBoxManager(FastColoredTextBox textBox) {
 			this.TextBox = textBox;
 
@@ -34,11 +36,20 @@ namespace Lumen.Studio {
 				return;
 			}
 
-			this.Menu.Items.SetAutocompleteItems(this.Language.GetAutocompleteItems(this));
+			List<AutocompleteItem> items = this.Language.GetAutocompleteItems(this);
+
+			if(items != null) {
+				this.Menu.Items.SetAutocompleteItems(items);
+			}
 		}
 
-		internal void OnTextChanged() {
-			this.Language.OnTextChanged(this);
+		internal void OnTextChanged(TextChangedEventArgs eventArgs) {
+			if (MainForm.AllowRegistrationChangas) {
+				this.ChangesSaved = false;
+				MainForm.Instance.HighlightUnsavedFile();
+			}
+
+			this.Language.OnTextChanged(this, eventArgs.ChangedRange);
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace Lumen.Lang.Std {
 		public Scope() {
 			this.variables = new Dictionary<String, Value>();
 			this.usings = new List<Module>();
-			this.attributes = new Dictionary<string, List<Value>>();
+			this.attributes = new Dictionary<String, List<Value>>();
 		}
 
 		public Scope(Scope parent) : this() {

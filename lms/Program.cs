@@ -1,173 +1,233 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Linq;
 
-using Tomen;
+using Lumen.Tomen;
+using Stereotype;
 
-namespace Anatomy {
+namespace Lumen.Anatomy {
 	public class Program {
+		public static String ProjectName { get; set; }
+
+		private static String PagesFolder {
+			get => ProjectName + "\\model\\pages";
+		}
+		private static String ScriptsFolder {
+			get => ProjectName + "\\model\\scripts";
+		}
+
+		private static List<String> Pages { get; } = new List<String>();
+
 		public static void Main(String[] args) {
-			if(args.Length > 1) {
-				ParseCommand(args);
-				return;
+			while (true) {
+				Console.Write("anatomy:> ");
+				String command = Console.ReadLine();
+				ParseCommand(command.Split(' '));
 			}
-
-			String file;
-
-			if(args.Length != 0) {
-				file = args[0].ToString();
-			} else {
-				file = Console.ReadLine();
-			}
-
-			new HTMLParser(file).Run();
-
-			Stereotype.Interpriter.Host = Path.GetDirectoryName(file) + "\\tmp";
-
-			foreach (var item in Directory.GetFiles(Path.GetDirectoryName(file) + "\\tmp")) {
-				Stereotype.Interpriter.Start(item);
-			}
-			
 		}
 
 		private static void ParseCommand(String[] args) {
-			if(args[0] == "new") {
+			if (args[0] == "new") {
 				CreateProject(args[1]);
 			}
+			else if (args[0] == "open") {
+				OpenProject(args[1]);
+			}
+			else if (args[0] == "pages") {
+				if (args.Length == 1) {
+					ListPages();
+					return;
+				}
+				if (args[1] == "new") {
+					CreatePage(args[2], 0);
+					return;
+				}
+			}
+			else if (args[0] == "build") {
+				BuildProject();
+			}
+		}
+
+		private static void BuildProject() {
+			MakeTmp();
+
+			MakeDirectory(ProjectName + "\\build\\resources");
+			MakeDirectory(ProjectName + "\\build\\resources\\images");
+			MakeDirectory(ProjectName + "\\build\\resources\\fonts");
+			MakeDirectory(ProjectName + "\\build\\scripts");
+			MakeDirectory(ProjectName + "\\build\\styles");
+			
+			foreach(String i in Directory.EnumerateFiles(ScriptsFolder)) {
+				File.Copy(i, ProjectName + "\\build\\scripts\\" + Path.GetFileName(i), true);
+			}
+
+			foreach (String i in Directory.EnumerateFiles(ProjectName + "\\model\\styles")) {
+				File.Copy(i, ProjectName + "\\build\\styles\\" + Path.GetFileName(i), true);
+			}
+		}
+
+		private static void MakeTmp() {
+			Lang.Std.Scope scope = MakeScope();
+
+			// Refresh tmp directory
+			foreach (String i in Directory.EnumerateFiles(PagesFolder)) {
+				// If it's tamplate file
+				if (i.EndsWith(".lmt")) {
+					String tmpPath = Path.GetFullPath(ProjectName + "\\tmp\\lmt-" + Path.GetFileNameWithoutExtension(i) + ".lm");
+					String buildPath = ProjectName + "\\build\\" + Path.GetFileNameWithoutExtension(i) + ".html";
+					File.WriteAllText(tmpPath, new HTMLParser(i, Path.GetFullPath(buildPath)).Run());
+
+					String old = Directory.GetCurrentDirectory();
+					Directory.SetCurrentDirectory(ProjectName + "\\tmp");
+					Interpriter.Start(tmpPath, scope);
+					Directory.SetCurrentDirectory(old);
+				}
+				else {
+					File.WriteAllText(ProjectName + "\\tmp\\" + Path.GetFileName(i), File.ReadAllText(i));
+				}
+			}
+		}
+
+		private static Lang.Std.Scope MakeScope() {
+			Lang.Std.Scope result = new Lang.Std.Scope();
+			result.AddUsing(Lang.Std.StandartModule.__Kernel__);
+
+			TomlTable table = Tomen.Tomen.ReadFile(ProjectName + "\\config.toml");
+
+			Lang.Std.RecordValue val = new Lang.Std.RecordValue();
+
+			val.Set("pages", new Lang.Std.Vec(Pages.Select(i => (Lang.Std.Value)new Lang.Std.Str(i)).ToList()), null);
+
+			val.Set("host", new Lang.Std.Str((table["host"] as TomlString).Value), null);
+			val.Set("enable_script", new Lang.Std.Bool((table["enable_script"] as TomlBool).Value), null);
+
+			result["config"] = val;
+
+			return result;
+		}
+
+		private static void ListPages() {
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("Pages in project: ");
+			Console.ForegroundColor = ConsoleColor.Gray;
+
+			foreach (String page in Pages) {
+				Console.WriteLine(page);
+			}
+		}
+
+		private static void OpenProject(String v) {
+			ProjectName = v;
+
+			Pages.Clear();
+
+			TomlTable table = Tomen.Tomen.ReadFile(ProjectName + "\\config.toml");
+			TomlArray array = table["pages"] as TomlArray;
+			foreach (ITomlValue item in array.Value) {
+				Pages.Add((item as TomlString).Value);
+			}
+		}
+
+		private static void CreatePage(String pageName, Int32 ident) {
+			String identStr = "";
+
+			if (ident == 1) {
+				identStr += "	";
+			}
+
+			Extensions.Print($"Creating page '{pageName}'...", ident: ident);
+			File.Create(PagesFolder + "\\" + pageName + ".lm").Close();
+			Console.WriteLine($"{identStr}	File '{PagesFolder + "\\" + pageName + ".lm"}' created");
+			File.Create(PagesFolder + "\\" + pageName + ".lmt").Close();
+			Console.WriteLine($"{identStr}	File '{PagesFolder + "\\" + pageName + ".lmt"}' created");
+			File.Create(ScriptsFolder + "\\" + pageName + ".js").Close();
+			Console.WriteLine($"{identStr}	File '{ScriptsFolder + "\\" + pageName + ".js"}' created");
+
+			ApplyTemplate(pageName);
+
+			Pages.Add(pageName);
+
+			TomlTable table = Tomen.Tomen.ReadFile(ProjectName + "\\config.toml");
+
+			table["pages"] = new TomlArray(Pages.Select(i => (ITomlValue)new TomlString(i)).ToList());
+
+			TomlTable t = new TomlTable(pageName);
+			t["name"] = new TomlString(pageName);
+			t["enable_script"] = new TomlBool(true);
+			t["path"] = new TomlString(PagesFolder);
+
+			table[pageName] = t;
+
+			Tomen.Tomen.WriteFile(ProjectName + "\\config.toml", table);
+
+			Extensions.Print("Configuration file are rebuilded", ident: ident);
+
+			Extensions.Print($"Page '{pageName}' created successfuly", ConsoleColor.Green, ident);	
+		}
+
+		private static void ApplyTemplate(String pageName) {
+			File.WriteAllText(PagesFolder + "\\" + pageName + ".lm", @"open common");
+
+			File.WriteAllText(PagesFolder + "\\" + pageName + ".lmt",
+				String.Format(File.ReadAllText("anatomy\\skillets\\default\\default.lmt"), pageName));
 		}
 
 		private static void CreateProject(String name) {
-			Directory.CreateDirectory(name);
-			Directory.CreateDirectory(name + "\\model");
-			Directory.CreateDirectory(name + "\\model\\pages");
-			Directory.CreateDirectory(name + "\\model\\res");
-			Directory.CreateDirectory(name + "\\model\\res\\img");
-			Directory.CreateDirectory(name + "\\model\\scripts");
-			Directory.CreateDirectory(name + "\\model\\styles");
+			ProjectName = name;
 
-			File.Create(name + "\\model\\pages\\index.lmt").Close();
-			File.Create(name + "\\model\\pages\\index.lm").Close();
+			Console.WriteLine($"Creating project '{name}'...");
+
+			MakeDirectory(name);
+			MakeDirectory(name + "\\model");
+			MakeDirectory(PagesFolder);
+			MakeDirectory(name + "\\model\\resources");
+			MakeDirectory(name + "\\model\\resources\\images");
+			MakeDirectory(name + "\\model\\resources\\fonts");
+			MakeDirectory(name + "\\model\\scripts");
+			MakeDirectory(name + "\\model\\styles");
 
 			File.Create(name + "\\config.toml").Close();
 
-			File.Create(name + "\\model\\res\\resx.toml").Close();
+			TomlTable table = new TomlTable(null);
+			table["name"] = new TomlString(name);
+			table["host"] = new TomlString("");
+			table["pages"] = new TomlArray(new List<ITomlValue>());
+			table["enable_script"] = new TomlBool(true);
 
-			File.Create(name + "\\model\\scripts\\index.js");
-			File.Create(name + "\\model\\styles\\default.css");
+			Tomen.Tomen.WriteFile(name + "\\config.toml", table);
 
-			Directory.CreateDirectory(name + "\\bin");
+			Extensions.Print("Configuration file created", ident: 1);
+
+			CreateCommonHelper(name);
+			CreatePage("index", 1);
+
+			File.Create(name + "\\model\\resources\\resx.toml").Close();
+			Console.WriteLine($"	File '{name + "\\model\\resources\\resx.toml"}' created");
+
+			File.Copy("anatomy\\skillets\\default\\default.css", name + "\\model\\styles\\default.css", true);
+			Console.WriteLine($"	File '{name + "\\model\\styles\\default.css"}' created");
+
+			Directory.CreateDirectory(name + "\\build");
 			Directory.CreateDirectory(name + "\\tmp");
-		}
-	}
 
-	class Writer : TextWriter {
-		public override Encoding Encoding => throw new NotImplementedException();
-	}
-
-	public class HTMLParser {
-		private readonly String source;
-
-		private readonly StringBuilder builder;
-		private Int32 position;
-
-		private readonly String file;
-
-		private readonly StringBuilder finalBuilder;
-
-		public HTMLParser(String fileName) {
-			this.file = Path.GetFullPath(fileName);
-			this.source = File.ReadAllText(fileName);
-			this.builder = new StringBuilder();
-			this.position = 0;
-			this.finalBuilder = new StringBuilder("let res := vec()" + Environment.NewLine);
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine($"	Project '{name}' created successfuly");
+			Console.ForegroundColor = ConsoleColor.Gray;
 		}
 
-		public void Run() {
-			Char current = Current();
-			while (current != '\0') {
-				if (current == '<' && At(1) == '%') {
-					current = Next();
-					current = Next();
-					this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"").Replace("#", "\\#") + "\"").Append(Environment.NewLine);
-					this.builder.Clear();
+		private static void CreateCommonHelper(String projectName) {
+			File.Copy("anatomy\\common.lm", PagesFolder + "\\common.lm", true);
 
-					BuildCode();
-				}
-				else {
-					this.builder.Append(current);
-				}
-				current = Next();
-			}
-
-			this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"").Replace("#", "\\#") + "\"").Append(Environment.NewLine);
-
-			this.finalBuilder.Append($"fwrite(\"{(Path.GetDirectoryName(this.file) + "\\rls\\" + Path.GetFileNameWithoutExtension(this.file)).Replace("\\b", "\\\\b").Replace("\\t", "\\\\t").Replace("\\v", "\\\\v").Replace("\\r", "\\\\r")}.html\", res * \"\")"); //C:\Users\пк\Desktop\Projects\LumenPad\lms\bin\Debug\manuals\standart\libs\vec.tmpl
-
-			WorkWithDir(Path.GetDirectoryName(this.file));
-
-			File.WriteAllText((Path.GetDirectoryName(this.file) + "\\tmp\\" + Path.GetFileNameWithoutExtension(this.file) + ".lm"), this.finalBuilder.ToString());
+			Extensions.Print($"File {PagesFolder + "\\common.lm"} created", ident: 1);
 		}
 
-		private void WorkWithDir(String dir) {
-			Directory.CreateDirectory(dir + "\\tmp");
-			Directory.CreateDirectory(dir + "\\tmp\\helpers");
-			Directory.CreateDirectory(dir + "\\rls");
+		private static void MakeDirectory(String name, Boolean logs = true) {
+			Directory.CreateDirectory(name);
 
-			foreach (String i in Directory.GetFiles(dir + "\\helpers")) {
-				if(File.Exists(dir + "\\tmp\\helpers\\" + Path.GetFileName(i))) {
-					File.Delete(dir + "\\tmp\\helpers\\" + Path.GetFileName(i));
-				}
-
-				File.Copy(i, dir + "\\tmp\\helpers\\" + Path.GetFileName(i));
+			if(logs) {
+				Extensions.Print($"Directory '{name}' created", ident: 1);
 			}
-		}
-
-		private void BuildCode() {
-			System.Char current = Current();
-
-			Boolean os = false;
-			if (current == '=') {
-				current = Next();
-				os = true;
-			}
-
-			while (true) {
-				if (current == '%' && At(1) == '>')
-					break;
-
-				builder.Append(current);
-				current = Next();
-			}
-
-			Next();
-			if (os) {
-				this.finalBuilder.Append("res += " + builder.ToString()).Append(Environment.NewLine);
-			}
-			else {
-				this.finalBuilder.Append(builder.ToString()).Append(Environment.NewLine);
-			}
-			this.builder.Clear();
-		}
-
-		public System.Char At(Int32 position) {
-			return this.source[this.position + position];
-		}
-
-		public System.Char Next() {
-			if (this.position == this.source.Length) {
-				return '\0';
-			}
-			this.position++;
-			return Current();
-		}
-
-		private System.Char Current() {
-			if (this.position == this.source.Length) {
-				return '\0';
-			}
-			return this.source[this.position];
 		}
 	}
 }
