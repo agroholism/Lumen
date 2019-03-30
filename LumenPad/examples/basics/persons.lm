@@ -1,0 +1,27 @@
+﻿// This simple application can write and read list of person into/from file 
+
+// Define type Person with fields name and age
+type _ = Person name age with
+    // Redefine cast to String
+    let String p =
+        "\(p.name) \(p.age)"
+    // Define constructor from list of two string
+    let fromStrings c = 
+        Person c.[0] (Number c.[1])
+
+// This function saves list of persons p to file f 
+let save f p =
+    File.write f (p * "\e")
+
+// This function load list of persons from file f 
+let load f =
+    (File.readArray f) * (_ / " ") * Person.fromStrings
+
+// Creates an person list 
+let persons = [| Person "Alex" 17; Person "Denis" 18 |]
+print persons
+// Save person list to file p.db
+save "p.db" persons
+// Load persons from file p.db
+let restored = load "p.db"
+print restored

@@ -10,6 +10,21 @@
     <AssemblyName>Lumen Studio</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -20,6 +35,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -29,6 +45,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icons8-лямбда-filled-96.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Lumen.Tomen">
@@ -55,8 +75,19 @@
     </Compile>
     <Compile Include="Console\ConsoleReader.cs" />
     <Compile Include="Console\ConsoleWriter.cs" />
+    <Compile Include="CreateProjectWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateProjectWindow.Designer.cs">
+      <DependentUpon>CreateProjectWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="IRunResult.cs" />
     <Compile Include="Language.cs" />
+    <Compile Include="LumenConsoleApplication.cs" />
+    <Compile Include="LumenLanguage.cs" />
+    <Compile Include="LumenStudioForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,6 +100,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TextBoxManager.cs" />
+    <EmbeddedResource Include="CreateProjectWindow.resx">
+      <DependentUpon>CreateProjectWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -83,6 +117,76 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="examples\basics\fibbonacci.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\basics\prime.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\basics\quickSort.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\basics\persons.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\basics\factorial.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\client.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\clock.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\Collections.ks">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\colors.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\drawing.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\fractal.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\graphics.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\julia.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\julia2.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\julia3.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\lazy.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\question.ks" />
+    <None Include="examples\rectangle.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\server.ks">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\switch.ks">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\visual\notepad.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\visual\clock.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="examples\visual\counter.lm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Lumen Studio.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -93,16 +197,22 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="settings\color-schemes\classic.toml">
+    <None Include="Resources\close.png" />
+    <None Include="Resources\close1.png" />
+    <None Include="Resources\close2.png" />
+    <None Include="Resources\close3.png" />
+    <None Include="Resources\close4.png" />
+    <None Include="Resources\fullscreen.png" />
+    <Content Include="settings\themes\sandy.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
+    <Content Include="settings\themes\standartLight.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="settings\languages\csharp\csharp.toml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="settings\languages\html\html.toml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="settings\languages\lumen\std.toml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="settings\languages\python\python_actor.lm">
@@ -111,36 +221,50 @@
     <None Include="settings\languages\python\python.toml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="settings\languages\lumen\lumen.toml">
+    <Content Include="settings\themes\standartDark.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="settings\languages\lumen\lumen_actor.lm">
+    </Content>
+    <Content Include="settings\languages\lumen\lumen.xml" />
+    <Content Include="settings\languages\lumen\documentation\ru\Prelude.xml" />
+    <Content Include="settings\localization\ru-RU.xml" />
+    <Content Include="settings\main.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="settings\main.toml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="types.lm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\source\repos\KVM\FastColoredTextBox\FastColoredTextBox.csproj">
+    <ProjectReference Include="..\..\..\..\source\repos\Hybrid\FastColoredTextBox\FastColoredTextBox.csproj">
       <Project>{6dd14a85-ccfc-4774-bd26-0f5772512319}</Project>
       <Name>FastColoredTextBox</Name>
     </ProjectReference>
-    <ProjectReference Include="..\light\light.csproj">
-      <Project>{823c41cd-2bbd-456e-bcb9-90578498c60d}</Project>
-      <Name>light</Name>
+    <ProjectReference Include="..\ldoc\ldoc.csproj">
+      <Project>{9ca4f227-a617-4a6c-a2a6-50b1a2ee8333}</Project>
+      <Name>ldoc</Name>
     </ProjectReference>
-    <ProjectReference Include="..\std\std.csproj">
+    <ProjectReference Include="..\lmi\lmi.csproj">
+      <Project>{4d45964f-221b-4a64-bb17-3ccbd4dd8e88}</Project>
+      <Name>lmi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\std\prelude.csproj">
       <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
-      <Name>std</Name>
+      <Name>prelude</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Starter.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icons8-лямбда-filled-96.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="settings\extensions\" />
+    <Folder Include="settings\themes\icons\standart\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

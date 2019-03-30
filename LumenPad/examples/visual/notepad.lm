@@ -1,0 +1,16 @@
+﻿#ref visual
+open Visual
+
+let rtb = RichTextBox.create ()
+rtb.setDock Dock.Fill
+rtb.setText (File.read "cache.txt")
+
+let saveBtn = Button.create ()
+saveBtn.setDock Dock.Bottom
+saveBtn.setText "Save"
+saveBtn.addOnClick b -> File.write "cache.txt" (RichTextBox.getText rtb)
+
+let form = Form.create ()
+form.addControl rtb
+form.addControl saveBtn
+Form.show form

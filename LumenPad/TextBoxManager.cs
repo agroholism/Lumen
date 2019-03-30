@@ -5,51 +5,54 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
+using Lumen;
 
 namespace Lumen.Studio {
-	public class TextBoxManager {
-		public FastColoredTextBox TextBox { get; private set; }
-		public AutocompleteMenu Menu { get; private set; }
-		public Language Language { get; set; }
+    public class TextBoxManager {
+        public FastColoredTextBox TextBox { get; private set; }
+        public AutocompleteMenu Menu { get; private set; }
+        public Language Language { get; set; }
 
-		public Boolean ChangesSaved { get; set; }
+        public Boolean ChangesSaved { get; set; }
 
-		public TextBoxManager(FastColoredTextBox textBox) {
-			this.TextBox = textBox;
+        public TextBoxManager(FastColoredTextBox textBox) {
+            this.TextBox = textBox;
 
-			this.Menu = new AutocompleteMenu(textBox) {
-				ShowItemToolTips = true,
-				AllowTabKey = true,
-				MinFragmentLength = 1,
-				AppearInterval = 50,
-				RenderMode = ToolStripRenderMode.Professional,
-				BackColor = Color.FromArgb(30, 30, 30),
-				ForeColor = Color.FromArgb(200, 200, 200),
-				SelectedColor = Color.FromArgb(112, 112, 112),
-				ImageList = MainForm.Instance.imageList1,
-				AlwaysShowTooltip = true
-			};
-		}
+            this.Menu = new AutocompleteMenu(textBox) {
+                ShowItemToolTips = true,
+                AllowTabKey = true,
+                MinFragmentLength = 1,
+                AppearInterval = 50,
+                RenderMode = ToolStripRenderMode.Professional,
+                BackColor = Color.FromArgb(30, 30, 30),
+                ForeColor = Color.FromArgb(200, 200, 200),
+                SelectedColor = Color.FromArgb(112, 112, 112),
+                ImageList = MainForm.Instance.imageList1,
+                AlwaysShowTooltip = true
+            };
+        }
 
-		internal void RebuildMenu() {
-			if (this.Menu == null) {
-				return;
-			}
+        internal void RebuildMenu() {
+            if (this.Menu == null) {
+                return;
+            }
 
-			List<AutocompleteItem> items = this.Language.GetAutocompleteItems(this);
+            List<AutocompleteItem> items = this.Language.GetAutocompleteItems(this);
 
-			if(items != null) {
-				this.Menu.Items.SetAutocompleteItems(items);
-			}
-		}
+            if (items != null) {
+                this.Menu.Items.SetAutocompleteItems(items);
+            }
+        }
 
-		internal void OnTextChanged(TextChangedEventArgs eventArgs) {
-			if (MainForm.AllowRegistrationChangas) {
-				this.ChangesSaved = false;
-				MainForm.Instance.HighlightUnsavedFile();
-			}
+        internal void OnTextChanged(TextChangedEventArgs eventArgs) {
+            if (MainForm.AllowRegiStringationChangas) {
+                this.ChangesSaved = false;
+                MainForm.Instance.HighlightUnsavedFile();
+            }
 
-			this.Language.OnTextChanged(this, eventArgs.ChangedRange);
-		}
-	}
+            this.Language.OnTextChanged(this, eventArgs.ChangedRange);
+        }
+
+        Place? b, e;
+    }
 }

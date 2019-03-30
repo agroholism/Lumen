@@ -1,145 +1,138 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace Lumen.Lang.Std {
-	public class Num : Value {
-		internal Double value;
+namespace Lumen.Lang {
+    public class Number : Value {
+        internal Double value;
 
-		public IObject Type => StandartModule.Num;
+        public IObject Type => Prelude.Number;
 
-		public Num(Double value) {
-			this.value = value;
-		}
+        public Number(Double value) {
+            this.value = value;
+        }
 
-		public static implicit operator Num(Double value) {
-			return new Num(value);
-		}
+        public static implicit operator Number(Double value) {
+            return new Number(value);
+        }
 
-		public static implicit operator Num(Int32 value) {
-			return new Num(value);
-		}
+        public static implicit operator Number(Int32 value) {
+            return new Number(value);
+        }
 
-		public static Num operator -(Num one) {
-			return new Num(-one.value);
-		}
+        public static Number operator -(Number one) {
+            return new Number(-one.value);
+        }
 
-		public static Num operator +(Num one,Num other) {
-			return new Num(one.value + other.value);
-		}
+        public static Number operator +(Number one, Number other) {
+            return new Number(one.value + other.value);
+        }
 
-		public static Num operator +(Num one, Double other) {
-			return new Num(one.value + other);
-		}
+        public static Number operator +(Number one, Double other) {
+            return new Number(one.value + other);
+        }
 
-		public static Num operator -(Num one, Num other) {
-			return new Num(one.value - other.value);
-		}
+        public static Number operator -(Number one, Number other) {
+            return new Number(one.value - other.value);
+        }
 
-		public static Num operator -(Num one, Double other) {
-			return new Num(one.value - other);
-		}
+        public static Number operator -(Number one, Double other) {
+            return new Number(one.value - other);
+        }
 
-		public static Num operator /(Num one, Num other) {
-			return new Num(one.value / other.value);
-		}
+        public static Number operator /(Number one, Number other) {
+            return new Number(one.value / other.value);
+        }
 
-		public static Num operator /(Num one, Double other) {
-			return new Num(one.value / other);
-		}
+        public static Number operator /(Number one, Double other) {
+            return new Number(one.value / other);
+        }
 
-		public static Num operator *(Num one, Num other) {
-			return new Num(one.value * other.value);
-		}
+        public static Number operator *(Number one, Number other) {
+            return new Number(one.value * other.value);
+        }
 
-		public static Num operator *(Num one, Double other) {
-			return new Num(one.value * other);
-		}
+        public static Number operator *(Number one, Double other) {
+            return new Number(one.value * other);
+        }
 
-		public static Boolean operator ==(Num one, Num other) {
-			return one.value == other.value;
-		}
+        public static Boolean operator ==(Number one, Number other) {
+            return one.value == other.value;
+        }
 
-		public static Boolean operator ==(Num one, Double other) {
-			return one.value == other;
-		}
+        public static Boolean operator ==(Number one, Double other) {
+            return one.value == other;
+        }
 
-		public static Boolean operator !=(Num one, Num other) {
-			return one.value != other.value;
-		}
+        public static Boolean operator !=(Number one, Number other) {
+            return one.value != other.value;
+        }
 
-		public static Boolean operator !=(Num one, Double other) {
-			return one.value != other;
-		}
+        public static Boolean operator !=(Number one, Double other) {
+            return one.value != other;
+        }
 
-		public static Boolean operator >(Num one, Num other) {
-			return one.value > other.value;
-		}
+        public static Boolean operator >(Number one, Number other) {
+            return one.value > other.value;
+        }
 
-		public static Boolean operator >(Num one, Double other) {
-			return one.value > other;
-		}
+        public static Boolean operator >(Number one, Double other) {
+            return one.value > other;
+        }
 
-		public static Boolean operator <(Num one, Num other) {
-			return one.value < other.value;
-		}
+        public static Boolean operator <(Number one, Number other) {
+            return one.value < other.value;
+        }
 
-		public static Boolean operator <(Num one, Double other) {
-			return one.value < other;
-		}
+        public static Boolean operator <(Number one, Double other) {
+            return one.value < other;
+        }
 
-		public static Boolean operator >=(Num one, Num other) {
-			return one.value >= other.value;
-		}
+        public static Boolean operator >=(Number one, Number other) {
+            return one.value >= other.value;
+        }
 
-		public static Boolean operator >=(Num one, Double other) {
-			return one.value >= other;
-		}
+        public static Boolean operator >=(Number one, Double other) {
+            return one.value >= other;
+        }
 
-		public static Boolean operator <=(Num one, Num other) {
-			return one.value <= other.value;
-		}
+        public static Boolean operator <=(Number one, Number other) {
+            return one.value <= other.value;
+        }
 
-		public static Boolean operator <=(Num one, Double other) {
-			return one.value <= other;
-		}
+        public static Boolean operator <=(Number one, Double other) {
+            return one.value <= other;
+        }
 
-		public Value Clone() {
-			return new Num(this.value);
-		}
+        public Value Clone() {
+            return new Number(this.value);
+        }
 
-		public String ToString(Scope e) {
-			return this.value.ToString();
-		}
+        public String ToString(Scope e) {
+            return this.value.ToString();
+        }
 
-		public override String ToString() {
-			return this.ToString(null);
-		}
+        public override String ToString() {
+            return this.ToString(null);
+        }
 
-		public override Boolean Equals(Object obj) {
-			if (obj is Num num) {
-				return this.value == num.value;
-			}
+        public override Boolean Equals(Object obj) => obj switch
+        {
+            Number num => this.value == num.value,
+            _ => false
+        };
 
-			if (obj is BigNum bigNum) {
-				return bigNum.value == this.value;
-			}
+        public Int32 CompareTo(Object obj) => obj switch
+        {
+            Number num => this.value.CompareTo(num.value),
+            Value value => throw new LumenException(Exceptions.TYPE_ERROR.F(this.Type, value.Type)),
+            _ => throw new LumenException(Exceptions.TYPE_ERROR.F(this.Type, obj.GetType()))
+        };
 
-			return false;
-		}
-
-		public override Int32 GetHashCode() {
-			return this.value.GetHashCode();
-		}
-
-		public Int32 CompareTo(Object obj) {
-			if (obj is Num num) {
-				return this.value.CompareTo(num.value);
-			}
-
-			if(obj is BigNum bigNum) {
-				return bigNum.value.CompareTo(new BigFloat(this.value));
-			}
-
-			throw new Exception("expected value of type 'Kernel.Number'", stack: null);
-		}
-	}
+        public override Int32 GetHashCode() {
+            Int32 hashCode = 1927925191;
+            hashCode = hashCode * -1521134295 + this.value.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<IObject>.Default.GetHashCode(this.Type);
+            return hashCode;
+        }
+    }
 }

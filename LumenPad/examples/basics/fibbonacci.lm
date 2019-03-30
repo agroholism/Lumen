@@ -1,0 +1,6 @@
+﻿// Eval an n-st fibbonacci number with patterns
+let fibbonacci 0 = 0
+let fibbonacci 1 = 1
+let fibbonacci n = self (n-1) + self (n-2)
+
+print (fibbonacci 10) //-> 55

@@ -1,0 +1,13 @@
+﻿#ref visual
+open Visual
+
+let counterLabel = Label.create ()
+counterLabel.position [| 100; 50 |]
+
+let form = Form.create ()
+form.addControl counterLabel
+form.backColor (Color.RGB 255 255 255)
+form.show ()
+
+while true:
+	counterLabel.text (DateTime.now ())

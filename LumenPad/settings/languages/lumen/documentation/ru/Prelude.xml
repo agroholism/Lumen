@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Documentation language="ru">
+  <Module name="Prelude" declaration="module Prelude" file="prelude.dll" description="Содержит базовые типы, модули и функции.">
+    <Function name="print" declaration="let print x" description=""/>
+    <Function name="read" declaration="let read ()" description=""/>
+    <Module name="Prelude.File">
+
+    </Module>
+  </Module>
+</Documentation>

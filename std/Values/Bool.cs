@@ -1,47 +1,61 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace Lumen.Lang.Std {
-	public struct Bool : Value {
-		internal Boolean value;
-		public IObject Type => StandartModule.Boolean;
+namespace Lumen.Lang {
+    public struct Bool : Value {
+        internal Boolean value;
+        public IObject Type => Prelude.Boolean;
 
-		public Bool(Boolean value) {
-			this.value = value;
-		}
+        public Bool(Boolean value) {
+            this.value = value;
+        }
 
-		public static implicit operator Bool(Boolean value) {
-			return new Bool(value);
-		}
+        public static implicit operator Bool(Boolean value) {
+            return new Bool(value);
+        }
 
-		public Int32 CompareTo(Object obj) {
-			if (obj is Bool b) {
-				Boolean value = this.value;
-				Boolean other = b.value;
+        public Int32 CompareTo(Object obj) {
+            if (obj is Bool b) {
+                Boolean value = this.value;
+                Boolean other = b.value;
 
-				if (value == other) {
-					return 0;
-				}
-				else if (value == false && other == true) {
-					return -1;
-				}
-				else {
-					return 1;
-				}
-			}
+                if (value == other) {
+                    return 0;
+                } else if (value == false && other == true) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
 
-			throw new Exception("expected value of type 'Kernel.Boolean'", stack: null);
-		}
+            throw new LumenException("expected value of type 'Kernel.Boolean'");
+        }
 
-		public Value Clone() {
-			return new Bool(this.value);
-		}
+        public override Boolean Equals(Object obj) {
+            if(obj is Bool b) {
+                return this.value == b.value;
+            } 
 
-		public String ToString(Scope e) {
-			return this.value ? "true" : "false";
-		}
+            return false;
+        }
 
-		public override String ToString() {
-			return this.ToString(null);
-		}
-	}
+        public Value Clone() {
+            return new Bool(this.value);
+        }
+
+        public String ToString(Scope e) {
+            return this.value ? "true" : "false";
+        }
+
+        public override String ToString() {
+            return this.ToString(null);
+        }
+
+        public override Int32 GetHashCode() {
+            Int32 hashCode = 1927925191;
+            hashCode = hashCode * -1521134295 + this.value.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<IObject>.Default.GetHashCode(this.Type);
+            return hashCode;
+        }
+    }
 }

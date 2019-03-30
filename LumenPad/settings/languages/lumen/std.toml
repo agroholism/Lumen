@@ -1,5 +1,0 @@
-﻿items = [
-	["let", 2, "let", "let", "let keyword"],
-	["if", 2, "if", "if", "if keyword"],
-	["while", 2, "while", "while", "while keyword"],
-]

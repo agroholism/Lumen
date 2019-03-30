@@ -1,23 +1,20 @@
 ﻿using System;
 
-namespace Lumen.Lang.Std {
-	/// <summary> Интерфейс, реализуемый всеми объектами. </summary>
-	public interface IObject : Value {
-		/// <summary> Возвращает поле объекта </summary> 
-		/// <param name="name"> Имя поля </param> 
-		/// <param name="mode"> Модификатор доступа </param>
-		/// <param name="e"> Область видимости, из которой осуществляется доступ. </param>
-		Value Get(String name, Scope e);
+namespace Lumen.Lang {
+    /// <summary> Интерфейс, реализуемый всеми объектами. </summary>
+    public interface IObject : Value {
+        IObject Parent { get; set; }
 
-		/// <summary> Устанавливает поле объекта. </summary> 
-		/// <param name="name"> Имя поля. </param> 
-		/// <param name="value"> Значение. </param>
-		/// <param name="mode"> Модификатор доступа. </param>
-		/// <param name="e"> Область видимости, из которой осуществляется доступ. </param>
-		void Set(String name, Value value, Scope e);
+        /// <summary> Устанавливает поле объекта. </summary> 
+        /// <param name="name"> Имя поля. </param> 
+        /// <param name="value"> Значение. </param>
+        /// <param name="scope"> Область видимости, из которой осуществляется доступ. </param>
+        void SetField(String name, Value value, Scope scope);
 
-		Boolean TryGet(String name, out Value result);
+        Value GetField(String name, Scope scope);
 
-		Boolean IsParentOf(Value value);
-	}
+        Boolean TryGetField(String name, out Value result);
+
+        Boolean IsParentOf(Value value);
+    }
 }

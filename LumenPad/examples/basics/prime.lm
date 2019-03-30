@@ -1,0 +1,17 @@
+﻿// Erathosphene sieve
+let primes xs =
+    let sieve [] = []
+    let sieve p::xs =
+        p :: self [for i in xs if i.mod p > 0: i]
+    return sieve xs
+
+// Erathosphene sieve with tail recursion
+let primes' xs =
+    let sieve res [] = res
+    let sieve res x::xs =
+        tailrec (res + [x]) [for i in xs if i.mod x > 0: i]
+    return sieve [] xs
+
+
+print (primes [for i in 2...10: i])  //-> [2, 3, 5, 7] 
+print (primes' [for i in 2...10: i]) //-> [2, 3, 5, 7] 

@@ -5,8 +5,12 @@ init [name] [path=""] [allow_script=true]
 open [name]
 
 pages
-pages new [name] [helper=true] [script=null] [style=null] [skillet="default"]
+pages new [name] [helper=true] [script=null] [style=null] [skillet="default"] [script_type=lm|js]
 pages delete [name]
+pages show [name]
+
+res show [name]
+res add [type="img|txt"] [link=""] [temporal=true] 
 
 config allow_script
 config host

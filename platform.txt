@@ -1,0 +1,24 @@
+Lumen.Studio
+Lumen.Studio.Interop
+Lumen.Studio.Designer
+Lumen.Studio.Debugger
+Lumen.Lang
+namespace Lumen.Lang
+Lumen.Lang.Libraries
+Lumen.Anatomy
+Lumen.Anatomy.Lumex
+Lumen.Light
+Lumen.Utils.Ldoc
+
+// add to studio debugger
+// goto XML
+// add to studio logger
+// remove cmd?
+// add to studio project builder for lumen
+// make anatomy
+// make ldoc
+// make visual
+// make system
+
+логин:	lumenlang	
+пароль:	35z393z2d67	

@@ -7,132 +7,151 @@ using System.Windows.Forms;
 using FastColoredTextBoxNS;
 
 namespace Lumen.Studio {
-	public class ConsoleEmulator : FastColoredTextBox {
-		private volatile Boolean isReadLineMode;
-		private volatile Boolean isUpdating;
-		private Place StartReadPlace { get; set; }
+    public class ConsoleEmulator : FastColoredTextBox {
+        private volatile Boolean isReadLineMode;
+        private volatile Boolean isUpdating;
+        private Place StartReadPlace { get; set; }
 
-		/// <summary>
-		/// Control is waiting for line entering. 
-		/// </summary>
-		public Boolean IsReadLineMode {
-			get { return this.isReadLineMode; }
-			set { this.isReadLineMode = value; }
-		}
+        /// <summary>
+        /// Control is waiting for line entering. 
+        /// </summary>
+        public Boolean IsReadLineMode {
+            get { return this.isReadLineMode; }
+            set { this.isReadLineMode = value; }
+        }
 
-		/// <summary>
-		/// Append line to end of text.
-		/// </summary>
-		public void WriteLine(String text) {
-			this.IsReadLineMode = false;
-			this.isUpdating = true;
-			try {
-				this.InvokeNeded(() => {
-					AppendText(text);
-					GoEnd();
-				});
-			}
-			finally {
-				this.isUpdating = false;
-				this.InvokeNeded(() => ClearUndo());
-			}
-		}
+        /// <summary>
+        /// Append line to end of text.
+        /// </summary>
+        public void WriteLine(String text) {
+            this.IsReadLineMode = false;
+            this.isUpdating = true;
+            Place end = this.Range.End;
 
-		/// <summary>
-		/// Append line to end of text.
-		/// </summary>
-		public void Write(String text) {
-			this.IsReadLineMode = false;
-			this.isUpdating = true;
-			try {
-				this.InvokeNeded(() => AppendText(text));
-			}
-			finally {
-				this.isUpdating = false;
-				this.InvokeNeded(() => ClearUndo());
-			}
-		}
+            ConsoleColor x = Light.Interpriter.Color;
 
-		public void Write(String text, Boolean b = true) {
-			try {
-				this.InvokeNeded(() => AppendText(text));
-			}
-			finally {
-				this.isReadLineMode = b;
-				this.isUpdating = b;
-				this.InvokeNeded(() => ClearUndo());
-			}
-		}
+            try {
+                this.InvokeNeded(() => {
+                    this.AppendText(text + Environment.NewLine);
+                    Range r = new Range(this, end, this.Range.End);
+                    r.SetStyle(new TextStyle(
+                new System.Drawing.SolidBrush(this.ColorToColor(x)),
+                System.Drawing.Brushes.Transparent, System.Drawing.FontStyle.Regular));
+                    this.GoEnd();
+                });
+            } finally {
+                this.isUpdating = false;
+                this.InvokeNeded(() => this.ClearUndo());
+            }
+        }
 
-		public event EventHandler OnReadLine;
+        /// <summary>
+        /// Append line to end of text.
+        /// </summary>
+        public void Write(String text) {
+            this.IsReadLineMode = false;
+            this.isUpdating = true;
+            try {
+                this.InvokeNeded(() => this.AppendText(text));
+            } finally {
+                this.isUpdating = false;
+                this.InvokeNeded(() => this.ClearUndo());
+            }
+        }
 
-		/// <summary>
-		/// Wait for line entering.
-		/// Set IsReadLineMode to false for break of waiting.
-		/// </summary>
-		/// <returns></returns>
-		public String ReadLine() {
-			GoEnd();
-			this.StartReadPlace = this.Range.End;
-			this.IsReadLineMode = true;
-			try {
-				while (this.IsReadLineMode) {
-					Application.DoEvents();
-					Thread.Sleep(5);
-				}
-			}
-			finally {
-				this.IsReadLineMode = false;
-				ClearUndo();
-			}
+        public void Write(String text, Boolean b = true) {
+            try {
+                this.InvokeNeded(() => this.AppendText(text));
+            } finally {
+                this.isReadLineMode = b;
+                this.isUpdating = b;
+                this.InvokeNeded(() => this.ClearUndo());
+            }
+        }
 
-			String res = new Range(this, this.StartReadPlace, this.Range.End).Text.TrimEnd('\r', '\n');
+        public event EventHandler OnReadLine;
 
-			OnReadLine?.Invoke(res, new EventArgs { });
+        /// <summary>
+        /// Wait for line entering.
+        /// Set IsReadLineMode to false for break of waiting.
+        /// </summary>
+        /// <returns></returns>
+        public String ReadLine() {
+            this.GoEnd();
+            this.StartReadPlace = this.Range.End;
+            this.IsReadLineMode = true;
+            try {
+                while (this.IsReadLineMode) {
+                    Application.DoEvents();
+                    Thread.Sleep(5);
+                }
+            } finally {
+                this.IsReadLineMode = false;
+                this.ClearUndo();
+            }
 
-			return res;
-		}
+            String res = new Range(this, this.StartReadPlace, this.Range.End).Text.TrimEnd('\r', '\n');
 
-		public override void OnTextChanging(ref String text) {
-			if (!this.IsReadLineMode && !this.isUpdating) {
-				text = ""; //cancel changing
-				return;
-			}
+            OnReadLine?.Invoke(res, new EventArgs { });
 
-			if (this.IsReadLineMode) {
-				if (this.Selection.Start < this.StartReadPlace || this.Selection.End < this.StartReadPlace) {
-					GoEnd();//move caret to entering position
-				}
+            return res;
+        }
 
-				if (this.Selection.Start == this.StartReadPlace || this.Selection.End == this.StartReadPlace) {
-					if (text == "\b") //backspace
-					{
-						text = ""; //cancel deleting of last char of readonly text
-						return;
-					}
-				}
+        public override void OnTextChanging(ref String text) {
+            if (!this.IsReadLineMode && !this.isUpdating) {
+                text = ""; //cancel changing
+                return;
+            }
 
-				if (text != null && text.Contains('\n')) {
-					text = text.Substring(0, text.IndexOf('\n') + 1);
-					this.IsReadLineMode = false;
-				}
-			}
+            if (this.IsReadLineMode) {
+                if (this.Selection.Start < this.StartReadPlace || this.Selection.End < this.StartReadPlace) {
+                    this.GoEnd();//move caret to entering position
+                }
 
-			base.OnTextChanging(ref text);
-		}
+                if (this.Selection.Start == this.StartReadPlace || this.Selection.End == this.StartReadPlace) {
+                    if (text == "\b") //backspace
+                    {
+                        text = ""; //cancel deleting of last char of readonly text
+                        return;
+                    }
+                }
 
-		public override void Clear() {
-			Boolean oldIsReadMode = this.isReadLineMode;
+                if (text != null && text.Contains('\n')) {
+                    text = text.Substring(0, text.IndexOf('\n') + 1);
+                    this.IsReadLineMode = false;
+                }
+            }
 
-			this.isReadLineMode = false;
-			this.isUpdating = true;
+            base.OnTextChanging(ref text);
+        }
 
-			base.Clear();
+        public override void OnTextChanged(Range r) {
+            base.OnTextChanged(r);
+            r.SetStyle(new TextStyle(
+                new System.Drawing.SolidBrush(this.ColorToColor(Console.ForegroundColor)), 
+                System.Drawing.Brushes.Transparent, System.Drawing.FontStyle.Regular));
+        }
 
-			this.isUpdating = false;
-			this.isReadLineMode = oldIsReadMode;
+        private System.Drawing.Color ColorToColor(ConsoleColor cc) {
+            if(cc == ConsoleColor.Gray || cc == ConsoleColor.DarkGray) {
+                return Settings.ForegroundColor;
+            }
 
-			this.StartReadPlace = Place.Empty;
-		}
-	}
+            return System.Drawing.Color.IndianRed;
+        }
+
+        public override void Clear() {
+            Boolean oldIsReadMode = this.isReadLineMode;
+
+            this.isReadLineMode = false;
+            this.isUpdating = true;
+
+            base.Clear();
+
+            this.isUpdating = false;
+            this.isReadLineMode = oldIsReadMode;
+
+            this.StartReadPlace = Place.Empty;
+        }
+    }
 }

@@ -1,0 +1,5 @@
+﻿/// <summary> My super function </summary>
+let f x y = x + y
+
+/// <summary> Gets a mul of two values </summary>
+let mul x y = x * y

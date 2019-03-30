@@ -1,0 +1,958 @@
+﻿		/*public class Dispatcher : SystemFun {
+			public List<Fun> funcs = new List<Fun>();
+
+			public void Add(UserFun fun) {
+				this.funcs.Add(fun);
+			}
+
+			public override Value Run(Scope e, params Value[] args) {
+				Int32 argsCount = 0;
+				List<String> vars = new List<String> { "self", "args", "kwargs", "this" };
+				foreach(var i in e.variables) {
+					if (!vars.Contains(i.Key)) {
+						argsCount++;
+					}
+				}
+				argsCount += args.Length;
+
+				List<Fun> candidates = new List<Fun>();
+
+				foreach(Fun i in this.funcs) {
+					if(i.Metadata.args.Count == argsCount) {
+						candidates.Add(i);
+					}
+				}
+
+				Dictionary<String, Object> arguments = new Dictionary<String, Object>();
+				Int32 counter = 0;
+
+				foreach (FunctionArgument i in candidates[0].Metadata.args) {
+					if (e.ExistsInThisScope(i.name.Replace("*", ""))) {
+						arguments.Add(i.name.Replace("*", ""), e.Get(i.name.Replace("*", "")));
+						continue;
+					}
+
+					if (counter < args.Length) {
+						if (i.name.StartsWith("*")) {
+							List<Value> v = new List<Value>();
+
+							for (Int32 z = counter; z < args.Length; z++) {
+								v.Add(args[z]);
+								counter++;
+							}
+
+							arguments.Add(i.name.SubString(1, i.name.Length - 1), new List(v));
+							continue;
+						}
+
+						arguments.Add(i.name, args[counter]);
+						counter++;
+					}
+					else {
+						arguments.Add(i.name, i.defaultValue);
+					}
+				}
+
+				counter = 0;
+
+				foreach (FunctionArgument i in candidates[0].Metadata.args) {
+					if (e.ExistsInThisScope(i.name.Replace("*", ""))) {
+						continue;
+					}
+
+					if (counter < args.Length || (args.Length == 0 && counter == args.Length)) {
+						if (i.name.StartsWith("*")) {
+							List<Value> v = new List<Value>();
+
+							for (Int32 z = counter; z < args.Length; z++) {
+								v.Add(args[z]);
+								counter++;
+							}
+
+							e.Set(i.name.SubString(1, i.name.Length - 1), new List(v));
+							continue;
+						}
+
+						if (args.Length != 0) {
+							e.Set(i.name, args[counter]);
+							counter++;
+						}
+						else {
+							if (i.defaultValue != null) {
+								if (i.defaultValue is Value val) {
+									e.Set(i.name, val);
+								}
+								else if (i.defaultValue is Expression exp) {
+									e.Set(i.name, exp.Eval(e));
+								}
+							}
+							else {
+								e.Set(i.name, Const.NULL);
+							}
+
+							counter++;
+						}
+					}
+					else {
+						if (i.defaultValue != null) {
+							if (i.defaultValue is Value val) {
+								e.Set(i.name, val);
+							}
+							else if (i.defaultValue is Expression exp) {
+								e.Set(i.name, exp.Eval(e));
+							}
+						}
+						else {
+							e.Set(i.name, Const.NULL);
+						}
+					}
+				}
+
+
+				foreach (UserFun i in candidates) {
+					if (i.Metadata.IsMatch(arguments)) {
+						if (i.condition != null && !Converter.ToBoolean(i.condition.Eval(e))) {
+							continue;
+						}
+						return i.Run(e, args);
+					}
+				}
+
+				throw new StandartLibrary.Exception("dispatch", stack: e);
+			}
+		}
+		*/
+//////////////////////////////////////////////////////////
+		internal static Expression MakeClosure(List<String> zex, Expression i, Scope e) {
+			return i.Closure(zex, e);
+
+			if (i is Namespace) {
+				zex.Add(((Namespace)i).name);
+			}
+
+			if (i is DecoratorE dece) {
+				return new DecoratorE(dece.expsOfDecos.Select(x => MakeClosure(zex, x, e)).ToList(), MakeClosure(zex, dece.func, e));
+			}
+
+			if (i is AnonymeDefine) {
+				var z = new List<String> { "self", "_", "this" };
+
+				foreach (var x in ((AnonymeDefine)i).Args)
+					z.Add(x.name.Replace("*", ""));
+				foreach (String x in zex)
+					z.Add(x);
+
+				return new AnonymeDefine(((AnonymeDefine)i).Args, MakeClosure(z, ((AnonymeDefine)i).Body, e));
+			}
+
+			if (i is FunctionDefineStatement fde) {
+				/*    var z = new List<String> { "self" };*/
+
+				/* foreach (String x in fde.Args.GetNames())
+                     z.Add(x.Replace("&", "").Replace("*", ""));
+                     */
+				/*    foreach (String x in zex)
+                        z.Add(x);*/
+
+				zex.Add(fde.NameFunction);
+				//   z.Add(fde.NameFunction);
+
+				// ((FunctionDefineStatement)i).Body = ReWrite(fde.NameFunction, z, fde.Body, e);
+			}
+
+			if (i is WhileExpression we)
+				return new WhileExpression(MakeClosure(zex, we.condition, e), MakeClosure(zex, we.body, e));
+
+			if (i is DotApplicate dapp) {
+				return new DotApplicate(MakeClosure(zex, dapp.res, e), dapp.exps.Select(x => MakeClosure(zex, x, e)).ToList());
+			}
+
+			if (i is Assigment ae) {
+				zex.Add(ae.id);
+				return new Assigment(ae.id, MakeClosure(zex, ae.exp, e), ae.line, ae.file);
+			}
+
+			if (i is SpreadE)
+				return new SpreadE(MakeClosure(zex, ((SpreadE)i).expression, e));
+
+			if (i is ListForGen lfg) {
+				return new ListForGen(lfg.names, MakeClosure(zex, lfg.container, e), MakeClosure(zex, lfg.body, e));
+			}
+
+			if (i is ConditionE cde)
+				return new ConditionE(MakeClosure(zex, cde.condition, e), MakeClosure(zex, ((ConditionE)i).trueExpression, e), MakeClosure(zex, ((ConditionE)i).falseExpression, e));
+
+			if (i is DotExpression dte)
+				return new DotExpression(MakeClosure(zex, dte.expression, e), dte.nameVariable);
+
+			if (i is IdExpression ce) {
+				if (!ce.id.StartsWith("$"))
+					if (!(zex.Contains(ce.id))) {
+						if (!e.IsExsists(ce.id))
+							throw new Lumen.Lang.Std.Exception($"\n\tFILE: {ce.file} LINE: {ce.line}\n\t неизвестный идентификатор {ce.id}", stack: e);
+						return new ValueE(e.Get(ce.id));
+					}
+				return i;
+			}
+
+			if (i is BinaryExpression) {
+				BinaryExpression z = (BinaryExpression)i;
+				return new BinaryExpression(MakeClosure(zex, z.expressionOne, e), MakeClosure(zex, z.expressionTwo, e), z.operation, z.line, z.file);
+			}
+
+			return i;
+		}
+
+using Lumen;
+using Microsoft.CSharp;
+using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using Lumen.Lang.Expressions;
+using Lumen.Lang;
+namespace Lumen.Light.FunctionInclude {
+    [Serializable]
+    class STD : Module {
+        public STD() {
+            //	Set("compute", new Interprate());
+            //Set("sleep", new Sleep());
+            //Set("abort", new TAbort());
+            //Set("Compiller", new Compile());
+        }
+
+        /*	class Interprate : SystemFun {
+                public override Value Run(Scope e, params Value[] Args) {
+                    return new Parser(new Lexer(Args[0].ToString(), "").Tokenization()).Parsing(false, System.IO.Directory.GetCurrentDirectory());
+                }
+            }
+            */
+        /*class Sleep : SystemFun {
+			public override Value Run(Scope e, params Value[] Args) {
+				System.Threading.Thread.Sleep((Int32)Args[0].ToDouble(e));
+				return new Null();
+			}
+		}
+		*/
+        /*class TAbort : SystemFun {
+			public override Value Run(Scope e, params Value[] Args) {
+				System.Threading.Thread.CurrentThread.Abort();
+				return new Null();
+			}
+		}*/
+    }
+
+    /*class Compile : SystemFun {
+		public override Value Run(Scope e, params Value[] Args) {
+			// Source code для компиляции      
+			String source = Args[0].ToString();
+			// Настройки компиляции
+			Dictionary<String, String> providerOptions = new Dictionary<String, String> { { "CompilerVersion", "v3.5" } };
+			CSharpCodeProvider provider = new CSharpCodeProvider(providerOptions);
+			CompilerParameters compilerParams = new CompilerParameters { OutputAssembly = Args[1].ToString(), GenerateExecutable = true };
+			// Компиляция      
+			// compilerParams.ReferencedAssemblies.Add("Stereotype.Dll");
+			CompilerResults results = provider.CompileAssemblyFromSource(compilerParams, source);
+			// Выводим информацию об ошибках      
+			Console.WriteLine("Number of Errors: {0}", results.Errors.Count);
+			foreach (CompilerError err in results.Errors)
+				Console.WriteLine("ERROR {0}", err.ErrorText);
+			return new Null();
+		}
+	}*/
+}
+
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+using Lumen.Lang.Expressions;
+using Lumen.Lang;
+
+namespace Lumen.Light {
+    [Serializable]
+    public class MainScope : Scope {
+        public static List<string> CONSTANTS = new List<string> { "Kernel" };
+        public static Prelude Kernel;
+
+        public MainScope() : base(null) {
+            Kernel = global::namespace Lumen.Lang.Prelude.Instance;
+
+            this.AddUsing(Kernel);
+            this.Set("Kernel", Kernel);
+
+           /* Kernel.Set("require", new LambdaFun((e, args) => {
+                String path = *IK.path + "\\" + *args[0].ToString(e);
+
+                path += System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + path + ".dll") || System.IO.File.Exists(path + ".dll") ? ".dll" : ".ks";
+
+                // make
+                if (path.EndsWith(".dll")) {
+                    if (System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + path)) {
+                        System.Reflection.Assembly ass = System.Reflection.Assembly.LoadFile(AppDomain.CurrentDomain.BaseDirectory + path);
+                        ass.GetType("Main").GetMethod("Import").Invoke(null, new Object[] { e.parent, "" });
+                        return Const.VOID;
+                    }
+                    System.Reflection.Assembly a = System.Reflection.Assembly.Load(path);
+                    a.GetType("Main").GetMethod("Import").Invoke(null, new Object[] { e, "" });
+                    return Const.VOID;
+                }
+
+                String fullPath = new FileInfo(path).FullName;
+
+                if (global::namespace Lumen.Lang.Prelude.LoadedModules.ContainsKey(fullPath)) {
+                    foreach (KeyValuePair<String, Value> i in global::namespace Lumen.Lang.Prelude.LoadedModules[fullPath]) {
+                        e.parent.Set(i.Key, i.Value);
+                    }
+                }
+
+                // TODO
+                Scope x = new Scope(e.parent);
+                x.AddUsing(Kernel);
+                Parser p = new Parser(new Lexer(System.IO.File.ReadAllText(path), "").Tokenization(), "");
+                p.Parsing(x);
+
+                /*	if (x.IsExsists("this")) {
+                        new Applicate(new ValueE(x["this"]), expressions).Eval(x);
+                    }*
+
+                Dictionary<String, Value> included = new Dictionary<String, Value>();
+                foreach (KeyValuePair<String, Value> i in x.variables) {
+                    included.Add(i.Key, i.Value);
+                    e.parent.Set(i.Key, i.Value);
+                }
+
+                global::namespace Lumen.Lang.Prelude.LoadedModules[fullPath] = included;
+
+                return Const.VOID;
+            }, "Kernel.require"));*/
+        }
+    }
+}
+
+
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+using Lumen.Lang.Expressions;
+using Lumen.Lang;
+
+namespace Lumen.Light {
+  /*  internal class DynamicLoad : Expression {
+        private readonly String name;
+
+        public Expression Optimize(Scope scope) {
+            return this;
+        }
+        public AnalyseResult Validate(MainScopeMetadata metadata) {
+            return AnalyseResult.Ok;
+        }
+        public DynamicLoad(String name) {
+            this.name = name;
+        }
+
+        public Expression Closure(List<String> visible, Scope thread) {
+            return this;
+        }
+
+        public Value Eval(Scope e) {*/
+            /* if (name.Contains("."))
+			 {
+				 String[] a = name.Split('.');
+				 if (e.IsExsists(a[0]))
+				 {
+					 var v = e.Get(a[0]);
+					 for (int i = 1; i < a.Length - 1; i++)
+					 {
+						 v = ((Core.Module)v).Get(a[i]);
+					 }
+
+					 ((Core.Module)v).Set(a[a.Length - 1], new DynamicModule(Assembly.Load(name), name));
+				 }
+				 else
+				 {
+					 e.Set(a[0], new DynamicModule(Assembly.Load(name)));
+				 }
+			 }
+			 else*/
+            //	e.Set(name, new NETModule(Assembly.Load(name), name));
+        /*    return Const.VOID;
+        }
+    }
+    */
+    /*internal class NETModule : Lumen.Lang.Std.IObject {
+		public Assembly module;
+		public String name;
+		readonly Dictionary<String, Value> cache = new Dictionary<String, Value>();
+
+		public Module Type => Lumen.Lang.Std.StandartModule._Type;
+
+		public NETModule(Assembly asm, String name) {
+			this.module = asm;
+		}
+
+		public Value Get(String name, AccessModifiers mode, Scope e) {
+			String fullName = this.name == null ? name : this.name + "." + name;
+
+			if (this.cache.TryGetValue(fullName, out Value val)) {
+				return val;
+			}
+			else {
+				Type t = this.module.GetType(fullName);
+				return new NETType(t);
+			}
+		}
+
+		public void Set(String name, Value value, AccessModifiers mode, Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public String ToString(Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public Value Clone() {
+			throw new NotImplementedException();
+		}
+
+		public Int32 CompareTo(Object obj) {
+			throw new NotImplementedException();
+		}
+	}
+	*/
+    /*internal class Dynamic : Value {
+		public Object Value;
+
+		public Module Type => new NETType(this.Value.GetType());
+
+		public Dynamic(Object Value) {
+			this.Value = Value;
+		}
+
+		public Value Clone() {
+			throw new NotImplementedException();
+		}
+
+		public Int32 CompareTo(Object obj) {
+			throw new NotImplementedException();
+		}
+
+		public String ToString(Scope e) {
+			throw new NotImplementedException();
+		}
+	}
+	*/
+    /*internal class NETType : Module {
+		readonly Type type;
+
+		public NETType(Type type) {
+			this.type = type;
+		}
+
+		public Value Get(String Name) {
+			if (this.type.IsEnum) {
+				return new Dynamic(this.type.GetField(Name).GetValue(this.type));
+			}
+
+			if (Name == "()") {
+				return new LambdaFun((e, args) => {
+					Type[] Types = new Type[args.Length];
+
+					for (Int32 i = 0; i < args.Length; i++) {
+						Types[i] = args[i].GetType();
+					}
+
+					dynamic x;
+
+					x = this.type.GetConStringuctor(Types);
+
+					x = x.Invoke(args);
+
+					return new Dynamic(x);
+				});
+			}
+
+			/*	foreach (Type i in Type.GetNestedTypes())
+					if (i.Name == Name)
+						return new DynamicType(i);
+	*
+			try {
+				MethodInfo x = this.type.GetMethod(Name);
+				if (x != null) {
+					return new LambdaFun((e, args) => {
+						Object[] margs = new Object[args.Length];
+						for (Int32 i = 0; i < args.Length; i++) {
+		margs[i] = /*C.Unpack(*args[i]/*)*;
+	}
+
+	return new Dynamic(x.Invoke(null, margs));
+					});
+				}
+				else {
+					PropertyInfo a = this.type.GetProperty(Name);
+					/*if (a == null)
+						return new FunDelegate(type, Name);
+					else return new Dynamic(a.GetValue(type, new object[] { }));*
+				}
+			}
+			catch {
+				/*var a = type.GetProperty(Name);
+				if (a == null)
+					return new FunDelegate(type, Name);
+				else return new Dynamic(a.GetValue(type, new object[] { }));*
+			}
+			return null;
+		}
+
+		/*public void Set(String Name, dynamic Value) {
+			type.GetProperty(Name).SetValue(type, Value);
+		}*
+	}
+*/
+    /* internal class DynamicModule : Core.Module
+	 {
+		 public Assembly Namespace;
+		 private String path;
+
+		 public DynamicModule(Assembly Namespace)
+		 {
+			 this.Namespace = Namespace;
+		 }
+
+		 public DynamicModule(Assembly Namespace, String path)
+		 {
+			 this.Namespace = Namespace;
+			 this.path = path;
+		 }
+
+		 public override Value Get(String Name)
+		 {
+			 if (path == null)
+			 {
+				 Type a = Namespace.GetType(Name);
+
+				 if (a != null)
+					 return new DynamicType(a);
+
+				 if (Contains(Name))
+					 return variables[Name];
+
+				 foreach (Type i in Namespace.ExportedTypes)
+					 if (i.FullName.StartsWith(Name + "."))
+						 return new DynamicModule(Namespace, Name);
+			 }
+			 else
+			 {
+				 Type a = Namespace.GetType(path + "." + Name);
+
+				 if (a != null)
+					 return new DynamicType(a);
+
+			   /*  foreach (Type i in Namespace.ExportedTypes)
+					 if (i.FullName.StartsWith(path + "." + Name + "."))
+						 return new DynamicModule(Namespace, path + "." + Name);
+			 }
+
+			 throw new HException("Not a type " + Name, "NATE");
+
+		 }
+	 }
+ */
+    /*internal class FunDelegate : SystemFun {
+		private System.Type type;
+		private String name;
+
+		public FunDelegate(System.Type type, String name) {
+			this.type = type;
+			this.name = name;
+		}
+
+		public override Value Run(Scope ex, params Value[] args) {
+			System.Type[] ttt = new System.Type[args.Length];
+			for (int i = 0; i < args.Length; i++)
+				ttt[i] = args[i].GetType();
+
+			var e = type.GetMethod(name, ttt);
+
+			if (e == null)
+				e = this.type.GetMethod(this.name, new System.Type[0]);
+
+			if (e == null) {
+				System.Type[] aa = new System.Type[ttt.Length - 1];
+				for (int i = 1; i < ttt.Length; i++)
+					aa[i - 1] = ttt[i];
+				e = type.GetMethod(name, aa);
+			}
+
+			if (e.IsStatic) {
+				var a = e.GetParameters();
+				for (int i = 0; i < a.Length; i++) {
+					if (a[i].ParameterType != args[i].GetType()) {
+						if (a[i].ParameterType.IsAssignableFrom(args[i].GetType()))
+							continue;
+						throw new StandartLibrary.Exception("Функция " + e.Name + " ожидала аргумент типа " + a[i].ParameterType + " != " + args[i].GetType() + "; позиция: " + (i + 1) + "; имя аргумента: " + a[i].Name);
+					}
+				}
+
+				var res = e.Invoke(null, args);
+				if (res != null)
+					return new Dynamic(res);
+				else return new Null();
+			}
+			else {
+				if (e.ReflectedType != args[0].GetType() && !(e.ReflectedType.IsAssignableFrom(args[0].GetType())))
+					throw new StandartLibrary.Exception("Функция " + e.Name + " ожидала аргумент типа " + e.ReflectedType + " != " + args[0].GetType());
+
+				object[] Args = new object[args.Length - 1];
+				var x = e.GetParameters();
+
+				for (int i = 1; i < args.Length; i++)
+					if (x[i - 1].ParameterType != args[i].GetType()) {
+						if (x[i - 1].ParameterType.IsAssignableFrom(args[i].GetType())) {
+							Args[i - 1] = args[i];
+							continue;
+						}
+						throw new StandartLibrary.Exception("Функция " + e.Name + " ожидала аргумент типа " + x[i - 1].ParameterType + " != " + args[i].GetType() + "; позиция: " + (i + 1) + "; имя аргумента: " + x[i - 1].Name);
+					}
+					else {
+						Args[i - 1] = args[i];
+					}
+
+				var a = e.Invoke(args[0], Args);
+				if (a != null)
+					return new Dynamic(a);
+				else return new Null();
+			}
+		}
+	}
+	/*
+  internal class DynamicType : Value {
+	  internal System.Type type;
+
+	  KType Value.Type => throw new NotImplementedException();
+
+	  public String GetDoc() {
+		  return "";
+	  }
+
+	  public DynamicType(System.Type t) {
+		  type = t;
+	  }
+
+	  public Value Clone() {
+		  throw new NotImplementedException();
+	  }
+
+	  public dynamic Get(String Name) {
+		  return 0;
+		  /*
+		  if (Type.IsEnum)
+			  return new Dynamic(Type.GetField(Name).GetValue(Type));
+
+		  if (Name == "()")
+			  return new DFun((args) =>
+			  {
+				  Type[] Types = new Type[args.Length];
+
+				  for (int i = 0; i < args.Length; i++)
+					  Types[i] = args[i].GetType();
+
+				  dynamic x;
+
+				  x = Type.GetConStringuctor(Types);
+
+				  x = x.Invoke(args);
+
+				  return new Dynamic(x);
+			  });
+
+		  foreach (Type i in Type.GetNestedTypes())
+			  if (i.Name == Name)
+				  return new DynamicType(i);
+
+		  try
+		  {
+			  var x = Type.GetMethod(Name);
+			  if(x != null)
+				  return new LFun((e, args) => {
+					  object[] margs = new object[args.Length];
+					  for (int i = 0; i < args.Length; i++)
+						  margs[i] = C.Unpack(args[i]);
+					  return new Dynamic(x.Invoke(null, margs));
+				  });
+			  else
+			  {
+				  var a = Type.GetProperty(Name);
+				  if (a == null)
+					  return new FunDelegate(Type, Name);
+				  else return new Dynamic(a.GetValue(Type));
+			  }
+		  }
+		  catch
+		  {
+			  var a = Type.GetProperty(Name);
+			  if (a == null)
+				  return new FunDelegate(Type, Name);
+			  else return new Dynamic(a.GetValue(Type));
+		  }
+		  */
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Lumen.Lang.Expressions;
+using Lumen.Lang;
+
+namespace Lumen.Light {
+ /*   internal class FunctionDefineDotStatement : Expression {
+        internal String name;
+        private List<ArgumentMetadataGenerator> arguments;
+        private Expression body;
+        private Expression returnedType;
+        private Int32 line;
+        private String fileName;
+        internal List<String> helper;
+
+        public FunctionDefineDotStatement(String name, List<ArgumentMetadataGenerator> arguments, Expression body, Expression returnedType, Int32 line, String fileName, List<String> helper) {
+            this.name = name;
+            this.arguments = arguments;
+            this.body = body;
+            this.returnedType = returnedType;
+            this.line = line;
+            this.fileName = fileName;
+            this.helper = helper;
+        }
+
+        public override String ToString() {
+            String result = "let " + this.name + "(" + String.Join(", ", this.arguments.Select(i => i.name)) + ")" + "{" + this.body + "}";
+            return result;
+        }
+
+        public Value Eval(Scope e) {
+            List<FunctionArgument> args = new List<FunctionArgument>();
+
+            foreach (ArgumentMetadataGenerator i in this.arguments) {
+                FunctionArgument arg = i.EvalArgumnet(e);
+
+                args.Add(arg);
+            }
+
+            List<String> notClosurableVariables = new List<String> { "self", "_", "this", "base", "value", "kwargs", "args" };
+
+            foreach (FunctionArgument i in args) {
+                String mutname = i.name.Replace("*", "");
+
+                if (mutname == "this") {
+                    throw new namespace Lumen.Lang.Exception("Параметр функции не может иметь имя this", stack: e);
+                }
+
+                notClosurableVariables.Add(mutname);
+            }
+
+            UserFun v = new UserFun {
+                Arguments = args,
+                body = this.body?.Closure(notClosurableVariables, e)
+            };
+
+
+            v.Set("@name", (String)(String.Join(".", this.helper) + "." + this.name), e);
+
+            if (this.returnedType != null) {
+                v.Set("type", this.returnedType.Eval(e), e);
+            }
+
+            Value x = e.Get(this.helper[0]);
+            for (Int32 i = 1; i < this.helper.Count; i++) {
+                if (x is IObject io) {
+                    x = io.Get(this.helper[i], e);
+                }
+            }
+
+            if (x is IObject f) {
+                f.Set(this.name, v, e);
+            }
+
+            return v;
+        }
+
+        public Expression Closure(List<String> visible, Scope thread) {
+            visible.Add(this.name);
+            return new FunctionDefineDotStatement(this.name, this.arguments.Select(i => new ArgumentMetadataGenerator(i.name, i.type?.Closure(visible, thread), i.defaultValue?.Closure(visible, thread))).ToList(), this.body.Closure(visible, thread), this.returnedType?.Closure(visible, thread), this.line, this.fileName, this.helper);
+        }
+
+        public Expression Optimize(Scope scope) {
+            throw new NotImplementedException();
+        }
+    }*/
+}
+
+using System;
+using System.Collections.Generic;
+
+using Lumen.Lang.Expressions;
+using Lumen.Lang;
+namespace Lumen.Light {
+  /*  [Serializable]
+    public class GenericFunctionMaker : Expression {
+        public FunctionDeclaration functionDefineStatement;
+        public Dictionary<String, Expression> generic;
+        public Expression Optimize(Scope scope) {
+            return this;
+        }
+        public GenericFunctionMaker(FunctionDeclaration functionDefineStatement, Dictionary<String, Expression> generic) {
+            this.functionDefineStatement = functionDefineStatement;
+            this.generic = generic;
+        }
+        public AnalyseResult Validate(MainScopeMetadata metadata) {
+            return AnalyseResult.Ok;
+        }
+        public Expression Closure(List<String> visible, Scope scope) {
+            return new GenericFunctionMaker(this.functionDefineStatement.Closure(visible, scope) as FunctionDeclaration, this.generic);
+        }
+
+        public Value Eval(Scope e) {
+            Dictionary<String, Value> args = new Dictionary<String, Value>();
+            foreach (KeyValuePair<String, Expression> i in this.generic) {
+                args.Add(i.Key, i.Value?.Eval(e));
+            }
+
+            e.Set(this.functionDefineStatement.NameFunction, new GenericFunc(args, this.functionDefineStatement, this.functionDefineStatement.NameFunction));
+            return Const.VOID;
+        }
+    }*/
+}
+
+#region Cmd 
+
+        private void CmdButtonClick(Object sender, EventArgs e) {
+            if (!this.IsCmdInitialized) {
+                this.CmdInit();
+            }
+
+            CmdInterface.DoInterfaceVisible();
+        }
+
+        private static class CmdInterface {
+            public static FastColoredTextBox CmdOutput { get; private set; }
+            public static ConsoleEmulator CmdInput { get; private set; }
+            public static Process GlobalCmdProcess { get; private set; }
+            private static volatile Boolean isWriteMode;
+
+            public static void InitializeGui() {
+                CmdInput = new ConsoleEmulator {
+                    Dock = DockStyle.Bottom,
+                    BackColor = Settings.BackgroundColor,
+                    ForeColor = Settings.ForegroundColor,
+                    ShowLineNumbers = false,
+                    Height = 20,
+                    Font = new Font("Consolas", 10f),
+                    ShowScrollBars = false
+                };
+
+                CmdOutput = new FastColoredTextBox {
+                    ForeColor = Settings.BackgroundColor,
+                    BackColor = Settings.ForegroundColor,
+                    Dock = DockStyle.Fill,
+                    ShowLineNumbers = false,
+                    Font = new Font("Consolas", 10f),
+                    PreferredLineWidth = 10
+                };
+
+                Instance.splitContainer3.Panel2.Controls.Add(CmdInterface.CmdInput);
+                Instance.splitContainer3.Panel2.Controls.Add(CmdInterface.CmdOutput);
+            }
+
+            public static void InitializeProcess() {
+                GlobalCmdProcess = new Process {
+                    StartInfo = new ProcessStartInfo {
+                        Arguments = "",
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        FileName = Settings.CmdPath,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        StandardOutputEncoding = Encoding.GetEncoding(Settings.CmdCodePage),
+                        StandardErrorEncoding = Encoding.GetEncoding(Settings.CmdCodePage)
+                    }
+                };
+
+                GlobalCmdProcess.OutputDataReceived += (sender, e) => {
+                    if (e.Data == null) {
+                        return;
+                    }
+
+                    isWriteMode = true;
+                    CmdOutput.AppendText(Convert(e.Data) + Environment.NewLine);
+                    isWriteMode = false;
+                };
+
+                GlobalCmdProcess.ErrorDataReceived += (sender, e) => {
+                    if (e.Data == null) {
+                        return;
+                    }
+
+                    isWriteMode = true;
+                    CmdOutput.AppendText(Convert(e.Data) + Environment.NewLine);
+                    isWriteMode = false;
+                };
+            }
+
+            private static String Convert(String String) {
+                Byte[] bytes = Encoding.Convert(
+                    GlobalCmdProcess.StartInfo.StandardOutputEncoding,
+                    Encoding.Unicode,
+                    GlobalCmdProcess.StartInfo.StandardOutputEncoding.GetBytes(String));
+
+                return Encoding.Unicode.GetString(bytes);
+            }
+
+            public static void RunProcess() {
+                GlobalCmdProcess.Start();
+
+                GlobalCmdProcess.StandardInput.WriteLine("chcp " + Settings.CmdCodePage);
+
+                GlobalCmdProcess.BeginOutputReadLine();
+
+                Boolean IsFirstCommand = true;
+                while (!GlobalCmdProcess.WaitForExit(300)) {
+                    if (!isWriteMode) {
+                        if (IsFirstCommand) {
+                            CmdOutput.Clear();
+                            IsFirstCommand = false;
+                        }
+                        GlobalCmdProcess.StandardInput.WriteLine(CmdInput.ReadLine());
+                        CmdInput.Clear();
+                    }
+                }
+            }
+
+            public static void DoInterfaceVisible() {
+                Instance.BottomPanelHideAll();
+
+                CmdOutput.Visible = true;
+                CmdInput.Visible = true;
+            }
+        }
+
+        private void BottomPanelHideAll() {
+            foreach (Control i in this.splitContainer3.Panel2.Controls) {
+                i.Visible = false;
+            }
+        }
+
+        private void CmdInit() {
+            CmdInterface.InitializeGui();
+
+            this.BottomPanelHideAll();
+
+            CmdInterface.InitializeProcess();
+
+            Factory.StartNew(CmdInterface.RunProcess);
+
+            this.IsCmdInitialized = true;
+        }
+
+        #endregion

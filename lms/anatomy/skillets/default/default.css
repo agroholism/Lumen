@@ -38,7 +38,7 @@ abbr[title] {
     border-bottom: 1px dotted
 }
 
-b, optgroup, strong {
+b, optgroup, Stringong {
     font-weight: 700
 }
 
@@ -719,7 +719,7 @@ legend {
         background-color: transparent
     }
 
-.pure-table-odd td, .pure-table-striped tr:nth-child(2n-1) td {
+.pure-table-odd td, .pure-table-Stringiped tr:nth-child(2n-1) td {
     background-color: #f2f2f2
 }
 

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Main settings of Lumen Studio -->
+<MainSettings>
+  <!-- Language of interface -->
+  <Language name="ru-RU"/>
+  
+  <!-- Theme of interface -->
+  <Theme name="standartDark" />
+
+  <AviableThemes>
+    <Theme name="standartDark" />
+    <Theme name="standartLight" />
+    <Theme name="sandy" />
+  </AviableThemes>
+  
+  <!--  List of aviable languages -->
+  <AviableLanguages>
+    <Language name="python" />
+    <Language name="html" />
+    <Language name="csharp" />
+  </AviableLanguages>
+  
+  <!-- List of aviable extensions -->
+  <Extensions>
+    
+  </Extensions>
+</MainSettings>

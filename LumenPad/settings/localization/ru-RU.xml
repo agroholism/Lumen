@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Localization>
+  <TranslationUnit name="menu.file" tr="Файл"/>
+  <TranslationUnit name="menu.file.open" tr="Открыть..."/>
+  <TranslationUnit name="menu.file.open.file" tr="Файл"/>
+  <TranslationUnit name="menu.file.open.project" tr="Проект"/>
+  <TranslationUnit name="menu.file.create" tr="Создать..."/>
+  <TranslationUnit name="menu.file.create.file" tr="Файл"/>
+  <TranslationUnit name="menu.file.create.project" tr="Проект"/>
+  <TranslationUnit name="menu.file.save" tr="Сохранить"/>
+  <TranslationUnit name="menu.file.saveAs" tr="Сохранить как..."/>
+  
+</Localization>

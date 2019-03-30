@@ -1,13 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lumen.Lang.Std {
-	public delegate Value HFun(Scope e, params Value[] args);
+using Lumen.Lang.Expressions;
 
-	public interface Fun : IObject {
-		Dictionary<String, Value> Attributes { get; set; }
-		List<FunctionArgument> Arguments { get; set; }
-		
-		Value Run(Scope e, params Value[] args);
-	}
+namespace Lumen.Lang {
+    /// <summary> Delegate for Lumen function </summary>
+    /// <param name="scope"> Scope for execution </param>
+    /// <param name="args"> Arguments that apply </param>
+    public delegate Value LumenFunc(Scope scope, params Value[] args);
+
+    /// <summary> Interface for any Lumen function value </summary>
+    public interface Fun : Value {
+        /// <summary> Name of function </summary>
+        String Name { get; set; }
+
+        /// <summary> Arguments of function </summary>
+        List<IPattern> Arguments { get; set; }
+
+        /// <summary> This method runs a function/ </summary>
+        Value Run(Scope e, params Value[] args);
+    }
 }

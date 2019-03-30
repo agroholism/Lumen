@@ -1,0 +1,38 @@
+﻿#ref visual
+open Visual
+
+type _ = Counter x 
+
+let counter = Counter 0
+
+let counterLabel = Label.create ()
+counterLabel.setLocation ([|100; 50|])
+counterLabel.setText ("Counter = " + counter.x)
+counterLabel.setForeColor Color.Blue
+
+let refresh () =
+    counterLabel.setText ("Counter = " + counter.x)
+
+let makeButton text x y color onClick =
+    let res = Button.create ()
+    res.setStyle Style.Flat
+    res.setLocation ([|x; y|])
+    res.setText text
+    res.addOnClick onClick
+    res.setForeColor color
+    res
+
+let incBtn = makeButton "+" 50 200 (Color.RGB 0 255 0) b -> 
+    counter.x <- counter.x + 1
+    refresh ()
+
+let decBtn = makeButton "-" 150 200 Color.Red b -> 
+    counter.x <- counter.x - 1
+    refresh ()
+
+let form = Form.create ()
+form.addControl incBtn
+form.addControl decBtn
+form.addControl counterLabel
+form.setBackColor (Color.RGB 255 255 255)
+Form.show form
