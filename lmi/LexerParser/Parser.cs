@@ -85,7 +85,14 @@ namespace Lumen.Light {
         }
 
         private Expression ParseTypeDeclaration() {
+            if (this.GetToken(0).Text == "class") {
+                Consume(TokenType.WORD);
+                return ParseTypeClassDeclaration();
+            }
+
             Dictionary<String, List<String>> constructors = new Dictionary<String, List<String>>();
+
+            List<Boolean> mutModifiers = new List<Boolean>();
 
             String name = this.Consume(TokenType.WORD).Text;
 
@@ -95,22 +102,52 @@ namespace Lumen.Light {
                 List<String> fields = new List<String>();
                 String constructorName = this.Consume(TokenType.WORD).Text;
                 while (!this.Match(TokenType.BAR) && !this.LookMatch(0, TokenType.EOC) && !this.LookMatch(0, TokenType.WHERE) && !this.Match(TokenType.EOF)) {
+                    if (this.Match(TokenType.MUTABLE)) {
+                        mutModifiers.Add(true);
+                    } else {
+                        mutModifiers.Add(false);
+                    }
                     fields.Add(this.Consume(TokenType.WORD).Text);
                 }
                 constructors.Add(constructorName, fields);
             }
 
+            List<Expression> derivings = new List<Expression>();
+
             List<Expression> members = new List<Expression>();
 
             if (this.Match(TokenType.WHERE)) {
                 this.Match(TokenType.DO);
+
+                while (this.Match(TokenType.DERIVING)) {
+                    derivings.Add(this.Expression());
+                }
+
                 while (!this.Match(TokenType.END) && !this.Match(TokenType.EOF)) {
                     members.Add(this.Expression());
                     this.Match(TokenType.EOC);
                 }
             }
 
-            return new TypeDeclarationE(name, constructors, members);
+            return new TypeDeclarationE(name, constructors, members, derivings, mutModifiers);
+        }
+
+        private Expression ParseTypeClassDeclaration() {
+            String name = Consume(TokenType.WORD).Text;
+            String parameter = Consume(TokenType.WORD).Text;
+
+            List<Expression> members = new List<Expression>();
+
+            if (this.Match(TokenType.WHERE)) {
+                this.Match(TokenType.DO);
+
+                while (!this.Match(TokenType.END) && !this.Match(TokenType.EOF)) {
+                    members.Add(this.Expression());
+                    this.Match(TokenType.EOC);
+                }
+            }
+
+            return new TypeClassDeclaration(name, parameter, members);
         }
 
         private Expression ParseMatch() {
@@ -214,17 +251,11 @@ namespace Lumen.Light {
 
                     result = new ListPattern(expressions);
                 }
-            } 
-            
-            else if (this.LookMatch(0, TokenType.NUMBER)) {
+            } else if (this.LookMatch(0, TokenType.NUMBER)) {
                 result = new ValuePattern(new Number(Double.Parse(this.Consume(TokenType.NUMBER).Text)));
-            } 
-            
-            else if (this.Match(TokenType.LPAREN)) {
+            } else if (this.Match(TokenType.LPAREN)) {
                 return ParseArgPattern();
-            } 
-            
-            else if (this.LookMatch(0, TokenType.WORD)) {
+            } else if (this.LookMatch(0, TokenType.WORD)) {
                 String id = this.Consume(TokenType.WORD).Text;
 
                 if (id == "_" && this.LookMatch(0, TokenType.EQUALS)) {
@@ -234,7 +265,7 @@ namespace Lumen.Light {
                     result = new HeadTailPattern(id, ns);
                 } else if (new[] { "true", "false" }.Contains(id)) {
                     result = new VariablePattern(id);
-                } else if(Char.IsLower(id[0])) {
+                } else if (Char.IsLower(id[0])) {
                     result = new NamePattern(id);
                 } else {
                     List<IPattern> subPatterns = new List<IPattern>();
@@ -344,13 +375,15 @@ namespace Lumen.Light {
 
             this.Match(TokenType.EOC);
             arguments = new List<IPattern>();
-            while (!this.LookMatch(0, TokenType.EQUALS)) {
+            while (!this.LookMatch(0, TokenType.EQUALS) && !this.LookMatch(0, TokenType.EOC)) {
                 arguments.Add(this.ParseArgPattern());
             }
 
-            this.Match(TokenType.EQUALS);
+            Expression body = null;
 
-            Expression body = this.Expression();
+            if (this.Match(TokenType.EQUALS)) {
+                body = this.Expression();
+            }
 
             return new FunctionDeclaration(name, arguments, body, line, this.fileName);
         }
@@ -803,7 +836,6 @@ namespace Lumen.Light {
 
                 while (this.ValidToken()) {
                     args.Add(this.Dot());
-                    this.Match(TokenType.SPLIT);
                 }
 
                 result = new Applicate(result, args, this.line, this.fileName);
@@ -914,7 +946,7 @@ namespace Lumen.Light {
                     }
 
                     elements.Add(this.Expression());
-                    this.Match(TokenType.EOC);
+                    this.Match(TokenType.SPLIT);
                 }
 
                 return new ListE(elements);
@@ -926,7 +958,6 @@ namespace Lumen.Light {
 
                 while (this.ValidToken()) {
                     args.Add(this.Dot());
-                    this.Match(TokenType.SPLIT);
                 }
 
                 Expression res = new TailRecursion(args, this.fileName, this.line);
@@ -942,7 +973,7 @@ namespace Lumen.Light {
                     }
 
                     elements.Add(this.Expression());
-                    this.Match(TokenType.EOC);
+                    this.Match(TokenType.SPLIT);
                 }
 
                 return new ArrayE(elements);
@@ -982,7 +1013,7 @@ namespace Lumen.Light {
             }
 
             // Lambdas (x) -> ...
-            if (this.LookMatch(0, TokenType.LPAREN) && this.LookMatch(1, TokenType.WORD) 
+            if (this.LookMatch(0, TokenType.LPAREN) && this.LookMatch(1, TokenType.WORD)
                 && this.LookMatch(2, TokenType.RPAREN) && this.LookMatch(3, TokenType.LAMBDA)) {
                 this.Match(TokenType.LPAREN);
                 NamePattern arg = new NamePattern(this.Consume(TokenType.WORD).Text);
@@ -993,8 +1024,8 @@ namespace Lumen.Light {
 
 
             // Lambdas (x, ...) -> ...
-            if (this.LookMatch(0, TokenType.LPAREN) && this.LookMatch(1, TokenType.WORD) 
-                && this.LookMatch(2, TokenType.SPLIT))  {
+            if (this.LookMatch(0, TokenType.LPAREN) && this.LookMatch(1, TokenType.WORD)
+                && this.LookMatch(2, TokenType.SPLIT)) {
                 this.Match(TokenType.LPAREN);
 
                 List<IPattern> args = new List<IPattern>();

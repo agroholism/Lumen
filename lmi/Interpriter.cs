@@ -48,7 +48,8 @@ namespace Lumen.Light {
         public static Value Eval(String source, String fileName="", Scope? scope = null) {
             try {
                 List<Token> tokens = new Lexer(source, fileName).Tokenization();
-                return new Parser(tokens, fileName).Parsing().Select(i => i.Eval(scope ?? mainScope)).Last();
+                return new Parser(tokens, fileName).Parsing().Select(i => 
+                    i.Eval(scope ?? mainScope)).Last();
             } catch (LumenException uex) {
                 WriteException(uex.ToString());
 

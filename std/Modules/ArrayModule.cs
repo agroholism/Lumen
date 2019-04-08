@@ -149,19 +149,19 @@ namespace Lumen.Lang {
             });
 
             this.SetField(Op.SETI, new LambdaFun((e, args) => {
-                List<Value> exemplare = Converter.ToList(args[0], e);
+                List<Value> exemplare = Converter.ToList(args[2], e);
 
                 List<Value> result = new List<Value>();
 
-                Int32 index = Index((Int32)args[1].ToDouble(e), exemplare.Count);
+                Int32 index = Index((Int32)args[0].ToDouble(e), exemplare.Count);
 
                 if (index < 0 || index >= exemplare.Count) {
                     throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
                 }
                 
-                exemplare[index] = args[2];
+                exemplare[index] = args[1];
 
-                return args[0];
+                return Const.UNIT;
             }));
             #endregion
 
@@ -173,8 +173,8 @@ namespace Lumen.Lang {
                 return Const.UNIT;
             }) {
                 Arguments = new List<IPattern> {
-                    new NamePattern("a"),
-                    new NamePattern("e")
+                    new NamePattern("e"),
+                    new NamePattern("a")
                 }
             });
 

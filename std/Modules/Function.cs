@@ -30,6 +30,21 @@ namespace Lumen.Lang {
                 }
             };
 
+            this.SetField(Op.PLUS, new LambdaFun((e, args) => {
+                Fun m = Converter.ToFunction(e["fc"], e);
+                Fun f = Converter.ToFunction(e["fn"], e);
+
+                return new LambdaFun((scope, arguments) => {
+                    m.Run(new Scope(scope), arguments);
+                    return f.Run(new Scope(scope), arguments);
+                });
+            }) {
+                Arguments = new List<IPattern> {
+                    new NamePattern("fn"),
+                    new NamePattern("fc"),
+                }
+            });
+
             this.SetField(Op.LSH, LCombine);
 
             this.SetField(Op.RSH, RCombine);

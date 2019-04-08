@@ -17,7 +17,7 @@ namespace Lumen.Light {
 
         public Expression Closure(List<String> visible, Scope scope) {
             Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
-            foreach(var i in this.patterns) {
+            foreach(KeyValuePair<IPattern, Expression> i in this.patterns) {
                 List<String> nls = new List<String>();
                 nls.AddRange(visible);
                 IPattern ip = i.Key.Closure(nls, scope) as IPattern;

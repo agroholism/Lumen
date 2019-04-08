@@ -10,13 +10,13 @@ namespace Lumen.Studio {
             this.Extensions = new List<String> { ".lm" };
             this.IdentOn = true;
 
-            this.Styles.Add("\".*?[^\\\\]\"", Settings.String);
-            this.Styles.Add("//.*", Settings.Comment);
-            this.Styles.Add("#ref", Settings.Type);
-            this.Styles.Add("'\\w+", Settings.Type);
-            this.Styles.Add("\\b(open|deriving|class|tailrec|with|as|type|mut|async|await|raise|match|module|next|try|except|finally|global|break|not|self|and|is|let|module|or|xor|where|new|do|end|this|if|else|for|in|while|from|return|true|false|void)\\b", Settings.Keyword);
-            this.Styles.Add("\\b(Unit|File|Number|Fail|Ok|Resut|Sequence|Text|Some|None|Optional|Array|Boolean|Map|List|Function)\\b", Settings.Type);
-            this.Styles.Add("\\b(Functor|Monad|Applicative|Comonad|Contravariant|Alternative|Ord|Enum)\\b", Settings.Interface);
+            this.Styles.Add(new Regex("(\"\")|\".*?[^\\\\]\"", RegexOptions.Compiled | RegexOptions.Singleline), Settings.String);
+            this.Styles.Add(new Regex("//.*"), Settings.Comment);
+            this.Styles.Add(new Regex("#\\w+"), Settings.Type);
+            this.Styles.Add(new Regex("'\\w+"), Settings.Type);
+            this.Styles.Add(new Regex("\\b(open|deriving|class|tailrec|with|as|type|mut|async|await|raise|match|module|next|try|except|finally|global|break|not|self|and|is|let|module|or|xor|where|new|do|end|this|if|else|for|in|while|from|return|true|false|void)\\b"), Settings.Keyword);
+            this.Styles.Add(new Regex("\\b(Unit|File|Number|Fail|Ok|Resut|Sequence|Text|Some|None|Optional|Array|Boolean|Map|List|Function)\\b"), Settings.Type);
+            this.Styles.Add(new Regex("\\b(Functor|Monad|Applicative|Comonad|Contravariant|Alternative|Ord|Enum)\\b"), Settings.Interface);
         }
 
         internal override void OnTextChanged(TextBoxManager manager, Range rng) {
@@ -36,8 +36,13 @@ namespace Lumen.Studio {
 
             rng.ClearStyle(StyleIndex.ALL);
 
-            foreach (KeyValuePair<String, Style> i in this.Styles) {
-                rng.SetStyle(i.Value, i.Key);
+            foreach (KeyValuePair<Regex, Style> i in this.Styles) {
+				if (i.Key.Options.HasFlag(RegexOptions.Singleline)) {
+					manager.TextBox.Range.SetStyle(i.Value, i.Key); // or visible range?
+				}
+				else {
+					rng.SetStyle(i.Value, i.Key);
+				}
             }
 
             foreach (Bookmark i in textBox.Bookmarks) {
@@ -88,7 +93,7 @@ namespace Lumen.Studio {
 
         internal override List<AutocompleteItem> GetAutocompleteItems(TextBoxManager manager) {
             List<AutocompleteItem> items = new List<AutocompleteItem> {
-                new AutocompleteItem("prelude", (Int32)Images.MODULE, "prelude", "module prelude = ...", "Содержит базовые типы, модули и функции."),
+				new AutocompleteItem("prelude", (Int32)Images.MODULE, "prelude", "module prelude = ...", "Содержит базовые типы, модули и функции."),
 
                 new AutocompleteItem("print", (Int32)Images.FUNCTION, "print", "let print x = ...", "Выводит аргументы в стандартный поток вывода"),
                 new AutocompleteItem("read", (Int32)Images.FUNCTION, "read", "let read () = ...", ""),

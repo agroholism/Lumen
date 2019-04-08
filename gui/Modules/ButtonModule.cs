@@ -14,7 +14,7 @@ namespace Lumen.Lang.Libraries.Visual {
 
                 obje.FlatStyle = StyleModule.ToStyle(style, e);
 
-                return Const.UNIT;
+                return btn;
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("style"),
@@ -22,7 +22,7 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("create", new LambdaFun((ex, argsx) => {
+            this.SetField("defaultConstructor", new LambdaFun((ex, argsx) => {
                 return new ButtonValue(new Button());
             }) {
                 Arguments = new List<IPattern> {
@@ -30,7 +30,23 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.Derive(Visual.Control);
+			this.SetField("liftB", new LambdaFun((scope, args) => {
+				if (!(scope["m"] is ButtonValue lbl)) {
+					return scope["m"];
+				}
+
+				Fun f = scope["f"] as Fun;
+
+				return f.Run(new Scope(scope), lbl);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("m"),
+					new NamePattern("f"),
+				}
+			});
+
+			this.Derive(Prelude.Monad);
+			this.Derive(Visual.Control);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace lmi {
                     continue;
                 }
 
-                var result = Interpriter.Eval(command.TrimEnd(new Char[] { ' ', '\t', '\r', '\n', ';' }), "interactive" ,mainScope);
+                Value result = Interpriter.Eval(command.TrimEnd(new Char[] { ' ', '\t', '\r', '\n', ';' }), "interactive" ,mainScope);
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"//-> {result} :: {result.Type}");
                 Console.ForegroundColor = ConsoleColor.Gray;

@@ -23,9 +23,9 @@ namespace Lumen.Lang {
                 return (scope["m"].Type.GetField("liftB", scope) as Fun).Run(scope, scope["m"], scope["f"]);
             }) {
                 Arguments = new List<IPattern> {
-                        new NamePattern("f"),
-                        new NamePattern("m")
-                    },
+					new NamePattern("m"),
+                    new NamePattern("f")
+                },
             });
         }
     }

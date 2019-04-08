@@ -49,7 +49,7 @@
     <Number foreColor="200; 200; 200" />
     <Comment1 foreColor= "87, 166, 74"/>
     <Comment2 foreColor= "87, 166, 74"/>
-    <Function foreColor= ""/>
+    <Function foreColor= "255; 155; 200"/>
     <Class foreColor= "255, 143, 79"/>
     <Interface foreColor= ""/>
     <Decorator foreColor= ""/>

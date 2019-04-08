@@ -7,7 +7,7 @@ namespace Lumen.Lang.Libraries.Visual {
         public RTBModule() {
             this.name = "Visual.RichTextBox";
 
-            this.SetField("create", new LambdaFun((ex, argsx) => {
+            this.SetField("defaultConstructor", new LambdaFun((ex, argsx) => {
                 return new RichTextBoxValue(new RichTextBox());
             }) {
                 Arguments = new List<IPattern> {

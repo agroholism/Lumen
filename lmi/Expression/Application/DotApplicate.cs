@@ -32,14 +32,21 @@ namespace Lumen.Light {
                 return new Applicate(new ValueE(function), this.argumentsExperssions, -1, "").Eval(e);
             }
 
+			if(obj is Constructor ctor) {
+				if (ctor.TryGetField(name, out var res)) {
+					return new Applicate(new ValueE(res), this.argumentsExperssions, -1, "").Eval(e);
+				}
+
+				throw new LumenException(Exceptions.MODULE_DOES_NOT_CONTAINS_FUNCTION.F(name, ctor.Name));
+			}
+
             if (obj is IObject iob) {
                 Value v = iob.GetField(name, e);
 
                 if (v is Fun fn) {
                     Scope innerScope = new Scope(e) { ["self"] = fn };
-                    List<Value> argse = new List<Value>();
+                    List<Value> argse = new List<Value> { obj };
                     argse.AddRange(this.EvalArguments(e));
-                    argse.Add(obj);
 
                     return fn.Run(innerScope, argse.ToArray());
                 }
@@ -61,10 +68,10 @@ namespace Lumen.Light {
 
             Scope innerScop = new Scope(e) { ["self"] = functio };
 
-            List<Value> Objects = new List<Value> { };
+            List<Value> Objects = new List<Value> { obj };
 
             Objects.AddRange(this.EvalArguments(e));
-            Objects.Add(obj);
+
             return functio.Run(innerScop, Objects.ToArray());
         }
 
@@ -88,12 +95,12 @@ namespace Lumen.Light {
             return new DotApplicate(this.callable.Closure(visible, thread), this.argumentsExperssions.Select(i => i.Closure(visible, thread)).ToList());
         }
 
-
         public override String ToString() {
             if (this.callable is DotExpression de && de.nameVariable == "[]") {
                 return de.expression + "[" + String.Join(", ", this.argumentsExperssions) + "]";
             }
-            return this.callable.ToString() + "(" + String.Join(", ", this.argumentsExperssions) + ")";
+
+            return this.callable.ToString() + String.Join(" ", this.argumentsExperssions);
         }
     }
 }

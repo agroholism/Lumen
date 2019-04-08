@@ -12,8 +12,8 @@ namespace Lumen.Lang {
             LinkedList Flatten(IEnumerable<Value> list, Scope s) {
                 LinkedList result = new LinkedList();
 
-                foreach (var i in list.Reverse()) {
-                    foreach (var j in i.ToLinkedList(s).Reverse()) {
+                foreach (Value i in list.Reverse()) {
+                    foreach (Value j in i.ToLinkedList(s).Reverse()) {
                         result = new LinkedList(j, result);
                     }
                 }
@@ -49,8 +49,16 @@ namespace Lumen.Lang {
                 Arguments = Const.This
             });
 
-            // Number -> List 'T -> List List 'T
-            this.SetField("chunkBySize", new LambdaFun((scope, args) => {
+			this.SetField(Op.STAR, new LambdaFun((scope, args) => {
+				LinkedList firstList = scope["this"].ToLinkedList(scope);
+
+				return new Text(String.Join(scope["other"].ToString(scope), firstList));
+			}) {
+				Arguments = Const.ThisOther
+			});
+
+			// Number -> List 'T -> List List 'T
+			this.SetField("chunkBySize", new LambdaFun((scope, args) => {
                 Value[] firstList = scope["list"].ToLinkedList(scope).ToArray();
                 Double size = scope["size"].ToDouble(scope);
 
@@ -79,8 +87,8 @@ namespace Lumen.Lang {
 
                 LinkedList result = new LinkedList();
 
-                foreach (var i in firstList.Select(i => fn.Run(new Scope(scope), i).ToLinkedList(scope)).Reverse()) {
-                    foreach (var j in i.Reverse()) {
+                foreach (LinkedList i in firstList.Select(i => fn.Run(new Scope(scope), i).ToLinkedList(scope)).Reverse()) {
+                    foreach (Value j in i.Reverse()) {
                         result = new LinkedList(j, result);
                     }
                 }

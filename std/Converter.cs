@@ -34,8 +34,9 @@ namespace Lumen.Lang {
         /// <summary> Converts any value to Int </summary>
         /// <param name="value">Value for converting</param>
         public static Int32 ToInt(this Value value, Scope scope) {
-            if (value is Number num)
+            if (value is Number num) {
                 return (Int32)num.value;
+            }
 
             return ToInt(ToNum(value, scope), scope);
         }
@@ -84,7 +85,7 @@ namespace Lumen.Lang {
 
             IObject type = value.Type;
 
-            if (type.TryGetField("map", out var prf) && prf is Fun fun) {
+            if (type.TryGetField("map", out Value prf) && prf is Fun fun) {
                 Scope s = new Scope(e) {
                     This = value
                 };
@@ -113,7 +114,7 @@ namespace Lumen.Lang {
 
             IObject type = value.Type;
 
-            if (type.TryGetField("vec", out var prf) && prf is Fun fun) {
+            if (type.TryGetField("vec", out Value prf) && prf is Fun fun) {
                 Scope s = new Scope(e) {
                     This = value
                 };
@@ -147,12 +148,12 @@ namespace Lumen.Lang {
 
             IObject type = value.Type;
 
-            if (type.TryGetField("vec", out var prf) && prf is Fun fun) {
+            if (type.TryGetField("vec", out Value prf) && prf is Fun fun) {
                 Scope s = new Scope(e) {
                     This = value
                 };
                 return ToList(fun.Run(s), e);
-            } else if (type.TryGetField("seq", out var prf1) && prf1 is Fun fun1) {
+            } else if (type.TryGetField("seq", out Value prf1) && prf1 is Fun fun1) {
                 Scope s = new Scope(e) {
                     This = value
                 };
@@ -181,7 +182,7 @@ namespace Lumen.Lang {
                     }
                 }
 
-                if (val.Type.TryGetField("seq", out var prf) && prf is Fun fun) {
+                if (val.Type.TryGetField("seq", out Value prf) && prf is Fun fun) {
                     Scope s = new Scope(e) {
                         This = val
                     };

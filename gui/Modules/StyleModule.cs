@@ -17,10 +17,10 @@ namespace Lumen.Lang.Libraries.Visual {
         public StyleModule() {
             this.name = "Visual.Style";
 
-            Flat = Prelude.CreateConstructor("Visual.Style.Flat", this, new List<String>());
-            Popup = Prelude.CreateConstructor("Visual.Style.Popup", this, new List<String>());
-            Standard = Prelude.CreateConstructor("Visual.Style.Standard", this, new List<String>());
-            System = Prelude.CreateConstructor("Visual.Style.System", this, new List<String>());
+            Flat = Helper.CreateConstructor("Visual.Style.Flat", this, new List<String>());
+            Popup = Helper.CreateConstructor("Visual.Style.Popup", this, new List<String>());
+            Standard = Helper.CreateConstructor("Visual.Style.Standard", this, new List<String>());
+            System = Helper.CreateConstructor("Visual.Style.System", this, new List<String>());
 
             this.SetField("Flat", Flat);
             this.SetField("Popup", Popup);

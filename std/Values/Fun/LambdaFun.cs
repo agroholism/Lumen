@@ -103,7 +103,7 @@ namespace Lumen.Lang {
             List<Value> vals = new List<Value>();
             vals.AddRange(args);
 
-            for (var i = 0; i < this.Args.Length; i++) {
+            for (Int32 i = 0; i < this.Args.Length; i++) {
                 vals.Insert(i, this.Args[i]);
             }
 

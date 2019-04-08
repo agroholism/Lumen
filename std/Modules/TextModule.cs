@@ -46,7 +46,7 @@ namespace Lumen.Lang {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField(Op.SHIP, new LambdaFun((scope, args) => {
+            this.SetField("compare", new LambdaFun((scope, args) => {
                 return new Number(scope.This.CompareTo(scope["other"]));
             }) {
                 Arguments = Const.ThisOther
@@ -412,11 +412,11 @@ namespace Lumen.Lang {
                 return new Number(Encoding.Unicode.GetByteCount(v));
             }));
             this.SetField("normalize", new LambdaFun((e, args) => {
-                //Checker.ExistsThis(e);
-
-                String v = e.Get("this").ToString();
-                return new Text(v.Normalize());
-            }));
+				String v = e.Get("this").ToString();
+				return new Text(v.Normalize());
+			}) {
+				Arguments = Const.This
+			});
 
             this.SetField("casecmp", new LambdaFun((e, args) => {
                 //Checker.ExistsThis(e);
@@ -485,7 +485,7 @@ namespace Lumen.Lang {
                 Arguments = Const.This
             });
 
-            this.Derive(Prelude.Comparable);
+            this.Derive(Prelude.Ord);
 
             // Add: method String#count [ref: Ruby]
             // Add: class FreezzeString, methods String#freeze and String#get_freeze?

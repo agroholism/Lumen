@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
@@ -21,7 +22,7 @@ namespace Lumen.Lang {
         }
 
         public Boolean Contains(String name) {
-            return this.variables.ContainsKey(name);
+            return this.variables.ContainsKey(name) || (this.TypeClasses?.Any(i => i.Contains(name)) ?? false);
         }
 
         public IObject Type => Prelude.Any;
@@ -51,7 +52,7 @@ namespace Lumen.Lang {
                 return result;
             }
 
-            foreach(var i in this.TypeClasses) {
+            foreach(TypeClass i in this.TypeClasses) {
                 if(i.TryGetField(name, out result)) {
                     return result;
                 }
@@ -75,7 +76,7 @@ namespace Lumen.Lang {
                 return true;
             }
 
-            foreach (var i in this.TypeClasses) {
+            foreach (TypeClass i in this.TypeClasses) {
                 if (i.TryGetField(name, out result)) {
                     return true;
                 }

@@ -15,9 +15,9 @@ using vion;
 public static class Main {
     public static Module PlotType { get; } = new PlotType();
 
-    public static IObject Point { get; } = Prelude.CreateConstructor("Point", PlotType, new List<String>());
-    public static IObject Area { get; } = Prelude.CreateConstructor("Area", PlotType, new List<String>());
-    public static IObject Line { get; } = Prelude.CreateConstructor("Line", PlotType, new List<String>());
+    public static IObject Point { get; } = Helper.CreateConstructor("Point", PlotType, new List<String>());
+    public static IObject Area { get; } = Helper.CreateConstructor("Area", PlotType, new List<String>());
+    public static IObject Line { get; } = Helper.CreateConstructor("Line", PlotType, new List<String>());
 
     public static void Import(Scope scope, String s) {
         Prelude.Instance.SetField("PlotType", PlotType);
@@ -35,9 +35,9 @@ public static class Main {
 
             chart.ChartAreas.Add(new ChartArea("[graphics]"));
 
-            var type = e["t"];
+            Value type = e["t"];
 
-            var chType = SeriesChartType.Line;
+            SeriesChartType chType = SeriesChartType.Line;
 
             if(type == Main.Point) {
                 chType = SeriesChartType.Point;
@@ -79,8 +79,8 @@ public static class Main {
 
             //mySeriesOfPoint.ToolTip = "X = #VALX, Y = #VALY";
 
-            var dataX = e["x"].ToSequence(scope);
-            var dataY = e["y"].ToSequence(scope);
+            IEnumerable<Value> dataX = e["x"].ToSequence(scope);
+            IEnumerable<Value> dataY = e["y"].ToSequence(scope);
 
             foreach (var i in dataX.Zip(dataY, (x, y) => new { x, y })) {
                 mySeriesOfPoint.Points.AddXY(i.x.ToDouble(scope), i.y.ToDouble(scope));

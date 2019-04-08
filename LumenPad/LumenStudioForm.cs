@@ -7,6 +7,8 @@ namespace Lumen.Studio {
         private Boolean mouseDown;
         private Point lastLocation;
 
+        protected Boolean isMaximized = false;
+
         public LumenStudioForm() {
             this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.ResizeRedraw, true);
@@ -30,8 +32,7 @@ namespace Lumen.Studio {
             this.mouseDown = false;
         }
 
-        protected override void OnPaint(PaintEventArgs e) // you can safely omit this method if you want
-{
+        protected override void OnPaint(PaintEventArgs e) {
             e.Graphics.FillRectangle(new SolidBrush(Settings.LinesColor), this.Top);
             e.Graphics.FillRectangle(new SolidBrush(Settings.LinesColor), this.Left);
             e.Graphics.FillRectangle(new SolidBrush(Settings.LinesColor), this.Right);
@@ -48,7 +49,7 @@ namespace Lumen.Studio {
             HTBOTTOMLEFT = 16,
             HTBOTTOMRIGHT = 17;
 
-        const Int32 _ = 10; // you can rename this variable if you like
+        const Int32 _ = 10;
 
         new Rectangle Top { get { return new Rectangle(0, 0, this.ClientSize.Width, _); } }
 
@@ -57,6 +58,7 @@ namespace Lumen.Studio {
         new Rectangle Bottom { get { return new Rectangle(0, this.ClientSize.Height - _, this.ClientSize.Width, _); } }
 
         new Rectangle Right { get { return new Rectangle(this.ClientSize.Width - _, 0, _, this.ClientSize.Height); } }
+
         Rectangle TopLeft { get { return new Rectangle(0, 0, _, _); } }
         Rectangle TopRight { get { return new Rectangle(this.ClientSize.Width - _, 0, _, _); } }
         Rectangle BottomLeft { get { return new Rectangle(0, this.ClientSize.Height - _, _, _); } }
@@ -66,27 +68,30 @@ namespace Lumen.Studio {
         protected override void WndProc(ref Message message) {
             base.WndProc(ref message);
 
-            if (message.Msg == 0x84) // WM_NCHITTEST
-            {
-                var cursor = this.PointToClient(Cursor.Position);
+            if (message.Msg == 0x84) {
+                if (this.isMaximized) {
+                    return;
+                }
 
-                if (this.TopLeft.Contains(cursor))
+                Point cursor = this.PointToClient(Cursor.Position);
+
+                if (this.TopLeft.Contains(cursor)) {
                     message.Result = (IntPtr)HTTOPLEFT;
-                else if (this.TopRight.Contains(cursor))
+                } else if (this.TopRight.Contains(cursor)) {
                     message.Result = (IntPtr)HTTOPRIGHT;
-                else if (this.BottomLeft.Contains(cursor))
+                } else if (this.BottomLeft.Contains(cursor)) {
                     message.Result = (IntPtr)HTBOTTOMLEFT;
-                else if (this.BottomRight.Contains(cursor))
+                } else if (this.BottomRight.Contains(cursor)) {
                     message.Result = (IntPtr)HTBOTTOMRIGHT;
-
-                else if (this.Top.Contains(cursor))
+                } else if (this.Top.Contains(cursor)) {
                     message.Result = (IntPtr)HTTOP;
-                else if (this.Left.Contains(cursor))
+                } else if (this.Left.Contains(cursor)) {
                     message.Result = (IntPtr)HTLEFT;
-                else if (this.Right.Contains(cursor))
+                } else if (this.Right.Contains(cursor)) {
                     message.Result = (IntPtr)HTRIGHT;
-                else if (this.Bottom.Contains(cursor))
+                } else if (this.Bottom.Contains(cursor)) {
                     message.Result = (IntPtr)HTBOTTOM;
+                }
             }
         }
     }

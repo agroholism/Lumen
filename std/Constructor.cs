@@ -67,7 +67,7 @@ namespace Lumen.Lang {
         }
 
         public Value GetField(String name, Scope scope) {
-            if (this.TryGetField(name, out var result)) {
+            if (this.TryGetField(name, out Value result)) {
                 return result;
             }
 
@@ -79,7 +79,7 @@ namespace Lumen.Lang {
         }
     }
 
-    public class SingletonConstructor : IObject {
+	public class SingletonConstructor : IObject {
         public String Name { get; set; }
         public IObject Parent { get; set; }
 
@@ -91,7 +91,7 @@ namespace Lumen.Lang {
         }
 
         public Value GetField(String name, Scope scope) {
-            if (this.TryGetField(name, out var result)) {
+            if (this.TryGetField(name, out Value result)) {
                 return result;
             }
 

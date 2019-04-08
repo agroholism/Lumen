@@ -11,13 +11,31 @@ namespace Lumen.Lang.Libraries.Visual {
         public ControlTC() {
             this.name = "Visual.Control";
 
-            this.SetField("addOnClick", new LambdaFun((scope, args) => {
+			this.Requirements = new List<Fun>();
+
+			this.SetField("addControl", new LambdaFun((scope, args) => {
+				VControl vcontrol = scope["ctrl"] as VControl;
+				Control control = vcontrol.Control;
+
+				VControl btn = scope["ctrl'"] as VControl;
+
+				control.Controls.Add(btn.Control);
+
+				return vcontrol;
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("ctrl'"),
+					new NamePattern("ctrl")
+				}
+			});
+
+			this.SetField("addOnClick", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
 
                 Fun fun = scope["f"] as Fun;
                 control.Click += (sender, obj) => fun.Run(new Scope(scope.parent), vcontrol);
-                return Const.UNIT;
+                return vcontrol;
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("f"),
@@ -32,7 +50,7 @@ namespace Lumen.Lang.Libraries.Visual {
 
                 control.BackColor = ColorModule.ToSystemColor(o, scope);
 
-                return Const.UNIT;
+                return vcontrol;
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("c"),
@@ -47,7 +65,7 @@ namespace Lumen.Lang.Libraries.Visual {
 
                 control.ForeColor = ColorModule.ToSystemColor(o, scope);
 
-                return Const.UNIT;
+                return vcontrol;
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("c"),
@@ -62,7 +80,7 @@ namespace Lumen.Lang.Libraries.Visual {
 
                 control.Dock = o;
 
-                return Const.UNIT;
+                return vcontrol;
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("d"),
@@ -80,7 +98,7 @@ namespace Lumen.Lang.Libraries.Visual {
 
                 control.Location = new Point(x, y);
 
-                return Const.UNIT;
+                return vcontrol;
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("point"),
@@ -109,7 +127,7 @@ namespace Lumen.Lang.Libraries.Visual {
 
                 control.Text = o;
 
-                return Const.UNIT;
+                return vcontrol;
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("t"),

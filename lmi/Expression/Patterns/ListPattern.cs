@@ -49,9 +49,9 @@ namespace Lumen.Light {
         }
 
         public List<String> GetDeclaredVariables() {
-            var res = new List<String>();
+            List<String> res = new List<String>();
 
-            foreach(var i in this.patterns) {
+            foreach(IPattern i in this.patterns) {
                 res.AddRange(i.GetDeclaredVariables());
             }
 

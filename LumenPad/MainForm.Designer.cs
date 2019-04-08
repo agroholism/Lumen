@@ -28,7 +28,7 @@ namespace Lumen.Studio {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.textBox = new FastColoredTextBoxNS.FastColoredTextBox();
-            this.output = new global::Lumen.Studio.ConsoleEmulator();
+            this.output = new Lumen.Studio.ConsoleEmulator();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
@@ -377,7 +377,7 @@ namespace Lumen.Studio {
             // 
             this.runToolStringipMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.runToolStringipMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
-            this.runToolStringipMenuItem.Image = global::Lumen.Studio.Properties.Resources.Starter;
+            this.runToolStringipMenuItem.Image = global::Lumen.Studio.Properties.Resources.run;
             this.runToolStringipMenuItem.Name = "runToolStringipMenuItem";
             this.runToolStringipMenuItem.Size = new System.Drawing.Size(28, 20);
             this.runToolStringipMenuItem.Click += new System.EventHandler(this.Run);
@@ -406,31 +406,28 @@ namespace Lumen.Studio {
             this.headerPanel.Name = "headerPanel";
             this.headerPanel.Size = new System.Drawing.Size(598, 24);
             this.headerPanel.TabIndex = 4;
-            this.headerPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FormMouseDown);
-            this.headerPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FormMouseMove);
-            this.headerPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FormMouseUp);
             // 
             // panel4
             // 
             this.panel4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel4.BackgroundImage = global::Lumen.Studio.Properties.Resources.fullscreen;
+            this.panel4.BackgroundImage = global::Lumen.Studio.Properties.Resources.maximize;
             this.panel4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.panel4.Location = new System.Drawing.Point(553, 4);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(16, 16);
             this.panel4.TabIndex = 2;
-            this.panel4.Click += new System.EventHandler(this.Panel4_Click);
+            this.panel4.Click += new System.EventHandler(this.MaximizeMinimize);
             // 
             // panel3
             // 
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel3.BackgroundImage = global::Lumen.Studio.Properties.Resources.close2;
+            this.panel3.BackgroundImage = global::Lumen.Studio.Properties.Resources.closew;
             this.panel3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.panel3.Location = new System.Drawing.Point(575, 4);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(16, 16);
             this.panel3.TabIndex = 1;
-            this.panel3.Click += new System.EventHandler(this.Panel3_Click);
+            this.panel3.Click += new System.EventHandler(this.Exit);
             // 
             // panel2
             // 
@@ -455,7 +452,7 @@ namespace Lumen.Studio {
             this.Name = "MainForm";
             this.Text = "Lumen Studio";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.FormLoad);
             ((System.ComponentModel.ISupportInitialize)(this.textBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.output)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);

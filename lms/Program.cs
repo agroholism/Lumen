@@ -5,6 +5,7 @@ using System.Linq;
 
 using Lumen.Tomen;
 using Lumen;
+using Lumen.Light;
 
 namespace Lumen.Anatomy {
     public class Program {
@@ -65,7 +66,7 @@ namespace Lumen.Anatomy {
         }
 
         private static void MakeTmp() {
-            Lang.Prelude.Scope scope = MakeScope();
+            Lang.Scope scope = MakeScope();
 
             // Refresh tmp directory
             foreach (String i in Directory.EnumerateFiles(PagesFolder)) {
@@ -85,21 +86,21 @@ namespace Lumen.Anatomy {
             }
         }
 
-        private static Lang.Prelude.Scope MakeScope() {
-            Lang.Prelude.Scope result = new Lang.Prelude.Scope();
-            result.AddUsing(Lang.Prelude.Prelude.Instance);
+        private static Lang.Scope MakeScope() {
+            Lang.Scope result = new Lang.Scope();
+            result.AddUsing(Lang.Prelude.Instance);
 
-            TomlTable table = Tomen.Tomen.ReadFile(ProjectName + "\\config.toml");
+           /* TomlTable table = Tomen.Tomen.ReadFile(ProjectName + "\\config.toml");
 
-            Lang.Prelude.ModuleValue val = new Lang.Prelude.ModuleValue();
+            Lang. val = new Lang.ModuleValue();
 
-            val.SetField("pages", new Lang.Prelude.Array(Pages.Select(i => (Lang.Prelude.Value)new Lang.Prelude.Text(i)).ToList()), null);
+            val.SetField("pages", new Lang.Array(Pages.Select(i => (Lang.Value)new Lang.Prelude.Text(i)).ToList()), null);
 
-            val.SetField("host", new Lang.Prelude.Text((table["host"] as TomlString).Value), null);
+            val.SetField("host", new Lang.Text((table["host"] as TomlString).Value), null);
             val.SetField("enable_script", new Lang.Prelude.Bool((table["enable_script"] as TomlBool).Value), null);
 
             result["config"] = val;
-
+			*/
             return result;
         }
 

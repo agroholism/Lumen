@@ -38,7 +38,7 @@ namespace Lumen.Light {
                 }
 
                 if (a is IObject obj) {
-                    if(obj.TryGetField(this.nameVariable, out var f)) {
+                    if(obj.TryGetField(this.nameVariable, out Value f)) {
                         return f;
                     }
 

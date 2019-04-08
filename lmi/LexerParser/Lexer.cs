@@ -255,7 +255,7 @@ namespace Lumen.Light {
                 this.AddToken(TokenType.MOD);
                 this.AddToken(TokenType.LBRACKET);
 
-                List<Token> zzz = new Lexer(String.Join("; ", substitutes), this.file).Tokenization();
+                List<Token> zzz = new Lexer(String.Join(", ", substitutes), this.file).Tokenization();
                 foreach (Token i in zzz) {
                     this.AddToken(i);
                 }
@@ -397,6 +397,9 @@ namespace Lumen.Light {
                 case "type":
                     this.AddToken(TokenType.TYPE);
                     break;
+                case "deriving":
+                    this.AddToken(TokenType.DERIVING);
+                    break;
                 case "as":
                     this.AddToken(TokenType.AS);
                     break;
@@ -478,13 +481,16 @@ namespace Lumen.Light {
                 current = this.Next();
                 if (!operatorsDictionary.ContainsKey(buffer.ToString() + current)) {
                     Token t = operatorsDictionary[buffer.ToString()];
+
                     if(this.tokens[this.tokens.Count - 1].Type == TokenType.EOC) {
                         this.tokens.RemoveAt(this.tokens.Count - 1);
                     }
+
                     if (this.tokens[this.tokens.Count - 1].Type == TokenType.DO) {
                         this.tokens.RemoveAt(this.tokens.Count - 1);
                         this.level -= 4;
                     }
+
                     this.AddToken(new Token(t.Type, t.Text));
                     return;
                 }
@@ -561,7 +567,7 @@ namespace Lumen.Light {
                 current = this.Next();
             }
 
-            if (Double.TryParse(buffer.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out var result)) {
+            if (Double.TryParse(buffer.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result)) {
                 this.AddToken(TokenType.NUMBER, result.ToString(System.Globalization.NumberFormatInfo.InvariantInfo));
             } else {
                 throw new LumenException(Exceptions.INCORRECT_NUMBER_LITERAL, line: this.line, fileName: this.file);

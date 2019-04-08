@@ -7,7 +7,7 @@ using System.Linq;
 namespace Lumen.Lang {
     public sealed class Prelude : Module {
         #region Fields
-        public static TypeClass Comparable { get; } = new ComparableModule();
+        public static TypeClass Ord { get; } = new OrdModule();
         public static TypeClass Sequence { get; } = new SequenceModule();
         public static TypeClass Functor { get; } = new Functor();
         public static TypeClass Monad { get; } = new Monad();
@@ -43,7 +43,7 @@ namespace Lumen.Lang {
 
             this.SetField("prelude", this);
 
-            this.SetField("Ord", Comparable);
+            this.SetField("Ord", Ord);
             this.SetField("Functor", Functor);
             this.SetField("Monad", Monad);
 
@@ -180,8 +180,10 @@ namespace Lumen.Lang {
 
             FailModule.SetField("String", new LambdaFun((scope, args) => {
                 IObject obj = scope["this"] as IObject;
-                if(obj.TryGetField("message", out var result))
+                if(obj.TryGetField("message", out Value result)) {
                     return new Text($"Failed with message '{result.ToString(scope)}'");
+                }
+
                 throw new LumenException("failed in fail.tos");
             }) {
                 Arguments = new List<IPattern> {

@@ -58,33 +58,11 @@ namespace Lumen.Light {
 
             Value operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.UNIT;
 
-            // SOLVE
-            if (operandOne is Instance typ) {
-                return ((Fun)typ.GetField(this.operation, e)).Run(new Scope(e), operandOne, operandTwo);
-            }
-
             IObject type = operandOne.Type;
-            if (type.TryGetField(this.operation, out var prf) && prf is Fun fun) {
-                try {
-                    return fun.Run(new Scope(e), operandOne, operandTwo);
-                } catch (LumenException lex) {
-                    if (lex.file == null) {
-                        lex.file = this.fileName;
-                    }
-
-                    if (lex.line == -1) {
-                        lex.line = this.line;
-                    }
-                    lex.AddToCallStack(fun.Name, this.fileName, this.line);
-
-                    throw;
-                }
-            } else {
-                throw new LumenException($"value of type {type} does hot have a operator {this.operation}") {
-                    line = this.line,
-                    file = this.fileName
-                };
-            }
+            return new Applicate(new DotExpression(new ValueE(type), this.operation, this.fileName, this.line), new List<Expression> {
+                new ValueE(operandOne),
+                new ValueE(operandTwo)
+            }, this.line, this.fileName).Eval(e);
         }
 
         public Expression Closure(List<String> visible, Scope thread) {

@@ -8,23 +8,7 @@ namespace Lumen.Lang.Libraries.Visual {
         public FormModule() {
             this.name = "Visual.Form";
 
-            this.SetField("addControl", new LambdaFun((e, args) => {
-                FormValue form = e["form"] as FormValue;
-                Form obje = form.value;
-
-                VControl btn = e["ctrl"] as VControl;
-
-                obje.Controls.Add(btn.Control);
-
-                return Const.UNIT;
-            }) {
-                Arguments = new List<IPattern> {
-                    new NamePattern("ctrl"),
-                    new NamePattern("form")
-                }
-            });
-
-            this.SetField("create", new LambdaFun((ex, argsx) => {
+            this.SetField("defaultConstructor", new LambdaFun((ex, argsx) => {
                 return new FormValue(new Form());
             }) {
                 Arguments = new List<IPattern> {
@@ -35,17 +19,17 @@ namespace Lumen.Lang.Libraries.Visual {
             this.SetField("close", new LambdaFun((ex, argsx) => {
                 Form item = (ex.Get("this") as FormValue).value;
                 item.Close();
-                return Const.UNIT;
+                return ex.Get("this");
             }) {
                 Arguments = Const.This
             });
 
             this.SetField("show", new LambdaFun((ex, argsx) => {
-                Form item = (ex.Get("form") as FormValue).value;
+                Form item = (ex.Get("this") as FormValue).value;
                 Task<DialogResult> task = Task.Factory.StartNew(() => item.ShowDialog());
                 return new LambdaFun((e, args) => {
                     task.Wait();
-                    return Const.UNIT;
+                    return ex.Get("this");
                 });
             }) {
                 Arguments = Const.This
@@ -54,12 +38,27 @@ namespace Lumen.Lang.Libraries.Visual {
             this.SetField("showDialog", new LambdaFun((ex, argsx) => {
                 Form item = (ex.Get("this") as FormValue).value;
                 item.ShowDialog();
-                return Const.UNIT;
+                return ex.Get("this");
             }) {
                 Arguments = Const.This
             });
 
-            this.Derive(Visual.Control);
+			this.SetField("liftB", new LambdaFun((scope, args) => {
+				if (!(scope["m"] is FormValue lbl)) {
+					return scope["m"];
+				}
+
+				Fun f = scope["f"] as Fun;
+				return f.Run(new Scope(scope), lbl);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("m"),
+					new NamePattern("f"),
+				}
+			});
+
+			this.Derive(Prelude.Monad);
+			this.Derive(Visual.Control);
         }
     }
 }

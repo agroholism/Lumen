@@ -33,7 +33,7 @@ namespace ldoc {
 
             List<CommentParseResult> res = new List<CommentParseResult>();
             foreach (Expression expression in lst) {
-                var r = AnalyzeExpression(expression);
+                List<CommentParseResult> r = AnalyzeExpression(expression);
                 if(r != null) {
                     res.AddRange(r);
                 }
@@ -105,7 +105,7 @@ namespace ldoc {
                     parseResult.Type = Type.MODULE;
                     res.Add(parseResult);
 
-                    foreach(var i in td.conStringuctors) {
+                    foreach(KeyValuePair<String, List<String>> i in td.conStringuctors) {
                         parseResult = new CommentParseResult();
                         parseResult.Name = (baseName == null ? "" : baseName + ".") + td.name + "." + td.conStringuctors;
                         parseResult.Declaration = parseResult.Declaration;
@@ -160,7 +160,7 @@ namespace ldoc {
                 parseResult.Type = Type.MODULE;
                 res.Add(parseResult);
 
-                foreach (var i in td1.conStringuctors) {
+                foreach (KeyValuePair<String, List<String>> i in td1.conStringuctors) {
                     parseResult = new CommentParseResult();
                     parseResult.Name = (baseName == null ? "" : baseName + ".") + td1.name + "." + i.Key;
                     parseResult.Declaration = parseResult.Declaration;

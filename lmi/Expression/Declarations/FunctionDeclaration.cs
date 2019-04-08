@@ -43,9 +43,9 @@ namespace Lumen.Light {
                 notClosurableVariables.AddRange(i.GetDeclaredVariables());
             }
 
-            UserFun v = new UserFun(this.arguments, this.Body?.Closure(notClosurableVariables, e));
-
-            v.Name = this.NameFunction;
+            UserFun v = new UserFun(this.arguments, this.Body?.Closure(notClosurableVariables, e)) {
+                Name = this.NameFunction
+            };
 
             if (e.ExistsInThisScope(this.NameFunction) && e[this.NameFunction] is Dispatcher dis) {
                 dis.Append(v);
@@ -81,13 +81,13 @@ namespace Lumen.Light {
             public IObject Parent { get; set; }
 
             public void Append(Fun f) {
-                this.functions.Add(f.Arguments, f);
+                this.functions[f.Arguments] = f;
             }
 
             public Boolean IsParentOf(Value value) {
                 if (value is IObject parent) {
                     while (true) {
-                        if (parent.TryGetField("@prototype", out var v)) {
+                        if (parent.TryGetField("@prototype", out Value v)) {
                             parent = v as IObject;
                             if (parent == this) {
                                 return true;
@@ -148,7 +148,7 @@ namespace Lumen.Light {
             }
 
             public Value GetField(String name, Scope e) {
-                if (this.Attributes.TryGetValue(name, out var result)) {
+                if (this.Attributes.TryGetValue(name, out Value result)) {
                     return result;
                 }
 

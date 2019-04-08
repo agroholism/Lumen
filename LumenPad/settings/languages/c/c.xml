@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language name="C" extensions=".c|.h">
+  <Foldings>
+    <Folding begin="{" end="}" />
+    <Folding begin="/\*" end="\*/" />
+  </Foldings>
+  
+  <Styles>
+    <Style name="string" pattern="(&quot;&quot;)|&quot;.*?[^\\]&quot;"/>
+    <Style name="comment" pattern="//.*$"/>
+    <Style name="comment" pattern="(/\*.*?\*/)|(/\*.*)"/>
+    <Style name="type" pattern="\b(int|long|double|float|char|void)\b"/>
+    <Style name="keyword" pattern="\b(for|if|else|while|break|continue|return)\b|\#define|\#include"/>
+    <Style name="function" pattern="\b(?&lt;range&gt;\w+)\("/>
+  </Styles>
+  
+  <Events>
+    <Build action="settings\\languages\\c\\build.bat [FILE]" />
+  </Events>
+</Language>

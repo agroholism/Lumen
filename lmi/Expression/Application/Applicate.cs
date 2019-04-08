@@ -25,7 +25,11 @@ namespace Lumen.Light {
             switch (callable) {
                 case Fun _:
                     return this.EvalFun((Fun)callable, e);
-                default:
+				case SingletonConstructor _:
+					return callable;
+				case Module m:
+					return this.EvalFun((Fun)m.GetField("defaultConstructor", e), e);
+				default:
                     throw new LumenException($"can not call a value of type {callable.Type}") {
                         line = line,
                         file = fileName
@@ -91,7 +95,7 @@ TAIL_RECURSION:
                 List<Value> vals = new List<Value>();
                 vals.AddRange(args);
 
-                for (var i = 0; i < this.Args.Length; i++) {
+                for (Int32 i = 0; i < this.Args.Length; i++) {
                     vals.Insert(i, this.Args[i]);
                 }
 
@@ -136,7 +140,9 @@ TAIL_RECURSION:
                 }
 
                 if (lex.functionName == null) {
-                    lex.functionName = (parent["self"] as Fun).Name;
+                    if(parent.ExistsInThisScope("self")) {
+                        lex.functionName = (parent["self"] as Fun).Name;
+                    }
                 } else {
                     if (parent.ExistsInThisScope("self")) {
                         Fun ff = parent["self"] as Fun;

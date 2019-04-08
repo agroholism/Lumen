@@ -51,6 +51,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\lmi\lmi.csproj">
+      <Project>{4D45964F-221B-4A64-BB17-3CCBD4DD8E88}</Project>
+      <Name>lmi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\std\prelude.csproj">
       <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
       <Name>prelude</Name>

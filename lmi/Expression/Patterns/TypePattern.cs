@@ -59,7 +59,7 @@ namespace Lumen.Light {
                     }
 
                     for (System.Int32 i = 0; i < ctor.Fields.Count; i++) {
-                        if ((value as IObject).TryGetField(ctor.Fields[i], out var fvalue)) {
+                        if ((value as IObject).TryGetField(ctor.Fields[i], out Value fvalue)) {
                             if (!this.subPatterns[i].Match(fvalue, scope)) {
                                 return false;
                             }

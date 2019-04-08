@@ -21,7 +21,7 @@ namespace Lumen.Anatomy {
             this.source = File.ReadAllText(fileName);
             this.builder = new StringBuilder();
             this.position = 0;
-            this.finalBuilder = new StringBuilder("let res := vec()" + Environment.NewLine);
+            this.finalBuilder = new StringBuilder("let mut res = []" + Environment.NewLine);
         }
 
         public String Run() {
@@ -31,14 +31,14 @@ namespace Lumen.Anatomy {
                     if (this.At(1) == '%') {
                         current = this.Next();
                         current = this.Next();
-                        this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"").Replace("#", "\\#") + "\"").Append(Environment.NewLine);
+                        this.finalBuilder.Append("res <- res + [\"" + this.builder.ToString().Replace("\"", "\\\"") + "\"]").Append(Environment.NewLine);
                         this.builder.Clear();
 
                         this.BuildCode(false);
                     } else if (this.At(1) == '=') {
                         current = this.Next();
                         current = this.Next();
-                        this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"").Replace("#", "\\#") + "\"").Append(Environment.NewLine);
+                        this.finalBuilder.Append("res <- res + [\"" + this.builder.ToString().Replace("\"", "\\\"") + "\"]").Append(Environment.NewLine);
                         this.builder.Clear();
 
                         this.BuildCode(true);
@@ -51,9 +51,9 @@ namespace Lumen.Anatomy {
                 current = this.Next();
             }
 
-            this.finalBuilder.Append("res += \"" + this.builder.ToString().Replace("\"", "\\\"").Replace("#", "\\#") + "\"").Append(Environment.NewLine);
+            this.finalBuilder.Append("res <- res + [\"" + this.builder.ToString().Replace("\"", "\\\"") + "\"]").Append(Environment.NewLine);
 
-            this.finalBuilder.Append($"fwrite(\"{(this.resultPath)}\", res * \"\")");
+            this.finalBuilder.Append($"writeFile (res * \"\") \"{(this.resultPath.Replace("\\", "\\\\"))}\"");
 
             return this.finalBuilder.ToString();
         }
@@ -76,7 +76,7 @@ namespace Lumen.Anatomy {
 
             this.Next();
             if (os) {
-                this.finalBuilder.Append("res += " + this.builder.ToString()).Append(Environment.NewLine);
+                this.finalBuilder.Append("res <- res + [" + this.builder.ToString() + "]").Append(Environment.NewLine);
             } else {
                 this.finalBuilder.Append(this.builder.ToString()).Append(Environment.NewLine);
             }

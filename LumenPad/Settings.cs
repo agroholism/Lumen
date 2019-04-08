@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 
 using FastColoredTextBoxNS;
 using Lumen.Lang;
-using Lumen.Tomen;
 
 namespace Lumen.Studio {
     public static class Settings {
@@ -18,6 +17,7 @@ namespace Lumen.Studio {
         public static Style String { get; set; } = new TextStyle(new SolidBrush(Color.OrangeRed), Brushes.Transparent, FontStyle.Regular);
         public static Style Comment { get; set; } = new TextStyle(new SolidBrush(Color.Green), Brushes.Transparent, FontStyle.Regular);
         public static Style Keyword { get; set; } = new TextStyle(new SolidBrush(Color.Blue), Brushes.Transparent, FontStyle.Regular);
+        public static Style Function { get; set; } = new TextStyle(new SolidBrush(Color.Blue), Brushes.Transparent, FontStyle.Regular);
 
         public static Color BackgroundColor { get; set; } = Color.White;
         public static Color LinesColor { get; set; } = Color.Silver;
@@ -33,7 +33,6 @@ namespace Lumen.Studio {
         public static List<Language> Languages { get; set; } = new List<Language> { };
         public static List<ProjectType> ProjectTypes { get; set; } = new List<ProjectType>();
 
-        public static TomlTable colorSchemeTable;
         public static XmlDocument MainSettings { get; private set; }
         public static XmlDocument ThemeDocument { get; set; }
         public static Style Interface { get; internal set; } = new TextStyle(new SolidBrush(Color.IndianRed), Brushes.Transparent, FontStyle.Regular);
@@ -51,7 +50,8 @@ namespace Lumen.Studio {
         private static void LoadProjectTypes() {
             ProjectTypes.Add(new LumenConsoleApplication());
             ProjectTypes.Add(new LumenFormsApplication());
-        }
+			ProjectTypes.Add(new AnamomyWebApplication());
+		}
 
         private static void LoadLastData() {
             XmlNode lastData = MainSettings.DocumentElement["LastData"];
@@ -72,7 +72,7 @@ namespace Lumen.Studio {
                 foreach (XmlNode i in aviable.ChildNodes) {
                     String name = i.Attributes["name"]?.Value;
 
-                    if (System.IO.File.Exists("settings\\languages\\" + name + ".toml")) {
+                    if (System.IO.File.Exists("settings\\languages\\" + name + ".xml")) {
                         LoadLanguage("settings\\languages\\", name);
                     } else {
                         LoadLanguage("settings\\languages\\" + name + "\\", name);
@@ -82,62 +82,67 @@ namespace Lumen.Studio {
         }
 
         private static void LoadLanguage(String path, String name) {
-            TomlTable langInfo = Tomen.Tomen.ReadFile(path + name + ".toml");
-
             Language result = new Language();
 
-            if (langInfo.Contains("name")) {
-                result.Name = (langInfo["name"] as TomlString).Value;
+            XmlDocument langDocument = new XmlDocument();
+            langDocument.Load(path + name + ".xml");
+
+            result.Name = langDocument.DocumentElement.Attributes["name"]?.Value;
+            result.Extensions = langDocument.DocumentElement.Attributes["extensions"]?.Value?.Split('|')?.ToList() ?? new List<String>();
+
+            XmlNode foldings = langDocument.DocumentElement["Foldings"];
+            if (foldings != null) {
+                foreach (XmlNode node in foldings.ChildNodes) {
+                    result.Folding.Add((node.Attributes["begin"]?.Value, node.Attributes["end"]?.Value));
+                }
             }
 
-            if (langInfo.Contains("on_run")) {
+            XmlNode styles = langDocument.DocumentElement["Styles"];
+            if(styles != null) {
+                foreach (XmlNode node in styles.ChildNodes) {
+					if(node.Attributes["options"]?.Value == "sinln")
+						result.Styles.Add(new Regex(node.Attributes["pattern"]?.Value, RegexOptions.Singleline | RegexOptions.Compiled), NameToStyle(node.Attributes["name"]?.Value));
+					else
+					result.Styles.Add(new Regex(node.Attributes["pattern"]?.Value, RegexOptions.Compiled), NameToStyle(node.Attributes["name"]?.Value));
+                }
+            }
+
+            XmlNode events = langDocument.DocumentElement["Events"];
+            if (events != null) {
+                result.Build = events["Build"]?.Attributes["action"]?.Value;
+            }
+
+			/*if (langInfo.Contains("on_run")) {
                 result.RunCommand = (langInfo["on_run"] as TomlString).Value;
             }
+			*/
 
-            if (langInfo.Contains("extensions")) {
-                result.Extensions = (langInfo["extensions"] as TomlArray).Value.Select(i => (i as TomlString).Value).ToList();
-            }
+			XmlNode identOn = langDocument.DocumentElement["IndentOn"];
+			if (identOn != null) {
+				result.IdentOn = Boolean.Parse(identOn.Attributes["value"]?.Value);
+			}
 
-            if (langInfo.Contains("folding")) {
-                foreach (ITomlValue i in (langInfo["folding"] as TomlArray).Value) {
-                    List<ITomlValue> arr = (i as TomlArray).Value;
-                    result.Folding.Add(
-                        ((arr[0] as TomlString).Value,
-                        (arr[1] as TomlString).Value));
-                }
-            }
+            /* if (langInfo.Contains("actor")) {
+                 String f = path + (langInfo["actor"] as TomlString).Value;
 
-            if (langInfo.Contains("ident_on")) {
-                result.IdentOn = (langInfo["ident_on"] as TomlBool).Value;
-            }
-
-            if (langInfo.Contains("styles")) {
-                foreach (ITomlValue i in (langInfo["styles"] as TomlArray).Value) {
-                    List<ITomlValue> arr = (i as TomlArray).Value;
-                    result.Styles[(arr[0] as TomlString).Value] = NameToStyle((arr[1] as TomlString).Value);
-                }
-            }
-
-            if (langInfo.Contains("actor")) {
-                String f = path + (langInfo["actor"] as TomlString).Value;
-
-                result.Actor = f;
-            }
-
-
+                 result.Actor = f;
+             }
+             */
             Languages.Add(result);
         }
 
         private static Style NameToStyle(String value) {
             switch (value) {
-                case "String":
+                case "string":
                     return Settings.String;
                 case "comment":
                     return Settings.Comment;
                 case "keyword":
                     return Settings.Keyword;
-                case "class":
+                case "type":
                     return Settings.Type;
+                case "function":
+                    return Settings.Function;
                 default:
                     return null;
             }
@@ -170,7 +175,7 @@ namespace Lumen.Studio {
                 if (syntax != null) {
 
                     XmlNode n = syntax["Keyword1"];
-                    if(n != null) {
+                    if (n != null) {
                         Keyword = ParseStyle(n);
                     }
 
@@ -187,6 +192,11 @@ namespace Lumen.Studio {
                     n = syntax["Class"];
                     if (n != null) {
                         Type = ParseStyle(n);
+                    }
+
+                    n = syntax["Function"];
+                    if (n != null) {
+                        Function = ParseStyle(n);
                     }
                 }
             }
@@ -213,7 +223,7 @@ namespace Lumen.Studio {
         }
 
         private static FontStyle StringToStyle(String str) {
-            if(str == null) {
+            if (str == null) {
                 return FontStyle.Regular;
             }
 

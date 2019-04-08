@@ -51,8 +51,8 @@ namespace Lumen.Lang {
                 throw new LumenException("liftA option");
             }) {
                 Arguments = new List<IPattern> {
-                    new NamePattern("f"),
                     new NamePattern("m"),
+                    new NamePattern("f"),
                 }
             });
 

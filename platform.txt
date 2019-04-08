@@ -19,6 +19,3 @@ Lumen.Utils.Ldoc
 // make ldoc
 // make visual
 // make system
-
-логин:	lumenlang	
-пароль:	35z393z2d67	

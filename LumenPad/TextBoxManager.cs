@@ -45,9 +45,8 @@ namespace Lumen.Studio {
         }
 
         internal void OnTextChanged(TextChangedEventArgs eventArgs) {
-            if (MainForm.AllowRegiStringationChangas) {
+            if (MainForm.AllowRegistrationChanges) {
                 this.ChangesSaved = false;
-                MainForm.Instance.HighlightUnsavedFile();
             }
 
             this.Language.OnTextChanged(this, eventArgs.ChangedRange);

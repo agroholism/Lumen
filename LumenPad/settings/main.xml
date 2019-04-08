@@ -15,10 +15,19 @@
   
   <!--  List of aviable languages -->
   <AviableLanguages>
-    <Language name="python" />
+    <Language name="c" />
+    <Language name="haskell" />
+    <Language name="xml" />
     <Language name="html" />
-    <Language name="csharp" />
   </AviableLanguages>
+
+  <ProjectType name="Lumen Console Application" image="lcapp.png" defautName="consoleApplication1">
+    <Controller name="Lumen.Studio.ProjectTypes.LumenConsoleApllication"/>
+  </ProjectType>
+
+  <ProjectType name="Lumen Visual Application" image="lvapp.png" defautName="visualApplication1">
+    <Controller name="Lumen.Studio.ProjectTypes.LumenVisualApllication"/>
+  </ProjectType>
   
   <!-- List of aviable extensions -->
   <Extensions>

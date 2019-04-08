@@ -94,6 +94,7 @@ namespace Lumen.Light {
         APPLICATIVEF,
         BFUNCTORBIND,
         MUTABLE,
-        CONTEXT
+        CONTEXT,
+        DERIVING
     }
 }

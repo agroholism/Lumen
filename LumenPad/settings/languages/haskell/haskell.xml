@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language name="Haskell" extensions=".hs">
+  <Foldings>
+
+  </Foldings>
+  
+  <Styles>
+    <Style name="string" pattern="(&quot;&quot;)|&quot;.*?[^\\]&quot;"/>
+    <Style name="comment" pattern="--.*$"/>
+    <Style name="keyword" pattern="\b(module|where|import|in|let|data|type|class|do)\b" />
+  </Styles>
+  
+  <Events>
+    <Build action="settings\\languages\\haskell\\build.bat [FILE]" />
+  </Events>
+</Language>

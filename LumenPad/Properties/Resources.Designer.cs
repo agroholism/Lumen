@@ -63,9 +63,9 @@ namespace Lumen.Studio.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap close {
+        internal static System.Drawing.Bitmap closew {
             get {
-                object obj = ResourceManager.GetObject("close", resourceCulture);
+                object obj = ResourceManager.GetObject("closew", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace Lumen.Studio.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap close1 {
+        internal static System.Drawing.Bitmap maximize {
             get {
-                object obj = ResourceManager.GetObject("close1", resourceCulture);
+                object obj = ResourceManager.GetObject("maximize", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,29 +83,9 @@ namespace Lumen.Studio.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap close2 {
+        internal static System.Drawing.Bitmap run {
             get {
-                object obj = ResourceManager.GetObject("close2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap fullscreen {
-            get {
-                object obj = ResourceManager.GetObject("fullscreen", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Starter {
-            get {
-                object obj = ResourceManager.GetObject("Starter", resourceCulture);
+                object obj = ResourceManager.GetObject("run", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

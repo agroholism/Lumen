@@ -18,7 +18,7 @@ let load f =
     (File.readArray f) * (_ / " ") * Person.fromStrings
 
 // Creates an person list 
-let persons = [| Person "Alex" 17; Person "Denis" 18 |]
+let persons = [| Person "Alex" 17, Person "Denis" 18 |]
 print persons
 // Save person list to file p.db
 save "p.db" persons

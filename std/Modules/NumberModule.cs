@@ -72,11 +72,14 @@ namespace Lumen.Lang {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField(Op.SHIP, new LambdaFun((scope, args) => {
-                return new Number(scope.This.CompareTo(scope["other"]));
+            this.SetField("compare", new LambdaFun((scope, args) => {
+                return new Number(scope["x"].CompareTo(scope["y"]));
             }) {
-                Arguments = Const.ThisOther
-            });
+                Arguments = new List<IPattern> {
+					new NamePattern("x"),
+					new NamePattern("y")
+				}
+			});
 
             this.SetField(Op.PLUS, new LambdaFun((scope, args) => {
                 Value other = scope["other"];
@@ -196,8 +199,8 @@ namespace Lumen.Lang {
                 Value other = scope["this"];
 
                 if (other is Number) {
-                    var numOne = scope["other"].ToDouble(scope);
-                    var numTwo = other.ToDouble(scope);
+                    Double numOne = scope["other"].ToDouble(scope);
+                    Double numTwo = other.ToDouble(scope);
 
                     return new Number((numOne % numTwo + numTwo) % numTwo);
                 }
@@ -417,7 +420,7 @@ namespace Lumen.Lang {
 
             #endregion
 
-            this.Derive(Prelude.Comparable);
+            this.Derive(Prelude.Ord);
             this.NameIt();
         }
 

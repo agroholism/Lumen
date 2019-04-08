@@ -23,7 +23,7 @@ namespace Lumen.Lang {
 
         public override String ToString() {
             StringBuilder result = new StringBuilder();
-            result.Append($"Exception: {this.Message} {Environment.NewLine}\tin {this.functionName} at {this.file}:{this.line}");
+            result.Append($"Exception: {this.Message} {Environment.NewLine}\tin {this.functionName ?? "<main>"} at {this.file}:{this.line}");
 
             if (this.callStack.Count > 0) {
                 foreach (Tuple<String, String, Int32> i in this.callStack) {

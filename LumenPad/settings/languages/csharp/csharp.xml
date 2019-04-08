@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language name="C#" extensions=".cs">
+  <Foldings>
+    <Folding begin="{" end="}" />
+    <Folding begin="/\*" end="\*/" />
+    <Folding begin="\b#region\b" end= "\b#endregion\b"/>
+  </Foldings>
+  
+  <Styles>
+    <Style name="string" pattern="(&quot;&quot;)|&quot;.*?[^\\]&quot;"/>
+    <Style name="comment" pattern="//.*$"/>
+    <Style name="comment" pattern="(/\*.*?\*/)|(/\*.*)"/>
+    <Style name="keyword" pattern="\b(abstract|as|class|interface|struct|enum|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|do|double|else|enum|event|explicit|extern|false|finally|fixed|float|for|foreach|goto|if|implicit|in|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|private|protected|public|readonly|ref|return|sbyte|sealed|short|sizeof|stackalloc|static|string|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|virtual|void|volatile|while|add|alias|ascending|descending|dynamic|from|get|global|group|into|join|let|orderby|partial|remove|select|set|value|var|where|yield)\b|\b#region\b|\b#endregion\b"/>
+    <Style name="function" pattern="\b(?&lt;range&gt;\w+)\("/>
+  </Styles>
+  
+  <Events>
+    <Build action="settings\\languages\\csharp\\build.bat [FILE]" />
+  </Events>
+</Language>

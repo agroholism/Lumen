@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Lumen.Studio {
-    public partial class CreateProjectWindow : LumenStudioForm {
+    public partial class CreateProjectWindow : LumenStudioForm/* Form/**/ {
         public CreateProjectWindow() : base() {
             this.InitializeComponent();
 
@@ -15,6 +15,7 @@ namespace Lumen.Studio {
             this.panel1.MouseDown += this.FormMouseDown;
             this.panel1.MouseUp += this.FormMouseUp;
             //*/
+
             this.StartPosition = FormStartPosition.CenterScreen;
 
             this.BackColor = Settings.LinesColor;
@@ -25,7 +26,9 @@ namespace Lumen.Studio {
 
             this.panel1.BackColor = Settings.BackgroundColor;
             this.panel1.ForeColor = Settings.ForegroundColor;
+        }
 
+        private void ShowProjectTypes() {
             Int32 index = 0;
             foreach (ProjectType i in Settings.ProjectTypes) {
                 this.projectTypesList.Items.Add(i.Name, index);
@@ -34,7 +37,7 @@ namespace Lumen.Studio {
         }
 
         private void CreateProjectWindow_Load(Object sender, EventArgs e) {
-
+            ShowProjectTypes();
         }
     }
 }

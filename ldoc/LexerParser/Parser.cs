@@ -688,7 +688,7 @@ namespace ldoc {
         private Expression Additive() {
             // Умножение uber alles
             Expression expr = this.Multiplicate();
-            var mem = this.allow;
+            Boolean mem = this.allow;
             this.allow = true;
             while (true) {
                 if (this.Match(TokenType.PLUS)) {
@@ -708,7 +708,7 @@ namespace ldoc {
 
         private Expression Multiplicate() {
             Expression expr = this.Exponentiation();
-            var mem = this.allow;
+            Boolean mem = this.allow;
             this.allow = true;
             while (true) {
                 if (this.Match(TokenType.STAR)) {
@@ -970,9 +970,9 @@ namespace ldoc {
             if (this.LookMatch(0, TokenType.VOID) && this.LookMatch(1, TokenType.LAMBDA)) {
                 this.Match(TokenType.VOID);
                 this.Match(TokenType.LAMBDA);
-                var mem = this.allow;
+                Boolean mem = this.allow;
                 this.allow = true;
-                var res = new AnonymeDefine( this.Expression());
+                AnonymeDefine res = new AnonymeDefine( this.Expression());
                 this.allow = mem;
                 return res;
             }
@@ -1006,9 +1006,9 @@ namespace ldoc {
                 }
 
                 this.Match(TokenType.LAMBDA);
-                var mem = this.allow;
+                Boolean mem = this.allow;
                 this.allow = true;
-                var res = new AnonymeDefine( this.Expression());
+                AnonymeDefine res = new AnonymeDefine( this.Expression());
                 this.allow = mem;
                 return res;
             }
@@ -1067,8 +1067,9 @@ namespace ldoc {
                 }
             }
 
-            if (this.Match(TokenType.VOID))
+            if (this.Match(TokenType.VOID)) {
                 return UnitExpression.Instance;
+            }
 
             if (this.Match(TokenType.LPAREN)) {
                 Boolean mem = this.allow;

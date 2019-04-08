@@ -23,7 +23,7 @@ namespace Lumen.Light {
         }
 
         public List<String> GetDeclaredVariables() {
-            var res = new List<String> { this.ide};
+            List<String> res = new List<String> { this.ide};
             res.AddRange(this.listPattern.GetDeclaredVariables());
             return res;
         }

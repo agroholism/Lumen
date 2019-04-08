@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language name="HTML" extensions=".htm|.html|.lmt">
+  <IndentOn value="true"/>
+  
+  <Styles>
+    <Style name="comment" pattern="(&lt;!--.*?--&gt;)|(&lt;!--.*)"/>
+    <Style name="comment" pattern="(&lt;!--.*?--&gt;)|(.*--&gt;)"/>
+    <Style name="keyword" pattern="&lt;/|&lt;|/&gt;|&gt;"/>
+    <Style name="keyword" pattern="&lt;(?&lt;range&gt;[!\w:]+)"/>
+    <Style name="keyword" pattern="&lt;/(?&lt;range&gt;[\w:]+)&gt;"/> 
+    <Style name="string" pattern="[\w\d\-]{1,20}?=(?&lt;range&gt;'[^']*')|[\w\d\-]{1,20}=(?&lt;range&gt;&quot;[^&quot;]*&quot;)|[\w\d\-]{1,20}=(?&lt;range&gt;[\w\d\-]{1,20})"/>
+  </Styles>
+</Language>

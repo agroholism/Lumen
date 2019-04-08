@@ -51,9 +51,6 @@
     <ApplicationIcon>icons8-лямбда-filled-96.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lumen.Tomen">
-      <HintPath>..\..\..\..\source\repos\Lumen.Tomen\Tomen\Lumen.Tomen\bin\Debug\Lumen.Tomen.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -70,11 +67,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncHelper.cs" />
-    <Compile Include="Console\ConsoleEmulator.cs">
+    <Compile Include="examples\Console\ConsoleEmulator.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Console\ConsoleReader.cs" />
-    <Compile Include="Console\ConsoleWriter.cs" />
+    <Compile Include="examples\Console\ConsoleReader.cs" />
+    <Compile Include="examples\Console\ConsoleWriter.cs" />
     <Compile Include="CreateProjectWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +95,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegexTester.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RegexTester.Designer.cs">
+      <DependentUpon>RegexTester.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="TextBoxManager.cs" />
     <EmbeddedResource Include="CreateProjectWindow.resx">
@@ -117,6 +120,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="RegexTester.resx">
+      <DependentUpon>RegexTester.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="examples\basics\fibbonacci.lm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -197,22 +203,34 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Resources\close.png" />
-    <None Include="Resources\close1.png" />
-    <None Include="Resources\close2.png" />
-    <None Include="Resources\close3.png" />
-    <None Include="Resources\close4.png" />
-    <None Include="Resources\fullscreen.png" />
+    <None Include="Resources\closew.png" />
+    <None Include="Resources\maximize.png" />
+    <None Include="Resources\run.png" />
+    <Content Include="settings\languages\html\html.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\languages\xml\xml.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\languages\csharp\csharp.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\languages\haskell\haskell.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\languages\c\c.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="settings\themes\sandy.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="settings\themes\standartLight.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="settings\languages\csharp\csharp.toml">
+    <None Include="settings\languages\haskell\build.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="settings\languages\html\html.toml">
+    <None Include="settings\languages\c\build.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="settings\languages\python\python_actor.lm">
@@ -248,9 +266,6 @@
       <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
       <Name>prelude</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Starter.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

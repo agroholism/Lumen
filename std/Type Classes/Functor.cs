@@ -23,8 +23,8 @@ namespace Lumen.Lang {
                 return (scope["fc"].Type.GetField("fmap", scope) as Fun).Run(scope, scope["fn"], scope["fc"]);
             }) {
                 Arguments = new List<IPattern> {
-                    new NamePattern("fn"),
-                    new NamePattern("fc")
+                    new NamePattern("fc"),
+                    new NamePattern("fn")
                  },
             });
 

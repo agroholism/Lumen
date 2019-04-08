@@ -42,7 +42,7 @@ namespace Lumen.Lang {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField(Op.SHIP, new LambdaFun((scope, args) => {
+            this.SetField("compare", new LambdaFun((scope, args) => {
                 Value other = scope["other"];
 
                 return (Number)scope.This.CompareTo(other);
@@ -58,7 +58,7 @@ namespace Lumen.Lang {
                 Arguments = Const.This
             });
 
-            this.Derive(Prelude.Comparable);
+            this.Derive(Prelude.Ord);
         }
     }
 }

@@ -19,12 +19,12 @@ namespace Lumen.Lang.Libraries.Visual {
         public DockModule() {
             this.name = "Visual.Dock";
 
-            Bottom = Prelude.CreateConstructor("Visual.Dock.Bottom", this, new List<String>());
-            Fill = Prelude.CreateConstructor("Visual.Dock.Fill", this, new List<String>());
-            Left = Prelude.CreateConstructor("Visual.Dock.Left", this, new List<String>());
-            Right = Prelude.CreateConstructor("Visual.Dock.Right", this, new List<String>());
-            None = Prelude.CreateConstructor("Visual.Dock.None", this, new List<String>());
-            Top = Prelude.CreateConstructor("Visual.Dock.Top", this, new List<String>());
+            Bottom = Helper.CreateConstructor("Visual.Dock.Bottom", this, new List<String>());
+            Fill = Helper.CreateConstructor("Visual.Dock.Fill", this, new List<String>());
+            Left = Helper.CreateConstructor("Visual.Dock.Left", this, new List<String>());
+            Right = Helper.CreateConstructor("Visual.Dock.Right", this, new List<String>());
+            None = Helper.CreateConstructor("Visual.Dock.None", this, new List<String>());
+            Top = Helper.CreateConstructor("Visual.Dock.Top", this, new List<String>());
 
             this.SetField("Bottom", Bottom);
             this.SetField("Fill", Fill);

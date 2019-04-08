@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using FastColoredTextBoxNS;
 using Lumen.Lang;
 
@@ -8,10 +9,10 @@ namespace Lumen.Studio {
     public class Language {
         public String Name { get; set; }
         public List<String> Extensions { get; set; } = new List<String>();
-        public Dictionary<String, Style> Styles = new Dictionary<String, Style>();
+        public Dictionary<Regex, Style> Styles = new Dictionary<Regex, Style>();
         public List<(String, String)> Folding { get; set; } = new List<(String, String)>();
 
-        public String RunCommand { get; set; }
+        public String Build { get; set; }
         public Module Fn { get; internal set; }
         public String Actor { get; set; }
         public Boolean IdentOn;
@@ -57,7 +58,7 @@ namespace Lumen.Studio {
 
             rng.ClearStyle(StyleIndex.ALL);
 
-            foreach (KeyValuePair<String, Style> i in this.Styles) {
+            foreach (KeyValuePair<Regex, Style> i in this.Styles) {
                 rng.SetStyle(i.Value, i.Key);
             }
 
