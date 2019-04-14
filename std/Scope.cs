@@ -117,7 +117,7 @@ namespace Lumen.Lang {
             if(this.mutable.Contains(name)) {
                 this.variables[name] = value;
             } else {
-                throw new LumenException("can not to change binding");
+                throw new LumenException($"can not to change binding {name}");
             }
         }
 

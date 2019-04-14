@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Xml.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 using Lumen.Light;
-using Lumen.Tomen;
 
 namespace Lumen.Anatomy {
 	public class Program {
@@ -18,7 +18,7 @@ namespace Lumen.Anatomy {
             get => ProjectName + "\\model\\scripts";
         }
 
-        private static List<String> Pages { get; } = new List<String>();
+        private static List<String> Pages { get; set; } = new List<String>();
 
         public static void Main() {
             while (true) {
@@ -30,7 +30,7 @@ namespace Lumen.Anatomy {
 
         private static void ParseCommand(String[] args) {
             if (args[0] == "new") {
-                CreateProject(args[1]);
+                CreateProject(args[1], true);
             } else if (args[0] == "open") {
                 OpenProject(args[1]);
             } else if (args[0] == "pages") {
@@ -117,11 +117,8 @@ namespace Lumen.Anatomy {
 
             Pages.Clear();
 
-            TomlTable table = Tomen.Tomen.ReadFile(ProjectName + "\\config.toml");
-            TomlArray array = table["pages"] as TomlArray;
-            foreach (ITomlValue item in array.Value) {
-                Pages.Add((item as TomlString).Value);
-            }
+			XDocument document = XDocument.Load(ProjectName + "\\config.xml");
+			Pages = document.Root.Elements().First(i => i.Name == "pages").Elements().Select(i => i.Value).ToList();
         }
 
         private static void CreatePage(String pageName, Int32 ident) {
@@ -143,37 +140,33 @@ namespace Lumen.Anatomy {
 
             Pages.Add(pageName);
 
-            TomlTable table = Tomen.Tomen.ReadFile(ProjectName + "\\config.toml");
+			XDocument document = XDocument.Load(ProjectName + "\\config.xml");
+			document.Root.Elements().First(i => i.Name == "pages").Add(new XElement("page", pageName));
+			document.Save(ProjectName + "\\config.xml");
 
-            table["pages"] = new TomlArray(Pages.Select(i => (ITomlValue)new TomlString(i)).ToList());
-
-            TomlTable t = new TomlTable(pageName);
-            t["name"] = new TomlString(pageName);
-            t["enable_script"] = new TomlBool(true);
-            t["path"] = new TomlString(PagesFolder);
-
-            table[pageName] = t;
-
-            Tomen.Tomen.WriteFile(ProjectName + "\\config.toml", table);
-
-            Extensions.Print("Configuration file are rebuilded", ident: ident);
+			Extensions.Print("Configuration file are rebuilded", ident: ident);
 
             Extensions.Print($"Page '{pageName}' created successfuly", ConsoleColor.Green, ident);
         }
 
         private static void ApplyTemplate(String pageName) {
-            File.WriteAllText(PagesFolder + "\\" + pageName + ".lm", @"open common");
+            File.WriteAllText(PagesFolder + "\\" + pageName + ".lm", @"#ref common");
 
             File.WriteAllText(PagesFolder + "\\" + pageName + ".lmt",
                 String.Format(File.ReadAllText("anatomy\\skillets\\default\\default.lmt"), pageName));
         }
 
-        private static void CreateProject(String name) {
+		/// <summary> Creates a new project in current directory. </summary>
+		/// <param name="name"> Name of project. </param>
+		/// <param name="allowOutput"> Allow output to console? </param>
+        private static void CreateProject(String name, Boolean allowOutput) {
             ProjectName = name;
 
-            Console.WriteLine($"Creating project '{name}'...");
+			if (allowOutput) {
+				Console.WriteLine($"Creating project '{name}'...");
+			}
 
-            MakeDirectory(name);
+			MakeDirectory(name);
             MakeDirectory(name + "\\model");
             MakeDirectory(PagesFolder);
             MakeDirectory(name + "\\model\\resources");
@@ -182,39 +175,37 @@ namespace Lumen.Anatomy {
             MakeDirectory(name + "\\model\\scripts");
             MakeDirectory(name + "\\model\\styles");
 
-            File.Create(name + "\\config.toml").Close();
+			// creating configuration file
+			XDocument config = new XDocument(
+				new XElement("project",
+					new XElement("name", new XText(name)),
+					new XElement("host", new XText("")),
+					new XElement("pages"),
+					new XElement("enableScript", new XText("True"))
+				)
+			);
 
-            TomlTable table = new TomlTable(null);
-            table["name"] = new TomlString(name);
-            table["host"] = new TomlString("");
-            table["pages"] = new TomlArray(new List<ITomlValue>());
-            table["enable_script"] = new TomlBool(true);
+			config.Save(ProjectName + "\\config.xml");
 
-            Tomen.Tomen.WriteFile(name + "\\config.toml", table);
+			if (allowOutput) {
+				Extensions.Print("Configuration file created", ident: 1);
+			}
 
-            Extensions.Print("Configuration file created", ident: 1);
-
-            CreateCommonHelper();
+			// create main page
             CreatePage("index", 1);
 
-            File.Create(name + "\\model\\resources\\resx.toml").Close();
-            Console.WriteLine($"	File '{name + "\\model\\resources\\resx.toml"}' created");
+			// resources create
+            File.Create(name + "\\model\\resources\\resx.xml").Close();
+            Console.WriteLine($"	File '{name + "\\model\\resources\\resx.xml"}' created");
 
+			// create styles
             File.Copy("anatomy\\skillets\\default\\default.css", name + "\\model\\styles\\default.css", true);
             Console.WriteLine($"	File '{name + "\\model\\styles\\default.css"}' created");
 
             Directory.CreateDirectory(name + "\\build");
             Directory.CreateDirectory(name + "\\tmp");
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"	Project '{name}' created successfuly");
-            Console.ForegroundColor = ConsoleColor.Gray;
-        }
-
-        private static void CreateCommonHelper() {
-            File.Copy("anatomy\\common.lm", PagesFolder + "\\common.lm", true);
-
-            Extensions.Print($"File {PagesFolder + "\\common.lm"} created", ident: 1);
+			Extensions.Print($"Project '{name}' created successfuly", ConsoleColor.Green, 1);
         }
 
         private static void MakeDirectory(String name, Boolean logs = true) {

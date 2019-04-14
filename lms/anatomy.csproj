@@ -33,9 +33,6 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lumen.Tomen">
-      <HintPath>..\..\..\..\source\repos\Lumen.Tomen\Tomen\Lumen.Tomen\bin\Debug\Lumen.Tomen.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
