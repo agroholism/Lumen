@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Language name="C#" extensions=".cs">
+<Language name="C#" extensions=".cs" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/language">
   <Foldings>
     <Folding begin="{" end="}" />
     <Folding begin="/\*" end="\*/" />

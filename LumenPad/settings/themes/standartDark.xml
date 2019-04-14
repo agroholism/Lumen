@@ -3,8 +3,8 @@
   Lumen Studio theme 'Standart Dark'
   Autor: Tsvikevich Denis © 2019
 -->
-<Theme name="Standart Dark">
-  <IconPack path="icons/standart"/>
+<Theme name="Standart Dark" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/theme">
+  <IconPack path="icons\standart"/>
   
   <Background color="30; 30; 30"/>
   <Foreground color="200; 200; 200"/>

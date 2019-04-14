@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<IconPack xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/iconpack">
+  <ProjectManager>
+    <Folder icon="projectManager\folder.png" />
+    <File icon="projectManager\file.png" />
+    <Extensions>
+      <Extension name=".lm|.lmx" icon="projectManager\lumen.png"/>
+      <Extension name=".py" icon="projectManager\python.png"/>
+      <Extension name=".img|.png" icon="projectManager\image.png"/>
+      <Extension name=".toml" icon="projectManager\toml.png"/>
+    </Extensions>
+  </ProjectManager>
+</IconPack>

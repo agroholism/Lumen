@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language name="TOML" extensions=".toml" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/language">
+  <Styles>
+    <Style name="comment" pattern="//"/>
+    <Style name="keyword" pattern="(?&lt;range&gt;\w+)\s*="/>
+    <Style name="string" pattern="[\w\d\-]{1,20}?=(?&lt;range&gt;'[^']*')|[\w\d\-]{1,20}=(?&lt;range&gt;&quot;[^&quot;]*&quot;)|[\w\d\-]{1,20}=(?&lt;range&gt;[\w\d\-]{1,20})"/>
+  </Styles>
+</Language>

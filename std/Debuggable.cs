@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Dynamic;
 
 namespace Lumen.Lang {
-    interface Debuggable : Value {
-        Dictionary<Text, Tuple<Value, Int32>> Inspect();
+	interface Debuggable : Value {
+        DynamicMetaObject Inspect();
     }
 }

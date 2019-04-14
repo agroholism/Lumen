@@ -67,6 +67,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncHelper.cs" />
+    <Compile Include="CopyableImageBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="examples\Console\ConsoleEmulator.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -78,10 +81,12 @@
     <Compile Include="CreateProjectWindow.Designer.cs">
       <DependentUpon>CreateProjectWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="IEditable.cs" />
     <Compile Include="IRunResult.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="LumenConsoleApplication.cs" />
     <Compile Include="LumenLanguage.cs" />
+    <Compile Include="LumenMenuRenderer.cs" />
     <Compile Include="LumenStudioForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -94,6 +99,7 @@
     <Compile Include="Interop\Interop.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Project.cs" />
+    <Compile Include="ProjectManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexTester.cs">
       <SubType>Form</SubType>
@@ -206,7 +212,12 @@
     <None Include="Resources\closew.png" />
     <None Include="Resources\maximize.png" />
     <None Include="Resources\run.png" />
+    <None Include="Resources\biohazard.png" />
+    <None Include="Resources\baseline_play_arrow_white_48dp.png" />
     <Content Include="settings\languages\html\html.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\languages\toml\toml.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="settings\languages\xml\xml.xml">
@@ -221,11 +232,32 @@
     <Content Include="settings\languages\c\c.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="settings\themes\sandy.xml">
+    <Content Include="settings\themes\icons\standart\icons.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\themes\icons\standart\projectManager\file.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="settings\themes\icons\standart\projectManager\folder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\themes\icons\standart\projectManager\image.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\themes\icons\standart\projectManager\lumen.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\themes\icons\standart\projectManager\python.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\themes\icons\standart\projectManager\toml.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="settings\themes\sandy.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="settings\themes\standartLight.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="settings\languages\haskell\build.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -240,14 +272,18 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="settings\themes\standartDark.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="settings\languages\lumen\lumen.xml" />
     <Content Include="settings\languages\lumen\documentation\ru\Prelude.xml" />
     <Content Include="settings\localization\ru-RU.xml" />
     <Content Include="settings\main.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="settings\schemas\main.xsd">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\source\repos\Hybrid\FastColoredTextBox\FastColoredTextBox.csproj">
@@ -279,7 +315,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="settings\extensions\" />
-    <Folder Include="settings\themes\icons\standart\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

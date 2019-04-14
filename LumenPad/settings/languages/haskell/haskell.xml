@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Language name="Haskell" extensions=".hs">
+<Language name="Haskell" extensions=".hs" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/language">
   <Foldings>
 
   </Foldings>

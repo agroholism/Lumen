@@ -3,7 +3,6 @@ Lumen.Studio.Interop
 Lumen.Studio.Designer
 Lumen.Studio.Debugger
 Lumen.Lang
-namespace Lumen.Lang
 Lumen.Lang.Libraries
 Lumen.Anatomy
 Lumen.Anatomy.Lumex
@@ -19,3 +18,13 @@ Lumen.Utils.Ldoc
 // make ldoc
 // make visual
 // make system
+
+OnDocumentation
+OnMessage
+OnWarinig
+OnError
+OnRefactoring
+BeforeDebugStep
+OnDebugStep
+AfterDebugStep
+OnDebugCollection

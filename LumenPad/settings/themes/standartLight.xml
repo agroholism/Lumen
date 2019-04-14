@@ -3,7 +3,7 @@
   Lumen Studio theme 'Standart Light'
   Autor: Tsvikevich Denis © 2019
 -->
-<Theme name="Standart Light">
+<Theme name="Standart Light" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/theme">
 	<IconPack path="icons/standart"/>
 
 	<Background color="255; 255; 255"/>

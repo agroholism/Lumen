@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="main"
+    targetNamespace="http://danielargent.github.io/xmlspec/lumen-studio/v1/main"
+    elementFormDefault="qualified"
+    xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/xsd/main"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="MainSettings">
+    <xs:complexType>
+      <xs:sequence>
+
+        <xs:element name="Language">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="CurrentTheme">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="AviableThemes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Theme">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        
+        <xs:element name="AviableLanguages" nillable="true">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Language">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        
+
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

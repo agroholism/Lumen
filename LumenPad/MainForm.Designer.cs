@@ -25,57 +25,68 @@ namespace Lumen.Studio {
 		/// содержимое этого метода с помощью редактора кода.
 		/// </summary>
 		private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.textBox = new FastColoredTextBoxNS.FastColoredTextBox();
-            this.output = new Lumen.Studio.ConsoleEmulator();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.treeView1 = new System.Windows.Forms.TreeView();
-            this.projectImages = new System.Windows.Forms.ImageList(this.components);
-            this.bottomPanel = new System.Windows.Forms.Panel();
-            this.bottomMenu = new System.Windows.Forms.MenuStrip();
-            this.outputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.interactiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.topMenu = new System.Windows.Forms.MenuStrip();
-            this.fileToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fileToolStringipMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.projectToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fileToolStringipMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.projectToolStringipMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAsToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.settingsToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.runToolStringipMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.headerPanel = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            ((System.ComponentModel.ISupportInitialize)(this.textBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.output)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
-            this.bottomPanel.SuspendLayout();
-            this.bottomMenu.SuspendLayout();
-            this.topMenu.SuspendLayout();
-            this.headerPanel.SuspendLayout();
-            this.SuspendLayout();
-            // 
-            // textBox
-            // 
-            this.textBox._UnsafeText = "";
-            this.textBox.AutoCompleteBrackets = true;
-            this.textBox.AutoCompleteBracketsList = new char[] {
+			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+			this.textBox = new FastColoredTextBoxNS.FastColoredTextBox();
+			this.Output = new Lumen.Studio.ConsoleEmulator();
+			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+			this.treeView1 = new System.Windows.Forms.TreeView();
+			this.projectImages = new System.Windows.Forms.ImageList(this.components);
+			this.bottomPanel = new System.Windows.Forms.Panel();
+			this.BottomMenu = new System.Windows.Forms.MenuStrip();
+			this.BottomMenuOutput = new System.Windows.Forms.ToolStripMenuItem();
+			this.BottomMenuLumenIntercative = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenu = new System.Windows.Forms.MenuStrip();
+			this.TopMenuFile = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuOpen = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuOpenFile = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuOpenProject = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuCreate = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuCreateFile = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuCreateProject = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuSave = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuSaveAs = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuEdit = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuUndo = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuRedo = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuEditSplitter = new System.Windows.Forms.ToolStripSeparator();
+			this.TopMenuCopy = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuPaste = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuCut = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuDelete = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuView = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuPanels = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuSettings = new System.Windows.Forms.ToolStripMenuItem();
+			this.TopMenuRunner = new System.Windows.Forms.ToolStripMenuItem();
+			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+			this.headerPanel = new System.Windows.Forms.Panel();
+			this.TopMenuMaximize = new System.Windows.Forms.Panel();
+			this.TopMenuClose = new System.Windows.Forms.Panel();
+			this.panel2 = new System.Windows.Forms.Panel();
+			this.TextBoxContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			((System.ComponentModel.ISupportInitialize)(this.textBox)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.Output)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+			this.splitContainer1.Panel1.SuspendLayout();
+			this.splitContainer1.Panel2.SuspendLayout();
+			this.splitContainer1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+			this.splitContainer2.Panel1.SuspendLayout();
+			this.splitContainer2.Panel2.SuspendLayout();
+			this.splitContainer2.SuspendLayout();
+			this.bottomPanel.SuspendLayout();
+			this.BottomMenu.SuspendLayout();
+			this.TopMenu.SuspendLayout();
+			this.headerPanel.SuspendLayout();
+			this.SuspendLayout();
+			// 
+			// textBox
+			// 
+			this.textBox._UnsafeText = "";
+			this.textBox.AutoCompleteBrackets = true;
+			this.textBox.AutoCompleteBracketsList = new char[] {
         '(',
         ')',
         '{',
@@ -86,50 +97,50 @@ namespace Lumen.Studio {
         '\"',
         '\'',
         '\''};
-            this.textBox.AutoIndentCharsPatterns = "";
-            this.textBox.AutoScrollMinSize = new System.Drawing.Size(42, 17);
-            this.textBox.BackBrush = null;
-            this.textBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.textBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.textBox.BookmarkColor = System.Drawing.Color.BlueViolet;
-            this.textBox.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
-            this.textBox.CharHeight = 17;
-            this.textBox.CharWidth = 7;
-            this.textBox.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.textBox.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.textBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.textBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-            this.textBox.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
-            this.textBox.Hotkeys = resources.GetString("textBox.Hotkeys");
-            this.textBox.IndentBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.textBox.IsReplaceMode = false;
-            this.textBox.LeftPadding = 10;
-            this.textBox.LineInterval = 2;
-            this.textBox.LineNumberColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
-            this.textBox.Location = new System.Drawing.Point(0, 0);
-            this.textBox.Name = "textBox";
-            this.textBox.Paddings = new System.Windows.Forms.Padding(0);
-            this.textBox.PreferredLineWidth = 5;
-            this.textBox.ReservedCountOfLineNumberChars = 2;
-            this.textBox.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-            this.textBox.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("textBox.ServiceColors")));
-            this.textBox.ServiceLinesColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.textBox.Size = new System.Drawing.Size(402, 210);
-            this.textBox.TabIndex = 0;
-            this.textBox.TextAreaBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.textBox.WordWrapIndent = 1;
-            this.textBox.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
-            this.textBox.Zoom = 100;
-            this.textBox.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.TextBox_ToolTipNeeded);
-            this.textBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TextBox_TextChanged);
-            this.textBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_KeyDown);
-            this.textBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TextBox_MouseDoubleClick);
-            // 
-            // output
-            // 
-            this.output._UnsafeText = "";
-            this.output.AutoCompleteBracketsList = new char[] {
+			this.textBox.AutoIndentCharsPatterns = "";
+			this.textBox.AutoScrollMinSize = new System.Drawing.Size(42, 17);
+			this.textBox.BackBrush = null;
+			this.textBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.textBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+			this.textBox.BookmarkColor = System.Drawing.Color.BlueViolet;
+			this.textBox.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
+			this.textBox.CharHeight = 17;
+			this.textBox.CharWidth = 7;
+			this.textBox.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.textBox.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+			this.textBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.textBox.Font = new System.Drawing.Font("Consolas", 9.75F);
+			this.textBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			this.textBox.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
+			this.textBox.Hotkeys = resources.GetString("textBox.Hotkeys");
+			this.textBox.IndentBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.textBox.IsReplaceMode = false;
+			this.textBox.LeftPadding = 10;
+			this.textBox.LineInterval = 2;
+			this.textBox.LineNumberColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
+			this.textBox.Location = new System.Drawing.Point(0, 0);
+			this.textBox.Name = "textBox";
+			this.textBox.Paddings = new System.Windows.Forms.Padding(0);
+			this.textBox.PreferredLineWidth = 5;
+			this.textBox.ReservedCountOfLineNumberChars = 2;
+			this.textBox.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+			this.textBox.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("textBox.ServiceColors")));
+			this.textBox.ServiceLinesColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.textBox.Size = new System.Drawing.Size(402, 210);
+			this.textBox.TabIndex = 0;
+			this.textBox.TextAreaBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.textBox.WordWrapIndent = 1;
+			this.textBox.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
+			this.textBox.Zoom = 100;
+			this.textBox.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.TextBox_ToolTipNeeded);
+			this.textBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TextBox_TextChanged);
+			this.textBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextBox_KeyDown);
+			this.textBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TextBox_MouseDoubleClick);
+			// 
+			// Output
+			// 
+			this.Output._UnsafeText = "";
+			this.Output.AutoCompleteBracketsList = new char[] {
         '(',
         ')',
         '{',
@@ -140,371 +151,469 @@ namespace Lumen.Studio {
         '\"',
         '\'',
         '\''};
-            this.output.AutoScrollMinSize = new System.Drawing.Size(2, 13);
-            this.output.BackBrush = null;
-            this.output.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.output.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
-            this.output.CharHeight = 13;
-            this.output.CharWidth = 7;
-            this.output.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.output.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.output.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.output.Font = new System.Drawing.Font("Courier New", 9F);
-            this.output.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-            this.output.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
-            this.output.Hotkeys = resources.GetString("output.Hotkeys");
-            this.output.IsReadLineMode = false;
-            this.output.IsReplaceMode = false;
-            this.output.Location = new System.Drawing.Point(0, 0);
-            this.output.Name = "output";
-            this.output.Paddings = new System.Windows.Forms.Padding(0);
-            this.output.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-            this.output.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("output.ServiceColors")));
-            this.output.ShowLineNumbers = false;
-            this.output.Size = new System.Drawing.Size(598, 88);
-            this.output.TabIndex = 1;
-            this.output.TextAreaBorderColor = System.Drawing.Color.SlateGray;
-            this.output.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
-            this.output.Zoom = 100;
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.Output.AutoScrollMinSize = new System.Drawing.Size(2, 13);
+			this.Output.BackBrush = null;
+			this.Output.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.Output.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
+			this.Output.CharHeight = 13;
+			this.Output.CharWidth = 7;
+			this.Output.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.Output.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+			this.Output.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.Output.Font = new System.Drawing.Font("Courier New", 9F);
+			this.Output.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			this.Output.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
+			this.Output.Hotkeys = resources.GetString("Output.Hotkeys");
+			this.Output.IsReadLineMode = false;
+			this.Output.IsReplaceMode = false;
+			this.Output.Location = new System.Drawing.Point(0, 0);
+			this.Output.Name = "Output";
+			this.Output.Paddings = new System.Windows.Forms.Padding(0);
+			this.Output.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+			this.Output.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("Output.ServiceColors")));
+			this.Output.ShowLineNumbers = false;
+			this.Output.Size = new System.Drawing.Size(598, 88);
+			this.Output.TabIndex = 1;
+			this.Output.TextAreaBorderColor = System.Drawing.Color.SlateGray;
+			this.Output.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
+			this.Output.Zoom = 100;
+			// 
+			// splitContainer1
+			// 
+			this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.splitContainer1.Location = new System.Drawing.Point(1, 26);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.bottomPanel);
-            this.splitContainer1.Panel2.Controls.Add(this.bottomMenu);
-            this.splitContainer1.Panel2.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.splitContainer1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.splitContainer1.Size = new System.Drawing.Size(598, 323);
-            this.splitContainer1.SplitterDistance = 210;
-            this.splitContainer1.SplitterWidth = 1;
-            this.splitContainer1.TabIndex = 3;
-            // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.textBox);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.treeView1);
-            this.splitContainer2.Size = new System.Drawing.Size(598, 210);
-            this.splitContainer2.SplitterDistance = 402;
-            this.splitContainer2.SplitterWidth = 1;
-            this.splitContainer2.TabIndex = 1;
-            // 
-            // treeView1
-            // 
-            this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView1.ImageIndex = 0;
-            this.treeView1.ImageList = this.projectImages;
-            this.treeView1.ItemHeight = 16;
-            this.treeView1.Location = new System.Drawing.Point(0, 0);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.SelectedImageIndex = 0;
-            this.treeView1.ShowPlusMinus = false;
-            this.treeView1.ShowRootLines = false;
-            this.treeView1.Size = new System.Drawing.Size(195, 210);
-            this.treeView1.TabIndex = 0;
-            this.treeView1.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseDoubleClick);
-            // 
-            // projectImages
-            // 
-            this.projectImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("projectImages.ImageStream")));
-            this.projectImages.TransparentColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(38)))));
-            this.projectImages.Images.SetKeyName(0, "fold.png");
-            this.projectImages.Images.SetKeyName(1, "other.png");
-            this.projectImages.Images.SetKeyName(2, "html.png");
-            this.projectImages.Images.SetKeyName(3, "py.png");
-            this.projectImages.Images.SetKeyName(4, "icons8-лямбда-filled-96.png");
-            this.projectImages.Images.SetKeyName(5, "css.png");
-            this.projectImages.Images.SetKeyName(6, "img.png");
-            // 
-            // bottomPanel
-            // 
-            this.bottomPanel.Controls.Add(this.output);
-            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomPanel.Location = new System.Drawing.Point(0, 0);
-            this.bottomPanel.Name = "bottomPanel";
-            this.bottomPanel.Size = new System.Drawing.Size(598, 88);
-            this.bottomPanel.TabIndex = 3;
-            // 
-            // bottomMenu
-            // 
-            this.bottomMenu.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bottomMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.outputToolStripMenuItem,
-            this.interactiveToolStripMenuItem});
-            this.bottomMenu.Location = new System.Drawing.Point(0, 88);
-            this.bottomMenu.Name = "bottomMenu";
-            this.bottomMenu.Size = new System.Drawing.Size(598, 24);
-            this.bottomMenu.TabIndex = 2;
-            this.bottomMenu.Text = "menuStrip1";
-            // 
-            // outputToolStripMenuItem
-            // 
-            this.outputToolStripMenuItem.Name = "outputToolStripMenuItem";
-            this.outputToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
-            this.outputToolStripMenuItem.Text = "Output";
-            this.outputToolStripMenuItem.Click += new System.EventHandler(this.OutputToolStripMenuItem_Click);
-            // 
-            // interactiveToolStripMenuItem
-            // 
-            this.interactiveToolStripMenuItem.Name = "interactiveToolStripMenuItem";
-            this.interactiveToolStripMenuItem.Size = new System.Drawing.Size(74, 20);
-            this.interactiveToolStripMenuItem.Text = "Interactive";
-            this.interactiveToolStripMenuItem.Click += new System.EventHandler(this.ShowInteractive);
-            // 
-            // topMenu
-            // 
-            this.topMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.topMenu.Dock = System.Windows.Forms.DockStyle.None;
-            this.topMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStringipMenuItem,
-            this.viewToolStringipMenuItem,
-            this.settingsToolStringipMenuItem,
-            this.runToolStringipMenuItem});
-            this.topMenu.Location = new System.Drawing.Point(29, 0);
-            this.topMenu.Name = "topMenu";
-            this.topMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.topMenu.Size = new System.Drawing.Size(178, 24);
-            this.topMenu.TabIndex = 1;
-            this.topMenu.Text = "menuStringip1";
-            // 
-            // fileToolStringipMenuItem
-            // 
-            this.fileToolStringipMenuItem.Checked = true;
-            this.fileToolStringipMenuItem.CheckState = System.Windows.Forms.CheckState.Indeterminate;
-            this.fileToolStringipMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStringipMenuItem,
-            this.createToolStringipMenuItem,
-            this.saveToolStringipMenuItem,
-            this.saveAsToolStringipMenuItem});
-            this.fileToolStringipMenuItem.Name = "fileToolStringipMenuItem";
-            this.fileToolStringipMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStringipMenuItem.Text = "File";
-            // 
-            // openToolStringipMenuItem
-            // 
-            this.openToolStringipMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStringipMenuItem1,
-            this.projectToolStringipMenuItem});
-            this.openToolStringipMenuItem.Name = "openToolStringipMenuItem";
-            this.openToolStringipMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.openToolStringipMenuItem.Text = "Open";
-            // 
-            // fileToolStringipMenuItem1
-            // 
-            this.fileToolStringipMenuItem1.Name = "fileToolStringipMenuItem1";
-            this.fileToolStringipMenuItem1.Size = new System.Drawing.Size(111, 22);
-            this.fileToolStringipMenuItem1.Text = "File";
-            this.fileToolStringipMenuItem1.Click += new System.EventHandler(this.OpenToolStringipMenuItem_Click);
-            // 
-            // projectToolStringipMenuItem
-            // 
-            this.projectToolStringipMenuItem.Name = "projectToolStringipMenuItem";
-            this.projectToolStringipMenuItem.Size = new System.Drawing.Size(111, 22);
-            this.projectToolStringipMenuItem.Text = "Project";
-            this.projectToolStringipMenuItem.Click += new System.EventHandler(this.ProjectToolStringipMenuItem_Click);
-            // 
-            // createToolStringipMenuItem
-            // 
-            this.createToolStringipMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStringipMenuItem2,
-            this.projectToolStringipMenuItem1});
-            this.createToolStringipMenuItem.Name = "createToolStringipMenuItem";
-            this.createToolStringipMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.createToolStringipMenuItem.Text = "Create";
-            // 
-            // fileToolStringipMenuItem2
-            // 
-            this.fileToolStringipMenuItem2.Name = "fileToolStringipMenuItem2";
-            this.fileToolStringipMenuItem2.Size = new System.Drawing.Size(111, 22);
-            this.fileToolStringipMenuItem2.Text = "File";
-            // 
-            // projectToolStringipMenuItem1
-            // 
-            this.projectToolStringipMenuItem1.Name = "projectToolStringipMenuItem1";
-            this.projectToolStringipMenuItem1.Size = new System.Drawing.Size(111, 22);
-            this.projectToolStringipMenuItem1.Text = "Project";
-            this.projectToolStringipMenuItem1.Click += new System.EventHandler(this.CreateProjectClick);
-            // 
-            // saveToolStringipMenuItem
-            // 
-            this.saveToolStringipMenuItem.Name = "saveToolStringipMenuItem";
-            this.saveToolStringipMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.saveToolStringipMenuItem.Text = "Save";
-            this.saveToolStringipMenuItem.Click += new System.EventHandler(this.SaveToolStringipMenuItem_Click);
-            // 
-            // saveAsToolStringipMenuItem
-            // 
-            this.saveAsToolStringipMenuItem.Name = "saveAsToolStringipMenuItem";
-            this.saveAsToolStringipMenuItem.Size = new System.Drawing.Size(112, 22);
-            this.saveAsToolStringipMenuItem.Text = "Save as";
-            // 
-            // viewToolStringipMenuItem
-            // 
-            this.viewToolStringipMenuItem.Name = "viewToolStringipMenuItem";
-            this.viewToolStringipMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.viewToolStringipMenuItem.Text = "View";
-            // 
-            // settingsToolStringipMenuItem
-            // 
-            this.settingsToolStringipMenuItem.Name = "settingsToolStringipMenuItem";
-            this.settingsToolStringipMenuItem.Size = new System.Drawing.Size(61, 20);
-            this.settingsToolStringipMenuItem.Text = "Settings";
-            // 
-            // runToolStringipMenuItem
-            // 
-            this.runToolStringipMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.runToolStringipMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
-            this.runToolStringipMenuItem.Image = global::Lumen.Studio.Properties.Resources.run;
-            this.runToolStringipMenuItem.Name = "runToolStringipMenuItem";
-            this.runToolStringipMenuItem.Size = new System.Drawing.Size(28, 20);
-            this.runToolStringipMenuItem.Click += new System.EventHandler(this.Run);
-            // 
-            // imageList1
-            // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.White;
-            this.imageList1.Images.SetKeyName(0, "3d.png");
-            this.imageList1.Images.SetKeyName(1, "hexagon.png");
-            this.imageList1.Images.SetKeyName(2, "triangle.png");
-            this.imageList1.Images.SetKeyName(3, "is_mainEnum.png");
-            this.imageList1.Images.SetKeyName(4, "module.png");
-            this.imageList1.Images.SetKeyName(5, "keyword.png");
-            // 
-            // headerPanel
-            // 
-            this.headerPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.splitContainer1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+			this.splitContainer1.Location = new System.Drawing.Point(1, 26);
+			this.splitContainer1.Name = "splitContainer1";
+			this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+			// 
+			// splitContainer1.Panel1
+			// 
+			this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+			this.splitContainer1.Panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
+			// 
+			// splitContainer1.Panel2
+			// 
+			this.splitContainer1.Panel2.Controls.Add(this.bottomPanel);
+			this.splitContainer1.Panel2.Controls.Add(this.BottomMenu);
+			this.splitContainer1.Panel2.RightToLeft = System.Windows.Forms.RightToLeft.No;
+			this.splitContainer1.RightToLeft = System.Windows.Forms.RightToLeft.No;
+			this.splitContainer1.Size = new System.Drawing.Size(598, 323);
+			this.splitContainer1.SplitterDistance = 210;
+			this.splitContainer1.SplitterWidth = 1;
+			this.splitContainer1.TabIndex = 3;
+			// 
+			// splitContainer2
+			// 
+			this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+			this.splitContainer2.Name = "splitContainer2";
+			// 
+			// splitContainer2.Panel1
+			// 
+			this.splitContainer2.Panel1.Controls.Add(this.textBox);
+			// 
+			// splitContainer2.Panel2
+			// 
+			this.splitContainer2.Panel2.Controls.Add(this.treeView1);
+			this.splitContainer2.Size = new System.Drawing.Size(598, 210);
+			this.splitContainer2.SplitterDistance = 402;
+			this.splitContainer2.SplitterWidth = 1;
+			this.splitContainer2.TabIndex = 1;
+			// 
+			// treeView1
+			// 
+			this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+			this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.treeView1.ImageIndex = 0;
+			this.treeView1.ImageList = this.projectImages;
+			this.treeView1.ItemHeight = 16;
+			this.treeView1.Location = new System.Drawing.Point(0, 0);
+			this.treeView1.Name = "treeView1";
+			this.treeView1.SelectedImageIndex = 0;
+			this.treeView1.ShowPlusMinus = false;
+			this.treeView1.ShowRootLines = false;
+			this.treeView1.Size = new System.Drawing.Size(195, 210);
+			this.treeView1.TabIndex = 0;
+			this.treeView1.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseDoubleClick);
+			// 
+			// projectImages
+			// 
+			this.projectImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+			this.projectImages.ImageSize = new System.Drawing.Size(16, 16);
+			this.projectImages.TransparentColor = System.Drawing.Color.Transparent;
+			// 
+			// bottomPanel
+			// 
+			this.bottomPanel.Controls.Add(this.Output);
+			this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.bottomPanel.Location = new System.Drawing.Point(0, 0);
+			this.bottomPanel.Name = "bottomPanel";
+			this.bottomPanel.Size = new System.Drawing.Size(598, 88);
+			this.bottomPanel.TabIndex = 3;
+			// 
+			// BottomMenu
+			// 
+			this.BottomMenu.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.BottomMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BottomMenuOutput,
+            this.BottomMenuLumenIntercative});
+			this.BottomMenu.Location = new System.Drawing.Point(0, 88);
+			this.BottomMenu.Name = "BottomMenu";
+			this.BottomMenu.Size = new System.Drawing.Size(598, 24);
+			this.BottomMenu.TabIndex = 2;
+			this.BottomMenu.Text = "menuStrip1";
+			// 
+			// BottomMenuOutput
+			// 
+			this.BottomMenuOutput.Name = "BottomMenuOutput";
+			this.BottomMenuOutput.Size = new System.Drawing.Size(57, 20);
+			this.BottomMenuOutput.Text = "Output";
+			this.BottomMenuOutput.Click += new System.EventHandler(this.OutputToolStripMenuItem_Click);
+			// 
+			// BottomMenuLumenIntercative
+			// 
+			this.BottomMenuLumenIntercative.Name = "BottomMenuLumenIntercative";
+			this.BottomMenuLumenIntercative.Size = new System.Drawing.Size(74, 20);
+			this.BottomMenuLumenIntercative.Text = "Interactive";
+			this.BottomMenuLumenIntercative.Click += new System.EventHandler(this.ShowInteractive);
+			// 
+			// TopMenu
+			// 
+			this.TopMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.TopMenu.Dock = System.Windows.Forms.DockStyle.None;
+			this.TopMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TopMenuFile,
+            this.TopMenuEdit,
+            this.TopMenuView,
+            this.TopMenuRunner});
+			this.TopMenu.Location = new System.Drawing.Point(29, 0);
+			this.TopMenu.Name = "TopMenu";
+			this.TopMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
+			this.TopMenu.Size = new System.Drawing.Size(276, 24);
+			this.TopMenu.TabIndex = 1;
+			this.TopMenu.Text = "menuStringip1";
+			// 
+			// TopMenuFile
+			// 
+			this.TopMenuFile.Checked = true;
+			this.TopMenuFile.CheckState = System.Windows.Forms.CheckState.Indeterminate;
+			this.TopMenuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TopMenuOpen,
+            this.TopMenuCreate,
+            this.TopMenuSave,
+            this.TopMenuSaveAs});
+			this.TopMenuFile.Name = "TopMenuFile";
+			this.TopMenuFile.Size = new System.Drawing.Size(37, 20);
+			this.TopMenuFile.Text = "File";
+			// 
+			// TopMenuOpen
+			// 
+			this.TopMenuOpen.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TopMenuOpenFile,
+            this.TopMenuOpenProject});
+			this.TopMenuOpen.Margin = new System.Windows.Forms.Padding(0, -1, 0, 0);
+			this.TopMenuOpen.Name = "TopMenuOpen";
+			this.TopMenuOpen.Size = new System.Drawing.Size(112, 22);
+			this.TopMenuOpen.Text = "Open";
+			// 
+			// TopMenuOpenFile
+			// 
+			this.TopMenuOpenFile.Margin = new System.Windows.Forms.Padding(-2, -1, 0, 0);
+			this.TopMenuOpenFile.Name = "TopMenuOpenFile";
+			this.TopMenuOpenFile.Size = new System.Drawing.Size(111, 22);
+			this.TopMenuOpenFile.Text = "File";
+			this.TopMenuOpenFile.Click += new System.EventHandler(this.OpenToolStringipMenuItem_Click);
+			// 
+			// TopMenuOpenProject
+			// 
+			this.TopMenuOpenProject.Margin = new System.Windows.Forms.Padding(-2, 0, 0, 0);
+			this.TopMenuOpenProject.Name = "TopMenuOpenProject";
+			this.TopMenuOpenProject.Size = new System.Drawing.Size(111, 22);
+			this.TopMenuOpenProject.Text = "Project";
+			this.TopMenuOpenProject.Click += new System.EventHandler(this.ProjectToolStringipMenuItem_Click);
+			// 
+			// TopMenuCreate
+			// 
+			this.TopMenuCreate.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TopMenuCreateFile,
+            this.TopMenuCreateProject});
+			this.TopMenuCreate.Name = "TopMenuCreate";
+			this.TopMenuCreate.Size = new System.Drawing.Size(112, 22);
+			this.TopMenuCreate.Text = "Create";
+			// 
+			// TopMenuCreateFile
+			// 
+			this.TopMenuCreateFile.Margin = new System.Windows.Forms.Padding(-1, -1, 0, 0);
+			this.TopMenuCreateFile.Name = "TopMenuCreateFile";
+			this.TopMenuCreateFile.Size = new System.Drawing.Size(111, 22);
+			this.TopMenuCreateFile.Text = "File";
+			// 
+			// TopMenuCreateProject
+			// 
+			this.TopMenuCreateProject.Margin = new System.Windows.Forms.Padding(-1, -1, 0, 0);
+			this.TopMenuCreateProject.Name = "TopMenuCreateProject";
+			this.TopMenuCreateProject.Size = new System.Drawing.Size(111, 22);
+			this.TopMenuCreateProject.Text = "Project";
+			this.TopMenuCreateProject.Click += new System.EventHandler(this.CreateProjectClick);
+			// 
+			// TopMenuSave
+			// 
+			this.TopMenuSave.Name = "TopMenuSave";
+			this.TopMenuSave.Size = new System.Drawing.Size(112, 22);
+			this.TopMenuSave.Text = "Save";
+			this.TopMenuSave.Click += new System.EventHandler(this.SaveToolStringipMenuItem_Click);
+			// 
+			// TopMenuSaveAs
+			// 
+			this.TopMenuSaveAs.Name = "TopMenuSaveAs";
+			this.TopMenuSaveAs.Size = new System.Drawing.Size(112, 22);
+			this.TopMenuSaveAs.Text = "Save as";
+			// 
+			// TopMenuEdit
+			// 
+			this.TopMenuEdit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TopMenuUndo,
+            this.TopMenuRedo,
+            this.TopMenuEditSplitter,
+            this.TopMenuCopy,
+            this.TopMenuPaste,
+            this.TopMenuCut,
+            this.TopMenuDelete});
+			this.TopMenuEdit.Name = "TopMenuEdit";
+			this.TopMenuEdit.Size = new System.Drawing.Size(39, 20);
+			this.TopMenuEdit.Text = "Edit";
+			this.TopMenuEdit.DropDownOpening += new System.EventHandler(this.TopMenuEdit_DropDownOpening);
+			// 
+			// TopMenuUndo
+			// 
+			this.TopMenuUndo.Margin = new System.Windows.Forms.Padding(0, -1, 0, 0);
+			this.TopMenuUndo.Name = "TopMenuUndo";
+			this.TopMenuUndo.Size = new System.Drawing.Size(107, 22);
+			this.TopMenuUndo.Text = "Undo";
+			this.TopMenuUndo.Click += new System.EventHandler(this.TopMenuUndo_Click);
+			// 
+			// TopMenuRedo
+			// 
+			this.TopMenuRedo.Name = "TopMenuRedo";
+			this.TopMenuRedo.Size = new System.Drawing.Size(107, 22);
+			this.TopMenuRedo.Text = "Redo";
+			this.TopMenuRedo.Click += new System.EventHandler(this.TopMenuRedo_Click);
+			// 
+			// TopMenuEditSplitter
+			// 
+			this.TopMenuEditSplitter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.TopMenuEditSplitter.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+			this.TopMenuEditSplitter.Name = "TopMenuEditSplitter";
+			this.TopMenuEditSplitter.Size = new System.Drawing.Size(104, 6);
+			// 
+			// TopMenuCopy
+			// 
+			this.TopMenuCopy.Name = "TopMenuCopy";
+			this.TopMenuCopy.Size = new System.Drawing.Size(107, 22);
+			this.TopMenuCopy.Text = "Copy";
+			this.TopMenuCopy.Click += new System.EventHandler(this.TopMenuCopy_Click);
+			// 
+			// TopMenuPaste
+			// 
+			this.TopMenuPaste.Name = "TopMenuPaste";
+			this.TopMenuPaste.Size = new System.Drawing.Size(107, 22);
+			this.TopMenuPaste.Text = "Paste";
+			this.TopMenuPaste.Click += new System.EventHandler(this.TopMenuPaste_Click);
+			// 
+			// TopMenuCut
+			// 
+			this.TopMenuCut.Name = "TopMenuCut";
+			this.TopMenuCut.Size = new System.Drawing.Size(107, 22);
+			this.TopMenuCut.Text = "Cut";
+			this.TopMenuCut.Click += new System.EventHandler(this.TopMenuCut_Click);
+			// 
+			// TopMenuDelete
+			// 
+			this.TopMenuDelete.Name = "TopMenuDelete";
+			this.TopMenuDelete.Size = new System.Drawing.Size(107, 22);
+			this.TopMenuDelete.Text = "Delete";
+			this.TopMenuDelete.Click += new System.EventHandler(this.TopMenuDelete_Click);
+			// 
+			// TopMenuView
+			// 
+			this.TopMenuView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TopMenuTools,
+            this.TopMenuPanels,
+            this.TopMenuSettings});
+			this.TopMenuView.Name = "TopMenuView";
+			this.TopMenuView.Size = new System.Drawing.Size(44, 20);
+			this.TopMenuView.Text = "View";
+			// 
+			// TopMenuTools
+			// 
+			this.TopMenuTools.Margin = new System.Windows.Forms.Padding(0, -1, 0, 0);
+			this.TopMenuTools.Name = "TopMenuTools";
+			this.TopMenuTools.Size = new System.Drawing.Size(116, 22);
+			this.TopMenuTools.Text = "Tools";
+			// 
+			// TopMenuPanels
+			// 
+			this.TopMenuPanels.Name = "TopMenuPanels";
+			this.TopMenuPanels.Size = new System.Drawing.Size(116, 22);
+			this.TopMenuPanels.Text = "Panels";
+			// 
+			// TopMenuSettings
+			// 
+			this.TopMenuSettings.Name = "TopMenuSettings";
+			this.TopMenuSettings.Size = new System.Drawing.Size(116, 22);
+			this.TopMenuSettings.Text = "Settings";
+			// 
+			// TopMenuRunner
+			// 
+			this.TopMenuRunner.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.TopMenuRunner.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(112)))), ((int)(((byte)(112)))), ((int)(((byte)(112)))));
+			this.TopMenuRunner.Image = global::Lumen.Studio.Properties.Resources.baseline_play_arrow_white_48dp;
+			this.TopMenuRunner.Name = "TopMenuRunner";
+			this.TopMenuRunner.Size = new System.Drawing.Size(28, 20);
+			this.TopMenuRunner.Click += new System.EventHandler(this.Run);
+			// 
+			// imageList1
+			// 
+			this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+			this.imageList1.TransparentColor = System.Drawing.Color.White;
+			this.imageList1.Images.SetKeyName(0, "3d.png");
+			this.imageList1.Images.SetKeyName(1, "hexagon.png");
+			this.imageList1.Images.SetKeyName(2, "triangle.png");
+			this.imageList1.Images.SetKeyName(3, "is_mainEnum.png");
+			this.imageList1.Images.SetKeyName(4, "module.png");
+			this.imageList1.Images.SetKeyName(5, "keyword.png");
+			// 
+			// headerPanel
+			// 
+			this.headerPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.headerPanel.Controls.Add(this.topMenu);
-            this.headerPanel.Controls.Add(this.panel4);
-            this.headerPanel.Controls.Add(this.panel3);
-            this.headerPanel.Controls.Add(this.panel2);
-            this.headerPanel.Location = new System.Drawing.Point(1, 1);
-            this.headerPanel.Name = "headerPanel";
-            this.headerPanel.Size = new System.Drawing.Size(598, 24);
-            this.headerPanel.TabIndex = 4;
-            // 
-            // panel4
-            // 
-            this.panel4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel4.BackgroundImage = global::Lumen.Studio.Properties.Resources.maximize;
-            this.panel4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.panel4.Location = new System.Drawing.Point(553, 4);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(16, 16);
-            this.panel4.TabIndex = 2;
-            this.panel4.Click += new System.EventHandler(this.MaximizeMinimize);
-            // 
-            // panel3
-            // 
-            this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel3.BackgroundImage = global::Lumen.Studio.Properties.Resources.closew;
-            this.panel3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.panel3.Location = new System.Drawing.Point(575, 4);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(16, 16);
-            this.panel3.TabIndex = 1;
-            this.panel3.Click += new System.EventHandler(this.Exit);
-            // 
-            // panel2
-            // 
-            this.panel2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel2.BackgroundImage")));
-            this.panel2.Location = new System.Drawing.Point(10, 4);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(16, 16);
-            this.panel2.TabIndex = 0;
-            // 
-            // MainForm
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ClientSize = new System.Drawing.Size(600, 350);
-            this.Controls.Add(this.headerPanel);
-            this.Controls.Add(this.splitContainer1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.topMenu;
-            this.MinimumSize = new System.Drawing.Size(600, 350);
-            this.Name = "MainForm";
-            this.Text = "Lumen Studio";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
-            this.Load += new System.EventHandler(this.FormLoad);
-            ((System.ComponentModel.ISupportInitialize)(this.textBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.output)).EndInit();
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            this.splitContainer1.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
-            this.bottomPanel.ResumeLayout(false);
-            this.bottomMenu.ResumeLayout(false);
-            this.bottomMenu.PerformLayout();
-            this.topMenu.ResumeLayout(false);
-            this.topMenu.PerformLayout();
-            this.headerPanel.ResumeLayout(false);
-            this.headerPanel.PerformLayout();
-            this.ResumeLayout(false);
+			this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.headerPanel.Controls.Add(this.TopMenu);
+			this.headerPanel.Controls.Add(this.TopMenuMaximize);
+			this.headerPanel.Controls.Add(this.TopMenuClose);
+			this.headerPanel.Controls.Add(this.panel2);
+			this.headerPanel.Location = new System.Drawing.Point(1, 1);
+			this.headerPanel.Name = "headerPanel";
+			this.headerPanel.Size = new System.Drawing.Size(598, 24);
+			this.headerPanel.TabIndex = 4;
+			// 
+			// TopMenuMaximize
+			// 
+			this.TopMenuMaximize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.TopMenuMaximize.BackgroundImage = global::Lumen.Studio.Properties.Resources.maximize;
+			this.TopMenuMaximize.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+			this.TopMenuMaximize.Location = new System.Drawing.Point(553, 4);
+			this.TopMenuMaximize.Name = "TopMenuMaximize";
+			this.TopMenuMaximize.Size = new System.Drawing.Size(16, 16);
+			this.TopMenuMaximize.TabIndex = 2;
+			this.TopMenuMaximize.Click += new System.EventHandler(this.MaximizeMinimize);
+			// 
+			// TopMenuClose
+			// 
+			this.TopMenuClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.TopMenuClose.BackgroundImage = global::Lumen.Studio.Properties.Resources.closew;
+			this.TopMenuClose.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+			this.TopMenuClose.Location = new System.Drawing.Point(575, 4);
+			this.TopMenuClose.Name = "TopMenuClose";
+			this.TopMenuClose.Size = new System.Drawing.Size(16, 16);
+			this.TopMenuClose.TabIndex = 1;
+			this.TopMenuClose.Click += new System.EventHandler(this.Exit);
+			// 
+			// panel2
+			// 
+			this.panel2.BackgroundImage = global::Lumen.Studio.Properties.Resources.biohazard;
+			this.panel2.Location = new System.Drawing.Point(10, 4);
+			this.panel2.Name = "panel2";
+			this.panel2.Size = new System.Drawing.Size(16, 16);
+			this.panel2.TabIndex = 0;
+			// 
+			// TextBoxContextMenu
+			// 
+			this.TextBoxContextMenu.Name = "TextBoxContextMenu";
+			this.TextBoxContextMenu.Size = new System.Drawing.Size(61, 4);
+			// 
+			// MainForm
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+			this.ClientSize = new System.Drawing.Size(600, 350);
+			this.Controls.Add(this.headerPanel);
+			this.Controls.Add(this.splitContainer1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MainMenuStrip = this.TopMenu;
+			this.MinimumSize = new System.Drawing.Size(600, 350);
+			this.Name = "MainForm";
+			this.Text = "Lumen Studio";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
+			this.Load += new System.EventHandler(this.FormLoad);
+			this.Shown += new System.EventHandler(this.MainForm_Shown);
+			((System.ComponentModel.ISupportInitialize)(this.textBox)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.Output)).EndInit();
+			this.splitContainer1.Panel1.ResumeLayout(false);
+			this.splitContainer1.Panel2.ResumeLayout(false);
+			this.splitContainer1.Panel2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+			this.splitContainer1.ResumeLayout(false);
+			this.splitContainer2.Panel1.ResumeLayout(false);
+			this.splitContainer2.Panel2.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+			this.splitContainer2.ResumeLayout(false);
+			this.bottomPanel.ResumeLayout(false);
+			this.BottomMenu.ResumeLayout(false);
+			this.BottomMenu.PerformLayout();
+			this.TopMenu.ResumeLayout(false);
+			this.TopMenu.PerformLayout();
+			this.headerPanel.ResumeLayout(false);
+			this.headerPanel.PerformLayout();
+			this.ResumeLayout(false);
 
 		}
 
         #endregion
 
         private FastColoredTextBoxNS.FastColoredTextBox textBox;
-		public ConsoleEmulator output;
+		public ConsoleEmulator Output;
 		private System.Windows.Forms.SplitContainer splitContainer1;
-		private System.Windows.Forms.MenuStrip topMenu;
-		private System.Windows.Forms.ToolStripMenuItem runToolStringipMenuItem;
+		public System.Windows.Forms.MenuStrip TopMenu;
+		private System.Windows.Forms.ToolStripMenuItem TopMenuRunner;
 		private System.Windows.Forms.SplitContainer splitContainer2;
 		public System.Windows.Forms.ImageList imageList1;
-		private System.Windows.Forms.ToolStripMenuItem fileToolStringipMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem openToolStringipMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem saveToolStringipMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem saveAsToolStringipMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem viewToolStringipMenuItem;
-		private System.Windows.Forms.TreeView treeView1;
-		private System.Windows.Forms.ToolStripMenuItem fileToolStringipMenuItem1;
-		private System.Windows.Forms.ToolStripMenuItem projectToolStringipMenuItem;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuFile;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuOpen;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuSave;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuSaveAs;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuView;
+		public System.Windows.Forms.TreeView treeView1;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuOpenFile;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuOpenProject;
 		private System.Windows.Forms.ImageList projectImages;
-		private System.Windows.Forms.ToolStripMenuItem createToolStringipMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem fileToolStringipMenuItem2;
-		private System.Windows.Forms.ToolStripMenuItem projectToolStringipMenuItem1;
-		private System.Windows.Forms.ToolStripMenuItem settingsToolStringipMenuItem;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuCreate;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuCreateFile;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuCreateProject;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuEdit;
         private System.Windows.Forms.Panel headerPanel;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Panel TopMenuClose;
+        private System.Windows.Forms.Panel TopMenuMaximize;
         private System.Windows.Forms.Panel bottomPanel;
-        private System.Windows.Forms.MenuStrip bottomMenu;
-        private System.Windows.Forms.ToolStripMenuItem outputToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem interactiveToolStripMenuItem;
-    }
+		public System.Windows.Forms.MenuStrip BottomMenu;
+        private System.Windows.Forms.ToolStripMenuItem BottomMenuOutput;
+		public System.Windows.Forms.ToolStripMenuItem BottomMenuLumenIntercative;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuTools;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuPanels;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuSettings;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuUndo;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuRedo;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuCopy;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuPaste;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuCut;
+		public System.Windows.Forms.ToolStripMenuItem TopMenuDelete;
+		private System.Windows.Forms.ContextMenuStrip TextBoxContextMenu;
+		public System.Windows.Forms.ToolStripSeparator TopMenuEditSplitter;
+	}
 }
 

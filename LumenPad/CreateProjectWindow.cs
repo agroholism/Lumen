@@ -6,8 +6,8 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Lumen.Studio {
-    public partial class CreateProjectWindow : LumenStudioForm/* Form/**/ {
-        public CreateProjectWindow() : base() {
+    public partial class CreateProjectDialog : LumenStudioForm/* Form/**/ {
+        public CreateProjectDialog() : base() {
             this.InitializeComponent();
 
             //* 

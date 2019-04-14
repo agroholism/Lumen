@@ -10,30 +10,48 @@ using System.Xml;
 using FastColoredTextBoxNS;
 
 namespace Lumen.Studio {
-	public partial class MainForm : LumenStudioForm /*/ Form/**/ {
+	public sealed partial class MainForm : LumenStudioForm /*/ Form/**/ {
 		/// <summary> Singleton realization  </summary>
 		public static MainForm Instance { get; private set; }
 
 		private static TaskFactory Factory { get; } = new TaskFactory();
-
 		public static TextBoxManager MainTextBoxManager { get; set; }
+		public static PictureBox MainPictureBox { get; } = new CopyableImageBox();
 
-		public static Project Project { get; set; }
-		public static String CurrentFile { get; set; }
-
-		public PictureBox MainPictureBox;
+		public static Control ActiveWorkingAreaControl { get; private set; }
+		public static Control ActiveBottomControl { get; private set; }
 
 		public String err;
 		public Place? b;
 		public Place? e;
 
-		public static Boolean AllowRegistrationChanges = true;
+		private readonly String argument;
 
-		public MainForm(String[] args) : base() {
+		internal MainForm(String[] args) : base() {
 			this.InitializeComponent();
+			this.StartPosition = FormStartPosition.CenterScreen;
+			Instance = this;
 
-			this.textBox.ContextMenuStrip = new ContextMenuStrip();
+			this.Opacity = 0;
 
+			Timer t = new Timer {
+				Interval = 10,
+				Enabled = true
+			};
+
+			t.Tick += (sender, e) => {
+				this.Opacity += 0.1;
+				if(this.Opacity >= 1) {
+					t.Enabled = false;
+				}
+			};
+
+			this.textBox.ContextMenuStrip = this.TextBoxContextMenu;
+			MainTextBoxManager = new TextBoxManager(this.textBox) {
+				Language = Settings.Languages[0]
+			};
+
+			// Make it into extension
 			ToolStripItem xmlize = new ToolStripButton("Xmlize");
 			xmlize.Click += (sender, e) => {
 				this.textBox.SelectedText = this.textBox.SelectedText.Replace("&", "&amp;")
@@ -46,91 +64,72 @@ namespace Lumen.Studio {
 				.Replace("&lt;", "<").Replace("&gt;", ">")
 				.Replace("&quot;", "\"").Replace("&amp;", "&");
 			};
-			this.textBox.ContextMenuStrip.Items.Add(xmlize);
-			this.textBox.ContextMenuStrip.Items.Add(dexmlize);
+			this.TextBoxContextMenu.Items.Add(xmlize);
+			this.TextBoxContextMenu.Items.Add(dexmlize);
 
-			this.textBox.ContextMenuStrip.BackColor = Settings.BackgroundColor;
-			this.textBox.ContextMenuStrip.ForeColor = Settings.ForegroundColor;
-			this.textBox.ContextMenuStrip.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 204);
-			this.textBox.ContextMenuStrip.ShowImageMargin = false;
-
-			this.textBox.ContextMenuStrip.Opening += (sender, e) => {
+			// Solve a problem
+			this.TextBoxContextMenu.Opening += (sender, e) => {
 				if (!this.textBox.Selection.IsEmpty) {
 					xmlize.Visible = true;
 					dexmlize.Visible = true;
 				}
 			};
-
-			this.textBox.ContextMenuStrip.Closed += (sender, e) => {
+			this.TextBoxContextMenu.Closed += (sender, e) => {
 				xmlize.Visible = false;
 				dexmlize.Visible = false;
 			};
 
+			//*
 			this.headerPanel.MouseDown += new MouseEventHandler(this.FormMouseDown);
 			this.headerPanel.MouseMove += new MouseEventHandler(this.FormMouseMove);
 			this.headerPanel.MouseUp += new MouseEventHandler(this.FormMouseUp);
+			//*/
 
-			ToolStripItem rtool = new ToolStripButton("Regex");
-			rtool.Click += (sender, e) => {
-				new RegexTester().ShowDialog();
-			};
+			this.treeView1.BeforeSelect += (sender, e) => e.Cancel = true;
 
-			this.topMenu.Items.Add(rtool);
-
-			this.treeView1.HideSelection = false;
-
-			this.treeView1.BeforeSelect += (sender, e) => {
-				e.Cancel = true;
-			};
-
-			Instance = this;
-
-			MainTextBoxManager = new TextBoxManager(this.textBox) {
-				Language = Settings.Languages[0]
-			};
-
-			this.splitContainer2.SplitterWidth = 1;
-
-			ConsoleWriter.Instance = new ConsoleWriter(this.output);
-			ConsoleReader.Instance = new ConsoleReader(this.output);
+			ConsoleWriter.Instance = new ConsoleWriter(this.Output);
+			ConsoleReader.Instance = new ConsoleReader(this.Output);
 
 			Console.SetOut(ConsoleWriter.Instance);
 			Console.SetIn(ConsoleReader.Instance);
 
-			this.MainPictureBox = new PictureBox {
-				Dock = DockStyle.Fill,
-				BorderStyle = BorderStyle.None,
-				WaitOnLoad = false,
-				Visible = false,
-				SizeMode = PictureBoxSizeMode.Zoom
-			};
+			this.splitContainer2.Panel1.Controls.Add(MainPictureBox);
 
-			this.splitContainer2.Panel1.Controls.Add(this.MainPictureBox);
+			ActiveBottomControl = this.Output;
+			this.MainMenuStrip.Renderer = new LumenMenuRenderer();
+			this.BottomMenu.Renderer = new LumenMenuRenderer();
 
 			this.ApplyColorScheme();
-			this.ColorizeTopMenu();
-			this.ColorizeBottomMenu();
 
 			if (args.Length > 0) {
-				if (File.Exists(args[0])) {
-					this.OpenFile(args[0], true);
-				}
-				else {
-					this.OpenProject(args[0]);
-					Settings.LastOpenedProject = null;
-				}
+				this.argument = args[0];
 			}
 
-			if (Settings.LastOpenedProject != null) {
-				this.OpenProject(Settings.LastOpenedProject);
-			}
+			this.Output.Location = new Point(0, this.Output.Width);
+
+			this.MakeControlActiveInWorkingArea(this.textBox);
+			this.Output.Location = new Point(0, 0);
 		}
 
-		#region ApplyTheme
-		internal void ApplyColorScheme() {
-			this.output.Font = new Font("Consolas", 9f);
 
-			this.treeView1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 204);
+		#region ApplyTheme
+		public void ApplyColorScheme() {
+			LoadImages();
+			this.treeView1.HideSelection = false;
+
+			this.Font = Settings.DefaultInterfaceFont;
+
+			this.Output.Font = new Font("Consolas", 9f);
+			this.Output.Dock = DockStyle.None;
+			this.Output.Size = this.bottomPanel.Size;
+			this.Output.Location = new Point(0, this.bottomPanel.Height);
+			this.Output.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
+
+			this.treeView1.Font = Settings.DefaultInterfaceFont;
+
+			this.splitContainer2.SplitterWidth = 1;
+
+			this.headerPanel.BackColor = Settings.BackgroundColor;
 
 			this.textBox.BackColor = Settings.BackgroundColor;
 			this.textBox.ForeColor = Settings.ForegroundColor;
@@ -142,19 +141,38 @@ namespace Lumen.Studio {
 			this.treeView1.BackColor = Settings.BackgroundColor;
 			this.treeView1.ForeColor = Settings.ForegroundColor;
 
-			this.topMenu.BackColor = Settings.BackgroundColor;
+			this.TopMenu.BackColor = Settings.BackgroundColor;
 			this.BackColor = Settings.LinesColor;
-			this.output.BackColor = Settings.BackgroundColor;
-			this.output.ForeColor = Settings.ForegroundColor;
+			this.Output.BackColor = Settings.BackgroundColor;
+			this.Output.ForeColor = Settings.ForegroundColor;
 			this.splitContainer1.BackColor = Settings.LinesColor;
 			this.splitContainer2.BackColor = Settings.LinesColor;
 
-			this.bottomMenu.BackColor = Settings.BackgroundColor;
-			this.bottomMenu.ForeColor = Settings.ForegroundColor;
+			this.BottomMenu.BackColor = Settings.BackgroundColor;
+			this.BottomMenu.ForeColor = Settings.ForegroundColor;
+
+			this.textBox.ContextMenuStrip.BackColor = Settings.BackgroundColor;
+			this.textBox.ContextMenuStrip.ForeColor = Settings.ForegroundColor;
+			this.textBox.ContextMenuStrip.Font = Settings.DefaultInterfaceFont;
+			this.textBox.ContextMenuStrip.ShowImageMargin = false;
+
+			this.ColorizeTopMenu();
+			this.ColorizeBottomMenu();
+		}
+
+		private void LoadImages() {
+			foreach (Object i in Settings.ProjectManagerImages) {
+				if (i is Image img) {
+					this.projectImages.Images.Add(img);
+				}
+				else if (i is Icon ico) {
+					this.projectImages.Images.Add(ico);
+				}
+			}
 		}
 
 		private void ColorizeTopMenu() {
-			foreach (Object i in this.topMenu.Items) {
+			foreach (Object i in this.TopMenu.Items) {
 				if (i is ToolStripMenuItem item) {
 					this.ColorizeMenuItem(item);
 				}
@@ -162,7 +180,7 @@ namespace Lumen.Studio {
 		}
 
 		private void ColorizeBottomMenu() {
-			foreach (Object i in this.bottomMenu.Items) {
+			foreach (Object i in this.BottomMenu.Items) {
 				if (i is ToolStripMenuItem item) {
 					this.ColorizeMenuItem(item);
 				}
@@ -184,16 +202,16 @@ namespace Lumen.Studio {
 		#endregion
 
 		private void Run(Object sender, EventArgs e) {
-			this.output.Clear();
+			this.Output.Clear();
 
 			if (MainTextBoxManager.Language != null) {
 				if (MainTextBoxManager.Language.Build != null) {
-					this.SavePreviousFile();
-					this.StartProcess(MainTextBoxManager.Language.Build.Replace("[FILE]", CurrentFile));
+					ProjectManager.SaveFile();
+					this.StartProcess(MainTextBoxManager.Language.Build.Replace("[FILE]", ProjectManager.CurrentFile));
 				}
 				else {
-					this.SavePreviousFile();
-					Task.Factory.StartNew(() => Light.Interpriter.Start(CurrentFile, new Lang.Scope()));
+					ProjectManager.SaveFile();
+					Task.Factory.StartNew(() => Light.Interpriter.Start(ProjectManager.CurrentFile, new Lang.Scope()));
 				}
 			}
 		}
@@ -273,104 +291,35 @@ namespace Lumen.Studio {
 				}
 			}
 
-			if (CurrentFile == null) {
+			if (argument != null) {
+				if (File.Exists(argument)) {
+					ProjectManager.OpenFile(argument, true);
+				}
+				else {
+					ProjectManager.OpenProject(argument);
+					Settings.LastOpenedProject = null;
+				}
+			}
+			else if (Settings.LastOpenedProject != null) {
+				ProjectManager.OpenProject(Settings.LastOpenedProject);
+			}
+			else if (ProjectManager.CurrentFile == null) {
 				if (!File.Exists("default.lm")) {
 					File.Create("default.lm").Close();
 				}
 
-				this.OpenFile("default.lm", true);
+				ProjectManager.OpenFile("default.lm", true);
 			}
 		}
 
-		#region File System
-
-		private void OpenFile(String path, Boolean save) {
-			if (File.Exists(path)) {
-				if (path.EndsWith(".png") || path.EndsWith(".jpg") || path.EndsWith(".ico")) {
-					this.OpenImage(path);
-					return;
-				}
-
-				this.MainPictureBox.Visible = false;
-				MainTextBoxManager.TextBox.Visible = true;
-
-				if (save) {
-					this.SavePreviousFile();
-				}
-
-				this.ProcessExtenstion(Path.GetExtension(path));
-				AllowRegistrationChanges = false;
-
-				MainTextBoxManager.TextBox.Text = File.ReadAllText(path);
-
-				AllowRegistrationChanges = true;
-
-				MainTextBoxManager.TextBox.ClearUndo();
-
-				CurrentFile = path;
-
-				if (Project != null) {
-					this.Text = path.Replace(Project.Path + "\\", "") + " - Lumen Studio";
-				}
-			}
-		}
-
-		private void ProcessExtenstion(String extension) {
-			foreach (Language language in Settings.Languages) {
-				if (language.Extensions.Contains(extension)) {
-					this.CustomizeForLanguage(language);
-					return;
-				}
-			}
-		}
-
-		private void CustomizeForLanguage(Language language) {
+		public void CustomizeForLanguage(Language language) {
 			MainTextBoxManager.Language = language;
 		}
 
-		private void SavePreviousFile() {
-			if (CurrentFile != null) {
-				File.WriteAllText(CurrentFile, MainTextBoxManager.TextBox.Text);
-				MainTextBoxManager.ChangesSaved = true;
+		public void UnshowAllAtWorkingArea() {
+			foreach (Control control in this.splitContainer2.Panel1.Controls) {
+				control.Visible = false;
 			}
-		}
-
-		public void DeleteRecursive(String dir) {
-			foreach (String d in Directory.EnumerateDirectories(dir)) {
-				this.DeleteRecursive(d);
-			}
-
-			foreach (String f in Directory.EnumerateFiles(dir)) {
-				File.Delete(f);
-			}
-
-			Directory.Delete(dir);
-		}
-
-		public void FileWriteWithCreating(String path) {
-			String[] s = path.Split('\\');
-
-			for (Int32 i = 1; i < s.Length - 1; i++) {
-				String p = "";
-				for (Int32 j = 0; j <= i; j++) {
-					p += s[j] + "\\";
-				}
-
-				if (!Directory.Exists(p)) {
-					Directory.CreateDirectory(p);
-				}
-			}
-
-			File.WriteAllText(path, MainTextBoxManager.TextBox.Text);
-		}
-
-		#endregion
-
-		private void OpenImage(String path) {
-			this.MainPictureBox.Visible = true;
-			this.textBox.Visible = false;
-
-			this.MainPictureBox.ImageLocation = path;
 		}
 
 		private void TextBox_ToolTipNeeded(Object sender, ToolTipNeededEventArgs e) {
@@ -406,28 +355,28 @@ namespace Lumen.Studio {
 		private void OpenToolStringipMenuItem_Click(Object sender, EventArgs e) {
 			OpenFileDialog dialog = new OpenFileDialog();
 			if (dialog.ShowDialog() == DialogResult.OK) {
-				this.OpenFile(dialog.FileName, true);
+				ProjectManager.OpenFile(dialog.FileName, true);
 			}
 		}
 
 		private void SaveToolStringipMenuItem_Click(Object sender, EventArgs e) {
-			this.SavePreviousFile();
+			ProjectManager.SaveFile();
 		}
 
 		private void MainForm_FormClosed(Object sender, FormClosedEventArgs e) {
-			if (Project != null && Project.Path != null) {
+			if (ProjectManager.Project != null && ProjectManager.Project.Path != null) {
 				XmlNode lastData = Settings.MainSettings.DocumentElement["LastData"];
 				if (lastData != null) {
-					lastData.Attributes["project"].Value = Project.Path;
+					lastData.Attributes["project"].Value = ProjectManager.Project.Path;
 				}
 				else {
 					XmlAttribute attribute = Settings.MainSettings.CreateAttribute("project");
-					attribute.Value = Project.Path;
+					attribute.Value = ProjectManager.Project.Path;
 					lastData = Settings.MainSettings.CreateElement("LastData");
 					lastData.Attributes.SetNamedItem(attribute);
 					Settings.MainSettings.DocumentElement.AppendChild(lastData);
 				}
-				Settings.MainSettings.Save("settings\\main.xml");
+				Settings.MainSettings.Save(Settings.ExecutablePath + "\\settings\\main.xml");
 			}
 
 			Application.Exit();
@@ -445,20 +394,11 @@ namespace Lumen.Studio {
 			FolderBrowserDialog ofd = new FolderBrowserDialog();
 
 			if (ofd.ShowDialog() == DialogResult.OK) {
-				this.OpenProject(ofd.SelectedPath);
+				ProjectManager.OpenProject(ofd.SelectedPath);
 			}
 		}
 
-		private void OpenProject(String selectedPath) {
-			Project = new Project {
-				Name = this.GetName(selectedPath),
-				Path = selectedPath
-			};
-
-			this.Fill(this.treeView1.Nodes.Add(Project.Name), Path.GetFullPath(selectedPath));
-		}
-
-		private void Fill(TreeNode node, String path) {
+		internal void Fill(TreeNode node, String path) {
 			foreach (String i in Directory.EnumerateDirectories(path)) {
 				TreeNode n = node.Nodes.Add(i, i.Replace(path + "\\", ""), 0, 0);
 				this.Fill(n, i);
@@ -470,29 +410,10 @@ namespace Lumen.Studio {
 		}
 
 		private Int32 GetImageIndex(String i) {
-			if (i.EndsWith(".html")) {
-				return 2;
-			}
-
-			if (i.EndsWith(".py")) {
-				return 3;
-			}
-
-			if (i.EndsWith(".lm")) {
-				return 4;
-			}
-
-			if (i.EndsWith(".css")) {
-				return 5;
-			}
-			if (i.EndsWith(".png")) {
-				return 6;
-			}
-
-			return 1;
+			return Settings.Loader.GetImageIndex(Path.GetExtension(i));
 		}
 
-		private String GetName(String path) {
+		public String GetName(String path) {
 			String[] cons = path.Split('\\');
 
 			return cons[cons.Length - 1];
@@ -502,23 +423,23 @@ namespace Lumen.Studio {
 			String path = e.Node.Name;
 			this.treeView1.SelectedNode = null;
 
-			if (Project == null) {
+			if (ProjectManager.Project == null) {
 				return;
 			}
 
-			this.OpenFile(path, true);
+			ProjectManager.OpenFile(path, true);
 		}
 
 		#endregion
 
 		private void TextBox_KeyDown(Object sender, KeyEventArgs e) {
 			if (e.Control && e.KeyCode == Keys.S) {
-				this.SavePreviousFile();
+				ProjectManager.SaveFile();
 			}
 		}
 
 		private void CreateProjectClick(Object sender, EventArgs e) {
-			new CreateProjectWindow().ShowDialog();
+			new CreateProjectDialog().ShowDialog();
 		}
 
 		private void Exit(Object sender, EventArgs e) {
@@ -563,17 +484,70 @@ namespace Lumen.Studio {
 			}
 		}
 
+		private Boolean direction = true;
+
+		public void MakeControlActiveInBottom(Control control) {
+			if(ActiveBottomControl == control) {
+				return;
+			}
+
+			if(direction) {
+				control.Location = new Point(0, -this.bottomPanel.Height);
+			}
+			else {
+				control.Location = new Point(0, this.bottomPanel.Height);
+			}
+
+			Int32 index = this.bottomPanel.Height / 10;
+
+			Timer t = new Timer {
+				Interval = 1,
+				Enabled = true
+			};
+
+			t.Tick += (sender, e) => {
+				// down
+				if (direction && control.Location.Y < 0) {
+					// move down
+					control.Location = new Point(0, control.Location.Y + index > 0 ? 0 : control.Location.Y + index);
+					ActiveBottomControl.Location = new Point(0, ActiveBottomControl.Location.Y + index);
+				} else if (!direction && control.Location.Y > 0) {
+					control.Location = new Point(0, control.Location.Y - index < 0 ? 0 : control.Location.Y - index);
+					ActiveBottomControl.Location = new Point(0, ActiveBottomControl.Location.Y - index);
+				}
+				else {
+					t.Enabled = false;
+					ActiveBottomControl = control;
+					direction = !direction;
+				}
+			};
+		}
+
 		private void OutputToolStripMenuItem_Click(Object sender, EventArgs e) {
-			this.BottomPanelHideAll();
-			this.output.Visible = true;
+			MakeControlActiveInBottom(Output);
 		}
 
 		private void ShowInteractive(Object sender, EventArgs e) {
-			this.BottomPanelHideAll();
+			//this.BottomPanelHideAll();
 			if (this.interactive == null) {
 				this.IntializeInteractive();
 			}
-			this.interactive.Visible = true;
+
+			MakeControlActiveInBottom(interactive);
+		}
+
+		public void AddControlToWorkingArea(Control control) {
+			this.splitContainer2.Panel1.Controls.Add(control);
+		}
+
+		public void MakeControlActiveInWorkingArea(Control control) {
+			if (!this.splitContainer2.Panel1.Contains(control)) {
+				this.AddControlToWorkingArea(control);
+			}
+
+			this.UnshowAllAtWorkingArea();
+			ActiveWorkingAreaControl = control;
+			control.Visible = true;
 		}
 
 		TextBoxManager tbmng;
@@ -581,11 +555,14 @@ namespace Lumen.Studio {
 		private void IntializeInteractive() {
 			this.interactive = new ConsoleEmulator();
 			this.bottomPanel.Controls.Add(this.interactive);
-			this.interactive.Dock = DockStyle.Fill;
 			this.interactive.Font = new Font("Consolas", 9f);
 			this.interactive.ShowLineNumbers = false;
 			this.interactive.BackColor = Settings.BackgroundColor;
 			this.interactive.ForeColor = Settings.ForegroundColor;
+			this.interactive.Size = this.bottomPanel.Size;
+			this.interactive.Visible = true;
+
+			this.interactive.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
 
 			this.tbmng = new TextBoxManager(this.interactive) {
 				Language = Settings.Languages[0]
@@ -617,6 +594,111 @@ namespace Lumen.Studio {
 					Console.SetOut(ConsoleWriter.Instance);
 				}
 			});
+		}
+
+		/* Edit submenu methods */
+		private void MakeShowIEditable() {
+			this.TopMenuUndo.Visible = true;
+			this.TopMenuRedo.Visible = true;
+			this.TopMenuEditSplitter.Visible = true;
+			this.TopMenuCopy.Visible = true;
+			this.TopMenuPaste.Visible = true;
+			this.TopMenuCut.Visible = true;
+			this.TopMenuDelete.Visible = true;
+		}
+
+		private void TopMenuEdit_DropDownOpening(Object sender, EventArgs e) {
+			this.MakeShowIEditable();
+
+			if (ActiveWorkingAreaControl is FastColoredTextBox) {
+				return;
+			}
+
+			if (!(ActiveWorkingAreaControl is IUndoable)) {
+				this.TopMenuUndo.Visible = false;
+			}
+
+			if (!(ActiveWorkingAreaControl is IRedoable)) {
+				this.TopMenuRedo.Visible = false;
+			}
+
+			if (!(this.TopMenuUndo.Visible && this.TopMenuRedo.Visible)) {
+				this.TopMenuEditSplitter.Visible = false;
+			}
+
+			if (!(ActiveWorkingAreaControl is ICopyable)) {
+				this.TopMenuCopy.Visible = false;
+			}
+
+			if (!(ActiveWorkingAreaControl is IPasteable)) {
+				this.TopMenuPaste.Visible = false;
+			}
+
+			if (!(ActiveWorkingAreaControl is ICutable)) {
+				this.TopMenuCut.Visible = false;
+			}
+
+			if (!(ActiveWorkingAreaControl is IDeleteable)) {
+				this.TopMenuDelete.Visible = false;
+			}
+		}
+
+		private void TopMenuUndo_Click(Object sender, EventArgs e) {
+			if (ActiveWorkingAreaControl is FastColoredTextBox textBox) {
+				textBox.Undo();
+			}
+			else if (ActiveWorkingAreaControl is IUndoable undonable) {
+				undonable.Undo();
+			}
+		}
+
+		private void TopMenuRedo_Click(Object sender, EventArgs e) {
+			if (ActiveWorkingAreaControl is FastColoredTextBox textBox) {
+				textBox.Redo();
+			}
+			else if (ActiveWorkingAreaControl is IRedoable redoable) {
+				redoable.Redo();
+			}
+		}
+
+		private void TopMenuCopy_Click(Object sender, EventArgs e) {
+			if (ActiveWorkingAreaControl is FastColoredTextBox textBox) {
+				textBox.Copy();
+			}
+			else if (ActiveWorkingAreaControl is ICopyable copyable) {
+				copyable.Copy();
+			}
+		}
+
+		private void TopMenuPaste_Click(Object sender, EventArgs e) {
+			if (ActiveWorkingAreaControl is FastColoredTextBox textBox) {
+				textBox.Paste();
+			}
+			else if (ActiveWorkingAreaControl is IPasteable pasteable) {
+				pasteable.Paste();
+			}
+		}
+
+		private void TopMenuCut_Click(Object sender, EventArgs e) {
+			if (ActiveWorkingAreaControl is FastColoredTextBox textBox) {
+				textBox.Cut();
+			}
+			else if (ActiveWorkingAreaControl is ICutable cutable) {
+				cutable.Cut();
+			}
+		}
+
+		private void TopMenuDelete_Click(Object sender, EventArgs e) {
+			if (ActiveWorkingAreaControl is FastColoredTextBox textBox) {
+				textBox.SelectedText = "";
+			}
+			else if (ActiveWorkingAreaControl is IDeleteable deleteable) {
+				deleteable.Delete();
+			}
+		}
+
+		private void MainForm_Shown(Object sender, EventArgs e) {
+
 		}
 	}
 }

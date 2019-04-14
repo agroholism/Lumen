@@ -3,7 +3,7 @@
   Lumen Studio theme 'Sandy'
   Autor: Tsvikevich Denis © 2019
 -->
-<Theme name="Sandy">
+<Theme name="Sandy" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/theme">
 	<IconPack path="icons/standart"/>
 
 	<Background color="2; 44; 55"/>
@@ -12,16 +12,16 @@
 
 	<Syntax>
 		<Casual foreColor="0; 0; 0"/>
-		<Keyword1 foreColor="0, 0, 255"/>
-		<Keyword2 foreColor="0, 0, 255"/>
-		<Text1 foreColor="255, 147, 89" />
-		<Text2 foreColor="255, 147, 89" />
+		<Keyword1 foreColor="140, 85, 66"/>
+		<Keyword2 foreColor="140, 85, 66"/>
+		<Text1 foreColor="#428684" />
+		<Text2 foreColor="#428684" />
 		<Number foreColor="200; 200; 200" />
 		<Comment1 foreColor= "0, 255, 0"/>
 		<Comment2 foreColor= "0, 255, 0"/>
-		<Function foreColor= ""/>
-		<Class foreColor= "0, 0, 255"/>
-		<Interface foreColor= ""/>
+		<Function foreColor= "#266C8F"/>
+		<Class foreColor= "148, 93, 132"/>
+		<Interface foreColor= "#5A186B"/>
 		<Decorator foreColor= ""/>
 		<Directive foreColor= ""/>
 		<Constant foreColor= ""/>

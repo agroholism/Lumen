@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+
 using FastColoredTextBoxNS;
-using Lumen;
 
 namespace Lumen.Studio {
-    public class TextBoxManager {
+	public class TextBoxManager {
         public FastColoredTextBox TextBox { get; private set; }
         public AutocompleteMenu Menu { get; private set; }
         public Language Language { get; set; }
@@ -24,11 +22,14 @@ namespace Lumen.Studio {
                 MinFragmentLength = 1,
                 AppearInterval = 50,
                 RenderMode = ToolStripRenderMode.Professional,
-                BackColor = Color.FromArgb(30, 30, 30),
-                ForeColor = Color.FromArgb(200, 200, 200),
+                BackColor = Settings.BackgroundColor,
+                ForeColor = Settings.ForegroundColor,
                 SelectedColor = Color.FromArgb(112, 112, 112),
                 ImageList = MainForm.Instance.imageList1,
-                AlwaysShowTooltip = true
+                AlwaysShowTooltip = true,
+				BorderColor = Settings.LinesColor,
+				Font = Settings.DefaultInterfaceFont,
+				DropShadowEnabled = false
             };
         }
 
@@ -45,13 +46,11 @@ namespace Lumen.Studio {
         }
 
         internal void OnTextChanged(TextChangedEventArgs eventArgs) {
-            if (MainForm.AllowRegistrationChanges) {
+            if (ProjectManager.AllowRegistrationChanges) {
                 this.ChangesSaved = false;
             }
 
             this.Language.OnTextChanged(this, eventArgs.ChangedRange);
         }
-
-        Place? b, e;
     }
 }

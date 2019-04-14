@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Lumen.Tomen;
-using Lumen;
 using Lumen.Light;
+using Lumen.Tomen;
 
 namespace Lumen.Anatomy {
-    public class Program {
+	public class Program {
         public static String ProjectName { get; set; }
 
         private static String PagesFolder {
             get => ProjectName + "\\model\\pages";
         }
+
         private static String ScriptsFolder {
             get => ProjectName + "\\model\\scripts";
         }
@@ -66,11 +66,9 @@ namespace Lumen.Anatomy {
         }
 
         private static void MakeTmp() {
-            Lang.Scope scope = MakeScope();
-
             // Refresh tmp directory
             foreach (String i in Directory.EnumerateFiles(PagesFolder)) {
-                // If it's tamplate file
+                // If it's template file
                 if (i.EndsWith(".lmt")) {
                     String tmpPath = Path.GetFullPath(ProjectName + "\\tmp\\lmt-" + Path.GetFileNameWithoutExtension(i) + ".lm");
                     String buildPath = ProjectName + "\\build\\" + Path.GetFileNameWithoutExtension(i) + ".html";
@@ -78,7 +76,7 @@ namespace Lumen.Anatomy {
 
                     String old = Directory.GetCurrentDirectory();
                     Directory.SetCurrentDirectory(ProjectName + "\\tmp");
-                    Interpriter.Start(tmpPath, scope);
+                    Interpriter.Start(tmpPath, MakeScope());
                     Directory.SetCurrentDirectory(old);
                 } else {
                     File.WriteAllText(ProjectName + "\\tmp\\" + Path.GetFileName(i), File.ReadAllText(i));
