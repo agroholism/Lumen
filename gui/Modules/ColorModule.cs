@@ -3,57 +3,57 @@ using System;
 
 namespace Lumen.Lang.Libraries.Visual {
     public class ColorModule : Module {
-        public static IObject Red { get; private set; }
-        public static IObject AliceBlue { get; private set; }
-        public static IObject AntiqueWhite { get; private set; }
-        public static IObject Aqua { get; private set; }
-        public static IObject Aquamarine { get; private set; }
-        public static IObject Azure { get; private set; }
-        public static IObject Beige { get; private set; }
-        public static IObject Bisque { get; private set; }
-        public static IObject Black { get; private set; }
-        public static IObject BlanchedAlmond { get; private set; }
-        public static IObject Blue { get; private set; }
-        public static IObject BurlyWood { get; private set; }
-        public static IObject Cyan { get; private set; }
-        public static IObject DarkBlue { get; private set; }
-        public static IObject DarkGoldenrod { get; private set; }
-        public static IObject DarkGray { get; private set; }
-        public static IObject DarkOliveGreen { get; private set; }
-        public static IObject DeepSkyBlue { get; private set; }
-        public static IObject Green { get; private set; }
-        public static IObject DodgerBlue { get; private set; }
-        public static IObject DimGray { get; private set; }
-        public static IObject DeepPink { get; private set; }
-        public static IObject DarkViolet { get; private set; }
-        public static IObject DarkTurquoise { get; private set; }
-        public static IObject DarkSlateGray { get; private set; }
-        public static IObject DarkSlateBlue { get; private set; }
-        public static IObject DarkSalmon { get; private set; }
-        public static IObject DarkSeaGreen { get; private set; }
-        public static IObject DarkRed { get; private set; }
-        public static IObject DarkOrchid { get; private set; }
-        public static IObject DarkOrange { get; private set; }
-        public static IObject DarkMagenta { get; private set; }
-        public static IObject DarkKhaki { get; private set; }
-        public static IObject DarkGreen { get; private set; }
-        public static IObject DarkCyan { get; private set; }
-        public static IObject Crimson { get; private set; }
-        public static IObject Cornsilk { get; private set; }
-        public static IObject CornflowerBlue { get; private set; }
-        public static IObject Coral { get; private set; }
-        public static IObject Chocolate { get; private set; }
-        public static IObject Chartreuse { get; private set; }
-        public static IObject CadetBlue { get; private set; }
-        public static IObject Brown { get; private set; }
-        public static IObject BlueViolet { get; private set; }
-        public static IObject White { get; private set; }
+        public static IType Red { get; private set; }
+        public static IType AliceBlue { get; private set; }
+        public static IType AntiqueWhite { get; private set; }
+        public static IType Aqua { get; private set; }
+        public static IType Aquamarine { get; private set; }
+        public static IType Azure { get; private set; }
+        public static IType Beige { get; private set; }
+        public static IType Bisque { get; private set; }
+        public static IType Black { get; private set; }
+        public static IType BlanchedAlmond { get; private set; }
+        public static IType Blue { get; private set; }
+        public static IType BurlyWood { get; private set; }
+        public static IType Cyan { get; private set; }
+        public static IType DarkBlue { get; private set; }
+        public static IType DarkGoldenrod { get; private set; }
+        public static IType DarkGray { get; private set; }
+        public static IType DarkOliveGreen { get; private set; }
+        public static IType DeepSkyBlue { get; private set; }
+        public static IType Green { get; private set; }
+        public static IType DodgerBlue { get; private set; }
+        public static IType DimGray { get; private set; }
+        public static IType DeepPink { get; private set; }
+        public static IType DarkViolet { get; private set; }
+        public static IType DarkTurquoise { get; private set; }
+        public static IType DarkSlateGray { get; private set; }
+        public static IType DarkSlateBlue { get; private set; }
+        public static IType DarkSalmon { get; private set; }
+        public static IType DarkSeaGreen { get; private set; }
+        public static IType DarkRed { get; private set; }
+        public static IType DarkOrchid { get; private set; }
+        public static IType DarkOrange { get; private set; }
+        public static IType DarkMagenta { get; private set; }
+        public static IType DarkKhaki { get; private set; }
+        public static IType DarkGreen { get; private set; }
+        public static IType DarkCyan { get; private set; }
+        public static IType Crimson { get; private set; }
+        public static IType Cornsilk { get; private set; }
+        public static IType CornflowerBlue { get; private set; }
+        public static IType Coral { get; private set; }
+        public static IType Chocolate { get; private set; }
+        public static IType Chartreuse { get; private set; }
+        public static IType CadetBlue { get; private set; }
+        public static IType Brown { get; private set; }
+        public static IType BlueViolet { get; private set; }
+        public static IType White { get; private set; }
 
-        public static IObject RGB { get; private set; }
-        public static IObject ARGB { get; private set; }
+        public static IType RGB { get; private set; }
+        public static IType ARGB { get; private set; }
 
         public ColorModule() {
-            this.name = "Visual.Color";
+            this.Name = "Visual.Color";
 
             Red = Helper.CreateConstructor("Visual.Color.Red", this, new String[0]);
             AliceBlue = Helper.CreateConstructor("Visual.Color.AliceBlue", this, new String[0]);
@@ -105,18 +105,18 @@ namespace Lumen.Lang.Libraries.Visual {
 
             ARGB = Helper.CreateConstructor("Visual.Color.ARGB", this, new[] { "A", "R", "G", "B" });
 
-            this.SetField("RGB", RGB);
-            this.SetField("ARGB", ARGB);
-            this.SetField("Green", Green);
-            this.SetField("DodgerBlue", DodgerBlue);
-            this.SetField("Red", Red);
-            this.SetField("Green", Green);
-            this.SetField("Blue", Blue);
-            this.SetField("Black", Black);
-            this.SetField("White", White);
+            this.SetMember("RGB", RGB);
+            this.SetMember("ARGB", ARGB);
+            this.SetMember("Green", Green);
+            this.SetMember("DodgerBlue", DodgerBlue);
+            this.SetMember("Red", Red);
+            this.SetMember("Green", Green);
+            this.SetMember("Blue", Blue);
+            this.SetMember("Black", Black);
+            this.SetMember("White", White);
         }
 
-        internal static Color ToSystemColor(IObject obj, Scope s) {
+        internal static Color ToSystemColor(IType obj, Scope s) {
             if(obj == AliceBlue) {
                 return Color.AliceBlue;
             }
@@ -687,18 +687,18 @@ namespace Lumen.Lang.Libraries.Visual {
                  return Color.YellowGreen;
              }*/
 
-            if (obj.Parent == RGB) {
-                Int32 r = obj.GetField("R", s).ToInt(s);
-                Int32 g = obj.GetField("G", s).ToInt(s);
-                Int32 b = obj.GetField("B", s).ToInt(s);
+            if (obj.Type == RGB) {
+                Int32 r = obj.GetMember("R", s).ToInt(s);
+                Int32 g = obj.GetMember("G", s).ToInt(s);
+                Int32 b = obj.GetMember("B", s).ToInt(s);
                 return Color.FromArgb(255, r, g, b);
             }
 
-            if (obj.Parent == ARGB) {
-                Int32 a = obj.GetField("A", s).ToInt(s);
-                Int32 r = obj.GetField("R", s).ToInt(s);
-                Int32 g = obj.GetField("G", s).ToInt(s);
-                Int32 b = obj.GetField("B", s).ToInt(s);
+            if (obj.Type == ARGB) {
+                Int32 a = obj.GetMember("A", s).ToInt(s);
+                Int32 r = obj.GetMember("R", s).ToInt(s);
+                Int32 g = obj.GetMember("G", s).ToInt(s);
+                Int32 b = obj.GetMember("B", s).ToInt(s);
                 return Color.FromArgb(a, r, g, b);
             }
 

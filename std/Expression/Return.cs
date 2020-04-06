@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Expressions {
-    public sealed class Return : Exception, Expression {
+	public sealed class Return : Exception, Expression {
         private readonly Expression expression;
 
         public Value Result { get; private set; }
@@ -25,8 +25,12 @@ namespace Lumen.Lang.Expressions {
             throw this;
         }
 
-        public Expression Closure(List<String> visible, Scope thread) {
-            return new Return(this.expression.Closure(visible, thread)) {
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			yield return new StopIteration();
+		}
+
+		public Expression Closure(ClosureManager manager) {
+            return new Return(this.expression?.Closure(manager)) {
                 Result = this.Result
             };
         }

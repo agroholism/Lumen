@@ -15,18 +15,18 @@ using vion;
 public static class Main {
     public static Module PlotType { get; } = new PlotType();
 
-    public static IObject Point { get; } = Helper.CreateConstructor("Point", PlotType, new List<String>());
-    public static IObject Area { get; } = Helper.CreateConstructor("Area", PlotType, new List<String>());
-    public static IObject Line { get; } = Helper.CreateConstructor("Line", PlotType, new List<String>());
+    public static IType Point { get; } = Helper.CreateConstructor("Point", PlotType, new List<String>());
+    public static IType Area { get; } = Helper.CreateConstructor("Area", PlotType, new List<String>());
+    public static IType Line { get; } = Helper.CreateConstructor("Line", PlotType, new List<String>());
 
     public static void Import(Scope scope, String s) {
-        Prelude.Instance.SetField("PlotType", PlotType);
+        Prelude.Instance.SetMember("PlotType", PlotType);
 
-        PlotType.SetField("Point", Point);
-        PlotType.SetField("Area", Area);
-        PlotType.SetField("Line", Line);
+        PlotType.SetMember("Point", Point);
+        PlotType.SetMember("Area", Area);
+        PlotType.SetMember("Line", Line);
 
-        scope.Set("plot", new LambdaFun((e, args) => {
+        scope.Bind("draw", new LambdaFun((e, args) => {
             Form form = new Form { Text = "", ShowIcon = false };
 
             Chart chart = new Chart {
@@ -49,7 +49,8 @@ public static class Main {
 
             Series mySeriesOfPoint = new Series("Sinus") {
                 ChartType = chType,
-                ChartArea = "[graphics]"
+                ChartArea = "[graphics]",
+				IsXValueIndexed = true
             };
 
             DataPoint last = null;
@@ -79,8 +80,8 @@ public static class Main {
 
             //mySeriesOfPoint.ToolTip = "X = #VALX, Y = #VALY";
 
-            IEnumerable<Value> dataX = e["x"].ToSequence(scope);
-            IEnumerable<Value> dataY = e["y"].ToSequence(scope);
+            IEnumerable<Value> dataX = e["x"].ToStream(scope);
+            IEnumerable<Value> dataY = e["y"].ToStream(scope);
 
             foreach (var i in dataX.Zip(dataY, (x, y) => new { x, y })) {
                 mySeriesOfPoint.Points.AddXY(i.x.ToDouble(scope), i.y.ToDouble(scope));
@@ -111,7 +112,7 @@ namespace vion {
 
 
         public PlotType() {
-            this.name = "PlotType";
+            this.Name = "PlotType";
         }
     }
 

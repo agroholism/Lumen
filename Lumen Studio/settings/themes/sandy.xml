@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+  Lumen Studio theme 'Sandy'
+  Autor: Tsvikevich Denis © 2019
+-->
+<Theme name="Sandy" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/theme">
+  <Variables>
+    <Variable name="back"  type="color" value="2; 44; 55"/>
+    <Variable name="fore"  type="color" value="108, 149, 79"/>
+    <Variable name="lines" type="color" value="7; 54; 66"/>
+  </Variables>
+  
+	<IconPack path="icons/standart"/>
+
+	<Background color="#back"/>
+	<Foreground color="#fore"/>
+	<Grid color="#lines"/>
+
+  <TopMenu>
+    <Background color="#back" />
+    <SelectedBackground color="#lines" />
+    <Foreground color="#fore" />
+    <Borders color="#lines"/>
+    <ArrowColor color="#lines"/>
+    <SelectedArrowColor color="#back"/>
+  </TopMenu>
+
+  <BottomMenu>
+    <Background color="#back" />
+    <SelectedBackground color="#lines" />
+    <Foreground color="#fore" />
+    <Borders color="#lines"/>
+    <ArrowColor color="#lines"/>
+  </BottomMenu>
+
+  <TextBox>
+    <Background color="#back"/>
+    <Foreground color="#fore"/>
+  </TextBox>
+
+  <Breakpoints>
+    <Active>
+      <SelfBackground color=""/>
+      <SelfForeground color=""/>
+      <Background color=""/>
+      <Foreground color=""/>
+    </Active>
+    <Unactive>
+      <SelfBackground color=""/>
+      <SelfForeground color=""/>
+      <Background color=""/>
+      <Foreground color=""/>
+    </Unactive>
+  </Breakpoints>
+
+  <AutocompleteMenu>
+    <Background color="#back" />
+    <SelectedBackground color="#lines" />
+    <Foreground color="#fore" />
+    <Borders color="#lines"/>
+    <ArrowColor color="#lines"/>
+    <ToolTip>
+      <Background color="#lines" />
+      <Foreground color="#fore" />
+      <Borders color="#lines"/>
+    </ToolTip>
+  </AutocompleteMenu>
+
+  <Syntax>
+		<Casual foreColor="#fore"/>
+		<Keyword1 foreColor="140, 85, 66"/>
+		<Keyword2 foreColor="140, 85, 66"/>
+		<Text1 foreColor="#428684" />
+		<Text2 foreColor="#428684" />
+		<Number foreColor="200; 200; 200" />
+		<Comment1 foreColor= "0, 255, 0"/>
+		<Comment2 foreColor= "0, 255, 0"/>
+		<Function foreColor= "#266C8F"/>
+		<Class foreColor= "148, 93, 132"/>
+		<Interface foreColor= "#5A186B"/>
+		<Decorator foreColor= ""/>
+		<Directive foreColor= ""/>
+		<Constant foreColor= ""/>
+		<Variable foreColor= ""/>
+		<Opertor foreColor= ""/>
+		<Tag foreColor= ""/>
+		<Attribute foreColor= ""/>
+	</Syntax>
+</Theme>

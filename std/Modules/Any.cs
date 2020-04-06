@@ -3,19 +3,17 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-    internal class AnyModule : Module {
+	internal class AnyModule : Module {
         internal AnyModule() {
-            this.name = "_";
+            this.Name = "_";
 
-            this.Parent = null;
-
-            this.SetField("String", new LambdaFun((e, args) => {
-                if(e.This is SingletonConstructor sc) {
-                    return new Text(sc.ToString(e));
+            this.SetMember("toText", new LambdaFun((e, args) => {
+                if(e["this"] is SingletonConstructor sc) {
+                    return new Text(sc.Name);
                 }
 
-                String result = "(" + e.This.Type.ToString(e) + " " 
-                    + String.Join<Value>(" ", (e.This as Instance).items) + ")";
+                String result = "(" + e["this"].Type.ToString() + " " 
+                    + String.Join<Value>(" ", (e["this"] as Instance).items) + ")";
                 return new Text(result);
             }) {
                 Arguments = new System.Collections.Generic.List<IPattern> {
@@ -23,7 +21,7 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.SetField(Op.EQUALS, new LambdaFun((e, args) => {
+            this.SetMember(Op.EQUALS, new LambdaFun((e, args) => {
                 Value first = e["x"];
                 Value second = e["y"];
 
@@ -35,7 +33,7 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.SetField(Op.NOT_EQL, new LambdaFun((e, args) => {
+            this.SetMember(Op.NOT_EQL, new LambdaFun((e, args) => {
                 Value first = e["x"];
                 Value second = e["y"];
 
@@ -48,4 +46,18 @@ namespace Lumen.Lang {
             });
         }
     }
+
+	internal class UnitModule : Module {
+		internal UnitModule() {
+			this.Name = "Unit";
+
+			this.SetMember("toText", new LambdaFun((e, args) => {
+				return new Text(e["this"].ToString());
+			}) {
+				Arguments = new System.Collections.Generic.List<IPattern> {
+					new NamePattern("this")
+				}
+			});
+		}
+	}
 }

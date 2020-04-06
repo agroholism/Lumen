@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Language name="PascalABC" extensions=".pas" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/language">
+  <Foldings>
+
+  </Foldings>
+  
+  <Styles>
+    <Style name="string" pattern="(&quot;&quot;)|&quot;.*?[^\\]&quot;"/>
+    <Style name="comment" pattern="//.*$"/>
+    <Style name="keyword" pattern="\b(program|begin|end|to|do|downto|var|const|type|array|sequence|string|function|procedure|result|real|integer|char|for|in|if|then|else|case|on|of|uses|class|interface|read|write)\b" />
+  </Styles>
+  
+  <Events>
+    <Build action="settings\\languages\\pascal\\build.bat [FILE]" />
+  </Events>
+</Language>

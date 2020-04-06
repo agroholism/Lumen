@@ -1,50 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Lumen.Lang {
-    public class Instance : IObject {
+	public class Instance : BaseValueImpl {
         public Value[] items;
 
-        /// <summary> Parent object, always must be Constructor </summary>
-        public IObject Parent { get; set; }
+        public override IType Type { get; }
 
-        public Boolean IsParentOf(Value value) {
-            if (value is IObject parent) {
-                while (true) {
-                    if (parent.Parent != null) {
-                        parent = parent.Parent;
-                        if (parent == this) {
-                            return true;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public override String ToString() {
-            return this.ToString(null);
-        }
-
-        public IObject Type => this.Parent;
-
-        public Instance(Constructor parent) {
-            this.items = new Value[parent.Fields.Count];
-            this.Parent = parent;
+		public Instance(Constructor type) {
+            this.items = new Value[type.Fields.Count];
+            this.Type = type;
         }
 
         public Boolean TryGetField(String name, out Value result) {
-            Int32 index = (this.Parent as Constructor).Fields.IndexOf(name);
+            Int32 index = (this.Type as Constructor).Fields.IndexOf(name);
 
             if (index != -1) {
                 result = this.items[index];
                 return true;
             }
 
-            if (this.Parent != null) {
-                if (this.Parent.TryGetField(name, out result)) {
+            if (this.Type != null) {
+                if (this.Type.TryGetMember(name, out result)) {
                     return true;
                 }
             }
@@ -54,42 +30,18 @@ namespace Lumen.Lang {
         }
 
         public Value GetField(String name, Scope e) {
-            Int32 index = (this.Parent as Constructor).Fields.IndexOf(name);
+            if(this.TryGetField(name, out Value result)) {
+				return result;
+			}
 
-            if (index != -1) {
-                return this.items[index];
-            }
-
-            if (this.Parent != null) {
-                if (this.Parent.TryGetField(name, out Value result)) {
-                    return result;
-                }
-            }
-
-            throw new LumenException($"Module does not contains a field {name}");
+            throw new LumenException(Exceptions.INSTANCE_OF_DOES_NOT_CONTAINS_FIELD.F(this.Type, name));
         }
 
         public void SetField(String name, Value value, Scope e) {
-            Int32 index = (this.Parent as Constructor).Fields.IndexOf(name);
-
-            if (index != -1) {
-                this.items[index] = value;
-            }
+            // throw
         }
 
-        public Int32 CompareTo(Object obj) {
-            throw new NotImplementedException();
-        }
-
-        public String ToString(Scope e) {
-            if (this.TryGetField("String", out Value value)) {
-                return ((Fun)value).Run(new Scope(e), this).ToString(e);
-            }
-
-            throw new LumenException("невозможно преобразовать объект к типу std.String");
-        }
-
-        public Value Clone() {
+        public override Value Clone() {
             return this;
         }
 
@@ -113,5 +65,13 @@ namespace Lumen.Lang {
         public override Int32 GetHashCode() {
             return base.GetHashCode();
         }
-    }
+
+		public override String ToString() {
+			if (this.TryGetField("toText", out Value value)) {
+				return ((Fun)value).Run(new Scope(), this).ToString();
+			}
+
+			return "(" + this.Type.ToString() + " " + String.Join<Value>(" ", this.items) + ")";
+		}
+	}
 }

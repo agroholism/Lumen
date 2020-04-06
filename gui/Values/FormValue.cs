@@ -10,7 +10,7 @@ namespace Lumen.Lang.Libraries.Visual {
             this.value = result;
         }
 
-        public IObject Type => Visual.RForm;
+        public IType Type => Visual.RForm;
 
         public Control Control => this.value;
 
@@ -25,7 +25,11 @@ namespace Lumen.Lang.Libraries.Visual {
         public String ToString(Scope e) {
             throw new NotImplementedException();
         }
-    }
+
+		public String ToString(String format, IFormatProvider formatProvider) {
+			throw new NotImplementedException();
+		}
+	}
 
     public class LabelValue : Value, VControl {
         public Label value;
@@ -34,7 +38,7 @@ namespace Lumen.Lang.Libraries.Visual {
             this.value = result;
         }
 
-        public IObject Type => Visual.Label;
+        public IType Type => Visual.Label;
 
         public Control Control => this.value;
 
@@ -49,5 +53,9 @@ namespace Lumen.Lang.Libraries.Visual {
         public String ToString(Scope e) {
             throw new NotImplementedException();
         }
-    }
+
+		public String ToString(String format, IFormatProvider formatProvider) {
+			throw new NotImplementedException();
+		}
+	}
 }

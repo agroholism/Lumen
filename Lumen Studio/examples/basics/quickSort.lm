@@ -1,0 +1,18 @@
+﻿// Quick sort realization for lists, use pattern matching
+let qsort [] = []
+let qsort x::xs = 
+    rec (List.filter (_<x) xs) + [x] + rec (List.filter (_>=x) xs)
+
+// Quick sort realization for lists, use generators
+let qsort' [] = []
+let qsort' x::xs = 
+    rec [for i in xs: if i < x: i] + [x] + rec [for i in xs: if i >= x: i]
+
+let qsort'' [] = []
+let qsort'' x::xs = 
+    rec xs.[_<x] + [x] + rec xs.[_>=x]
+
+let testList = [7, 3, 7, 8, 2]
+print (qsort testList)  //-> [2, 3, 7, 7, 8]
+print (qsort' testList) //-> [2, 3, 7, 7, 8]
+print (qsort'' testList) //-> [2, 3, 7, 7, 8]

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Lumen.Lang {
     /// <summary> Contains more important Kernel constants. </summary>
     public static class Const {
-        /// <summary> const null </summary>
-        public static Void UNIT { get; } = new Void();
+		/// <summary> const null </summary>
+		public static Value UNIT { get; } = new Unit();
 
         /// <summary> const true </summary>
         public static Bool TRUE { get; } = new Bool(true);
@@ -21,14 +21,5 @@ namespace Lumen.Lang {
         public static List<IPattern> This { get; } = new List<IPattern> {
                 new NamePattern("this")
             };
-    }
-
-    [System.Flags]
-    public enum EntityAttribute {
-        PROPERTY = 1,
-        FUNCTION = 2,
-        CONSTRUCTOR = 4,
-        MODULE = 8,
-        CLASSTYPE = 16
     }
 }

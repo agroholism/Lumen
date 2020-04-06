@@ -2,7 +2,7 @@
 using System;
 
 namespace ldoc {
-    internal class ListForGen : Expression {
+   /* internal class ListForGen : Expression {
         internal String names;
         internal Expression container;
         internal Expression body;
@@ -12,5 +12,5 @@ namespace ldoc {
             this.container = container;
             this.body = body;
         }
-    }
+    }*/
 }

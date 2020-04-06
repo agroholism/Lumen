@@ -1,0 +1,50 @@
+﻿// Example usage of lazy values in Lumen
+
+// Takes first n elements to List
+let take 1 x::xs = [x] 
+let take n x::xs = x :: rec (n-1) xs
+
+// Converts lazy list to list
+let asList [] = []
+let asList x::xs = x :: rec xs
+
+// Lazy mapping (eq Stream.map)
+let map f [] = []
+let map f x::xs = & f x :: rec f xs
+
+// Lazy filtration (eq Stream.filter)
+let filter f [] = []
+let filter f x::xs = 
+    if f x: x :: & rec f xs 
+    else:   rec f xs
+
+let mapFlat _ [] = []
+let mapFlat f x::xs = & f x + rec f xs
+
+let flatten = mapFlat id _
+
+// Infinitie list of numbers n..
+let numsFrom n = n :: & rec (n+1)
+// Infinitie list of squares
+let squares = map (_^2) (numsFrom 0)
+// Infinitie list of 1
+let ones = (_ -> 1 :: & rec ()) ()
+
+// Function for checking lazyness
+let mapper x =
+    print "Mapper \(x)" 
+    return -x
+
+
+map mapper squares              // map infinity list
+|> filter (x -> x.mod 2 = 0) _  // filter only evens
+|> take 3 _                     // take first 3 elements
+|> print                        // print result
+
+// Test list
+let test = [[1, 2], [3, 4]]
+
+// Make list flat
+flatten test
+|> asList
+|> print

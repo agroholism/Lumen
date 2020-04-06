@@ -5,186 +5,181 @@ using System.Linq;
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
-namespace Lumen.Light {
-    internal class Applicate : Expression {
-        public Expression callable;
-        public List<Expression> argumentsExpression;
-        public Int32 line;
-        public String fileName;
+namespace Lumen.Lmi {
+	internal class Applicate : Expression {
+		private Expression callableExpression;
+		private List<Expression> argumentsExpression;
+		private Int32 lineNumber;
+		private String fileName;
 
-        public Applicate(Expression callable, List<Expression> argumentsExpression, Int32 line, String fileName) {
-            this.callable = callable;
-            this.argumentsExpression = argumentsExpression;
-            this.line = line;
-            this.fileName = fileName;
-        }
+		public Applicate(Expression callableExpression, List<Expression> argumentsExpression, Int32 lineNumber, String fileName) {
+			this.callableExpression = callableExpression;
+			this.argumentsExpression = argumentsExpression;
+			this.lineNumber = lineNumber;
+			this.fileName = fileName;
+		}
 
-        public Value Eval(Scope e) {
-            Value callable = this.callable.Eval(e);
+		public Value Eval(Scope scope) {
+			Value callableValue = this.callableExpression.Eval(scope);
 
-            switch (callable) {
-                case Fun _:
-                    return this.EvalFun((Fun)callable, e);
-				case SingletonConstructor _:
-					return callable;
-				case Module m:
-					return this.EvalFun((Fun)m.GetField("defaultConstructor", e), e);
-				default:
-                    throw new LumenException($"can not call a value of type {callable.Type}") {
-                        line = line,
-                        file = fileName
-                    };
-            }
-        }
+			if (callableValue is SingletonConstructor) {
+				return callableValue;
+			}
 
-        internal Value EvalFun(Fun function, Scope e) {
-            Scope innerScope = new Scope(e) {
-                ["self"] = function
-            };
+			try {
+				return this.CallFunction(callableValue.ToFunction(scope), scope);
+			}
+			catch (LumenException lex) {
+				lex.file ??= this.fileName;
+				lex.line = lex.line == -1 ? this.lineNumber : lex.line;
 
-            try {
-                Boolean isPartial = this.argumentsExpression.Any(i => i is IdExpression id && id.id == "_");
+				if (lex.functionName == null && scope.ExistsInThisScope("rec") && scope["rec"] is Fun fun1) {
+					lex.functionName = fun1.Name;
+				}
 
-                if (isPartial) {
-                    return this.MakePartial(function, e);
-                }
+				throw;
+			}
+		}
 
-                Value[] arguments = this.argumentsExpression.Select(i => i.Eval(e)).ToArray();
+		private Value CallFunction(Fun function, Scope e) {
+			if (this.argumentsExpression.Any(i => i is IdExpression id && id.id == "_")) {
+				return this.MakePartial(function, e);
+			}
 
-                return this.ProcessCall(e, innerScope, function, arguments);
-            } catch (GotoE ex) {
+			Scope innerScope = new Scope(e);
+
+			try {
+				Value[] arguments = this.argumentsExpression.Select(i => i.Eval(e)).ToArray();
+
+				return this.ProcessCall(e, innerScope, function, arguments);
+			}
+			catch (TailRecursion.Tailrec tailrec) {
 TAIL_RECURSION:
-                try {
-                    return this.ProcessCall(e, innerScope, function, ex.result);
-                } catch (GotoE gt) {
-                    ex = gt;
-                    goto TAIL_RECURSION;
-                }
-            }
-        }
+				try {
+					return this.ProcessCall(e, innerScope, function, tailrec.newArguments);
+				}
+				catch (TailRecursion.Tailrec _tailrec) {
+					tailrec = _tailrec;
+					goto TAIL_RECURSION;
+				}
+			}
+		}
 
-        private class PartialFun : Fun {
-            public Fun InnerFunction { get; set; }
-            public Value[] Args { get; set; }
-            public Int32 restArgs;
+		private Value ProcessCall(Scope parent, Scope scope, Fun function, Value[] args) {
+			try {
+				scope["rec"] = function;
 
-            public String Name { get; set; }
-            public EntityAttribute Attribute { get; set; }
-            public List<IPattern> Arguments { get; set; }
-            public IObject Parent { get; set; }
+				return function.Run(scope, args);
+			}
+			catch (LumenException lex) {
+				lex.file ??= this.fileName;
+				lex.line = lex.line == -1 ? this.lineNumber : lex.line;
 
-            public IObject Type => Prelude.Function;
+				if (lex.functionName == null && scope.ExistsInThisScope("rec") && scope["rec"] is Fun fun) {
+					lex.functionName = fun.Name;
+				}
+				else {
+					if (parent.ExistsInThisScope("rec") && scope["rec"] is Fun fun1) {
+						lex.AddToCallStack(fun1.Name, this.fileName, this.lineNumber);
+					}
+					else {
+						lex.AddToCallStack(null, this.fileName, this.lineNumber);
+					}
+				}
 
-            public Value Clone() {
-                return this;
-            }
+				throw;
+			}
+		}
 
-            public Int32 CompareTo(Object obj) {
-                throw new NotImplementedException();
-            }
+		private Value MakePartial(Fun function, Scope parent) {
+			List<IPattern> arguments = new List<IPattern>();
 
-            public Value GetField(String name, Scope scope) {
-                throw new NotImplementedException();
-            }
+			List<Expression> expressions = new List<Expression>();
+			Int32 x = 0;
+			foreach (Expression exp in this.argumentsExpression) {
+				if (!(exp is IdExpression ide) || ide.id != "_") {
+					expressions.Add(new ValueLiteral(exp.Eval(parent)));
+					continue;
+				}
 
-            public Boolean IsParentOf(Value value) {
-                throw new NotImplementedException();
-            }
+				String parameterName = $"<apply-part-arg-{x}>";
+				arguments.Add(new NamePattern(parameterName));
+				expressions.Add(new IdExpression(parameterName, ide.line, ide.file));
+				x++;
+			}
 
-            public Value Run(Scope e, params Value[] args) {
-                List<Value> vals = new List<Value>();
-                vals.AddRange(args);
+			return new UserFun(arguments, new Applicate(new ValueLiteral(function), expressions, this.lineNumber, this.fileName)) {
+				Name = $"<apply-part-from-{function.Name ?? "<anonym-func>"}>"
+			};
+		}
 
-                for (Int32 i = 0; i < this.Args.Length; i++) {
-                    vals.Insert(i, this.Args[i]);
-                }
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			Value callableValue = Const.UNIT;
+			foreach (Value result in this.callableExpression.EvalWithYield(scope)) {
+				if (result is CurrGeenVal cgv) {
+					callableValue = cgv.Value;
+				}
+				else {
+					yield return result;
+				}
+			}
 
-                return this.InnerFunction.Run(e, vals.ToArray());
-            }
+			if (callableValue is SingletonConstructor) {
+				yield return new CurrGeenVal(callableValue);
+				yield break;
+			}
 
-            public void SetField(String name, Value value, Scope scope) {
-                throw new NotImplementedException();
-            }
+			IEnumerable<Value> results;
 
-            public String ToString(Scope e) {
-                return "partial";
-            }
+			try {
+				results = this.CallFunctionWithYield(callableValue.ToFunction(scope), scope);
+			}
+			catch (LumenException lex) {
+				lex.file ??= this.fileName;
+				lex.line = lex.line == -1 ? this.lineNumber : lex.line;
 
-            public Boolean TryGetField(String name, out Value result) {
-                throw new NotImplementedException();
-            }
-        }
+				if (lex.functionName == null && scope.ExistsInThisScope("rec") && scope["rec"] is Fun fun1) {
+					lex.functionName = fun1.Name;
+				}
 
-        private Value ProcessCall(Scope parent, Scope scope, Fun function, Value[] args) {
-            if (function is FunctionDeclaration.Dispatcher dis) {
-                if (dis.functions.First().Key.Count > args.Length) {
-                    return new PartialFun {
-                        InnerFunction = function,
-                        Args = args,
-                        restArgs = dis.functions.First().Key.Count - args.Length
-                    };
-                }
-            }
+				throw;
+			}
 
-            scope.Bind("self", function);
+			foreach (Value result in results) {
+				yield return result;
+			}
+		}
 
-            try {
-                return function.Run(scope, args);
-            } catch (LumenException lex) {
-                if (lex.file == null) {
-                    lex.file = this.fileName;
-                }
+		private IEnumerable<Value> CallFunctionWithYield(Fun function, Scope e) {
+			if (this.argumentsExpression.Any(i => i is IdExpression id && id.id == "_")) {
+				yield return new CurrGeenVal(this.MakePartial(function, e));
+			}
 
-                if (lex.line == -1) {
-                    lex.line = this.line;
-                }
+			Scope innerScope = new Scope(e);
 
-                if (lex.functionName == null) {
-                    if(parent.ExistsInThisScope("self")) {
-                        lex.functionName = (parent["self"] as Fun).Name;
-                    }
-                } else {
-                    if (parent.ExistsInThisScope("self")) {
-                        Fun ff = parent["self"] as Fun;
+			List<Value> args = new List<Value>();
+			foreach (Expression i in this.argumentsExpression) {
+				foreach (Value j in i.EvalWithYield(e)) {
+					switch (j) {
+						case CurrGeenVal cgv:
+							args.Add(cgv.Value);
+							break;
+						default:
+							yield return j;
+							break;
+					}
+				}
+			}
 
-                        lex.AddToCallStack(ff.Name, this.fileName, this.line);
-                    } else {
-                        lex.AddToCallStack(null, this.fileName, this.line);
-                    }
-                }
+			yield return new CurrGeenVal(this.ProcessCall(e, innerScope, function, args.ToArray()));
+		}
 
-                throw;
-            }
-        }
+		public Expression Closure(ClosureManager manager) {
+			return new Applicate(this.callableExpression.Closure(manager), this.argumentsExpression.Select(i => i.Closure(manager)).ToList(), this.lineNumber, this.fileName);
+		}
 
-        private Value MakePartial(Fun function, Scope parent) {
-            List<IPattern> a = new List<IPattern>();
-
-            List<Expression> nexps = new List<Expression>();
-            Int32 x = 0;
-            foreach (Expression exp in this.argumentsExpression) {
-                if (exp is IdExpression ide && ide.id == "_") {
-                    a.Add(new NamePattern("#x" + x));
-                    nexps.Add(new IdExpression("#x" + x, ide.line, ide.file));
-                    x++;
-                } else {
-                    nexps.Add(new ValueE(exp.Eval(parent)));
-                }
-            }
-
-            UserFun f = new UserFun(a, new Applicate(new ValueE(function), nexps, this.line, this.fileName)) {
-                Name = function.Name + "'"
-            };
-
-            return f;
-        }
-
-        public override String ToString() {
-            return "(" + this.callable.ToString() + " " + String.Join(" ", this.argumentsExpression) + ")";
-        }
-
-        public Expression Closure(List<String> visible, Scope thread) {
-            return new Applicate(this.callable.Closure(visible, thread), this.argumentsExpression.Select(i => i.Closure(visible, thread)).ToList(), this.line, this.fileName);
-        }
-    }
+		public override String ToString() {
+			return this.callableExpression.ToString() + " " + Utils.ArgumentsToString(this.argumentsExpression);
+		}
+	}
 }

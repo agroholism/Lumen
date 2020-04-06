@@ -1,33 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Lumen.Lang.Expressions;
 using Lumen.Lang;
-using String = System.String;
+using Lumen.Lang.Expressions;
 
-namespace Lumen.Light {
-    [Serializable]
-    public class ValueE : Expression {
-        public Value val;
+namespace Lumen.Lmi {
+	public class ValueLiteral : Expression {
+        public Value result;
 
-        public ValueE(Value Object) {
-            this.val = Object;
+        public ValueLiteral(Value value) {
+            this.result = value;
         }
 
-        public Expression Closure(List<String> visible, Scope thread) {
-            return this;
+        public ValueLiteral(Double Object) {
+            this.result = new Number(Object);
         }
 
-        public ValueE(Double Object) {
-            this.val = new Number(Object);
+		public ValueLiteral(System.Text.RegularExpressions.Regex regex) {
+			this.result = new Regex(regex);
+		}
+
+		public Value Eval(Scope e) {
+            return this.result;
         }
 
-        public Value Eval(Scope e) {
-            return this.val;
-        }
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			yield return new CurrGeenVal(this.Eval(scope));
+		}
 
-        public override String ToString() {
-            return this.val.ToString();
+		public Expression Closure(ClosureManager manager) {
+			return this;
+		}
+
+		public override String ToString() {
+            return this.result.ToString();
         }
     }
 }

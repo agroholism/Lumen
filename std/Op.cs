@@ -31,13 +31,13 @@ namespace Lumen.Lang {
         public const String LSH = "op_lsh";
         public const String RSH = "op_rsh";
 
-        public const String GETI = "op_geti";
-        public const String SETI = "op_seti";
+        public const String GETI = "getIndex";
+        public const String SETI = "setIndex";
 
         public const String MOD = "op_mod";
         public const String DIV = "op_div";
 
-        public const String POW = "op_pow";
+        public const String POW = "^";
 
         public const String APLUS = "op_aplus";
         public const String AMINUS = "op_aminus";

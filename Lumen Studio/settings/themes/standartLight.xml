@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- 
+  Lumen Studio theme 'Standart Light'
+  Autor: Tsvikevich Denis © 2019
+-->
+<Theme name="Standart Light" xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/theme">
+	<IconPack path="icons\standart"/>
+
+	<Background color="255; 255; 255"/>
+	<Foreground color="0; 0; 0"/>
+	<Grid color="200;200;200"/>
+
+	<Syntax>
+		<Casual foreColor="0; 0; 0"/>
+		<Keyword1 foreColor="0, 0, 255"/>
+		<Keyword2 foreColor="0, 0, 255"/>
+		<Text1 foreColor="255, 147, 89" />
+		<Text2 foreColor="255, 147, 89" />
+		<Number foreColor="200; 200; 200" />
+		<Comment1 foreColor= "0, 255, 0"/>
+		<Comment2 foreColor= "0, 255, 0"/>
+		<Function foreColor= ""/>
+		<Class foreColor= "0, 0, 255"/>
+		<Interface foreColor= ""/>
+		<Decorator foreColor= ""/>
+		<Directive foreColor= ""/>
+		<Constant foreColor= ""/>
+		<Variable foreColor= ""/>
+		<Opertor foreColor= ""/>
+		<Tag foreColor= ""/>
+		<Attribute foreColor= ""/>
+	</Syntax>
+</Theme>

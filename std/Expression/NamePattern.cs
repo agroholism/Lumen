@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang.Expressions {
     public class NamePattern : IPattern {
-        private String id;
+        private readonly String identifier;
 
-        public NamePattern(String id) {
-            this.id = id;
+		
+
+		public NamePattern(String identifier) {
+			this.identifier = identifier;
         }
 
-        public Expression Closure(List<String> visible, Scope scope) {
-            if (!visible.Contains(this.id)) {
-                visible.Add(this.id);
-            }
+		public Expression Closure(ClosureManager manager) {
+			manager.Declare(this.identifier);
 
             return this;
         }
@@ -21,17 +21,22 @@ namespace Lumen.Lang.Expressions {
             throw new NotImplementedException();
         }
 
-        public List<String> GetDeclaredVariables() {
-            return new List<String> { this.id };
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+
+		public List<String> GetDeclaredVariables() {
+            return new List<String> { this.identifier };
         }
 
-        public Boolean Match(Value value, Scope scope) {
-            scope[this.id] = value;
-            return true;
+        public MatchResult Match(Value value, Scope scope) {
+            scope[this.identifier] = value;
+            return MatchResult.True;
         }
 
         public override String ToString() {
-            return this.id.ToString();
+            return this.identifier.ToString();
         }
     }
 }

@@ -1,12 +1,12 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 
-using Lumen.Lang.Expressions;
 using Lumen.Lang;
-using String = System.String;
+using Lumen.Lang.Expressions;
 
-namespace Lumen.Light {
-    class IsExpression : Expression {
+namespace Lumen.Lmi {
+	class IsExpression : Expression {
         internal Expression Expression;
         internal Expression type;
 
@@ -14,11 +14,9 @@ namespace Lumen.Light {
             this.Expression = Expression;
             this.type = type;
         }
-        public Expression Optimize(Scope scope) {
-            return this;
-        }
-        public Expression Closure(List<String> visible, Scope thread) {
-            return new IsExpression(this.Expression.Closure(visible, thread), this.type.Closure(visible, thread));
+
+        public Expression Closure(ClosureManager manager) {
+            return new IsExpression(this.Expression.Closure(manager), this.type.Closure(manager));
         }
 
         public Value Eval(Scope e) {
@@ -27,17 +25,14 @@ namespace Lumen.Light {
             if (this.type is IdExpression) {
                 String nametype = ((IdExpression)this.type).id;
                 if (nametype == "void") {
-                    return new Bool(v is Lang.Void);
+                  //  return new Bool(v is Lang.Void);
                 }
             }
 
             Value p = this.type.Eval(e);
 
-            if (p is Lang.Void) {
-                return new Bool(v is Lang.Void);
-            }
 
-            if (v is IObject && p is IObject io) {
+            if (v is IType && p is IType io) {
                 return (Bool)io.IsParentOf(v);
             }
 
@@ -53,7 +48,12 @@ namespace Lumen.Light {
             return new Bool(false);
         }
 
-        public override String ToString() {
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+
+		public override String ToString() {
             return this.Expression.ToString() + " is " + this.type;
         }
     }

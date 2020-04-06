@@ -1,26 +1,47 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     internal class TailRecursion : Expression {
-        private List<Expression> args;
-        private System.String fileName;
-        private System.Int32 line;
+        private List<Expression> argumentsExpression;
+        private String fileName;
+        private Int32 lineNumber;
 
-        public TailRecursion(List<Expression> args, System.String fileName, System.Int32 line) {
-            this.args = args;
+        public TailRecursion(List<Expression> argumentsExpression, String fileName, Int32 lineNumber) {
+            this.argumentsExpression = argumentsExpression;
             this.fileName = fileName;
-            this.line = line;
-        }
-
-        public Expression Closure(List<System.String> visible, Scope scope) {
-            return this;
+            this.lineNumber = lineNumber;
         }
 
         public Value Eval(Scope e) {
-            throw new GotoE(this.args.Select(i => i.Eval(e)).ToArray());
+            throw new Tailrec(this.argumentsExpression.Select(i => i.Eval(e)).ToArray());
         }
-    }
+
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			throw new LumenException("evaluating tailrec in generator");
+		}
+
+		public Expression Closure(ClosureManager manager) {
+			manager.HasTailRecursion = true;
+			return new TailRecursion(
+				this.argumentsExpression.Select(i => i.Closure(manager)).ToList(),
+				this.fileName, this.lineNumber);
+		}
+
+		public override String ToString() {
+			return "tailrec " + Utils.ArgumentsToString(this.argumentsExpression);
+		}
+
+		public class Tailrec : Exception {
+			public Value[] newArguments;
+
+			public Tailrec(Value[] result) {
+				this.newArguments = result;
+			}
+		}
+	}
 }

@@ -9,9 +9,9 @@ using Lumen.Lang;
 using String = System.String;
 using System.Linq;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     public static class Interpriter {
-        public static String Host { get; set; }
+        public static String BasePath { get; set; }
 
         public static ConsoleColor Color { get; set; } = ConsoleColor.Gray;
 
@@ -48,9 +48,10 @@ namespace Lumen.Light {
         public static Value Eval(String source, String fileName="", Scope? scope = null) {
             try {
                 List<Token> tokens = new Lexer(source, fileName).Tokenization();
-                return new Parser(tokens, fileName).Parsing().Select(i => 
+                return new Parser(tokens, fileName).Parse().Select(i => 
                     i.Eval(scope ?? mainScope)).Last();
-            } catch (LumenException uex) {
+            }
+			catch (LumenException uex) {
                 WriteException(uex.ToString());
 
                 if (uex.Note != null) {
@@ -76,7 +77,7 @@ namespace Lumen.Light {
         public static List<Expression>? GetAST(String code, String file, Scope? scope = null) {
             try {
                 List<Token> tokens = new Lexer(code, file).Tokenization();
-                return new Parser(tokens, file).Parsing();
+                return new Parser(tokens, file).Parse();
             } catch {
 
             }

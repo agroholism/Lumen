@@ -10,7 +10,7 @@ namespace Lumen.Lang.Libraries.Visual {
             this.value = result;
         }
 
-        public IObject Type => Visual.RTB;
+        public IType Type => Visual.RTB;
 
         public Control Control => this.value;
 
@@ -25,5 +25,9 @@ namespace Lumen.Lang.Libraries.Visual {
         public String ToString(Scope e) {
             throw new NotImplementedException();
         }
-    }
+
+		public String ToString(String format, IFormatProvider formatProvider) {
+			throw new NotImplementedException();
+		}
+	}
 }

@@ -1,0 +1,134 @@
+// TODO
+Fix imports!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Lumen 0.6
+- 05.05.2019
+* improvements of curring
+* new functions:
+	Collections.* values x
+	Collections.- values values'
+	Collections.+ values values'
+	Collection.iter values action
+	Collection.iteri values action
+	Collections.getIndex values indices
+* bug fix
+
+- 06.05.2019
+* mut modifier in constructor params
+* partial constructors
+* TypePattern
+
+- 07.05.2019
+* Context pattern removed and now included in type pattersn
+* Format type class
+* improved string interpolation
+
+- 09.05.2019
+* lazy evaluation
+* promises
+* yield prototype
+
+- 16.07.2019
+* Ref type ! operator, <- is also operator now
+* import improvements
+
+- 17.07.2019
+* extend operator
+* fix function declaration
+* fix applicatte
+* fix dot apllicate
+* fix parser
+* chained equality
+* fix Ord class
+* = operator for Arrays, Maps and Lists, now they can be used in Map
+
+Lumen 0.8
+- 01.04.2020
+* function can not have tail recursion and yield at the same time
+* [||] and where patterns
+* return in generators now allowed
+* from in array/list literals
+* assert function
+
+TODO:
+- fix import
+- let Left v | Right v = i  YES (make pattern parsing rules)
+- while let
+- Pair - what is it?
+- functors
+- module - it is required?
+- exceptions?
+
+Lumen 0.9
+NON STRICT FOREACH
+3. let callSecond () = callFirst()
+   and callFirst () = callSecond()
+10. operator in pattern matching?
+9. match operator for strings and regex
+12 range pattern
+4. ... in pattern matching
+6. map literal ?
+14. Result ?
+let m = {| x: val, y: val2 |}
+let p = {| 1, 2, 3, 4, 5 |}
+let x = anoymous (| x = 5, y = 3 |)
+let x = type { x = 5, y = 3 }  
+let y = type { x with y = 9 }
+
+			if (ActiveBottomControl == control) {
+				return;
+			}
+
+			if (this.direction) {
+				control.Location = new Point(0, -this.bottomPanel.Height);
+			}
+			else {
+				control.Location = new Point(0, this.bottomPanel.Height);
+			}
+
+			Int32 index = this.bottomPanel.Height / 10;
+
+			Timer t = new Timer { Interval = 1, Enabled = true };
+
+			t.Tick += (sender, e) => {
+				// down
+				if (direction && control.Location.Y < 0) {
+					// move down
+					control.Location = new Point(0, control.Location.Y + index > 0 ? 0 : control.Location.Y + index);
+					ActiveBottomControl.Location = new Point(0, ActiveBottomControl.Location.Y + index);
+				}
+				else if (!direction && control.Location.Y > 0) {
+					control.Location = new Point(0, control.Location.Y - index < 0 ? 0 : control.Location.Y - index);
+					ActiveBottomControl.Location = new Point(0, ActiveBottomControl.Location.Y - index);
+				}
+				else {
+					t.Enabled = false;
+					ActiveBottomControl = control;
+					direction = !direction;
+				}
+			};
+
+			    
+buildPage [
+    ["16.07.2019", 
+    [
+    [Removed, "Removed <code>mut</code> modifier"],
+    [Added, "<code>Ref</code> type in prelude"],
+    [Added, "<code>from ... import ...</code> syntax"]
+    ]
+    ],
+    ["17.07.2019", 
+    [
+    [Fixed, "Function application bug fixes"],
+    [Fixed, "Parser bug fixes"],
+    [Fixed, "Fixed <code>Ord</code> class"],
+    [Added, "<code>extend</code> operator"],
+    [Added, "Chained equality and comphrasion"]
+    ]
+    ],
+    ["18.07.2019", 
+    [
+    [Added, "Equality operators for <code>Array</code>, <code>List</code> and <code>Map</code>"]
+    ]
+    ]
+]

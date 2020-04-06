@@ -5,30 +5,30 @@ using System.Collections.Generic;
 namespace Lumen.Lang {
     internal class Option : Module {
         public Constructor Some { get; private set; }
-        public IObject None { get; private set; }
+        public IType None { get; private set; }
 
         public Option() {
-            this.name = "prelude.Option";
+            this.Name = "prelude.Option";
 
-            this.Some = Helper.CreateConstructor("prelude.Option.Some", this, new[] { "x" }) as Constructor;
-            this.None = Helper.CreateConstructor("prelude.Option.None", this, new String[0]);
+			this.IncludeMixin(Prelude.Functor);
 
-            this.Parent = Prelude.Any;
+			this.Some = Helper.CreateConstructor("Option.Some", this, new List<String> { "x" }) as Constructor;
+			this.None = Helper.CreateConstructor("Option.None", this, new List<String>());
 
-            this.SetField("Some", this.Some);
-            this.SetField("None", this.None);
+            this.SetMember("Some", this.Some);
+            this.SetMember("None", this.None);
 
             LambdaFun fmap = new LambdaFun((scope, args) => {
-                IObject obj = scope["fc"] as IObject;
+                Value functor = scope["fc"];
 
-                if (obj == this.None) {
+                if (functor == this.None) {
                     return this.None;
-                } else if (this.Some.IsParentOf(obj)) {
-                    Fun f = scope["fn"] as Fun;
-                    return Helper.CreateSome(f.Run(new Scope(scope), Prelude.DeconstructSome(obj, scope)));
+                } else if (this.Some.IsParentOf(functor)) {
+                    Fun mapper = scope["fn"].ToFunction(scope);
+                    return Helper.CreateSome(mapper.Run(new Scope(scope), Prelude.DeconstructSome(functor, scope)));
                 }
 
-                throw new LumenException("fmap option");
+                throw new LumenException(Exceptions.TYPE_ERROR.F(this, functor.Type));
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("fn"),
@@ -36,11 +36,11 @@ namespace Lumen.Lang {
                 }
             };
 
-            this.SetField("fmap", fmap);
+            this.SetMember("fmap", fmap);
 
             // Applicative
-            this.SetField("liftA", new LambdaFun((scope, args) => {
-                IObject obj = scope["f"] as IObject;
+            this.SetMember("liftA", new LambdaFun((scope, args) => {
+                IType obj = scope["f"] as IType;
 
                 if (obj == this.None) {
                     return this.None;
@@ -56,8 +56,8 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.SetField("liftB", new LambdaFun((scope, args) => {
-                IObject obj = scope["m"] as IObject;
+            this.SetMember("liftB", new LambdaFun((scope, args) => {
+                IType obj = scope["m"] as IType;
 
                 if (obj == this.None) {
                     return this.None;
@@ -74,10 +74,10 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.SetField("String", new LambdaFun((scope, args) => {
-                IObject obj = scope["this"] as IObject;
+            this.SetMember("String", new LambdaFun((scope, args) => {
+                IType obj = scope["this"] as IType;
                 if (this.Some.IsParentOf(obj)) {
-                    return new Text($"Some {obj.GetField("x", scope)}");
+                    return new Text($"Some {obj.GetMember("x", scope)}");
                 } else {
                     return new Text("None");
                 }
@@ -87,10 +87,6 @@ namespace Lumen.Lang {
                     new NamePattern("this")
                 }
             });
-
-            this.Derive(Prelude.Functor);
-            this.Derive(Prelude.Applicative);
-            this.Derive(Prelude.Monad);
         }
     }
 }

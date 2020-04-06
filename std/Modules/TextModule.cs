@@ -1,39 +1,40 @@
-﻿using Lumen.Lang.Expressions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 
+using Lumen.Lang.Expressions;
+
 namespace Lumen.Lang {
-    internal sealed class TextModule : Module {
+	internal sealed class TextModule : Module {
         internal TextModule() {
-            this.name = "prelude.Text";
+            this.Name = "Text";
 
-            #region operators
+			#region operators
 
-            this.SetField(Op.USTAR, new LambdaFun((scope, args) => {
-                return new Number(scope.This.ToString(scope).Length);
+			this.SetMember(Op.USTAR, new LambdaFun((scope, args) => {
+                return new Number(scope["this"].ToString().Length);
             }) {
                 Arguments = Const.This
             });
 
-            this.SetField(Op.PLUS, new LambdaFun((scope, args) => {
-                return new Text(scope.This.ToString(scope) + scope["other"].ToString(scope));
+            this.SetMember(Op.PLUS, new LambdaFun((scope, args) => {
+                return new Text(scope["this"].ToString() + scope["other"].ToString());
             }) {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField(Op.LSH, new LambdaFun((scope, args) => {
-                Text str = scope.This as Text;
-                str.value += scope["other"].ToString(scope);
+            this.SetMember(Op.LSH, new LambdaFun((scope, args) => {
+                Text str = scope["this"] as Text;
+                str.value += scope["other"].ToString();
                 return str;
             }) {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField(Op.STAR, new LambdaFun((scope, args) => {
-                String str = scope.This.ToString(scope);
+            this.SetMember(Op.STAR, new LambdaFun((scope, args) => {
+                String str = scope["this"].ToString();
                 Int32 count = (Int32)scope["other"].ToDouble(scope);
 
                 StringBuilder buffer = new StringBuilder();
@@ -46,32 +47,56 @@ namespace Lumen.Lang {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField("compare", new LambdaFun((scope, args) => {
-                return new Number(scope.This.CompareTo(scope["other"]));
+            this.SetMember("compare", new LambdaFun((scope, args) => {
+                return new Number(scope["this"].CompareTo(scope["other"]));
             }) {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField(Op.MOD, new LambdaFun((scope, args) => {
-                return new Text(String.Format(scope.This.ToString(scope), scope["other"].ToSequence(scope).ToArray()));
+            this.SetMember(Op.MOD, new LambdaFun((scope, args) => {
+                return new Text(String.Format(scope["this"].ToString(), scope["other"].ToStream(scope).ToArray()));
             }) {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField(Op.SLASH, new LambdaFun((scope, args) => {
-                return new Array(
-                    scope.This.ToString(scope).Split(
-                        scope["other"].ToString(scope).ToCharArray(),
-                        StringSplitOptions.RemoveEmptyEntries
-                    ).Select(x => (Value)new Text(x)).ToList());
+            this.SetMember(Op.SLASH, new LambdaFun((scope, args) => {
+				Value arg = scope["arg"];
+				if (arg is Text text) {
+					return new Array(
+						scope["text"].ToString().Split(
+							arg.ToString().ToCharArray(),
+							StringSplitOptions.RemoveEmptyEntries
+						).Select(x => (Value)new Text(x)).ToList());
+				} else if (arg is Number num) {
+					String t = scope["text"].ToString();
+					Int32 numb = num.ToInt(scope);
+					List<Value> result = new List<Value>();
+					for(Int32 i = 0; i < t.Length; i += numb) {
+						String sub = "";
+						for(Int32 j = i; j < i + numb; j++) {
+							sub += t[j];
+						}
+						result.Add(new Text(sub));
+					}
+
+					return new Array(result);
+				}
+				else {
+					IEnumerable<Value> value = scope["text"].ToStream(scope);
+					Fun func = scope["arg"].ToFunction(scope);
+
+					return value.Aggregate((x, y) => func.Run(new Scope(scope), x, y));
+				}
             }) {
-                Arguments = Const.ThisOther
+                Arguments = new List<IPattern> {
+					new NamePattern("text"),
+					new NamePattern("arg")
+				}
             });
 
-            // make it later
-            this.SetField("inc", new LambdaFun((e, args) => {
-                String value = e.Get("this").ToString();
-                String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            this.SetMember("inc", new LambdaFun((e, args) => {
+                String value = e["text"].ToString();
+                const String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
                 Int32 last_char = value.Length - 1;
                 while (true) {
                     Int32 index = chars.IndexOf(value[last_char]);
@@ -114,7 +139,9 @@ namespace Lumen.Lang {
                 }
                 return new Text(value);
             }) {
-                Arguments = Const.ThisOther
+                Arguments = new List<IPattern> {
+					new NamePattern("text")
+				}
             });
             // make get and set
             // match =~
@@ -160,74 +187,74 @@ namespace Lumen.Lang {
 
             #endregion
 
-            this.SetField("concat", new LambdaFun((e, args) => {
-                String[] z = new String[args.Length + 1];
-
-                z[0] = e.Get("this").ToString(e);
-                Int32 index = 1;
-                foreach (Value i in e["other"].ToSequence(e)) {
-                    z[index] = i.ToString(e);
-                    index++;
-                }
-
-                return new Text(String.Concat(z));
+            this.SetMember("concat", new LambdaFun((e, args) => {
+				return new Text(String.Concat(e["values"].ToStream(e)));
             }) {
                 Arguments = new List<IPattern> {
-                    Const.This[0],
-                    new NamePattern("*other")
+                    new NamePattern("values")
                 }
             });
 
-            this.SetField("Sequence", new LambdaFun((e, args) => {
-                String v = e.Get("this").ToString();
+            this.SetMember("toStream", new LambdaFun((e, args) => {
+				String v = e["values"].ToString();
+				return new Stream(this.GlobalizationEach(v));
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("values")
+				}
+			});
 
-                if (args.Length > 0) {
-                    Double wait = Converter.ToDouble(args[0], e);
-                    Int32 index = 0;
-                    if (wait == 2) {
-                        return new Enumerator(this.GlobalizationEach(v).Select(i => new Array(new List<Value> { i, new Number(index++) })));
-                    } else if (wait > 2) {
-                        return new Enumerator(this.GlobalizationEach(v).Select(i => new Array(new List<Value> { i, new Number(index++), new Number((Int32)i.ToString()[0]) })));
-                    }
-                }
+			this.SetMember("fromStream", new LambdaFun((e, args) => {
+				IEnumerable<Value> v = e["stream"].ToStream(e);
+				return new Text(String.Concat(v));
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("stream")
+				}
+			});
 
-                return new Enumerator(this.GlobalizationEach(v));
+			this.SetMember("toText", new LambdaFun((e, args) => {
+                return e["this"];
             }));
-            this.SetField("String", new LambdaFun((e, args) => {
-                return e.This;
-            }));
 
-            this.SetField("upper", new LambdaFun((e, args) => {
-                return new Text(e.This.ToString(e).ToUpper());
-            }) { Arguments = Const.This });
-            this.SetField("lower", new LambdaFun((e, args) => {
-                return new Text(e.This.ToString(e).ToLower());
-            }) { Arguments = Const.This });
+            this.SetMember("toUpper", new LambdaFun((e, args) => {
+                return new Text(e["this"].ToString().ToUpper());
+            }) {
+				Arguments = Const.This
+			});
 
-            this.SetField("isAscii", new LambdaFun((e, args) => {
-                return (Bool)(e.This.ToString(e)[0] < 255);
+            this.SetMember("toLower", new LambdaFun((e, args) => {
+                return new Text(e["this"].ToString().ToLower());
+            }) {
+				Arguments = Const.This
+			});
+
+            this.SetMember("isAscii", new LambdaFun((e, args) => {
+                return (Bool)(e["this"].ToString()[0] < 255);
             }) {
                 Arguments = Const.This
             });
             
-            this.SetField("contains", new LambdaFun((e, args) => {
-                return new Bool(e.This.ToString(e).Contains(e["other"].ToString(e)));
-            }) {
-                Arguments = Const.ThisOther
-            });
-            this.SetField("isStartsWith", new LambdaFun((e, args) => {
-                return new Bool(e.This.ToString(e).StartsWith(e["other"].ToString(e)));
-            }) {
-                Arguments = Const.ThisOther
-            });
-            this.SetField("isEndsWith", new LambdaFun((e, args) => {
-                return new Bool(e.This.ToString(e).EndsWith(e["other"].ToString(e)));
+            this.SetMember("contains", new LambdaFun((e, args) => {
+                return new Bool(e["this"].ToString().Contains(e["other"].ToString()));
             }) {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField("replace", new LambdaFun((e, args) => {
-                return new Text(e.This.ToString(e).Replace(e["other"].ToString(e), e["xother"].ToString(e)));
+            this.SetMember("isStartsWith", new LambdaFun((e, args) => {
+                return new Bool(e["this"].ToString().StartsWith(e["other"].ToString()));
+            }) {
+                Arguments = Const.ThisOther
+            });
+
+            this.SetMember("isEndsWith", new LambdaFun((e, args) => {
+                return new Bool(e["this"].ToString().EndsWith(e["other"].ToString()));
+            }) {
+                Arguments = Const.ThisOther
+            });
+
+            this.SetMember("replace", new LambdaFun((e, args) => {
+                return new Text(e["this"].ToString().Replace(e["other"].ToString(), e["xother"].ToString()));
             }) {
                 Arguments = new List<IPattern> {
                     Const.This[0],
@@ -236,83 +263,95 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.SetField("index", new LambdaFun((e, args) => {
-                return new Number(e.This.ToString(e).IndexOf(e["other"].ToString(e)));
+            this.SetMember("index", new LambdaFun((e, args) => {
+                return new Number(e["this"].ToString().IndexOf(e["other"].ToString()));
             }) {
                 Arguments = Const.ThisOther
             });
 
-            this.SetField("get_chars", new LambdaFun((e, args) => {
-                String s = e.Get("this").ToString();
-                return new Array(s.Select<Char, Value>(x => new Number(x)).ToList());
-            }));
+            this.SetMember("getChars", new LambdaFun((scope, args) => {
+				String s = scope["text"].ToString();
+				return new Array(s.Select<Char, Value>(x => new Number(x)).ToList());
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("text")
+				}
+			});
 
-            this.SetField("isEmpty", new LambdaFun((e, args) => {
+            this.SetMember("isEmpty", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 return new Bool("" == s);
             }) {
                 Arguments = Const.This
             });
 
-            this.SetField("size", new LambdaFun((e, args) => {
+            this.SetMember("size", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 return new Number(s.Length);
             }) {
                 Arguments = Const.This
             });
 
-            this.SetField("tr", new LambdaFun((e, args) => {
-                String s = e.Get("this").ToString();
+            this.SetMember("tr", new LambdaFun((e, args) => {
+				String text = e["text"].ToString();
 
-                String source = args[0].ToString();
-                String to = args[1].ToString();
+				String source = e["src"].ToString();
+				String to = e["res"].ToString();
 
-                StringBuilder buff = new StringBuilder();
+				StringBuilder buff = new StringBuilder();
 
-                for (Int32 i = 0; i < source.Length; i++) {
-                    if (i + 1 < source.Length && source[i + 1] == '-') {
-                        if (Char.IsLetterOrDigit(source[i]) && Char.IsLetterOrDigit(source[i + 2])) {
-                            for (Int32 j = (Int32)source[i]; j <= (Int32)source[i + 2]; j++) {
-                                buff.Append((Char)j);
-                            }
-                            i += 2;
-                        }
-                    } else {
-                        buff.Append(source[i]);
-                    }
-                }
+				for (Int32 i = 0; i < source.Length; i++) {
+					if (i + 1 < source.Length && source[i + 1] == '-') {
+						if (Char.IsLetterOrDigit(source[i]) && Char.IsLetterOrDigit(source[i + 2])) {
+							for (Int32 j = source[i]; j <= source[i + 2]; j++) {
+								buff.Append((Char)j);
+							}
+							i += 2;
+						}
+					}
+					else {
+						buff.Append(source[i]);
+					}
+				}
 
-                source = buff.ToString();
-                Console.WriteLine(source);
-                buff.Clear();
+				source = buff.ToString();
+				buff.Clear();
 
-                for (Int32 i = 0; i < to.Length; i++) {
-                    if (i + 1 < to.Length && to[i + 1] == '-') {
-                        if (Char.IsLetterOrDigit(to[i]) && Char.IsLetterOrDigit(to[i + 2])) {
-                            for (Int32 j = (Int32)to[i]; j <= (Int32)to[i + 2]; j++) {
-                                buff.Append((Char)j);
-                            }
-                            i += 2;
-                        }
-                    } else {
-                        buff.Append(to[i]);
-                    }
-                }
+				for (Int32 i = 0; i < to.Length; i++) {
+					if (i + 1 < to.Length && to[i + 1] == '-') {
+						if (Char.IsLetterOrDigit(to[i]) && Char.IsLetterOrDigit(to[i + 2])) {
+							for (Int32 j = to[i]; j <= (Int32)to[i + 2]; j++) {
+								buff.Append((Char)j);
+							}
+							i += 2;
+						}
+					}
+					else {
+						buff.Append(to[i]);
+					}
+				}
 
-                to = buff.ToString();
-                Console.WriteLine(to);
-                buff.Clear();
-                for (Int32 i = 0; i < s.Length; i++) {
-                    Int32 position = source.IndexOf(s[i]);
-                    if (position != -1) {
-                        buff.Append(position >= to.Length ? to[to.Length - 1] : to[position]);
-                    } else {
-                        buff.Append(s[i]);
-                    }
-                }
-                return new Text(buff.ToString());
-            }));
-            this.SetField("white_space?", new LambdaFun((e, args) => {
+				to = buff.ToString();
+
+				buff.Clear();
+				for (Int32 i = 0; i < text.Length; i++) {
+					Int32 position = source.IndexOf(text[i]);
+					if (position != -1) {
+						buff.Append(position >= to.Length ? to[to.Length - 1] : to[position]);
+					}
+					else {
+						buff.Append(text[i]);
+					}
+				}
+				return new Text(buff.ToString());
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("text"),
+					new NamePattern("src"),
+					new NamePattern("res")
+				}
+			});
+            this.SetMember("isWhiteSpace", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 if (s.Length == 1) {
                     return new Bool(Char.IsWhiteSpace(s[0]));
@@ -320,16 +359,16 @@ namespace Lumen.Lang {
 
                 return new Array(s.Select<Char, Value>(x => new Bool(Char.IsWhiteSpace(x))).ToList());
             }));
-            this.SetField("capitalize", new LambdaFun((e, args) => {
+            this.SetMember("capitalize", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString().ToLower();
                 return new Text(Char.ToUpper(s[0]) + s.Substring(1));
             }));
-            this.SetField("title_case", new LambdaFun((e, args) => {
+            this.SetMember("toTitleCase", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 TextInfo t = CultureInfo.CurrentCulture.TextInfo;
                 return new Text(t.ToTitleCase(s));
             }));
-            this.SetField("swap_caze", new LambdaFun((e, args) => {
+            this.SetMember("swapCase", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 String result = "";
                 foreach (Char i in s) {
@@ -342,21 +381,20 @@ namespace Lumen.Lang {
 
                 return new Text(result);
             }));
-            /*Set("ljust", new LambdaFun((e, args) => {
-				String s = e.Get("this").ToString();
-				if (args.Length == 1)
-					return new KString(s.PadLeft((int)Converter.ToDouble(args[0],e)));
-				else
-					return new KString(s.PadLeft((int)Converter.ToDouble(args[0],e), args[1].ToString()[0]));
+			this.SetMember("ljust", new LambdaFun((e, args) => {
+				String s = e["text"].ToString();
+				return args.Length == 1
+					? new Text(s.PadLeft((Int32)Converter.ToDouble(args[0], e)))
+					: new Text(s.PadLeft((Int32)Converter.ToDouble(args[0], e), args[1].ToString()[0]));
 			}));
-			Set("rjust", new LambdaFun((e, args) => {
+			this.SetMember("rjust", new LambdaFun((e, args) => {
 				String s = e.Get("this").ToString();
 				if (args.Length == 1)
-					return new KString(s.PadRight((int)Converter.ToDouble(args[0],e)));
+					return new Text(s.PadRight((int)Converter.ToDouble(args[0],e)));
 				else
-					return new KString(s.PadRight((int)Converter.ToDouble(args[0],e), args[1].ToString()[0]));
-			}));*/
-            this.SetField("chomp", new LambdaFun((e, args) => {
+					return new Text(s.PadRight((int)Converter.ToDouble(args[0],e), args[1].ToString()[0]));
+			}));
+            this.SetMember("chomp", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 if (args.Length == 0) {
                     return new Text(s.Trim());
@@ -364,7 +402,7 @@ namespace Lumen.Lang {
                     return new Text(s.Trim(args[0].ToString().ToCharArray()));
                 }
             }));
-            this.SetField("rchomp", new LambdaFun((e, args) => {
+            this.SetMember("rchomp", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 if (args.Length == 0) {
                     return new Text(s.TrimEnd());
@@ -372,7 +410,7 @@ namespace Lumen.Lang {
                     return new Text(s.TrimEnd(args[0].ToString().ToCharArray()));
                 }
             }));
-            this.SetField("lchomp", new LambdaFun((e, args) => {
+            this.SetMember("lchomp", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 if (args.Length == 0) {
                     return new Text(s.TrimStart());
@@ -380,7 +418,7 @@ namespace Lumen.Lang {
                     return new Text(s.TrimStart(args[0].ToString().ToCharArray()));
                 }
             }));
-            this.SetField("reverse", new LambdaFun((e, args) => {
+            this.SetMember("reverse", new LambdaFun((e, args) => {
                 Char[] a = e.Get("this").ToString().ToCharArray();
                 System.Array.Reverse(a);
                 return new Text(new String(a));
@@ -394,36 +432,40 @@ namespace Lumen.Lang {
 				}
 				return new List(lst);
 			}));*/
-            this.SetField("squeeze", new LambdaFun((e, args) => {
+            this.SetMember("squeeze", new LambdaFun((e, args) => {
                 String str = e.Get("this").ToString();
-                return new Text(System.String.Join("", str.Distinct()));
+                return new Text(String.Join("", str.Distinct()));
             }));
-            this.SetField("delete", new LambdaFun((e, args) => {
+            this.SetMember("delete", new LambdaFun((e, args) => {
                 return new Text(e.Get("this").ToString().Replace(args[0].ToString(), ""));
             }));
-            this.SetField("split", new LambdaFun((e, args) => {
+            this.SetMember("split", new LambdaFun((e, args) => {
                 return new Array(e.Get("this").ToString()
                     .Split(args[0].ToString()[0])
                     .Select(x => (Value)new Text(x)).ToList());
             }));
 
-            this.SetField("get_bytesize", new LambdaFun((e, args) => {
+            this.SetMember("get_bytesize", new LambdaFun((e, args) => {
                 String v = e.Get("this").ToString();
                 return new Number(Encoding.Unicode.GetByteCount(v));
             }));
-            this.SetField("normalize", new LambdaFun((e, args) => {
+            this.SetMember("normalize", new LambdaFun((e, args) => {
 				String v = e.Get("this").ToString();
 				return new Text(v.Normalize());
 			}) {
 				Arguments = Const.This
 			});
 
-            this.SetField("casecmp", new LambdaFun((e, args) => {
-                //Checker.ExistsThis(e);
+            this.SetMember("casecmp", new LambdaFun((scope, args) => {
+				String v = scope["x"].ToString();
 
-                String v = e.Get("this").ToString(e);
-                return new Number(System.String.Compare(v, args[0].ToString(), true));
-            }));
+				return new Number(String.Compare(v, scope["y"].ToString(), true));
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("x"),
+					new NamePattern("y")
+				}
+			});
             /*Set("center", new LambdaFun((e, args) => {
 				//Checker.ExistsThis(e);
 
@@ -474,7 +516,7 @@ namespace Lumen.Lang {
 				return new List(res);
 			}));*/
 
-            this.SetField("Number", new LambdaFun((e, args) => {
+            this.SetMember("toNumber", new LambdaFun((e, args) => {
                 String v = e.Get("this").ToString();
                 try {
                     return new Number(Double.Parse(v));
@@ -485,8 +527,8 @@ namespace Lumen.Lang {
                 Arguments = Const.This
             });
 
-            this.Derive(Prelude.Ord);
-
+            this.IncludeMixin(Prelude.Ord);
+			this.IncludeMixin(Prelude.Collection);
             // Add: method String#count [ref: Ruby]
             // Add: class FreezzeString, methods String#freeze and String#get_freeze?
             // Modified: String#index with regex

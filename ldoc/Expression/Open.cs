@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 
 namespace ldoc {
-    public class Reference : Expression {
+   /* public class Reference : Expression {
         public String pathToFile;
         public Int32 line;
         private readonly String fileName;
@@ -14,5 +14,5 @@ namespace ldoc {
             this.fileName = fileName;
             this.line = line;
         }
-    }
+    }*/
 }

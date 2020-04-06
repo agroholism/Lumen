@@ -1,21 +1,40 @@
 ﻿new [name="newProject"] [allow_script=true] [skillet="default"]
-
 init [name] [path=""] [allow_script=true]
-
 open [name]
+
+sections add [name]
 
 pages
 pages new [name] [helper=true] [script=null] [style=null] [skillet="default"] [script_type=lm|js]
 pages delete [name]
+pages rename [old-name] [new-name]
 pages show [name]
+pages newtemplate [name]
 
 res show [name]
-res add [type="img|txt"] [link=""] [temporal=true] 
+res add [type="img|txt|ttf"] [link=""] [temporal=true] 
 
-config allow_script
-config host
+config show host
+config set host http:\\danielargent.github.io
+config refresh
+
+events on
+events off
+
+scripts
+scripts new [name]
+scripts delete [name]
+scripts rename [old-name] [new-name]
+scripts off
+scripts on
+
+styles
+styles new [name]
+styles delete [name]
+styles rename [old-name] [new-name]
 
 build
+build into [path]
 
 [name]
 |__ build*
@@ -24,7 +43,6 @@ build
 |
 |__ model
 |   |__ pages
-|	|	|__ common.lm
 |   |   |__ index.lm
 |	|	|__ index.lmt
 |	|	
@@ -35,10 +53,44 @@ build
 |	|	|__ default.css
 |	|
 |	|__ resources
-|		|__ images
-|		|
-|		|__ fonts
-|		|
-|		|__ resx.toml
+|	|	|__ images
+|	|	|
+|	|	|__ fonts
+|	|	|
+|	|	|__ resx.xml
+|	|
+|	|__ events.lm
 |
-|__ config.toml
+|__ config.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<name>plpro</name>
+	<host>some host!</host>
+	<sections>
+
+	</sections>
+	<pages>
+		<page>index</page>
+		<page>common-template</page>
+	</pages>
+	<ignore>
+		<page>common-template</page>
+	</ignore>
+	<enableScript>True</enableScript>
+	<events path="model\events.lm">
+		<beforeBuild>onBeginBuild</beforeBuild>
+		<afterBuild>onAfterBuild</afterBuild>
+		<pageAdded></pageAdded>
+		<pageDeleted></pageDeleted>
+		<pageRenamed></pageRenamed>
+		<scriptAdded></scriptAdded>
+		<scriptDeleted></scriptRenamed>
+		<scriptRenamed></scriptRenamed>
+		<scriptsOff></scriptsOff>
+		<scriptsOn></scriptsOn>
+		<styleAdded></styleAdded>
+		<styleDeleted></styleDeleted>
+		<styleRenamed></styleRenamed>
+	</events>
+</project>

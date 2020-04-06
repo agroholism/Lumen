@@ -2,19 +2,16 @@
 
 namespace Lumen.Lang {
     /// <summary> Интерфейс, реализуемый всеми объектами. </summary>
-    public interface IObject : Value {
-        IObject Parent { get; set; }
+    public interface IType : Value {
+        void SetMember(String name, Value value, Scope scope);
 
-        /// <summary> Устанавливает поле объекта. </summary> 
-        /// <param name="name"> Имя поля. </param> 
-        /// <param name="value"> Значение. </param>
-        /// <param name="scope"> Область видимости, из которой осуществляется доступ. </param>
-        void SetField(String name, Value value, Scope scope);
+		Value GetMember(String name, Scope scope);
 
-        Value GetField(String name, Scope scope);
+		Boolean TryGetMember(String name, out Value result);
 
-        Boolean TryGetField(String name, out Value result);
+		Boolean IsParentOf(Value value);
 
-        Boolean IsParentOf(Value value);
-    }
+		Boolean HasMixin(Module typeClass);
+
+	}
 }

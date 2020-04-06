@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Lumen.Lang.Expressions;
+using Lumen.Lang;
+
+using String = System.String;
+
 namespace ldoc {
     internal class DotExpression : Expression {
         internal Expression expression;
@@ -13,6 +18,55 @@ namespace ldoc {
             this.nameVariable = nameVariable;
             this.fileName = fileName;
             this.line = line;
+        }
+
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+
+		public Expression Closure(ClosureManager manager) {
+            return new DotExpression(this.expression.Closure(manager), this.nameVariable, this.fileName, this.line);
+        }
+
+        public Value Eval(Scope e) {
+            if (this.expression is IdExpression conste && conste.id == "_") {
+                return new UserFun(
+                    new List<IPattern> { new NamePattern("x") }, new DotExpression(new IdExpression("x", this.line, this.fileName), this.nameVariable, this.fileName, this.line));
+            }
+
+            try {
+                Value a = this.expression.Eval(e);
+
+                if (a is Module module) {
+                    return module.GetMember(this.nameVariable, e);
+                }
+
+                if (a is IType obj) {
+                    if(obj.TryGetMember(this.nameVariable, out Value f)) {
+                        return f;
+                    }
+
+                }
+
+              /*  IObject type = a.Type;
+
+                if (type.TryGetField(this.nameVariable, out Value prf) && prf is Fun property && property.Attribute == EntityAttribute.PROPERTY) {
+                    return property.Run(new Scope { ["this"] = a });
+                }*/
+
+                return Const.UNIT;
+            } catch (LumenException hex) {
+                if (hex.file == null) {
+                    hex.file = this.fileName;
+                }
+
+                if (hex.line == -1) {
+                    hex.line = this.line;
+                }
+
+                throw;
+            }
         }
 
         public override String ToString() {

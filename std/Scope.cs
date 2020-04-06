@@ -2,26 +2,15 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
-    public class Scope {
+	public class Scope {
         public IDictionary<String, Value> variables;
         public List<Module> usings;
         public Scope parent;
         public Dictionary<String, List<Value>> attributes;
-        public List<String> mutable = new List<string>();
 
         public Value this[String name] {
             get => this.Get(name);
             set => this.Bind(name, value);
-        }
-
-        public Value This {
-            get {
-                if (this.IsExsists("this")) {
-                    return this.Get("this");
-                }
-                return null;
-            }
-            set => this.Set("this", value);
         }
 
         public Scope() {
@@ -66,7 +55,7 @@ namespace Lumen.Lang {
 
             foreach (Value i in this.usings) {
                 if (i is Module m) {
-                    if (m.TryGetField(name, out result)) {
+                    if (m.TryGetMember(name, out result)) {
                         return true;
                     }
                     continue;
@@ -89,36 +78,37 @@ namespace Lumen.Lang {
             this.attributes[id] = new List<Value> { val };
         }
 
-        public Value Get(String name) {
-            if (this.variables.TryGetValue(name, out Value value)) {
-                return value;
-            }
+		public Value Get(String name) {
+			if (this.variables.TryGetValue(name, out Value value)) {
+				return value;
+			}
 
-            foreach (Module i in this.usings) {
-                if (i.TryGetField(name, out value)) {
-                    return value;
-                }
+			foreach (Module i in this.usings) {
+				if (i.TryGetMember(name, out value)) {
+					return value;
+				}
 
-                continue;
-            }
+				continue;
+			}
 
-            if (this.parent != null) {
-                return this.parent.Get(name);
-            }
+			if (this.parent != null) {
+				return this.parent.Get(name);
+			}
 
-            throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(name));
+			List<String> maybe = new List<string>();
+			foreach (KeyValuePair<String, Value> i in this.variables) {
+				if (Helper.Tanimoto(i.Key, name) > 0.4) {
+					maybe.Add(i.Key);
+				}
+			}
+
+			throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(name)) {
+				Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}{String.Join(Environment.NewLine, maybe)}" : null
+			};
         }
 
         public void Bind(String name, Value value) {
             this.variables[name] = value;
-        }
-
-        public virtual void Set(String name, Value value) {
-            if(this.mutable.Contains(name)) {
-                this.variables[name] = value;
-            } else {
-                throw new LumenException($"can not to change binding {name}");
-            }
         }
 
         public void AddUsing(Module obj) {

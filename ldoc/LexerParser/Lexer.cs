@@ -1,65 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Lumen.Lang;
 
 namespace ldoc {
     internal sealed class Lexer {
         private const String operatorsString = "+-\\*/%(){}=<>!&|;:?,[]^.~$";
-        private static readonly IDictionary<String, Token> operatorsDictionary = new Dictionary<String, Token>() {
-            ["()"] = new Token(TokenType.VOID, "()"),
+		private static readonly IDictionary<String, Token> operatorsDictionary = new Dictionary<String, Token>() {
+			["()"] = new Token(TokenType.VOID, "()"),
 
-            ["~"] = new Token(TokenType.TILDE, Op.BNOT),
+			["~"] = new Token(TokenType.TILDE, Op.BNOT),
 
-            ["+"] = new Token(TokenType.PLUS, Op.PLUS),
-            ["-"] = new Token(TokenType.MINUS, Op.MINUS),
-            ["*"] = new Token(TokenType.STAR, Op.STAR),
-            ["/"] = new Token(TokenType.SLASH, Op.SLASH),
+			["+"] = new Token(TokenType.PLUS, Op.PLUS),
+			["-"] = new Token(TokenType.MINUS, Op.MINUS),
+			["*"] = new Token(TokenType.STAR, Op.STAR),
+			["/"] = new Token(TokenType.SLASH, Op.SLASH),
 
-            ["%"] = new Token(TokenType.MOD, Op.MOD),
-            ["^"] = new Token(TokenType.BXOR, Op.UNARY_XOR),
-            ["&"] = new Token(TokenType.AMP, Op.BAND),
-            ["|"] = new Token(TokenType.BAR, Op.BOR),
+			["%"] = new Token(TokenType.MOD, Op.MOD),
+			["^"] = new Token(TokenType.BXOR, Op.UNARY_XOR),
+			["&"] = new Token(TokenType.AMP, Op.BAND),
+			["|"] = new Token(TokenType.BAR, Op.BOR),
 
-            ["<<"] = new Token(TokenType.BLEFT, Op.LSH),
-            [">>"] = new Token(TokenType.BRIGTH, Op.RSH),
+			["<<"] = new Token(TokenType.BLEFT, Op.LSH),
+			[">>"] = new Token(TokenType.BRIGTH, Op.RSH),
 
-            ["("] = new Token(TokenType.LPAREN),
-            [")"] = new Token(TokenType.RPAREN),
+			["<<="] = new Token(TokenType.BLEFT, Op.LSH),
+			[">>-"] = new Token(TokenType.FUNCTORBIND, Op.RSH),
+			[">>="] = new Token(TokenType.BIND, Op.RSH),
 
-            ["="] = new Token(TokenType.EQUALS, Op.EQUALS),
-            ["<"] = new Token(TokenType.LT, Op.LT),
-            [">"] = new Token(TokenType.GT, Op.GT),
-            ["<>"] = new Token(TokenType.NOT_EQUALS, Op.NOT_EQL),
-            ["<="] = new Token(TokenType.LTEQ, Op.LTEQ),
-            [">="] = new Token(TokenType.GTEQ, Op.GTEQ),
-            ["<=>"] = new Token(TokenType.SHIP, Op.SHIP),
+			["=>"] = new Token(TokenType.CONTEXT, Op.RSH),
 
-            ["=~"] = new Token(TokenType.EQMATCH, Op.MATCH),
-            ["!~"] = new Token(TokenType.EQNOTMATCH, Op.NOT_MATCH),
+			["("] = new Token(TokenType.LPAREN),
+			[")"] = new Token(TokenType.RPAREN),
 
-            ["->"] = new Token(TokenType.LAMBDA, Op.STAR),
-            ["<-"] = new Token(TokenType.ASSIGN, "<-"),
+			["<$"] = new Token(TokenType.NOT_EQUALS),
+			["<$>"] = new Token(TokenType.BFUNCTORBIND),
 
-            ["::"] = new Token(TokenType.COLONCOLON),
+			["="] = new Token(TokenType.EQUALS, Op.EQUALS),
+			["<"] = new Token(TokenType.LT, Op.LT),
+			[">"] = new Token(TokenType.GT, Op.GT),
+			["<*"] = new Token(TokenType.NOT_EQUALS, Op.NOT_EQL),
+			["<*>"] = new Token(TokenType.APPLICATIVEF, Op.NOT_EQL),
+			["<>"] = new Token(TokenType.NOT_EQUALS, Op.NOT_EQL),
+			["<="] = new Token(TokenType.LTEQ, Op.LTEQ),
+			[">="] = new Token(TokenType.GTEQ, Op.GTEQ),
+			["<=>"] = new Token(TokenType.SHIP, Op.SHIP),
 
-            [":"] = new Token(TokenType.COLON),
-            [";"] = new Token(TokenType.EOC, ";"),
-            [","] = new Token(TokenType.SPLIT, ","),
-            ["."] = new Token(TokenType.DOT, "."),
+			["=~"] = new Token(TokenType.EQMATCH, Op.MATCH),
+			["!~"] = new Token(TokenType.EQNOTMATCH, Op.NOT_MATCH),
 
-            [".."] = new Token(TokenType.DOTDOT, Op.RANGE_EXCLUSIVE),
-            ["..."] = new Token(TokenType.DOTDOTDOT, Op.RANGE_INCLUSIVE),
+			["->"] = new Token(TokenType.LAMBDA, Op.STAR),
+			["<-"] = new Token(TokenType.ASSIGN, "<-"),
 
-            ["["] = new Token(TokenType.LBRACKET, "["),
-            ["]"] = new Token(TokenType.RBRACKET, "]"),
+			["::"] = new Token(TokenType.COLONCOLON),
 
-            ["[<"] = new Token(TokenType.ATTRIBUTE_OPEN, "[<"),
-            [">]"] = new Token(TokenType.ATTRIBUTE_CLOSE, ">]"),
+			[":"] = new Token(TokenType.COLON),
+			[";"] = new Token(TokenType.EOC, ";"),
+			[","] = new Token(TokenType.SPLIT, ","),
+			["."] = new Token(TokenType.DOT, "."),
 
-            ["|>"] = new Token(TokenType.FPIPE, "|>"),
-            ["<|"] = new Token(TokenType.BPIPE, "<|")
-        };
-        private readonly String source;
+			[".."] = new Token(TokenType.DOTDOT, Op.RANGE_EXCLUSIVE),
+			["..."] = new Token(TokenType.DOTDOTDOT, Op.RANGE_INCLUSIVE),
+
+			["["] = new Token(TokenType.LBRACKET, "["),
+			["]"] = new Token(TokenType.RBRACKET, "]"),
+
+			["[|"] = new Token(TokenType.ARRAY_OPEN, "[|"),
+			["|]"] = new Token(TokenType.ARRAY_CLOSED, "|]"),
+
+			["[<"] = new Token(TokenType.ATTRIBUTE_OPEN, "[<"),
+			[">]"] = new Token(TokenType.ATTRIBUTE_CLOSE, ">]"),
+
+			["|>"] = new Token(TokenType.FPIPE, "|>"),
+			["<|"] = new Token(TokenType.BPIPE, "<|")
+		};
+		private readonly String source;
         private readonly Int32 length;
         private readonly List<Token> tokens;
         private Int32 position;
@@ -311,98 +326,119 @@ namespace ldoc {
                 && last != TokenType.EOC;
         }
 
-        private void Word() {
-            StringBuilder buffer = new StringBuilder();
+		private void Word() {
+			StringBuilder buffer = new StringBuilder();
 
-            Char current = this.Peek(0);
+			Char current = this.Peek(0);
 
-            while (true) {
-                if (!Char.IsLetterOrDigit(current)
-                    && current != '_' && current != '#') {
-                    break;
-                }
+			while (true) {
+				if (!Char.IsLetterOrDigit(current)
+					&& current != '_' && current != '#' && current != '\'') {
+					break;
+				}
 
-                buffer.Append(current);
+				buffer.Append(current);
 
-                current = this.Next();
-            }
+				current = this.Next();
+			}
 
-            String word = buffer.ToString();
+			String word = buffer.ToString();
 
-            switch (word) {
-                case "__LINE__":
-                    this.AddToken(TokenType.NUMBER, this.line.ToString());
-                    break;
-                case "__FILE__":
-                    this.AddToken(TokenType.TEXT, this.file);
-                    break;
-                case "for":
-                    this.AddToken(TokenType.FOR);
-                    break;
-                case "#ref":
-                    this.AddToken(TokenType.REF);
-                    break;
-                case "is":
-                    this.AddToken(TokenType.IS);
-                    break;
-                case "type":
-                    this.AddToken(TokenType.TYPE);
-                    break;
-                case "as":
-                    this.AddToken(TokenType.AS);
-                    break;
-                case "match":
-                    this.AddToken(TokenType.MATCH);
-                    break;
-                case "with":
-                    this.AddToken(TokenType.WITH);
-                    break;
-                case "open":
-                    this.AddToken(TokenType.OPEN);
-                    break;
-                case "in":
-                    this.AddToken(TokenType.IN);
-                    break;
-                case "if":
-                    this.AddToken(TokenType.IF);
-                    break;
-                case "else":
-                    this.AddToken(TokenType.ELSE);
-                    break;
-                case "while":
-                    this.AddToken(TokenType.WHILE);
-                    break;
-                case "let":
-                    this.AddToken(TokenType.LET);
-                    break;
-                case "return":
-                    this.AddToken(TokenType.RETURN);
-                    break;
-                case "module":
-                    this.AddToken(TokenType.MODULE);
-                    break;
-                case "or":
-                    this.AddToken(TokenType.OR);
-                    break;
-                case "xor":
-                    this.AddToken(TokenType.XOR);
-                    break;
-                case "and":
-                    this.AddToken(TokenType.AND);
-                    break;
-                case "not":
-                    this.AddToken(TokenType.NOT);
-                    break;
-                case "async":
-                    this.AddToken(TokenType.ASYNC);
-                    break;
-                default:
-                    this.AddToken(TokenType.WORD, word);
-                    break;
-            }
-        }
+			switch (word) {
+				case "__LINE__":
+					this.AddToken(TokenType.NUMBER, this.line.ToString());
+					break;
+				case "__FILE__":
+					this.AddToken(TokenType.TEXT, this.file);
+					break;
+				case "for":
+					this.AddToken(TokenType.FOR);
+					break;
+				case "import":
+					this.AddToken(TokenType.IMPORT);
+					break;
+				case "mut":
+					this.AddToken(TokenType.MUTABLE);
+					break;
+				case "async":
+					this.AddToken(TokenType.ASYNC);
+					break;
+				case "yield":
+					this.AddToken(TokenType.YIELD);
+					break;
+				case "is":
+					this.AddToken(TokenType.IS);
+					break;
+				case "class":
+					this.AddToken(TokenType.CLASS);
+					break;
+				case "type":
+					this.AddToken(TokenType.TYPE);
+					break;
+				case "deriving":
+					this.AddToken(TokenType.DERIVING);
+					break;
+				case "as":
+					this.AddToken(TokenType.AS);
+					break;
+				case "match":
+					this.AddToken(TokenType.MATCH);
+					break;
+				case "where":
+					this.AddToken(TokenType.WHERE);
+					break;
+				case "tailrec":
+					this.AddToken(TokenType.TAIL_REC);
+					break;
+				case "open":
+					this.AddToken(TokenType.OPEN);
+					break;
+				case "in":
+					this.AddToken(TokenType.IN);
+					break;
+				case "if":
+					this.AddToken(TokenType.IF);
+					break;
+				case "else":
+					this.AddToken(TokenType.ELSE);
+					break;
+				case "while":
+					this.AddToken(TokenType.WHILE);
+					break;
+				case "let":
+					this.AddToken(TokenType.LET);
+					break;
+				case "return":
+					this.AddToken(TokenType.RETURN);
+					break;
+				case "module":
+					this.AddToken(TokenType.MODULE);
+					break;
+				case "or":
+					this.AddToken(TokenType.OR);
+					break;
+				case "xor":
+					this.AddToken(TokenType.XOR);
+					break;
+				case "and":
+					this.AddToken(TokenType.AND);
+					break;
+				case "not":
+					this.AddToken(TokenType.NOT);
+					break;
+				case "break":
+					this.AddToken(TokenType.BREAK);
+					break;
+				case "next":
+					this.AddToken(TokenType.NEXT);
+					break;
+				default:
+					this.AddToken(TokenType.WORD, word);
+					break;
+			}
+		}
 
-        private void Operator() {
+		private void Operator() {
             Char current = this.Peek(0);
 
             if (current == '/') {

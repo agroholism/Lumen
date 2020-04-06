@@ -7,13 +7,13 @@ using Lumen.Lang.Expressions;
 
 using String = System.String;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     public class OptimizationScope : Scope {
         public List<String> whileConstants = new List<String> { "true", "false", "null" };
         public Dictionary<String, Expression> constsValues = new Dictionary<String, Expression> {
-            ["true"] = new ValueE(Const.TRUE),
-            ["false"] = new ValueE(Const.FALSE),
-            ["null"] = new ValueE(Const.UNIT)
+            ["true"] = new ValueLiteral(Const.TRUE),
+            ["false"] = new ValueLiteral(Const.FALSE),
+            ["null"] = new ValueLiteral(Const.UNIT)
         };
         public List<String> notUsed = new List<String>();
         public Boolean isPrimary = true;

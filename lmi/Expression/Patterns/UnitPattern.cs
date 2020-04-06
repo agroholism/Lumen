@@ -1,27 +1,43 @@
 ﻿using System.Collections.Generic;
+using System;
+
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
+	/// <summary> Pattern () </summary>
     internal class UnitPattern : IPattern {
-        public Expression Closure(List<System.String> visible, Scope scope) {
-            return this;
+		public static UnitPattern Instance = new UnitPattern();
+
+		public Boolean IsNotEval => false;
+
+		private UnitPattern() {
+
+		}
+
+        public MatchResult Match(Value value, Scope scope) {
+            return new MatchResult { Success = value == Const.UNIT };
         }
 
-        public Value Eval(Scope e) {
-            throw new System.NotImplementedException();
-        }
+		public List<String> GetDeclaredVariables() {
+			return new List<String>();
+		}
 
-        public List<System.String> GetDeclaredVariables() {
-            return new List<System.String>();
-        }
+		public Value Eval(Scope e) {
+			throw new NotImplementedException();
+		}
 
-        public System.Boolean Match(Value value, Scope scope) {
-            return value is Void;
-        }
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
 
-        public override System.String ToString() {
-            return "()";
-        }
-    }
+		public Expression Closure(ClosureManager manager) {
+			return this;
+		}
+
+		public override String ToString() {
+			return "()";
+		}
+	}
 }

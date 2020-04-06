@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Anatomy.cs" />
+    <Compile Include="AnatomyProject.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="HTMLParser.cs" />
     <Compile Include="Program.cs" />

@@ -1,10 +1,9 @@
-﻿using Lumen.Light;
+﻿using Lumen.Lmi;
 using System;
-using System.Text.RegularExpressions;
 using Lumen.Lang;
 
 namespace lmi {
-    public class Program {
+	public class Program {
         public static void Main(String[] args) {
             if (args.Length == 0) {
                 RunInteractive();

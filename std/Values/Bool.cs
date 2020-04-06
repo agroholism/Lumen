@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Lumen.Lang {
     public struct Bool : Value {
         internal Boolean value;
-        public IObject Type => Prelude.Boolean;
+        public IType Type => Prelude.Boolean;
 
         public Bool(Boolean value) {
             this.value = value;
@@ -39,10 +39,6 @@ namespace Lumen.Lang {
             return false;
         }
 
-        public Value Clone() {
-            return new Bool(this.value);
-        }
-
         public String ToString(Scope e) {
             return this.value ? "true" : "false";
         }
@@ -54,8 +50,16 @@ namespace Lumen.Lang {
         public override Int32 GetHashCode() {
             Int32 hashCode = 1927925191;
             hashCode = hashCode * -1521134295 + this.value.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<IObject>.Default.GetHashCode(this.Type);
+            hashCode = hashCode * -1521134295 + EqualityComparer<IType>.Default.GetHashCode(this.Type);
             return hashCode;
         }
-    }
+
+		public String ToString(String format, IFormatProvider formatProvider) {
+			return this.ToString(null);
+		}
+
+		public Value Clone() {
+			throw new NotImplementedException();
+		}
+	}
 }

@@ -9,11 +9,11 @@ using System;
 namespace Lumen.Lang.Libraries.Visual {
     public class ControlTC : TypeClass {
         public ControlTC() {
-            this.name = "Visual.Control";
+            this.Name = "Visual.Control";
 
 			this.Requirements = new List<Fun>();
 
-			this.SetField("addControl", new LambdaFun((scope, args) => {
+			this.SetMember("addControl", new LambdaFun((scope, args) => {
 				VControl vcontrol = scope["ctrl"] as VControl;
 				Control control = vcontrol.Control;
 
@@ -29,7 +29,7 @@ namespace Lumen.Lang.Libraries.Visual {
 				}
 			});
 
-			this.SetField("addOnClick", new LambdaFun((scope, args) => {
+			this.SetMember("addOnClick", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
 
@@ -43,10 +43,10 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("setBackColor", new LambdaFun((scope, args) => {
+            this.SetMember("setBackColor", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
-                IObject o = scope["c"] as IObject;
+                IType o = scope["c"] as IType;
 
                 control.BackColor = ColorModule.ToSystemColor(o, scope);
 
@@ -58,10 +58,10 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("setForeColor", new LambdaFun((scope, args) => {
+            this.SetMember("setForeColor", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
-                IObject o = scope["c"] as IObject;
+                IType o = scope["c"] as IType;
 
                 control.ForeColor = ColorModule.ToSystemColor(o, scope);
 
@@ -73,10 +73,10 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("setDock", new LambdaFun((scope, args) => {
+            this.SetMember("setDock", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
-                DockStyle o = DockModule.ToStyle(scope["d"] as IObject, scope);
+                DockStyle o = DockModule.ToStyle(scope["d"] as IType, scope);
 
                 control.Dock = o;
 
@@ -88,7 +88,7 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("setLocation", new LambdaFun((scope, args) => {
+            this.SetMember("setLocation", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
                 List<Value> point = scope["point"].ToList(scope);
@@ -106,7 +106,7 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("getLocation", new LambdaFun((scope, args) => {
+            this.SetMember("getLocation", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
 
@@ -120,7 +120,7 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("setText", new LambdaFun((scope, args) => {
+            this.SetMember("setText", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
                 String o = scope["t"].ToString(scope);
@@ -135,7 +135,7 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("getText", new LambdaFun((scope, args) => {
+            this.SetMember("getText", new LambdaFun((scope, args) => {
                 VControl vcontrol = scope["ctrl"] as VControl;
                 Control control = vcontrol.Control;
 

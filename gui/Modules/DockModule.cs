@@ -9,15 +9,15 @@ using System;
 namespace Lumen.Lang.Libraries.Visual {
     public class DockModule : Module {
 
-        public static IObject Bottom { get; private set; }
-        public static IObject Fill { get; private set; }
-        public static IObject Left { get; private set; }
-        public static IObject Right { get; private set; }
-        public static IObject Top { get; private set; }
-        public static IObject None { get; private set; }
+        public static IType Bottom { get; private set; }
+        public static IType Fill { get; private set; }
+        public static IType Left { get; private set; }
+        public static IType Right { get; private set; }
+        public static IType Top { get; private set; }
+        public static IType None { get; private set; }
 
         public DockModule() {
-            this.name = "Visual.Dock";
+            this.Name = "Visual.Dock";
 
             Bottom = Helper.CreateConstructor("Visual.Dock.Bottom", this, new List<String>());
             Fill = Helper.CreateConstructor("Visual.Dock.Fill", this, new List<String>());
@@ -26,15 +26,15 @@ namespace Lumen.Lang.Libraries.Visual {
             None = Helper.CreateConstructor("Visual.Dock.None", this, new List<String>());
             Top = Helper.CreateConstructor("Visual.Dock.Top", this, new List<String>());
 
-            this.SetField("Bottom", Bottom);
-            this.SetField("Fill", Fill);
-            this.SetField("Left", Left);
-            this.SetField("Right", Right);
-            this.SetField("Top", Top);
-            this.SetField("None", None);
+            this.SetMember("Bottom", Bottom);
+            this.SetMember("Fill", Fill);
+            this.SetMember("Left", Left);
+            this.SetMember("Right", Right);
+            this.SetMember("Top", Top);
+            this.SetMember("None", None);
         }
 
-        public static DockStyle ToStyle(IObject obj, Scope s) {
+        public static DockStyle ToStyle(IType obj, Scope s) {
             if(obj == Bottom) {
                 return DockStyle.Bottom;
             }

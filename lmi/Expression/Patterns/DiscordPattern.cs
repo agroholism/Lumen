@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     internal class DiscordPattern : IPattern {
-        public Expression Closure(List<String> visible, Scope scope) {
+		public static DiscordPattern Instance { get; } = new DiscordPattern();
+		public Boolean IsNotEval { get; } = true;
+		private DiscordPattern() {
+
+		}
+
+        public Expression Closure(ClosureManager manager) {
             return this;
         }
 
@@ -17,8 +23,13 @@ namespace Lumen.Light {
             return new List<String>();
         }
 
-        public Boolean Match(Value value, Scope scope) {
-            return true;
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+
+		public MatchResult Match(Value value, Scope scope) {
+            return MatchResult.True;
         }
 
         public override String ToString() {

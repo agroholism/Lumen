@@ -44,13 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DocComment.cs" />
-    <Compile Include="Exceptions.cs" />
-    <Compile Include="Expression.cs" />
     <Compile Include="Expression\Application\Applicate.cs" />
     <Compile Include="Expression\Application\DotApplicate.cs" />
+    <Compile Include="Expression\Application\TailRecursion.cs" />
     <Compile Include="Expression\ArgumentGenerator.cs" />
-    <Compile Include="Expression\Assigment\Assigment.cs" />
-    <Compile Include="Expression\Assigment\DotAssigment.cs" />
     <Compile Include="Expression\AsyncE.cs" />
     <Compile Include="Expression\BlockE.cs" />
     <Compile Include="Expression\Break.cs" />
@@ -60,15 +57,20 @@
     <Compile Include="Expression\Declarations\TypeDeclarationE.cs" />
     <Compile Include="Expression\Declarations\VariableDeclaration.cs" />
     <Compile Include="Expression\DotExpression.cs" />
+    <Compile Include="Expression\GotoE.cs" />
     <Compile Include="Expression\IdExpression.cs" />
     <Compile Include="Expression\Imperative\ConditionE.cs" />
     <Compile Include="Expression\Imperative\ForCycle.cs" />
     <Compile Include="Expression\Imperative\WhileExpression.cs" />
-    <Compile Include="Expression\IPattern.cs" />
+    <Compile Include="Expression\Import.cs" />
     <Compile Include="Expression\ListForGen.cs" />
+    <Compile Include="Expression\ListGenerator.cs" />
+    <Compile Include="Expression\Literals\ArrayLiteral.cs" />
     <Compile Include="Expression\Literals\ExpressionE.cs" />
     <Compile Include="Expression\Literals\LambdaFunction.cs" />
     <Compile Include="Expression\Literals\ListE.cs" />
+    <Compile Include="Expression\Literals\ListLiteral.cs" />
+    <Compile Include="Expression\Literals\MapE.cs" />
     <Compile Include="Expression\Literals\StringE.cs" />
     <Compile Include="Expression\Literals\UnitExpression.cs" />
     <Compile Include="Expression\Literals\ValueExpression.cs" />
@@ -81,6 +83,7 @@
     <Compile Include="Expression\Operators\GetIndexE.cs" />
     <Compile Include="Expression\Operators\IsExpression.cs" />
     <Compile Include="Expression\Patterns\AsPattern.cs" />
+    <Compile Include="Expression\Patterns\DeconstructPattern.cs" />
     <Compile Include="Expression\Patterns\DiscordPattern.cs" />
     <Compile Include="Expression\Patterns\EmptyListPattern.cs" />
     <Compile Include="Expression\Patterns\HeadTailPattern.cs" />
@@ -88,22 +91,34 @@
     <Compile Include="Expression\Patterns\OrPattern.cs" />
     <Compile Include="Expression\Patterns\TypePattern.cs" />
     <Compile Include="Expression\Patterns\UnitPattern.cs" />
+    <Compile Include="Expression\Patterns\ValuePattern.cs" />
     <Compile Include="Expression\Patterns\VariablePattern.cs" />
+    <Compile Include="Expression\Patterns\WherePattern.cs" />
     <Compile Include="Expression\Return.cs" />
     <Compile Include="Expression\Rspr.cs" />
+    <Compile Include="Expression\SeguenceGenerator.cs" />
+    <Compile Include="Expression\TypeClassDeclaration.cs" />
+    <Compile Include="LexerParser\ConstructorMetadata.cs" />
     <Compile Include="LexerParser\Lexer.cs" />
+    <Compile Include="LexerParser\ParameterMetadata.cs" />
     <Compile Include="LexerParser\Parser.cs" />
     <Compile Include="LexerParser\Token.cs" />
     <Compile Include="LexerParser\TokenType.cs" />
-    <Compile Include="LumenException.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Recursion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test.lm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\std\prelude.csproj">
+      <Project>{b2914bdf-f767-4007-a7be-1b478c39a54e}</Project>
+      <Name>prelude</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

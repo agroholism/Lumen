@@ -1,171 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-    internal class ArrayModule : Module {
+	internal class ArrayModule : Module {
         public ArrayModule() {
-            this.name = "prelude.Array";
+            this.Name = "Array";
 
-            #region operators
+			#region operators
+			this.SetMember(Op.SETI, new LambdaFun((e, args) => {
+				List<Value> exemplare = e.Get("array").ToList(e);
 
-            // *vec<?> := num
-            this.SetField(Op.USTAR, new LambdaFun((scope, args) => {
-                return (Number)scope["a"].ToList(scope).Count;
-            }) {
-                Arguments = new List<IPattern> {
-                    new NamePattern("a")
-                }
-            });
+				List<Value> result = new List<Value>();
 
-            // vec<?> + ? := vec<?> { can be slow - makes copy } 
-            this.SetField(Op.PLUS, new LambdaFun((scope, args) => {
-                List<Value> value = scope["other"].Clone().ToList(scope);
-                foreach (Value i in scope["this"].ToSequence(scope)) {
-                    value.Add(i);
-                }
+				Int32 index = Index((Int32)e.Get("index").ToDouble(e), exemplare.Count);
 
-                return new Array(value);
-            }) {
-                Arguments = Const.ThisOther
-            });
+				if (index < 0 || index >= exemplare.Count) {
+					throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
+				}
 
-            // vec<?> - (vec<?> | seq<?>) := vec<?>
-            this.SetField(Op.MINUS, new LambdaFun((scope, args) => {
-                List<Value> value = scope["other"].ToList(scope);
-                IEnumerable<Value> other = scope["this"].ToSequence(scope);
+				exemplare[index] = e.Get("value");
 
-                return new Array(value.Except(other).ToList());
-            }) {
-                Arguments = Const.ThisOther
-            });
+				return Const.UNIT;
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("array"),
+					new NamePattern("index"),
+					new NamePattern("value")
+				}
+			});
+			#endregion
 
-            // vec<?> * (String | fun<?> | num) := String | vec<?> | vec<?>
-            this.SetField(Op.STAR, new LambdaFun((scope, args) => {
-                List<Value> value = scope["other"].ToList(scope);
-                Value other = scope["this"];
+			this.SetMember("getRefIndex", new LambdaFun((e, args) => {
+				Int32 index = e.Get("index").ToInt(e);
+				return new ArrayRef(e.Get("this") as Array, index);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("this"),
+					new NamePattern("index")
+				}
+			});
 
-                switch (other) {
-                    case Text _:
-                        return new Text(String.Join(other.ToString(scope), value));
-                    case Fun fun:
-                        return new Array(value.Select((it, i) => fun.Run(new Scope(scope), it, (Number)i)).ToList());
-                    case Number num:
-                        return new Array(Cycle(value, (Int32)num.ToDouble(scope)).ToList());
-                    default:
-                        throw new LumenException($"operator '*' can not get a value of type {other.Type}");
-                }
-
-                IEnumerable<Value> Cycle(IEnumerable<Value> val, Int32 count) {
-                    Int32 currentIndex = 0;
-                    while (currentIndex < count) {
-                        foreach (Value i in val) {
-                            yield return i;
-                        }
-                        currentIndex++;
-                    }
-                }
-
-            }) {
-                Arguments = Const.ThisOther
-            });
-
-            // vec<?> = ? := bool
-            this.SetField(Op.EQUALS, new LambdaFun((scope, args) => {
-                return new Bool(scope["other"].Equals(scope["this"]));
-            }) {
-                Arguments = Const.ThisOther
-            });
-
-            // vec<?> <> ? := bool
-            this.SetField(Op.NOT_EQL, new LambdaFun((scope, args) => {
-                return new Bool(!scope.This.Equals(scope["other"]));
-            }) {
-                Arguments = Const.ThisOther
-            });
-
-            // vec<?> & (seq<?> | vec<?>) := vec<?>
-            this.SetField(Op.BAND, new LambdaFun((scope, args) => {
-                List<Value> value = scope.This.ToList(scope);
-                IEnumerable<Value> other = scope["other"].ToSequence(scope);
-
-                return new Array(value.Union(other).ToList());
-            }) {
-                Arguments = Const.ThisOther
-            });
-
-            // vec<?> | (seq<?> | vec<?>) := vec<?>
-            this.SetField(Op.BOR, new LambdaFun((scope, args) => {
-                List<Value> value = scope.This.ToList(scope);
-                IEnumerable<Value> other = scope["other"].ToSequence(scope);
-
-                return new Array(value.Intersect(other).ToList());
-            }) {
-                Arguments = Const.ThisOther
-            });
-
-            // vec<?>[...args]
-            this.SetField(Op.GETI, new LambdaFun((scope, args) => {
-                List<Value> exemplare = scope["a"].ToList(scope);
-                Value i = scope["i"];
-
-                if (i is Fun f) {
-                    return new Array(exemplare.Where(x => f.Run(new Scope(scope), x).ToBoolean()).ToList());
-                }
-
-                if (i is Number) {
-                    Int32 index = Index(i.ToInt(scope), exemplare.Count);
-
-                    if (index < 0 || index >= exemplare.Count) {
-                        throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
-                    }
-
-                    return exemplare[index];
-                }
-
-                List<Value> result = new List<Value>();
-
-                foreach (Value subIndex in i.ToSequence(scope)) {
-                    if (subIndex is Number) {
-                        Int32 ind = Index(subIndex.ToInt(scope), exemplare.Count);
-
-                        if (ind < 0 || ind >= exemplare.Count) {
-                            throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
-                        }
-
-                        result.Add(exemplare[ind]);
-                    }
-                }
-
-                return new Array(result);
-
-            }) {
-                Arguments = new List<IPattern> {
-                    new NamePattern("i"),
-                    new NamePattern("a")
-                }
-            });
-
-            this.SetField(Op.SETI, new LambdaFun((e, args) => {
-                List<Value> exemplare = Converter.ToList(args[2], e);
-
-                List<Value> result = new List<Value>();
-
-                Int32 index = Index((Int32)args[0].ToDouble(e), exemplare.Count);
-
-                if (index < 0 || index >= exemplare.Count) {
-                    throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
-                }
-                
-                exemplare[index] = args[1];
-
-                return Const.UNIT;
-            }));
-            #endregion
-
-            this.SetField("add", new LambdaFun((scope, args) => {
+			this.SetMember("add", new LambdaFun((scope, args) => {
                 List<Value> array = scope["a"].ToList(scope);
 
                 array.Add(scope["e"]);
@@ -178,45 +55,12 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.SetField("map", new LambdaFun((e, args) => {
-                List<Value> v = e["a"].Clone().ToList(e);
-                UserFun f = (UserFun)e["f"];
-
-                if (f.Arguments.Count == 1) {
-                    for (Int32 i = 0; i < v.Count; i++) {
-                        v[i] = f.Run(new Scope(e), v[i]);
-                    }
-                } else {
-                    for (Int32 i = 0; i < v.Count; i++) {
-                        v[i] = f.Run(new Scope(e), v[i], new Number(i));
-                    }
-                }
-
-                return new Array(v);
-            }) {
-                Arguments = new List<IPattern> {
-                    new NamePattern("f"),
-                    new NamePattern("a")
-                }
-            });
-
-            // Converts vec to std.seq, can get
-            this.SetField("Sequence", new LambdaFun((e, args) => {
-                List<Value> v = e.This.ToList(e);
-
-                if (args.Length > 0 && args[0].ToDouble(e) > 1) {
-                    Int32 index = 0;
-                    return new Enumerator(v.Select(i => new Array(new List<Value> { i, new Number(index++) })));
-                }
-
-                return new Enumerator(v);
+            this.SetMember("toText", new LambdaFun((e, args) => {
+                Array v = e["this"].ToArray(e);
+                return new Text(v.ToString());
             }));
-            this.SetField("String", new LambdaFun((e, args) => {
-                Array v = e.This.ToVec(e);
-                return new Text(v.ToString(e));
-            }));
-            this.SetField("sort", new LambdaFun((e, args) => {
-                List<Value> value = e.This.Clone().ToList(e);
+            this.SetMember("sort", new LambdaFun((e, args) => {
+                List<Value> value = e["this"].Clone().ToList(e);
 
                 Value by = e["by"];
                 Value descending = e["descending"];
@@ -283,35 +127,39 @@ namespace Lumen.Lang {
 							return new List(list);
 						}, "Kernel.List.sort!"));
 						*/
-            this.SetField("contains", new LambdaFun((e, args) => {
-                List<Value> value = e.This.ToList(e);
-                Value obj = args[0];
-                return (Bool)value.Contains(obj);
-            }));
-            this.SetField("pop", new LambdaFun((e, args) => {
+            this.SetMember("contains", new LambdaFun((e, args) => {
+				List<Value> value = e["this"].ToList(e);
+				return (Bool)value.Contains(e.Get("elem"));
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("this"),
+					new NamePattern("elem")
+				}
+			});
+            this.SetMember("pop", new LambdaFun((e, args) => {
                 List<Value> list = Converter.ToList(e.Get("this"), e);
                 Value lastElement = list[list.Count - 1];
                 list.RemoveAt(list.Count - 1);
                 return lastElement;
             }));
-            this.SetField("peek", new LambdaFun((e, args) => {
+            this.SetMember("peek", new LambdaFun((e, args) => {
                 List<Value> list = Converter.ToList(e.Get("this"), e);
                 Value lastElement = list[list.Count - 1];
                 return lastElement;
             }));
-            this.SetField("shift", new LambdaFun((e, args) => {
-                List<Value> list = e.This.ToList(e);
+            this.SetMember("shift", new LambdaFun((e, args) => {
+                List<Value> list = e["this"].ToList(e);
                 Value firstElement = list[0];
                 list.RemoveAt(0);
                 return firstElement;
             }));
-            this.SetField("unshift", new LambdaFun((e, args) => {
-                List<Value> list = e.This.ToList(e);
+            this.SetMember("unshift", new LambdaFun((e, args) => {
+                List<Value> list = e["this"].ToList(e);
                 list.Insert(0, args[0]);
                 return Const.UNIT;
             }));
-            this.SetField("map_m", new LambdaFun((e, args) => {
-                List<Value> v = e.This.ToList(e);
+            this.SetMember("map_m", new LambdaFun((e, args) => {
+                List<Value> v = e["this"].ToList(e);
                 UserFun f = (UserFun)args[0];
 
                 if (f.Arguments.Count == 1) {
@@ -327,7 +175,7 @@ namespace Lumen.Lang {
                 return Const.UNIT;
             }));
 
-            this.SetField("index", new LambdaFun((e, args) => {
+            this.SetMember("index", new LambdaFun((e, args) => {
                 List<Value> list = Converter.ToList(e.Get("this"), e);
                 Int32 result = list.IndexOf(args[0]);
                 if (result == -1) {
@@ -335,7 +183,7 @@ namespace Lumen.Lang {
                 }
                 return (Number)result;
             }));
-            this.SetField("last_index", new LambdaFun((e, args) => {
+            this.SetMember("last_index", new LambdaFun((e, args) => {
                 List<Value> list = Converter.ToList(e.Get("this"), e);
                 Int32 result = list.LastIndexOf(args[0]);
                 if (result == -1) {
@@ -343,12 +191,12 @@ namespace Lumen.Lang {
                 }
                 return (Number)result;
             }));
-            this.SetField("clear", new LambdaFun((e, args) => {
+            this.SetMember("clear", new LambdaFun((e, args) => {
                 List<Value> list = Converter.ToList(e.Get("this"), e);
                 list.Clear();
                 return Const.UNIT;
             }));
-            this.SetField("find_index", new LambdaFun((e, args) => {
+            this.SetMember("find_index", new LambdaFun((e, args) => {
                 List<Value> list = Converter.ToList(e.Get("this"), e);
 
                 Value obj = args[0];
@@ -367,7 +215,7 @@ namespace Lumen.Lang {
 
                 return (Number)result;
             }));
-            this.SetField("find", new LambdaFun((e, args) => {
+            this.SetMember("find", new LambdaFun((e, args) => {
                 List<Value> list = Converter.ToList(e.Get("this"), e);
 
                 Value obj = args[0];
@@ -386,24 +234,24 @@ namespace Lumen.Lang {
 
                 return result;
             }));
-            this.SetField("find_last", new LambdaFun((e, args) => {
+            this.SetMember("find_last", new LambdaFun((e, args) => {
                 List<Value> v = Converter.ToList(e.Get("this"), e);
                 return v.FindLast(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x)));
             }));
-            this.SetField("find_last_index", new LambdaFun((e, args) => {
+            this.SetMember("find_last_index", new LambdaFun((e, args) => {
                 List<Value> v = Converter.ToList(e.Get("this"), e);
                 return new Number(v.FindLastIndex(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x))));
             }));
-            this.SetField("insert", new LambdaFun((e, args) => {
+            this.SetMember("insert", new LambdaFun((e, args) => {
                 List<Value> v = Converter.ToList(e.Get("this"), e);
                 v.Insert((Int32)Converter.ToDouble(args[0], e), args[1]);
                 return Const.UNIT;
             }));
-            this.SetField("last_index", new LambdaFun((e, args) => {
+            this.SetMember("last_index", new LambdaFun((e, args) => {
                 List<Value> v = Converter.ToList(e.Get("this"), e);
                 return new Number(v.LastIndexOf(args[0]));
             }));
-            this.SetField("delete", new LambdaFun((e, args) => {
+            this.SetMember("delete", new LambdaFun((e, args) => {
                 List<Value> v = Converter.ToList(e.Get("this"), e);
                 foreach (Value i in args) {
                     v.Remove(i);
@@ -411,7 +259,7 @@ namespace Lumen.Lang {
 
                 return Const.UNIT;
             }));
-            this.SetField("reject", new LambdaFun((e, args) => {
+            this.SetMember("reject", new LambdaFun((e, args) => {
                 List<Value> v = Converter.ToList(e.Get("this"), e);
                 v.RemoveAll(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x)));
                 return Const.UNIT;
@@ -424,7 +272,7 @@ namespace Lumen.Lang {
 
 				return Const.NULL;
 			}, "Kernel.List.remove_at!"));*/
-            this.SetField("reverse", new LambdaFun((e, args) => {
+            this.SetMember("reverse", new LambdaFun((e, args) => {
                 List<Value> arv = Converter.ToList(e.Get("this"), e);
                 List<Value> result = new List<Value>(arv.Count);
                 foreach (Value i in arv) {
@@ -434,14 +282,14 @@ namespace Lumen.Lang {
                 result.Reverse();
                 return new Array(result);
             }));
-            this.SetField("reverse", new LambdaFun((e, args) => {
+            this.SetMember("reverse", new LambdaFun((e, args) => {
                 List<Value> arv = Converter.ToList(e.Get("this"), e);
                 arv.Reverse();
                 return new Array(arv);
             }));
             //Set("flatten", new Flatten());
-            this.SetField("partition", new LambdaFun((e, args) => {
-                List<Value> obj = e.This.ToList(e);
+            this.SetMember("partition", new LambdaFun((e, args) => {
+                List<Value> obj = e["this"].ToList(e);
 
                 List<Value> first = new List<Value>();
                 List<Value> second = new List<Value>();
@@ -458,12 +306,15 @@ namespace Lumen.Lang {
                 return new Array(new List<Value> { new Array(first), new Array(second) });
             }));
 
-            /*    this.Set("String", new LambdaFun((e, args) => {
-                    Array v = e.This.ToVec(e);
-                    return (String)v.ToString(e);
-                }));*/
+			this.SetMember("toStream", new LambdaFun((e, args) => {
+				return new Stream(e["array"].ToList(e));
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("array")
+				}
+			});
 
-            this.Derive(Prelude.Sequence);
+			this.IncludeMixin(Prelude.Collection);
         }
 
         private static Int32 Index(Int32 index, Int32 count) {

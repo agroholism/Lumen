@@ -1,3 +1,55 @@
+public class LazyList : IEnumerable<Value>, Value {
+		public Value Current { get; set; }
+		public Lazy Next { get; set; }
+
+		public IType Type => Prelude.List;
+
+		public Value Clone() {
+			throw new NotImplementedException();
+		}
+
+		public Int32 CompareTo(Object obj) {
+			throw new NotImplementedException();
+		}
+
+		public IEnumerator<Value> GetEnumerator() {
+			yield return this.Current;
+
+			Lazy next = this.Next;
+			while (next.Force() is LazyList ll) {
+				yield return ll.Current;
+				next = ll.Next;
+			}
+		}
+
+		public String ToString(Scope e) {
+			return "[lazy]";
+		}
+
+		public String ToString(String format, IFormatProvider formatProvider) {
+			return "[lazy]";
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return this.GetEnumerator();
+		}
+	}
+
+
+			if (right is Lazy lazy) {
+				Value v = this.result.Eval(e);
+				return new LazyList { Current = v, Next = lazy };
+				/*LinkedList l = lazy.Force() as LinkedList;
+				return new List(new LinkedList(this.result.Eval(e), l));*/
+			}
+
+			if (right is LazyList lazylist) {
+				Value v = this.result.Eval(e);
+				return new LazyList { Current = v, Next = new Lazy(null) { value = lazylist } };
+				/*LinkedList l = lazy.Force() as LinkedList;
+				return new List(new LinkedList(this.result.Eval(e), l));*/
+			}
+
 Lumen.Studio
 Lumen.Studio.Interop
 Lumen.Studio.Designer
@@ -28,3 +80,372 @@ BeforeDebugStep
 OnDebugStep
 AfterDebugStep
 OnDebugCollection
+
+//////////// Lumen ///////////
+
+// :deprecated
+// :added in 0.3.6
+
+// Связка. Не изменяема в данной области видимости.
+// Неинициализированные значения не допускаются синтаксисом.
+let a = 9
+
+// Изменяемая связка. Изменяется оператором присваивания.
+// Неинициализированные значения не допускаются синтаксисом.
+let mut b = 3
+
+// Объявления функций аналогичны операторам связывания и подчиняются им, с некоторыми 
+// особенностями. После имени связки должен идти хотя бы один шаблон сопоставления.
+let f x = x * x
+
+// Возможна перегрузка связок, однако это не означает что связка обязана 
+// быть изменяемой.
+// Если какая-то функция уже связанна с данным именем, то ещё одна перегрузка будет 
+// добавлена к уже существующим.
+// Если с данным именем уже связано не функциональное значение, то будет выброшено
+// исключение BindingIsAlsoExists
+let area (Circle radius) = 3.14*radius^2
+let area (Square side) = side^2
+
+// Оператор присваивания <-. Присваивает новое значение мутабельной связке.
+// Если происходит попытка присваивания неизменяемой переменной - выбрасывается
+// исключение CanNotToChangeBinding
+let mut i = 0
+i <- i + 1
+
+// Определение области видимости.
+// Область видимости - это:
+// 1. Тело или декларация функции
+//	let n = 9
+//	let fact n = // эта связка не имеет ничего общего с внешней
+//		if n = 0: 
+//			1 
+//		else: 
+//			n * rec (n-1)
+// 2. Тело оператора, выделенное отступом
+//	let mut i = 10
+//	while i > 0:
+//		let j = i * i // Эта переменная новая с каждым проходом
+//		i <- i + 1
+//		print j
+
+type Color = Red | Green | Blue | RGB r g b
+// Color - это тип
+// RGB - конструктор значения
+// Red Green и Blue - конструкторы значения без параметров
+// Имена типов и конструкторов ОБЯЗАНЫ начинаться с большой буквы
+
+// Паттерн матчинг
+let f None // совпадает с None и ()
+let f () // Аналогично тому что выше
+
+
+()
+[] 
+[x, y, z]
+3
+_
+
+// Exceptions:
+L001 IncorrectNumberLiteral
+L002 WaitAnotherToken
+L003 UnexceptedToken
+L004 UnclosedListLiteral
+L005 UnclosedTextLiteral
+L006 UnclosedArrayLiteral
+L007 UnclosedLambda
+
+L010 IdentifierIsAlreadyExists
+L011 BindingIsAlreadyExists
+L012 UnknownIdentifier
+L013 ModuleDoesNotContainsName
+
+L020 ValueIsNotAFunction
+L021 TypeError
+L022 ConvertError
+
+L030 TypeDoesNotImpelentTypeClass
+L031 FunctionWithSignatureCanNotBeApplied
+
+L100 IndexOutOfRange
+
+
+
+	public class Channel : BaseValueImpl {
+		public Boolean CanNext { get; private set; } = true;
+
+		private Value data;
+		public System.Threading.CancellationTokenSource tokenSource;
+
+		public System.Threading.ManualResetEventSlim RecieveEvent { get; set; } = 
+			new System.Threading.ManualResetEventSlim(false);
+		public System.Threading.ManualResetEventSlim SendEvent { get; set; } = 
+			new System.Threading.ManualResetEventSlim(false);
+
+		public Channel(System.Threading.CancellationTokenSource tokenSource) {
+			this.tokenSource = tokenSource;
+			this.tokenSource.Token.Register(() => {
+				this.SendEvent.Set();
+				this.RecieveEvent.Set();
+			});
+		}
+
+		public override IType Type => Prelude.Number;
+
+		public void Send(Value data) {
+			if (this.tokenSource.IsCancellationRequested) {
+				this.tokenSource.Token.ThrowIfCancellationRequested();
+			}
+
+			if (this.data != null) {
+				this.RecieveEvent.Wait();
+			}
+
+			if (this.tokenSource.IsCancellationRequested) {
+				this.tokenSource.Token.ThrowIfCancellationRequested();
+			}
+
+			this.data = data;
+			this.SendEvent.Set();
+			this.RecieveEvent.Reset();
+		}
+
+		public Value Recieve() {
+			if (this.tokenSource.IsCancellationRequested) {
+				if(this.data != null) {
+					Value res = this.data;
+					this.data = null;
+					this.CanNext = true;
+					return res;
+				}
+				this.CanNext = false;
+				throw new OperationCanceledException();
+			}
+
+			if (this.data == null) {
+				this.SendEvent.Wait();
+			}
+
+			if (this.tokenSource.IsCancellationRequested) {
+				if (this.data != null) {
+					Value res = this.data;
+					this.data = null;
+					this.CanNext = true;
+					return res;
+				}
+
+				this.CanNext = false;
+				throw new OperationCanceledException();
+			}
+
+			Value result = this.data;
+
+			this.data = null;
+			this.RecieveEvent.Set();
+			this.SendEvent.Reset();
+			return result;
+		}
+
+		public void Close() {
+			this.tokenSource.Cancel();
+		}
+
+		public override String ToString(Scope e) {
+			return "Channel";
+		}
+	}
+
+	public class Promise : Value {
+		public System.Threading.Tasks.Task<Value> task;
+
+		public Promise(System.Threading.Tasks.Task<Value> task) {
+			this.task = task;
+		}
+
+		public IType Type => this.task.Result.Type;
+
+		public Value Clone() {
+			return this.task.Result.Clone();
+		}
+
+		public Int32 CompareTo(Object obj) {
+			return this.task.Result.CompareTo(obj);
+		}
+
+		public String ToString(Scope e) {
+			return this.task.Result.ToString(e);
+		}
+
+		public String ToString(String format, IFormatProvider formatProvider) {
+			return this.task.Result.ToString(format, formatProvider);
+		}
+
+		public override String ToString() {
+			return this.task.Result.ToString();
+		}
+	}
+
+
+	if (manager.HasYield) {
+				v = new LambdaFun((sc, ar) => {
+					CancellationTokenSource tokenSource = new CancellationTokenSource();
+					CancellationToken ct = tokenSource.Token;
+
+					Channel channel = new Channel(tokenSource);
+					sc["$defchan"] = channel;
+
+					ff = ff.Clone() as Fun;
+					(ff as UserFun).Body = (ff as UserFun).Body.Closure(new ClosureManager(sc, true));
+
+					Task<Value>.Factory.StartNew(() => {
+						Value result = ff.Run(sc, ar);
+						channel.Close();
+						return result;
+					}, ct);
+
+					return new Stream(new YieldGenerator(channel));
+				}) {
+					Arguments = ff.Arguments,
+					IsLazy = ff.IsLazy,
+					Name = ff.Name	
+				};
+			}
+class Attributed 'a where
+    let getAttribute instance (name: Text)
+    let setAttribute instance (name: Text) value
+
+type Vec = Vec internal attrs where
+    deriving Format
+    deriving Attributed 
+    
+    let constructor internal =
+        base internal (Map ())
+    
+    let getAttribute (Vec _ attrs) (name: Text) =
+        attrs.[name]
+    let setAttribute (Vec _ attrs) (name: Text) value =
+        attrs.[name] <- value
+    
+    let + (Vec internal _) operand = 
+        Vec (List.map (_ + operand) internal)
+    let - (Vec internal _) operand = 
+        Vec (List.map (_ - operand) internal)
+    let * (Vec internal _) operand = 
+        Vec (List.map (_ * operand) internal)
+    let / (Vec internal _) operand = 
+        Vec (List.map (_ / operand) internal)
+    let toText (Vec internal _) =
+        "Vec [\(List.count internal id)] \(internal)"
+    let format (Vec internal _) as vec mod =
+        if mod = "p" or mod = "pretty":
+            let mut result = "Vec "
+            let mut resultHelper = "\t"
+            let mut index = 0
+            for i in internal:
+                let modified = " \(i)  "
+                result <- result + "[\(index)]" + (" " * (*modified - *"[\(index)]"))
+                resultHelper <- resultHelper + modified
+                index <- index + 1
+            return "\(result)\e\(resultHelper)"
+        return Vec.toText vec
+
+let getAttr (some: Attributed) (name: Text) =
+    return some.getAttribute name
+        
+let m = Map [["name", "v"]]
+let v = Vec ["Hello!", "how", "are", "u"] m 
+print "\(v:pretty)" 
+print (getAttr v "name")
+
+
+
+public Value this[Int32 index] {
+            get {
+                Int32 i = index;
+                index = index < 0 ? this.value.Count + index : index;
+
+                if (index >= this.value.Count || index < 0) {
+                    throw new LumenException("выход за пределы списка при срезе вида [i]. Требуемый индекс [" + i + "] превышает длину списка [" + this.value.Count + "]");
+                }
+
+                return this.value[index];
+            }
+            set {
+                index = index < 0 ? this.value.Count + index : index;
+
+                if (index >= this.value.Count) {
+                    for (Int32 j = this.value.Count; j < index; j++) {
+                        this.value.Add(Const.UNIT);
+                    }
+
+                    this.value.Add(value);
+
+                } else if (index < 0) {
+                    this.value.InsertRange(0, new Array(-index - 1).value);
+                    this.value.Insert(0, value);
+                } else {
+                    this.value[index] = value;
+                }
+            }
+        }
+
+        public Value this[Int32 first, Int32 second] {
+            get {
+                Int32 i = first;
+                Int32 j = second;
+
+                if (first < 0) {
+                    first = this.value.Count + first;
+                }
+
+                if (second < 0) {
+                    second = this.value.Count + second;
+                }
+
+                if (second != this.value.Count) {
+                    second++;
+                }
+
+                if (first > this.value.Count || second > this.value.Count || first < 0 || second < 0) {
+                    throw new LumenException("выход за пределы списка при срезе вида [i:j]: границы требуемого диапазонa [" + i + ":" + j + "] превышают длину списка [" + this.value.Count + "]");
+                }
+
+                if (first >= second) {
+                    return new Array();
+                }
+
+                List<Value> val = new List<Value>();
+
+                for (Int32 index = first; index < second; index++) {
+                    val.Add(this.value[index]);
+                }
+
+                return new Array(val);
+            }
+            set {
+                Int32 i = first;
+                Int32 j = second;
+
+                if (first < 0) {
+                    first = this.value.Count + first;
+                }
+
+                if (second < 0) {
+                    second = this.value.Count + second;
+                }
+
+                if (i == 0) {
+                    if (second != this.value.Count) {
+                        second++;
+                    }
+                }
+
+                if (first > this.value.Count || second > this.value.Count) {
+                    throw new LumenException("выход за пределы списка при срезе вида [i:j]: границы требуемого диапазонa [" + i + ":" + j + "] превышают длину списка [" + this.value.Count + "]");
+                }
+
+                this.value.RemoveRange(first, second);
+
+                this.value.Insert(first, value);
+            }
+        }

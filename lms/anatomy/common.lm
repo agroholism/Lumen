@@ -1,4 +1,13 @@
-﻿let rel = config.host + _
+﻿let path first second =
+	if first.endsWith "\\":
+		first + if second.endsWith "\\": second else: second + "\\"
+	else 
+		"\(first)\\\(second)\\"
+
+let path parts =
+	parts / path
+
+let rel x = path config.host x
 
 let script name =
     if config.enable_script:
@@ -8,6 +17,11 @@ let script name =
 
 let style name =
 	"<link rel=\"stylesheet\" href=\"#{rel("styles/#{name}.css")}\">"
+
+type Template = ... where
+	let release self resdir params = ...
+
+
 
 module Components where
 	type Menu = Menu heading items
@@ -47,3 +61,6 @@ module Components where
 
 
 
+let menu = 
+Menu [Menu.Item "Home"]
+>>= onItemClick "onItemClick"

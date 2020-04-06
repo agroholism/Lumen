@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Expressions {
-    public class Break : Exception, Expression {
+	public class Break : Exception, Expression {
         private Int32 label;
 
         public Break(Int32 label) : base("unexpected break with label") {
@@ -18,7 +18,12 @@ namespace Lumen.Lang.Expressions {
             throw this;
         }
 
-        public Expression Closure(List<String> visible, Scope thread) {
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+
+		public Expression Closure(ClosureManager manager) {
             return this;
         }
     }

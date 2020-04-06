@@ -17,14 +17,14 @@ namespace Lumen.Lang.Libraries.Visual {
         public static Visual Instance { get; } = new Visual();
 
         private Visual() {
-            this.SetField("Control", Control);
-            this.SetField("Form", RForm);
-            this.SetField("Color", ColorType);
-            this.SetField("Button", Button);
-            this.SetField("Label", Label);
-            this.SetField("Style", Style);
-            this.SetField("RichTextBox", RTB);
-            this.SetField("Dock", Dock);
+            this.SetMember("Control", Control);
+            this.SetMember("Form", RForm);
+            this.SetMember("Color", ColorType);
+            this.SetMember("Button", Button);
+            this.SetMember("Label", Label);
+            this.SetMember("Style", Style);
+            this.SetMember("RichTextBox", RTB);
+            this.SetMember("Dock", Dock);
         }
     }
 }

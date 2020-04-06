@@ -2,10 +2,10 @@
 
 namespace Lumen.Lang {
     /// <summary> Экземпляр типа Kernel.String. </summary>
-    public class Text : Value, IFormattable {
+    public class Text : Value {
         internal String value;
 
-        public IObject Type => Prelude.Text;
+        public IType Type => Prelude.Text;
 
         #region HEnumerable
         /*
@@ -136,10 +136,6 @@ namespace Lumen.Lang {
         }
 
         public override String ToString() {
-            return this.value;
-        }
-
-        public String ToString(Scope e) {
             return this.value;
         }
 

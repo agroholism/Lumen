@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lumen.Lang {
-    public class List : Value {
-        public LinkedList value;
+	/// <summary> List value </summary>
+	public class List : BaseValueImpl {
+		public LinkedList value;
 
-        public IObject Type => Prelude.List;
+        public override IType Type => Prelude.List;
 
         public List() {
             this.value = LinkedList.Empty;
@@ -16,48 +16,27 @@ namespace Lumen.Lang {
             this.value = LinkedList.Create(elements);
         }
 
-        public List(List<Value> elements) {
+        public List(IEnumerable<Value> elements) {
             this.value = LinkedList.Create(elements);
         }
 
-        public List(LinkedList value) {
+		internal List(LinkedList value) {
             this.value = value;
         }
 
-        public String ToString(Scope e) {
-            return "[" + String.Join("; ", this.value) + "]";
+        public override String ToString() {
+            return "[" + String.Join(", ", this.value) + "]";
         }
 
         public override Boolean Equals(Object obj) {
-            if (obj is List) {
-                LinkedList v1 = this.value;
-                LinkedList v2 = ((List)obj).value;
-
-                return v1.Equals(v2);
+            if (obj is List list) {
+                return this.value.Equals(list.value);
             }
+
             return false;
         }
 
-        public Int32 CompareTo(Object obj) {
-            if (obj is Value) {
-                Scope e = new Scope(null);
-                e.Set("this", this);
-                //return (int)Converter.ToDouble(((Fun)Type.Get("<=>", null)).Run(e, (Value)obj), null);
-            }
-            throw new LumenException("notcomparable");
-        }
-
-        public override Int32 GetHashCode() {
-            Int32 res = 0;
-
-            foreach (Value i in this.value) {
-                res |= i.GetHashCode();
-            }
-
-            return res;
-        }
-
-        public Value Clone() {
+        public override Value Clone() {
             List<Value> result = new List<Value>();
             foreach (Value i in this.value) {
                 result.Add(i);
@@ -65,8 +44,8 @@ namespace Lumen.Lang {
             return new Array(result);
         }
 
-        public override String ToString() {
-            return this.ToString(null);
-        }
-    }
+		public override Int32 GetHashCode() {
+			return -1584136870;
+		}
+	}
 }

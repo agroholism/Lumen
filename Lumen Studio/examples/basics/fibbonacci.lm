@@ -1,0 +1,15 @@
+﻿// Eval an n-st fibbonacci number with patterns
+let fibbonacci 0 = 0
+let fibbonacci 1 = 1
+let fibbonacci n = rec (n-1) + rec (n-2)
+
+// Eval an n-st fibbonacci number with dynamic programming
+let fibbonacci' n =
+    let (a, b) = (ref 0, ref 1)
+    for i in 2...n: 
+        Ref.swap a b 
+        b <- !a + !b
+    return b 
+
+print (fibbonacci 10)  //-> 55
+print (fibbonacci' 10) //-> 55

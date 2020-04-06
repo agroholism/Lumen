@@ -86,6 +86,21 @@ namespace ldoc {
         WITH,
         REF,
         AS,
-        DOC
-    }
+        DOC,
+		MUTABLE,
+		TAIL_REC,
+		WHERE,
+		DERIVING,
+		CLASS,
+		YIELD,
+		IMPORT,
+		FUNCTORBIND,
+		BFUNCTORBIND,
+		BIND,
+		APPLICATIVEF,
+		ARRAY_OPEN,
+		REC,
+		CONTEXT,
+		ARRAY_CLOSED
+	}
 }

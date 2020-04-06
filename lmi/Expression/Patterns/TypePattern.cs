@@ -2,89 +2,110 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Lumen.Lang.Expressions;
 using Lumen.Lang;
+using Lumen.Lang.Expressions;
 
-namespace Lumen.Light {
-    internal class TypePattern : IPattern {
-        private String id;
-        private List<IPattern> subPatterns;
+namespace Lumen.Lmi {
+	internal class TypePattern : IPattern {
+		private IPattern subpattern;
+		private List<Expression> requirements;
 
-        public TypePattern(String id, List<IPattern> subPatterns) {
-            this.id = id;
-            this.subPatterns = subPatterns;
-        }
+		public Boolean IsNotEval => false;
 
-        public Expression Closure(List<String> visible, Scope scope) {
-            return new TypePattern(this.id, this.subPatterns.Select(i => i.Closure(visible, scope) as IPattern).ToList());
-        }
+		public TypePattern(IPattern innerExpression, List<Expression> requirements) {
+			this.subpattern = innerExpression;
+			this.requirements = requirements;
+		}
 
-        public Value Eval(Scope e) {
-            throw new System.NotImplementedException();
-        }
+		public Expression Closure(ClosureManager manager) {
+			String typeParameter = this.FindTypeParameter();
+			if (typeParameter != null) {
+				manager.Declare(typeParameter);
+			}
+			return new TypePattern(this.subpattern.Closure(manager) as IPattern, this.requirements.Select(i => i.Closure(manager)).ToList());
+		}
 
-        public List<String> GetDeclaredVariables() {
-            List<String> res = new List<String>();
+		public Value Eval(Scope e) {
+			throw new NotImplementedException();
+		}
 
-            if (this.id.StartsWith("'")) {
-                res.Add(this.id);
-            }
+		public String FindTypeParameter() {
+			foreach (Expression i in this.requirements) {
+				if (i is IdExpression idExpression && idExpression.id.StartsWith("'")) {
+					return idExpression.id;
+				}
+			}
 
-            foreach (IPattern i in this.subPatterns) {
-                res.AddRange(i.GetDeclaredVariables());
-            }
+			return null;
+		}
 
-            return res;
-        }
+		public List<String> GetDeclaredVariables() {
+			String typeParameter = FindTypeParameter();
+			if (typeParameter != null) {
+				List<String> result = new List<String> { typeParameter };
+				result.AddRange(this.subpattern.GetDeclaredVariables());
+				return result;
+			}
+			return this.subpattern.GetDeclaredVariables();
+		}
 
-        public System.Boolean Match(Value value, Scope scope) {
-            Value needed;
+		public MatchResult Match(Value value, Scope scope) {
+			foreach (Expression requirement in this.requirements) {
+				if (requirement is IdExpression idExpression && idExpression.id.StartsWith("'")) {
+					scope[idExpression.id] = value.Type;
+					continue;
+				}
 
-            if (!this.id.StartsWith("'")) {
-                needed = scope[this.id];
-            } else {
-                if (scope.ExistsInThisScope(this.id)) {
-                    needed = scope[this.id];
-                } else {
-                    needed = value.Type;
-                    scope[this.id] = value.Type;
-                }
-            }
+				Value requiredType = requirement.Eval(scope);
 
-            if (needed is Constructor ctor) {
-                if (ctor.IsParentOf(value)) {
+				if (requiredType is Constructor ctor) {
+					requiredType = GetModule(ctor);
+				}
 
-                    if(this.subPatterns.Count != ctor.Fields.Count) {
-                        return false;
-                    }
+				if (requiredType is Module module && module.IsParentOf(value)) {
+					continue;
+				}
 
-                    for (System.Int32 i = 0; i < ctor.Fields.Count; i++) {
-                        if ((value as IObject).TryGetField(ctor.Fields[i], out Value fvalue)) {
-                            if (!this.subPatterns[i].Match(fvalue, scope)) {
-                                return false;
-                            }
-                        }
-                    }
+				if (requiredType is Module typeClass && this.GetModule(value.Type).HasMixin(typeClass)) {
+					continue;
+				}
 
-                    return true;
-                }
-                return false;
-            }
+				return new MatchResult {
+					Success = false,
+					Note = $"wait value of type {requiredType} given {value.Type}"
+				};
+			}
 
-            if (needed is SingletonConstructor) {
-                return needed == value;
-            }
+			return this.subpattern.Match(value, scope);
+		}
 
-            if (needed is Module m) {
-                if (m.IsParentOf(value)) {
-                    return this.subPatterns[0].Match(value, scope);
-                }
-            }
-            return false;
-        }
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
 
-        public override String ToString() {
-            return $"({this.id} {String.Join(" ", this.subPatterns)})";
-        }
-    }
+		public Module GetModule(IType obj) {
+			if (obj is Module m) {
+				return m;
+			}
+
+			if (obj is Instance instance) {
+				return (instance.Type as Constructor).Parent as Module;
+			}
+
+			if (obj is Constructor constructor) {
+				return constructor.Parent;
+			}
+
+			if (obj is SingletonConstructor singleton) {
+				return singleton.Parent;
+			}
+
+			return this.GetModule(obj.Type);
+		}
+
+		public override String ToString() {
+			return $"({this.subpattern}: {String.Join(", ", this.requirements)})";
+		}
+	}
 }

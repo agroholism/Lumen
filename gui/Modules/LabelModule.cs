@@ -9,12 +9,12 @@ using System;
 namespace Lumen.Lang.Libraries.Visual {
 	public class LabelModule : Module {
 		public LabelModule() {
-			this.name = "Visual.Label";
+			this.Name = "Visual.Label";
 
-			this.SetField("setStyle", new LambdaFun((e, args) => {
+			this.SetMember("setStyle", new LambdaFun((e, args) => {
 				LabelValue btn = e["lbl"] as LabelValue;
 				Label obje = btn.value;
-				IObject style = e["style"] as IObject;
+				IType style = e["style"] as IType;
 
 				obje.FlatStyle = StyleModule.ToStyle(style, e);
 
@@ -26,15 +26,15 @@ namespace Lumen.Lang.Libraries.Visual {
 				}
 			});
 
-			this.SetField("defaultConstructor", new LambdaFun((ex, argsx) => {
+			this.SetMember("defaultConstructor", new LambdaFun((ex, argsx) => {
 				return new LabelValue(new Label());
 			}) {
 				Arguments = new List<IPattern> {
-
+					new NamePattern("()")
 				}
 			});
 
-			this.SetField("liftB", new LambdaFun((scope, args) => {
+			this.SetMember("liftB", new LambdaFun((scope, args) => {
 				if (!(scope["m"] is LabelValue lbl)) {
 					return scope["m"];
 				}

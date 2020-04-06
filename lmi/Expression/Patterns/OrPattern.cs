@@ -1,21 +1,23 @@
 ﻿using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
+using System;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     internal class OrPattern : IPattern {
         private IPattern result;
         private IPattern second;
+		public Boolean IsNotEval => false;
 
-        public OrPattern(IPattern result, IPattern second) {
+		public OrPattern(IPattern result, IPattern second) {
             this.result = result;
             this.second = second;
         }
 
-        public Expression Closure(List<System.String> visible, Scope scope) {
+        public Expression Closure(ClosureManager manager) {
             return new OrPattern(
-                this.result.Closure(visible, scope) as IPattern, 
-                this.second.Closure(visible, scope) as IPattern);
+                this.result.Closure(manager) as IPattern, 
+                this.second.Closure(manager) as IPattern);
         }
 
         public Value Eval(Scope e) {
@@ -29,8 +31,19 @@ namespace Lumen.Light {
             return res;
         }
 
-        public System.Boolean Match(Value value, Scope scope) {
-            return this.result.Match(value, scope) || this.second.Match(value, scope);
+
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+		public MatchResult Match(Value value, Scope scope) {
+			var result1 = this.result.Match(value, scope);
+
+			if(!result1.Success) {
+				result1 = this.second.Match(value, scope);
+			}
+
+			return result1;
         }
 
         public override System.String ToString() {

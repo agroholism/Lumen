@@ -3,46 +3,64 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang;
 using System;
 
-namespace Lumen.Light {
-    internal class HeadTailPattern : IPattern {
-        private String xName;
-        private String xsName;
+namespace Lumen.Lmi {
+	internal class HeadTailPattern : IPattern {
+		private IPattern xName;
+		private IPattern xsName;
 
-        public HeadTailPattern(String xName, String xsName) {
-            this.xName = xName;
-            this.xsName = xsName;
-        }
+		public Boolean IsNotEval => false;
 
-        public Expression Closure(List<String> visible, Scope scope) {
-            visible.AddRange(new List<String> { this.xName, this.xsName });
+		public HeadTailPattern(IPattern xName, IPattern xsName) {
+			this.xName = xName;
+			this.xsName = xsName;
+		}
 
-            return this;
-        }
+		public Expression Closure(ClosureManager manager) {
+			manager.Declare(this.GetDeclaredVariables());
 
-        public Value Eval(Scope e) {
-            throw new NotImplementedException();
-        }
+			return this;
+		}
 
-        public List<String> GetDeclaredVariables() {
-            return new List<String> { this.xName, this.xsName };
-        }
+		public Value Eval(Scope e) {
+			throw new NotImplementedException();
+		}
 
-        public Boolean Match(Value value, Scope scope) {
-            if (value is List list) {
-                if (LinkedList.IsEmpty(list.value)) {
-                    return false;
-                }
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
 
-                scope.Bind(this.xName, list.value.Head);
-                scope.Bind(this.xsName, new List(list.value.Tail));
-                return true;
-            }
+		public List<String> GetDeclaredVariables() {
+			List<String> result = this.xName.GetDeclaredVariables();
+			result.AddRange(this.xsName.GetDeclaredVariables());
+			return result;
+		}
 
-            return false;
-        }
+		public MatchResult Match(Value value, Scope scope) {
+			List list = null;
 
-        public override String ToString() {
-            return $"{this.xName}::{this.xsName}";
-        }
-    }
+			if (value is List) {
+				list = value as List;
+			}
+
+			if (list == null || LinkedList.IsEmpty(list.value)) {
+				return new MatchResult {
+					Success = false,
+					Note = "function wait a non empty List"
+				};
+			}
+			else {
+				MatchResult x = this.xName.Match(list.value.Head, scope);
+				if (!x.Success) {
+					return x;
+				}
+
+				return this.xsName.Match(new List(list.value.Tail), scope);
+			}
+		}
+
+		public override String ToString() {
+			return $"{this.xName}::{this.xsName}";
+		}
+	}
 }

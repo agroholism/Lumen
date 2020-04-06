@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Lumen.Lang.Expressions;
 
 namespace ldoc {
     public class Program {
@@ -96,18 +97,19 @@ namespace ldoc {
                     return res;
                 }
 
-                if (de.Inner is TypeDeclarationE td) {
+                if (de.Inner is TypeDeclaration td) {
                     List<CommentParseResult> res = new List<CommentParseResult>();
 
                     CommentParseResult parseResult = ParseComment(de.doc);
-                    parseResult.Declaration = "type " + td.name + " = " + String.Concat(" | ", td.conStringuctors.Select(x => x.Key + " " + String.Join(" ", x.Value)));
+                    parseResult.Declaration = "type " + td.name
+						+ " = " + String.Concat(" | ", td.constructors.Select(x => x.Name + " " + String.Join(" ", x.Parameters)));
                     parseResult.Name = (baseName == null ? "" : baseName + ".") + td.name;
                     parseResult.Type = Type.MODULE;
                     res.Add(parseResult);
 
-                    foreach(KeyValuePair<String, List<String>> i in td.conStringuctors) {
+                    foreach(var i in td.constructors) {
                         parseResult = new CommentParseResult();
-                        parseResult.Name = (baseName == null ? "" : baseName + ".") + td.name + "." + td.conStringuctors;
+                        parseResult.Name = (baseName == null ? "" : baseName + ".") + td.name + "." + td.constructors;
                         parseResult.Declaration = parseResult.Declaration;
                         parseResult.Type = Type.CONSTRUCTOR;
                         res.Add(parseResult);
@@ -151,18 +153,18 @@ namespace ldoc {
                 return res;
             }
 
-            if (expression is TypeDeclarationE td1) {
+            if (expression is TypeDeclaration td1) {
                 List<CommentParseResult> res = new List<CommentParseResult>();
 
                 CommentParseResult parseResult = new CommentParseResult();
-                parseResult.Declaration = "type " + td1.name + " = " + String.Join(" | ", td1.conStringuctors.Select(x => x.Key + " " + String.Join(" ", x.Value)).ToArray());
+                parseResult.Declaration = "type " + td1.name + " = " + String.Join(" | ", td1.constructors.Select(x => x.Name + " " + String.Join(" ", x.Parameters)).ToArray());
                 parseResult.Name = (baseName == null ? "" : baseName + ".") + td1.name;
                 parseResult.Type = Type.MODULE;
                 res.Add(parseResult);
 
-                foreach (KeyValuePair<String, List<String>> i in td1.conStringuctors) {
+                foreach (var i in td1.constructors) {
                     parseResult = new CommentParseResult();
-                    parseResult.Name = (baseName == null ? "" : baseName + ".") + td1.name + "." + i.Key;
+                    parseResult.Name = (baseName == null ? "" : baseName + ".") + td1.name + "." + i.Name;
                     parseResult.Declaration = parseResult.Declaration;
                     parseResult.Type = Type.CONSTRUCTOR;
                     res.Add(parseResult);

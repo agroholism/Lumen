@@ -5,12 +5,12 @@ using System.Windows.Forms;
 namespace Lumen.Lang.Libraries.Visual {
     public class ButtonModule : Module {
         public ButtonModule() {
-            this.name = "Visual.Button";
+            this.Name = "Visual.Button";
 
-            this.SetField("setStyle", new LambdaFun((e, args) => {
+            this.SetMember("setStyle", new LambdaFun((e, args) => {
                 ButtonValue btn = e["btn"] as ButtonValue;
                 Button obje = btn.value;
-                IObject style = e["style"] as IObject;
+                IType style = e["style"] as IType;
 
                 obje.FlatStyle = StyleModule.ToStyle(style, e);
 
@@ -22,15 +22,15 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
 
-            this.SetField("defaultConstructor", new LambdaFun((ex, argsx) => {
+            this.SetMember("defaultConstructor", new LambdaFun((ex, argsx) => {
                 return new ButtonValue(new Button());
-            }) {
-                Arguments = new List<IPattern> {
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("()")
+				}
+			});
 
-                }
-            });
-
-			this.SetField("liftB", new LambdaFun((scope, args) => {
+			this.SetMember("liftB", new LambdaFun((scope, args) => {
 				if (!(scope["m"] is ButtonValue lbl)) {
 					return scope["m"];
 				}

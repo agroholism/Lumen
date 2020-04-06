@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace ldoc {
-    internal class AttributeExpression : Expression {
+    /*internal class AttributeExpression : Expression {
         internal List<Expression> attributes;
         internal Expression declaration;
 
@@ -10,5 +10,5 @@ namespace ldoc {
             this.attributes = attributes;
             this.declaration = declaration;
         }
-    }
+    }*/
 }

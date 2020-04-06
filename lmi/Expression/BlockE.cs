@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     public class BlockE : Expression {
         public List<Expression> expressions;
 
@@ -34,11 +34,29 @@ namespace Lumen.Light {
         }
 
         public override String ToString() {
-            return String.Join(Environment.NewLine, this.expressions.Select(i => "\t" + i.ToString()));
+			return String.Join(Environment.NewLine, this.expressions);
+
         }
 
-        public Expression Closure(List<String> visible, Scope thread) {
-            return new BlockE(this.expressions.Select(expression => expression.Closure(visible, thread)).ToList());
+        public Expression Closure(ClosureManager manager) {
+            return new BlockE(this.expressions.Select(expression => expression.Closure(manager)).ToList());
         }
-    }
+
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			for (Int32 i = 0; i < this.expressions.Count - 1; i++) {
+				IEnumerable<Value> x = this.expressions[i].EvalWithYield(scope);
+				foreach (Value it in x) {
+					if(it is CurrGeenVal) {
+						continue;
+					}
+					yield return it;
+				}
+			}
+
+			IEnumerable<Value> z = this.expressions[this.expressions.Count - 1].EvalWithYield(scope);
+			foreach (Value it in z) {
+				yield return it;
+			}
+		}
+	}
 }

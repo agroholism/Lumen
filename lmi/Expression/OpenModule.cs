@@ -2,7 +2,7 @@
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     internal class OpenModule : Expression {
         private readonly Expression expression;
 
@@ -10,15 +10,15 @@ namespace Lumen.Light {
             this.expression = expression;
         }
 
-        public Expression Closure(List<System.String> visible, Scope scope) {
-            return new OpenModule(this.expression.Closure(visible, scope));
+        public Expression Closure(ClosureManager manager) {
+            return new OpenModule(this.expression.Closure(manager));
         }
 
         public Value Eval(Scope e) {
             Value value = this.expression.Eval(e);
 
             if (value is Module module) {
-                foreach (KeyValuePair<System.String, Value> i in module.variables) {
+                foreach (KeyValuePair<System.String, Value> i in module.Members) {
                     e[i.Key] = i.Value;
                 }
                 return Const.UNIT;
@@ -26,5 +26,10 @@ namespace Lumen.Light {
 
             throw new LumenException("it's not a module");
         }
-    }
+
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+	}
 }

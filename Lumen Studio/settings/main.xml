@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Main settings of Lumen Studio -->
+<MainSettings xmlns="http://danielargent.github.io/xmlspec/lumen-studio/v1/main/">
+  <!-- Language of interface -->
+  <Language name="ru-RU"/>
+  
+  <!-- Theme of interface -->
+  <EnabledTheme name="standartDark" />
+
+  <!--  List of aviable themes -->
+  <AviableThemes>
+    <Theme name="standartDark" />
+    <Theme name="standartLight" />
+    <Theme name="sandy" />
+  </AviableThemes>
+  
+  <!--  List of aviable languages -->
+  <AviableLanguages>
+    <Language name="c" />
+    <Language name="csharp" />
+    <Language name="haskell" />
+    <Language name="xml" />
+    <Language name="html" />
+    <Language name="toml" />
+    <Language name="pascal" />
+  </AviableLanguages>
+  
+  <!--  List of aviable project types -->
+  <ProjectTypes>
+    <ProjectType name="Lumen Console Application" image="lcapp.png" defautName="consoleApplication1">
+      <Controller name="Lumen.Studio.ProjectTypes.LumenConsoleApllication"/>
+    </ProjectType>
+
+    <ProjectType name="Lumen Visual Application" image="lvapp.png" defautName="visualApplication1">
+      <Controller name="Lumen.Studio.ProjectTypes.LumenVisualApllication"/>
+    </ProjectType>
+
+    <ProjectType name="Anatomy Web Application" image="awapp.png" defautName="webApplication1">
+      <Controller name="Lumen.Studio.ProjectTypes.AnatomyWebApplication"/>
+    </ProjectType>
+  </ProjectTypes>
+  
+  <!-- List of aviable extensions -->
+  <Extensions>
+    <Extension name="xmltools" enabled="true" />
+  </Extensions>
+</MainSettings>

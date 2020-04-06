@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Light {
+namespace Lumen.Lmi {
     internal class AsPattern : IPattern {
-        private IPattern listPattern;
-        private String ide;
+        private readonly IPattern innerPattern;
+        private readonly String identifier;
 
-        public AsPattern(IPattern listPattern, String ide) {
-            this.listPattern = listPattern;
-            this.ide = ide;
+		public AsPattern(IPattern innerPattern, String identifier) {
+            this.innerPattern = innerPattern;
+            this.identifier = identifier;
         }
 
-        public Expression Closure(List<String> visible, Scope scope) {
-            visible.Add(this.ide);
-            return new AsPattern(this.listPattern.Closure(visible, scope) as IPattern, this.ide);
+        public Expression Closure(ClosureManager manager) {
+			manager.Declare(this.identifier);
+            return new AsPattern(this.innerPattern.Closure(manager) as IPattern, this.identifier);
         }
 
         public Value Eval(Scope e) {
@@ -23,22 +23,29 @@ namespace Lumen.Light {
         }
 
         public List<String> GetDeclaredVariables() {
-            List<String> res = new List<String> { this.ide};
-            res.AddRange(this.listPattern.GetDeclaredVariables());
-            return res;
+            List<String> result = new List<String> { this.identifier };
+            result.AddRange(this.innerPattern.GetDeclaredVariables());
+            return result;
         }
 
-        public Boolean Match(Value value, Scope scope) {
-            if(this.listPattern.Match(value, scope)) {
-                scope[this.ide] = value;
-                return true;
+        public MatchResult Match(Value value, Scope scope) {
+			MatchResult result = this.innerPattern.Match(value, scope);
+
+			if (result.Success) {
+                scope[this.identifier] = value;
+                return MatchResult.True;
             }
 
-            return false;
+            return result;
         }
 
-        public override String ToString() {
-            return $"{this.listPattern.ToString()} as {this.ide}";
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+
+		public override String ToString() {
+            return $"{this.innerPattern.ToString()} as {this.identifier}";
         }
     }
 }

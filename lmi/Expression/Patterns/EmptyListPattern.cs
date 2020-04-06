@@ -1,31 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Light {
-    internal class EmptyListPattern : IPattern {
-        public Expression Closure(List<String> visible, Scope scope) {
-            return this;
-        }
+namespace Lumen.Lmi {
+	/// <summary> Pattern [] </summary>
+	internal class EmptyListPattern : IPattern {
+		public static EmptyListPattern Instance { get; } = new EmptyListPattern();
+		public Boolean IsNotEval { get; } = false;
 
-        public Value Eval(Scope e) {
-            throw new NotImplementedException();
-        }
+		private EmptyListPattern() {
 
-        public List<String> GetDeclaredVariables() {
-            return new List<String>();
-        }
+		}
 
-        public Boolean Match(Value value, Scope scope) {
-            if (value is List list) {
-                return LinkedList.IsEmpty(list.value);
+        public MatchResult Match(Value value, Scope scope) {
+            if (value is List list && LinkedList.IsEmpty(list.value)) {
+                return MatchResult.True;
             }
 
-            return false;
+            return new MatchResult {
+				Success = false,
+				Note = "function wait an empty list"
+			};
         }
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
 
-        public override String ToString() {
+		public List<String> GetDeclaredVariables() {
+			return new List<String>();
+		}
+
+		public Value Eval(Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public Expression Closure(ClosureManager manager) {
+			return this;
+		}
+
+		public override String ToString() {
             return "[]";
         }
     }

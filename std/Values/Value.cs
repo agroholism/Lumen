@@ -1,11 +1,9 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-    public interface Value : IComparable {
-        IObject Type { get; }
+	public interface Value : IComparable, IFormattable {
+        IType Type { get; }
 
-        String ToString(Scope e);
-
-        Value Clone();
-    }
+		Value Clone();
+	}
 }

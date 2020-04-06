@@ -1,7 +1,7 @@
-﻿using System.Dynamic;
+﻿using System;
 
 namespace Lumen.Lang {
-	interface Debuggable : Value {
-        DynamicMetaObject Inspect();
+	interface Debuggable {
+        Object Inspect();
     }
 }
