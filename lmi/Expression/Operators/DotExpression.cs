@@ -41,9 +41,18 @@ namespace Lumen.Lmi {
 					return itype.GetMember(this.memberName, e);
 				}
 
-				if (value is Instance instance) {
-					return instance.GetField(this.memberName, e);
+				if (value is Instance instance 
+					&& instance.TryGetField(this.memberName, out Value result)) {
+					return result;
 				}
+
+				if(value.Type.TryGetMember(this.memberName, out Value member)) {
+					return new Applicate(new ValueLiteral(member), new List<Expression> {
+						new ValueLiteral(value)
+					}, this.line, this.fileName).Eval(e);
+				}
+
+
 
 				// internal unification //
 

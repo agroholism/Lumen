@@ -8,16 +8,20 @@ namespace Lumen.Lang {
             this.Name = "_";
 
             this.SetMember("toText", new LambdaFun((e, args) => {
-                if(e["this"] is SingletonConstructor sc) {
+				Value self = e["self"];
+
+                if(self is SingletonConstructor sc) {
                     return new Text(sc.Name);
                 }
 
-                String result = "(" + e["this"].Type.ToString() + " " 
-                    + String.Join<Value>(" ", (e["this"] as Instance).items) + ")";
-                return new Text(result);
-            }) {
+				if(self is Instance instance) {
+					return new Text($"({instance.Type.ToString() } {String.Join<Value>(" ", instance.items)})");
+				}
+
+				return new Text(self.ToString());
+			}) {
                 Arguments = new System.Collections.Generic.List<IPattern> {
-                    new NamePattern("this")
+                    new NamePattern("self")
                 }
             });
 

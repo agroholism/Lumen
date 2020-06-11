@@ -8,6 +8,7 @@ namespace Lumen.Lang {
         public String file;
         public String functionName;
         public String Note { get; set; }
+		public Value AttachedObject { get; set; }
         private List<Tuple<String, String, Int32>> callStack;
 
         public LumenException(String message, String functionName=null, Int32 line=-1, String fileName=null) : base(message) {
@@ -23,7 +24,7 @@ namespace Lumen.Lang {
 
         public override String ToString() {
             StringBuilder result = new StringBuilder();
-            result.Append($"Exception: {this.Message} {Environment.NewLine}\tin {this.functionName ?? "<main>"} at {this.file}:{this.line}");
+            result.Append($"{this.AttachedObject?.Type?.ToString() ?? "Exception"}: {this.Message} {Environment.NewLine}\tin {this.functionName ?? "<main>"} at {this.file}:{this.line}");
 
             if (this.callStack.Count > 0) {
                 foreach (Tuple<String, String, Int32> i in this.callStack) {

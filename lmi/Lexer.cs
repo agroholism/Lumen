@@ -461,6 +461,9 @@ namespace Lumen.Lmi {
 				case "use":
 					this.AddToken(TokenType.USE);
 					break;
+				case "raise":
+					this.AddToken(TokenType.RAISE);
+					break;
 				case "is":
 					this.AddToken(TokenType.IS);
 					break;
@@ -538,13 +541,6 @@ namespace Lumen.Lmi {
 				current = this.Peek(0);
 			}
 
-			if (current == '<' && this.Peek(1) == '[') {
-				Next();
-				Next();
-				SuperText();
-				return;
-			}
-
 			StringBuilder buffer = new StringBuilder();
 
 			while (true) {
@@ -553,11 +549,13 @@ namespace Lumen.Lmi {
 				if (!operatorsDictionary.ContainsKey(buffer.ToString() + current)) {
 					Token t = operatorsDictionary[buffer.ToString()];
 
-					if (this.tokens[this.tokens.Count - 1].Type == TokenType.EOC) {
+					if (t.Type != TokenType.LPAREN && this.tokens.Count > 0 && 
+						this.tokens[this.tokens.Count - 1].Type == TokenType.EOC) {
 						this.tokens.RemoveAt(this.tokens.Count - 1);
 					}
 
-					if (this.tokens[this.tokens.Count - 1].Type == TokenType.DO) {
+					if (this.tokens.Count > 0 &&
+						this.tokens[this.tokens.Count - 1].Type == TokenType.DO) {
 						this.tokens.RemoveAt(this.tokens.Count - 1);
 						this.level -= 4;
 					}

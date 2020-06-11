@@ -106,6 +106,7 @@
 		WHEN,
 		REGEX_LITERAL,
 		QUESTION,
-		USE
+		USE,
+		RAISE
 	}
 }

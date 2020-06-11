@@ -2,11 +2,30 @@
 using System.Collections.Generic;
 
 using Lumen.Lang.Expressions;
+using System.Linq;
 
 namespace Lumen.Lang {
 	internal class ArrayModule : Module {
-        public ArrayModule() {
-            this.Name = "Array";
+		public ArrayModule() {
+			this.Name = "Array";
+
+			/*
+Array.add+2404
+Array.addAt
+Array.addAll+2404
+Array.addAllAt
+Array.addUnique
+Array.prepend
+Array.prependAll
+Array.remove+2404
+Array.removeFirst+2404
+Array.removeLast+2404
+Array.removeIf+2404
+Array.removeAt
+Array.removeAll
+
+Array.refs
+			 */
 
 			#region operators
 			this.SetMember(Op.SETI, new LambdaFun((e, args) => {
@@ -32,279 +51,259 @@ namespace Lumen.Lang {
 			});
 			#endregion
 
-			this.SetMember("getRefIndex", new LambdaFun((e, args) => {
-				Int32 index = e.Get("index").ToInt(e);
-				return new ArrayRef(e.Get("this") as Array, index);
+			this.SetMember("add", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
+
+				array.Add(scope["element"]);
+
+				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("this"),
-					new NamePattern("index")
+					new NamePattern("self"),
+					new NamePattern("element")
 				}
 			});
 
-			this.SetMember("add", new LambdaFun((scope, args) => {
-                List<Value> array = scope["a"].ToList(scope);
+			this.SetMember("addAll", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
 
-                array.Add(scope["e"]);
+				array.AddRange(scope["elements"].ToStream(scope));
 
-                return Const.UNIT;
-            }) {
-                Arguments = new List<IPattern> {
-                    new NamePattern("e"),
-                    new NamePattern("a")
-                }
-            });
+				return Const.UNIT;
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("self"),
+					new NamePattern("elements")
+				}
+			});
 
-            this.SetMember("toText", new LambdaFun((e, args) => {
-                Array v = e["this"].ToArray(e);
-                return new Text(v.ToString());
-            }));
-            this.SetMember("sort", new LambdaFun((e, args) => {
-                List<Value> value = e["this"].Clone().ToList(e);
+			this.SetMember("remove", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
+				Value element = scope["element"];
 
-                Value by = e["by"];
-                Value descending = e["descending"];
+				while (array.Contains(element)) {
+					array.Remove(element);
+				}
 
-                if (by != Const.UNIT) {
-                    Fun fun = (Fun)by;
+				return Const.UNIT;
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("self"),
+					new NamePattern("element")
+				}
+			});
 
-                    if (descending.ToBoolean()) {
-                        value.Sort((i, j) => {
-                            Scope scope = new Scope(e);
-                            scope["self"] = fun;
-                            return -(Int32)Converter.ToDouble(fun.Run(scope, i, j), e);
-                        });
-                    } else {
-                        value.Sort((i, j) => {
-                            Scope scope = new Scope(e);
-                            scope["self"] = fun;
-                            return (Int32)Converter.ToDouble(fun.Run(scope, i, j), e);
-                        });
-                    }
-                } else if (descending.ToBoolean()) {
-                    value.Sort((i, j) => j.CompareTo(i));
-                } else {
-                    value.Sort();
-                }
+			this.SetMember("removeFirst", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
+				Value element = scope["element"];
 
-                return new Array(value);
-            }) {
+				array.Remove(element);
 
-            });
-            /*
-						Set("sort!", new LambdaFun((e, args) => {
-							List<Value> list = Converter.ToList(e.Get("this"), e);
+				return Const.UNIT;
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("self"),
+					new NamePattern("element")
+				}
+			});
 
-							if (e.IsExsists("by")) {
-								Value obj1 = e.Get("by");
-								//Checker.CheckType(obj1, Kernel.Function, e);
+			this.SetMember("removeLast", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
+				Value element = scope["element"];
 
-								Fun fun = (Fun)obj1;
+				Int32 lastIndex = array.LastIndexOf(element);
+				if (lastIndex > -1) {
+					array.RemoveAt(lastIndex);
+				}
 
-								list.Sort((i, j) => {
-									Scope scope = new Scope(e);
-									scope["self"] = fun;
-									scope["args"] = new List(new List<Value> { i, j });
-									scope["kwargs"] = new Map();
-									return (Int32)Converter.ToDouble(fun.Run(scope, i, j), e);
-								});
-							}
-							else if (args.Length == 0) {
-								list.Sort();
-							}
-							else if (args.Length >= 1) {
-								//Checker.CheckType(args[0], Kernel.Function, e);
-								Fun fun = (Fun)args[0];
-								list.Sort((i, j) => {
-									Scope scope = new Scope(e);
-									scope["self"] = fun;
-									scope["args"] = new List(new List<Value> { i, j });
-									scope["kwargs"] = new Map();
-									return (Int32)Converter.ToDouble(fun.Run(scope, i, j), e);
-								});
-							}
+				return Const.UNIT;
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("self"),
+					new NamePattern("element")
+				}
+			});
 
-							return new List(list);
-						}, "Kernel.List.sort!"));
-						*/
-            this.SetMember("contains", new LambdaFun((e, args) => {
-				List<Value> value = e["this"].ToList(e);
-				return (Bool)value.Contains(e.Get("elem"));
+			this.SetMember("removeIf", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
+
+				Fun predicate = scope["predicate"].ToFunction(scope);
+				array.RemoveAll(x => predicate.Run(new Scope(scope), x).ToBoolean());
+
+				return Const.UNIT;
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("self"),
+					new NamePattern("predicate")
+				}
+			});
+
+			this.SetMember("toText", new LambdaFun((e, args) => {
+				Array v = e["self"].ToArray(e);
+				return new Text(v.ToString());
+			}) {
+				Arguments = Const.Self
+			});
+
+			this.SetMember("sortBy", new LambdaFun((scope, args) => {
+				List<Value> value = scope["self"].Clone().ToList(scope);
+
+				Fun mutator = scope["other"].ToFunction(scope);
+				value.Sort((i, j) => {
+					Value first = mutator.Run(new Scope(scope), i);
+					Value second = mutator.Run(new Scope(scope), j);
+					return first.CompareTo(second);
+				});
+
+				return new Array(value);
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			this.SetMember("sort", new LambdaFun((e, args) => {
+				List<Value> value = e["self"].Clone().ToList(e);
+
+				value.Sort();
+
+				return new Array(value);
+			}) {
+				Arguments = Const.Self
+			});
+
+			this.SetMember("sortWith", new LambdaFun((scope, args) => {
+				List<Value> value = scope["self"].Clone().ToList(scope);
+
+				Fun comparator = scope["other"].ToFunction(scope);
+				value.Sort((i, j) => {
+					return (Int32)Converter.ToDouble(comparator.Run(new Scope(scope), i, j), scope);
+				});
+
+				return new Array(value);
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			this.SetMember("sortDescending", new LambdaFun((e, args) => {
+				List<Value> value = e["self"].Clone().ToList(e);
+
+				value.Sort((i, j) => j.CompareTo(i));
+
+				return new Array(value);
+			}) {
+				Arguments = Const.Self
+			});
+
+			this.SetMember("sortDescendingBy", new LambdaFun((scope, args) => {
+				List<Value> value = scope["self"].Clone().ToList(scope);
+
+				Fun mutator = scope["other"].ToFunction(scope);
+				value.Sort((i, j) => {
+					Value first = mutator.Run(new Scope(scope), i);
+					Value second = mutator.Run(new Scope(scope), j);
+					return second.CompareTo(first);
+				});
+
+				return new Array(value);
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			this.SetMember("sortDescendingWith", new LambdaFun((scope, args) => {
+				List<Value> value = scope["self"].Clone().ToList(scope);
+
+				Fun comparator = scope["other"].ToFunction(scope);
+				value.Sort((i, j) => {
+					return -(Int32)Converter.ToDouble(comparator.Run(new Scope(scope), i, j), scope);
+				});
+
+				return new Array(value);
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			this.SetMember("contains", new LambdaFun((scope, args) => {
+				List<Value> value = scope["this"].ToList(scope);
+				return (Bool)value.Contains(scope["elem"]);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("this"),
 					new NamePattern("elem")
 				}
 			});
-            this.SetMember("pop", new LambdaFun((e, args) => {
-                List<Value> list = Converter.ToList(e.Get("this"), e);
-                Value lastElement = list[list.Count - 1];
-                list.RemoveAt(list.Count - 1);
-                return lastElement;
-            }));
-            this.SetMember("peek", new LambdaFun((e, args) => {
-                List<Value> list = Converter.ToList(e.Get("this"), e);
-                Value lastElement = list[list.Count - 1];
-                return lastElement;
-            }));
-            this.SetMember("shift", new LambdaFun((e, args) => {
-                List<Value> list = e["this"].ToList(e);
-                Value firstElement = list[0];
-                list.RemoveAt(0);
-                return firstElement;
-            }));
-            this.SetMember("unshift", new LambdaFun((e, args) => {
-                List<Value> list = e["this"].ToList(e);
-                list.Insert(0, args[0]);
-                return Const.UNIT;
-            }));
-            this.SetMember("map_m", new LambdaFun((e, args) => {
-                List<Value> v = e["this"].ToList(e);
-                UserFun f = (UserFun)args[0];
 
-                if (f.Arguments.Count == 1) {
-                    for (Int32 i = 0; i < v.Count; i++) {
-                        v[i] = f.Run(new Scope(e), v[i]);
-                    }
-                } else {
-                    for (Int32 i = 0; i < v.Count; i++) {
-                        v[i] = f.Run(new Scope(e), v[i], new Number(i));
-                    }
-                }
+			this.SetMember("indexOf", new LambdaFun((scope, args) => {
+				List<Value> self = scope["self"].ToList(scope);
+				Int32 result = self.IndexOf(scope["other"]);
 
-                return Const.UNIT;
-            }));
+				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
+			}) {
+				Arguments = Const.SelfOther
+			});
 
-            this.SetMember("index", new LambdaFun((e, args) => {
-                List<Value> list = Converter.ToList(e.Get("this"), e);
-                Int32 result = list.IndexOf(args[0]);
-                if (result == -1) {
-                    return Const.FALSE;
-                }
-                return (Number)result;
-            }));
-            this.SetMember("last_index", new LambdaFun((e, args) => {
-                List<Value> list = Converter.ToList(e.Get("this"), e);
-                Int32 result = list.LastIndexOf(args[0]);
-                if (result == -1) {
-                    return Const.FALSE;
-                }
-                return (Number)result;
-            }));
-            this.SetMember("clear", new LambdaFun((e, args) => {
-                List<Value> list = Converter.ToList(e.Get("this"), e);
-                list.Clear();
-                return Const.UNIT;
-            }));
-            this.SetMember("find_index", new LambdaFun((e, args) => {
-                List<Value> list = Converter.ToList(e.Get("this"), e);
+			this.SetMember("lastIndexOf", new LambdaFun((scope, args) => {
+				List<Value> self = scope["self"].ToList(scope);
+				Int32 result = self.LastIndexOf(scope["other"]);
 
-                Value obj = args[0];
-                //Checker.CheckType(obj, Kernel.Function, e);
+				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
+			}) {
+				Arguments = Const.SelfOther
+			});
 
-                Int32 result = list.FindIndex(i => {
-                    Scope scope = new Scope(e);
-                    scope["args"] = new Array(new List<Value> { i });
-                    scope["kwargs"] = new Map();
-                    return Converter.ToBoolean((obj as Fun).Run(scope, i));
-                });
+			this.SetMember("findIndex", new LambdaFun((scope, args) => {
+				List<Value> self = scope["self"].ToList(scope);
 
-                if (result == -1) {
-                    return Const.FALSE;
-                }
+				Fun other = scope["other"].ToFunction(scope);
 
-                return (Number)result;
-            }));
-            this.SetMember("find", new LambdaFun((e, args) => {
-                List<Value> list = Converter.ToList(e.Get("this"), e);
+				Int32 result = self.FindIndex(i => other.Run(new Scope(scope), i).ToBoolean());
 
-                Value obj = args[0];
-                //Checker.CheckType(obj, Kernel.Function, e);
+				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
+			}) {
+				Arguments = Const.SelfOther
+			});
 
-                Value result = list.Find(i => {
-                    Scope scope = new Scope(e);
-                    scope["args"] = new Array(new List<Value> { i });
-                    scope["kwargs"] = new Map();
-                    return Converter.ToBoolean((obj as Fun).Run(scope, i));
-                });
+			this.SetMember("find", new LambdaFun((scope, args) => {
+				List<Value> self = scope["self"].ToList(scope);
 
-                if (result == null) {
-                    return Const.FALSE;
-                }
+				Fun other = scope["other"].ToFunction(scope);
 
-                return result;
-            }));
-            this.SetMember("find_last", new LambdaFun((e, args) => {
-                List<Value> v = Converter.ToList(e.Get("this"), e);
-                return v.FindLast(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x)));
-            }));
-            this.SetMember("find_last_index", new LambdaFun((e, args) => {
-                List<Value> v = Converter.ToList(e.Get("this"), e);
-                return new Number(v.FindLastIndex(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x))));
-            }));
-            this.SetMember("insert", new LambdaFun((e, args) => {
-                List<Value> v = Converter.ToList(e.Get("this"), e);
-                v.Insert((Int32)Converter.ToDouble(args[0], e), args[1]);
-                return Const.UNIT;
-            }));
-            this.SetMember("last_index", new LambdaFun((e, args) => {
-                List<Value> v = Converter.ToList(e.Get("this"), e);
-                return new Number(v.LastIndexOf(args[0]));
-            }));
-            this.SetMember("delete", new LambdaFun((e, args) => {
-                List<Value> v = Converter.ToList(e.Get("this"), e);
-                foreach (Value i in args) {
-                    v.Remove(i);
-                }
+				Value result = self.Find(i => other.Run(new Scope(scope), i).ToBoolean());
 
-                return Const.UNIT;
-            }));
-            this.SetMember("reject", new LambdaFun((e, args) => {
-                List<Value> v = Converter.ToList(e.Get("this"), e);
-                v.RemoveAll(x => Converter.ToBoolean(((Fun)args[0]).Run(new Scope(e), x)));
-                return Const.UNIT;
-            }));
-            /*Set("remove_at!", new LambdaFun((e, args) => {
-				List<Value> v = Converter.ToList(e.Get("this"), e);
-				foreach (Value i in args) {
-					v.RemoveAt((int)Converter.ToBigFloat(i, e));
-				}
+				return result == null ? Prelude.None : (Value)Helper.CreateSome(result);
+			}) {
+				Arguments = Const.SelfOther
+			});
 
-				return Const.NULL;
-			}, "Kernel.List.remove_at!"));*/
-            this.SetMember("reverse", new LambdaFun((e, args) => {
-                List<Value> arv = Converter.ToList(e.Get("this"), e);
-                List<Value> result = new List<Value>(arv.Count);
-                foreach (Value i in arv) {
-                    result.Add(i);
-                }
+			this.SetMember("findLast", new LambdaFun((scope, args) => {
+				List<Value> self = scope["self"].ToList(scope);
 
-                result.Reverse();
-                return new Array(result);
-            }));
-            this.SetMember("reverse", new LambdaFun((e, args) => {
-                List<Value> arv = Converter.ToList(e.Get("this"), e);
-                arv.Reverse();
-                return new Array(arv);
-            }));
-            //Set("flatten", new Flatten());
-            this.SetMember("partition", new LambdaFun((e, args) => {
-                List<Value> obj = e["this"].ToList(e);
+				Fun other = scope["other"].ToFunction(scope);
 
-                List<Value> first = new List<Value>();
-                List<Value> second = new List<Value>();
+				Value result = self.FindLast(i => other.Run(new Scope(scope), i).ToBoolean());
 
-                Fun predicate = args[0].ToFunction(e);
-                foreach (Value i in obj) {
-                    if (predicate.Run(new Scope(e), i).ToBoolean()) {
-                        first.Add(i);
-                    } else {
-                        second.Add(i);
-                    }
-                }
+				return result == null ? Prelude.None : (Value)Helper.CreateSome(result);
+			}) {
+				Arguments = Const.SelfOther
+			});
 
-                return new Array(new List<Value> { new Array(first), new Array(second) });
-            }));
+			this.SetMember("findLastIndex", new LambdaFun((scope, args) => {
+				List<Value> self = scope["self"].ToList(scope);
+
+				Fun other = scope["other"].ToFunction(scope);
+
+				Int32 result = self.FindLastIndex(i => other.Run(new Scope(scope), i).ToBoolean());
+
+				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			this.SetMember("clear", new LambdaFun((scope, args) => {
+				List<Value> self = scope["self"].ToList(scope);
+				self.Clear();
+				return Const.UNIT;
+			}) {
+				Arguments = Const.Self
+			});
 
 			this.SetMember("toStream", new LambdaFun((e, args) => {
 				return new Stream(e["array"].ToList(e));
@@ -315,13 +314,13 @@ namespace Lumen.Lang {
 			});
 
 			this.IncludeMixin(Prelude.Collection);
-        }
+		}
 
-        private static Int32 Index(Int32 index, Int32 count) {
-            if (index < 0) {
-                return count + index;
-            }
-            return index;
-        }
-    }
+		private static Int32 Index(Int32 index, Int32 count) {
+			if (index < 0) {
+				return count + index;
+			}
+			return index;
+		}
+	}
 }

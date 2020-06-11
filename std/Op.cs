@@ -50,7 +50,7 @@ namespace Lumen.Lang {
         public const String MATCH = "op_match";
         public const String NOT_MATCH = "op_not_match";
 
-        public const String RANGE_EXCLUSIVE = "op_dote";
-        public const String RANGE_INCLUSIVE = "op_doti";
+        public const String RANGE_EXCLUSIVE = "rangeExcl";
+        public const String RANGE_INCLUSIVE = "rangeIncl";
     }
 }

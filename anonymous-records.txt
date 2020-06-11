@@ -1,0 +1,8 @@
+Proposed to version 1.2
+
+let point = type { x = 0, y = 3 }
+let point = type (x = 0, y = 3)
+
+type _Anon_type_ = _Anon_type_ x y 
+
+let point = _Anon_type_ 0 3

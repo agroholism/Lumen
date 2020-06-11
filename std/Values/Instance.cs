@@ -19,11 +19,11 @@ namespace Lumen.Lang {
                 return true;
             }
 
-            if (this.Type != null) {
+           /* if (this.Type != null) {
                 if (this.Type.TryGetMember(name, out result)) {
                     return true;
                 }
-            }
+            }*/
 
             result = null;
             return false;

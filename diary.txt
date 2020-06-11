@@ -50,6 +50,12 @@ Lumen 0.8
 * from in array/list literals
 * assert function
 
+- 11.06.2020
+* nan and inf constants
+* Number.isnan function
+* exception types
+* raise operator
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)
@@ -57,7 +63,8 @@ TODO:
 - Pair - what is it?
 - functors
 - module - it is required?
-- exceptions?
+
+MODULE unsafe - macro, that changes a parent scope
 
 Lumen 0.9
 NON STRICT FOREACH

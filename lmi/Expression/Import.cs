@@ -8,11 +8,14 @@ using Module = Lumen.Lang.Module;
 
 namespace Lumen.Lmi {
 	public class Import : Expression {
+		// from
 		private readonly String path;
 		private readonly Int32 line;
 		private readonly String fileName;
 		private Boolean isFrom;
+		// is imported all entities (only when isFrom)
 		private Boolean importAll;
+		// is imported some entities (only when isFrom)
 		private List<String> entities;
 
 		public Import(String path, Boolean isFrom, Boolean importAll, List<String> entities, String fileName, Int32 line) {
@@ -25,6 +28,24 @@ namespace Lumen.Lmi {
 		}
 
 		public Value Eval(Scope scope) {
+			Tuple<Module, Module> module = ImportFromPath(scope);
+
+			if(this.isFrom) {
+				if(this.importAll) {
+					foreach(var i in module.Item1.Members) {
+						scope.Bind(i.Key, i.Value);
+					}
+				} else {
+					foreach (var i in entities) {
+						scope.Bind(i, module.Item1.Members[i]);
+					}
+				}
+			} else {
+				scope.Bind(module.Item2.Name, module.Item2);
+			}
+
+			return Const.UNIT;
+
 			if (!Directory.Exists(this.path)) {
 				String fullPath = new FileInfo(this.path + ".lm").FullName;
 
@@ -42,7 +63,7 @@ namespace Lumen.Lmi {
 						}
 					}
 					else {
-						scope.Bind(diffbc[diffbr.Count -1], this.GetRequiredModule(Prelude.GlobalImportCache[fullPath], diffbc, scope));
+						scope.Bind(diffbc[diffbr.Count - 1], this.GetRequiredModule(Prelude.GlobalImportCache[fullPath], diffbc, scope));
 					}
 
 					return Const.UNIT;
@@ -58,7 +79,7 @@ namespace Lumen.Lmi {
 
 				if (this.isFrom) {
 					if (importAll) {
-						foreach(var i in lowLevelModule.Members) {
+						foreach (var i in lowLevelModule.Members) {
 							scope.Bind(i.Key, i.Value);
 						}
 					}
@@ -102,6 +123,149 @@ namespace Lumen.Lmi {
 				}*/
 			}
 			return Const.UNIT;
+		}
+
+		private Tuple<Module, Module> ImportFromPath(Scope scope) {
+			// Is not directory
+			if (!Directory.Exists(this.path)) {
+				// Is this a lumen file?
+				Boolean isLumenFile = File.Exists(new FileInfo(this.path + ".lm").FullName);
+
+				if (isLumenFile) {
+					return this.ImportLumenFile(new FileInfo(this.path + ".lm").FullName, scope);
+				}
+
+				if (!File.Exists(new FileInfo(this.path + ".dll").FullName)) {
+					throw new LumenException(Exceptions.MODULE_DOES_NOT_EXISTS.F(this.path), line: this.line, fileName: this.fileName);
+				}
+
+				return this.ImportDllFile(new FileInfo(this.path + ".dll").FullName);
+
+				String fullPath = new FileInfo(this.path + ".lm").FullName;
+
+				List<String> diffbr = this.GetModulePath(Path.GetDirectoryName(fullPath));
+				List<String> diffbc = this.GetModulePath(Directory.GetCurrentDirectory());
+
+				// if this module is already imported
+				/*if (Prelude.GlobalImportCache.ContainsKey(fullPath)) {
+					if (this.isFrom) {
+						// get required module
+						Module m = this.GetRequiredModule(Prelude.GlobalImportCache[fullPath], diffbc, scope);
+
+						foreach (String i in this.entities) {
+							scope.Bind(i, m.GetMember(i, scope));
+						}
+					}
+					else {
+						scope.Bind(diffbc[diffbr.Count - 1], this.GetRequiredModule(Prelude.GlobalImportCache[fullPath], diffbc, scope));
+					}
+
+					return Const.UNIT;
+				}*/
+
+				/*	if (!File.Exists(fullPath)) {
+						throw new LumenException(Exceptions.MODULE_DOES_NOT_EXISTS.F(this.path), line: this.line, fileName: this.fileName);
+					}
+
+					Module lowLevelModule = this.CreateModules(diffbr, scope, out Module topLevelModule);
+					this.ImportFileIntoModule(scope, fullPath, lowLevelModule);
+					Prelude.GlobalImportCache[fullPath] = topLevelModule;
+
+					if (this.isFrom) {
+						if (importAll) {
+							foreach (var i in lowLevelModule.Members) {
+								scope.Bind(i.Key, i.Value);
+							}
+						}
+						else {
+							foreach (String i in this.entities) {
+								scope.Bind(i, lowLevelModule.GetMember(i, scope));
+							}
+						}
+					}
+					else {
+						scope.Bind(diffbc[diffbc.Count - 1], topLevelModule);
+					}*/
+				/*if (Directory.Exists(this.path)) {
+					if (this.importAll) {
+						foreach (String i in Directory.EnumerateFiles(this.path, "*.lm")) {
+							this.ImportFile(scope, i, false);
+						}
+					}
+					else {
+						foreach (String i in this.entities) {
+							Boolean isDllExtension = File.Exists(this.path + "\\" + i + ".dll");
+							this.ImportFile(scope, this.path + "\\" + i + (isDllExtension ? ".dll" : ".lm"), false);
+						}
+					}
+				}
+				else if (File.Exists(this.path + (File.Exists(this.path + ".dll") ? ".dll" : ".lm"))) {
+					Boolean isDllExtension = File.Exists(this.path + ".dll");
+					this.ImportFile(scope, this.path + (isDllExtension ? ".dll" : ".lm"), true);
+				}
+				else {
+					throw new LumenException(Exceptions.PACKAGE_DOES_NOT_EXISTS.F(this.path), line: this.line, fileName: this.fileName);
+				}*/
+
+				/*if (Directory.Exists(this.path)) {
+					foreach (String i in Directory.EnumerateFiles(this.path, "*.lm")) {
+						this.ImportFile(scope, i, false);
+					}
+				}
+				else {
+					this.ImportFile(scope, this.path + (File.Exists(this.path + ".dll") ? ".dll" : ".lm"), false);
+				}*/
+			}
+
+			return null;
+		}
+
+		private Tuple<Module, Module> ImportDllFile(String fullName) {
+			throw new NotImplementedException();
+		}
+
+		private Tuple<Module, Module> ImportLumenFile(String fullPath, Scope scope) {
+			List<String> diffbr = this.GetModulePath(Path.GetDirectoryName(fullPath));
+			List<String> diffbc = this.GetModulePath(Directory.GetCurrentDirectory());
+			diffbr.Add(Path.GetFileNameWithoutExtension(fullPath));
+			// if this module is already imported
+			if (Prelude.GlobalImportCache.ContainsKey(fullPath)) {
+				return new Tuple<Module, Module>(this.GetRequiredModule(Prelude.GlobalImportCache[fullPath], diffbc, scope), Prelude.GlobalImportCache[fullPath]);
+			}
+
+			Module lowLevelModule = this.CreateModules(diffbr, scope, out Module topLevelModule);
+			this.ImportFileIntoModule(scope, fullPath, lowLevelModule);
+			Prelude.GlobalImportCache[fullPath] = topLevelModule;
+			return new Tuple<Module, Module>(lowLevelModule, topLevelModule);
+						/*if (Directory.Exists(this.path)) {
+				if (this.importAll) {
+					foreach (String i in Directory.EnumerateFiles(this.path, "*.lm")) {
+						this.ImportFile(scope, i, false);
+					}
+				}
+				else {
+					foreach (String i in this.entities) {
+						Boolean isDllExtension = File.Exists(this.path + "\\" + i + ".dll");
+						this.ImportFile(scope, this.path + "\\" + i + (isDllExtension ? ".dll" : ".lm"), false);
+					}
+				}
+			}
+			else if (File.Exists(this.path + (File.Exists(this.path + ".dll") ? ".dll" : ".lm"))) {
+				Boolean isDllExtension = File.Exists(this.path + ".dll");
+				this.ImportFile(scope, this.path + (isDllExtension ? ".dll" : ".lm"), true);
+			}
+			else {
+				throw new LumenException(Exceptions.PACKAGE_DOES_NOT_EXISTS.F(this.path), line: this.line, fileName: this.fileName);
+			}*/
+
+			/*if (Directory.Exists(this.path)) {
+				foreach (String i in Directory.EnumerateFiles(this.path, "*.lm")) {
+					this.ImportFile(scope, i, false);
+				}
+			}
+			else {
+				this.ImportFile(scope, this.path + (File.Exists(this.path + ".dll") ? ".dll" : ".lm"), false);
+			}*/
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

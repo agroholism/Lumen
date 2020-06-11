@@ -665,14 +665,14 @@ namespace Lumen.Lang {
 				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
 				return new Array(v.ToList());
 			}) {
-				Arguments = Const.This
+				Arguments = Const.Self
 			});
 
 			this.SetMember("Text", new LambdaFun((e, args) => {
 				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
 				return new Text("[seq]");
 			}) {
-				Arguments = Const.This
+				Arguments = Const.Self
 			});
 
 			this.SetMember("step", new LambdaFun((e, args) => {

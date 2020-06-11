@@ -1,0 +1,41 @@
+Proposed to version 0.8
+
+Добавить оператор try-with-finally
+
+type FactException = exception
+    | ValueIsNegative
+    | ValueIsNotInteger
+    | ValueIsNotNumber
+
+let fact n: Number = 
+    if Number.mod n 1 <> 0:
+        raise ValueIsNotInteger
+    if n < 0:
+        raise ValueIsNegative
+    let fact' 0 = 1
+    let fact' n = n * rec (n-1)
+    fact' n 
+let fact n = 
+    raise ValueIsNotNumber
+
+let factSafe n =
+    try 
+        Some (fact 5)
+    with
+    | e = print (Exception.getMessage e) 
+
+
+try
+	return compute ()
+with
+| e = print "Hello!"
+finally
+
+
+
+failwith message
+invalidArg name mess
+functionIsNotImplementedForType
+notImplemented 
+exit message
+using 

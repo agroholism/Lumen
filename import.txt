@@ -1,0 +1,82 @@
+stdlib                          // module stdlib
+|___ text                       // module stdlib.text
+|    |___ regex.dll             // module stdlib.text.regex
+|___ utils
+|    |___ array.lm
+|    |     
+|    |    type ArrayRef         // stdlib.utils.array.ArrayRef
+|    |    let fromList f x 
+|    |    let empty ()
+|    |
+|    |___ list.lm
+|    |___ itertools.lm
+|___ async.dll
+
+// Импортирует ВСЕ модули и подмодули расположенные в папке stdlib
+// Создаёт модуль stdlib и рекурсивно все остальные
+import stdlib
+// Импортирует все модули из модуля stdlib.text
+// Создаёт следующую структуру объектов:
+// module stdlib
+//  module text 
+//   module regex 
+import stdlib.text
+// Импортирует .dll файл
+import stdlib.text.regex
+import * from stdlib = import stdlib
+import text from stdlib = import stdlib.text
+import regex from stdlib.text = import stdlib.text.regex
+import * from stdlib.utils = import array, list, itertools from stdlib.utils
+import ArrayRef from stdlib.utils.array 
+BUT NOT import stdlib.utils.array.ArrayRef WHY?
+
+Спроектированная на данный момент система импорта является необычайно сложной. Необходима
+постепенная реаллизация, с установлением четких правил работы выражений.
+
+Сущность = директория или файл
+
+== Правила импорта файла (1)
+	1. в случае если файл является файлом .lm:
+		1.1. создаётся модуль, имеющий имя файла
+		1.2. все команды, находящиеся в файле исполняются в контексте созанного в п. 1.1. модуля
+	2. в случае если файл является файлом .dll:
+		2.1. при помощи рефлексии вызывается метод Import(Scope, Object) класса Main
+		     Scope - область видимости, в которой исполняется импортирование
+			 Object - дополнительный зарезервированный аргумент
+
+== Простейший оператор импорта (2)
+
+	import name
+
+	Где name может быть:
+	1. директорией - в этом случае:
+		1. создётся модуль с именем name
+		2. правило import рекурсивно распространяется на все сущности, находящиеся внутри директории,
+		   при этом эти импорты исполняются в контексте созанного в п. 1 модуля
+	2. файлом - в этом случае выполняются правила импорта файла
+
+== Оператор импорта с одинарной вложенностью (3)
+	
+	import name1.name2
+
+	Конвертируется в 
+
+	import name2 from name1
+
+== Оператор импорта с двойной вложенностью (3)
+	
+	import name1.name2.name3
+
+	Конвертируется в 
+
+	import name1.name2
+	import name3 from name1.name2
+
+ entity = file|directory
+
+ import entity
+ import directory.entity
+
+ import object from entity
+ import object1, object2 from entity
+ import * from entity

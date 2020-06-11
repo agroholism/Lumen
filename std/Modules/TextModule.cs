@@ -14,49 +14,59 @@ namespace Lumen.Lang {
 			#region operators
 
 			this.SetMember(Op.USTAR, new LambdaFun((scope, args) => {
-                return new Number(scope["this"].ToString().Length);
+                return new Number(scope["self"].ToString().Length);
             }) {
-                Arguments = Const.This
-            });
+				Arguments = new List<IPattern> {
+					new NamePattern("self"),
+					new NamePattern("x")
+				}
+			});
 
             this.SetMember(Op.PLUS, new LambdaFun((scope, args) => {
-                return new Text(scope["this"].ToString() + scope["other"].ToString());
+                return new Text(scope["self"].ToString() + scope["other"].ToString());
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember(Op.LSH, new LambdaFun((scope, args) => {
-                Text str = scope["this"] as Text;
+                Text str = scope["self"] as Text;
                 str.value += scope["other"].ToString();
                 return str;
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember(Op.STAR, new LambdaFun((scope, args) => {
-                String str = scope["this"].ToString();
-                Int32 count = (Int32)scope["other"].ToDouble(scope);
+                String str = scope["self"].ToString();
+				Value other = scope["other"];
 
-                StringBuilder buffer = new StringBuilder();
+				if (other == Const.UNIT) {
+					return new Number(str.Length);
+				}
+
+
+				Int32 count = (Int32)other.ToDouble(scope);
+
+				StringBuilder buffer = new StringBuilder();
                 for (Int32 i = 0; i < count; i++) {
                     buffer.Append(str);
                 }
 
                 return new Text(buffer.ToString());
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember("compare", new LambdaFun((scope, args) => {
-                return new Number(scope["this"].CompareTo(scope["other"]));
+                return new Number(scope["self"].CompareTo(scope["other"]));
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember(Op.MOD, new LambdaFun((scope, args) => {
-                return new Text(String.Format(scope["this"].ToString(), scope["other"].ToStream(scope).ToArray()));
+                return new Text(String.Format(scope["self"].ToString(), scope["other"].ToStream(scope).ToArray()));
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember(Op.SLASH, new LambdaFun((scope, args) => {
@@ -143,11 +153,11 @@ namespace Lumen.Lang {
 					new NamePattern("text")
 				}
             });
-            // make get and set
-            // match =~
-            // make ranges
+			// make get and set
+			// match =~
+			// make ranges
 
-            /*   this.Set(Op.GETI, new LambdaFun((e, args) => {
+			/*   this.Set(Op.GETI, new LambdaFun((e, args) => {
                 System.String value = e.Get("this").ToString();
                 if (args.Length == 1) {
                     if (args[0] is Number) {
@@ -185,17 +195,123 @@ namespace Lumen.Lang {
                 return new Number(e.Get("this").ToString().Length);
             }));*/
 
-            #endregion
+			#endregion
 
-            this.SetMember("concat", new LambdaFun((e, args) => {
-				return new Text(String.Concat(e["values"].ToStream(e)));
+			// Collection -> Text
+			// let concat values = ...
+			// Сцепляет Collection объектов в единую строку
+			// Примечание:
+			//  Для пустого Collection возвращает пустую строку
+			// Исключения: 
+			//	ConvertException: невозможно преобразовать объект к типу Stream
+			this.SetMember("concat", new LambdaFun((scope, args) => {
+				return new Text(String.Concat(scope["values"].ToStream(scope)));
             }) {
                 Arguments = new List<IPattern> {
                     new NamePattern("values")
                 }
             });
 
-            this.SetMember("toStream", new LambdaFun((e, args) => {
+			// Text -> Text
+			// let toUpper self = ...
+			// Переводит строку в верхний регистр
+			this.SetMember("upperCase", new LambdaFun((scope, args) => {
+				return new Text(scope["self"].ToString().ToUpper());
+			}) {
+				Arguments = Const.Self
+			});
+
+			// Text -> Text
+			// let toLower self = ...
+			// Переводит строку в нижний регистр
+			this.SetMember("lowerCase", new LambdaFun((scope, args) => {
+				return new Text(scope["self"].ToString().ToLower());
+			}) {
+				Arguments = Const.Self
+			});
+
+			// Text -> Text
+			// let capitalize self = ...
+			this.SetMember("capitalizeCase", new LambdaFun((scope, args) => {
+				String self = scope["self"].ToString().ToLower();
+				return new Text(Char.ToUpper(self[0]) + self.Substring(1));
+			}) {
+				Arguments = Const.Self
+			});
+
+			// Text -> Text
+			// let toTitleCase self = ...
+			this.SetMember("titleCase", new LambdaFun((scope, args) => {
+				String self = scope["self"].ToString();
+				TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+
+				return new Text(textInfo.ToTitleCase(self));
+			}) {
+				Arguments = Const.Self
+			});
+
+			// Text -> Text
+			// let swapCase self = ...
+			this.SetMember("swapCase", new LambdaFun((scope, args) => {
+				String self = scope["self"].ToString();
+
+				StringBuilder result = new StringBuilder();
+				foreach (Char i in self) {
+					result.Append(Char.IsUpper(i) ? Char.ToLower(i) : Char.ToUpper(i));
+				}
+
+				return new Text(result.ToString());
+			}) {
+				Arguments = Const.Self
+			});
+
+			// Text -> Text -> Boolean
+			// let contains substring string = ...
+			// Определяет, содержится ли подстрока substring в строке string
+			this.SetMember("contains", new LambdaFun((scope, args) => {
+				return new Bool(scope["this"].ToString().Contains(scope["other"].ToString()));
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			// Text -> Boolean
+			this.SetMember("isEmpty", new LambdaFun((scope, args) => {
+				String self = scope["self"].ToString();
+
+				return new Bool("" == self);
+			}) {
+				Arguments = Const.Self
+			});
+
+			// Text -> Text -> Boolean
+			// let contains string prefix = ...
+			// Определяет, начинается ли строка string со строки prefix
+			this.SetMember("isStartsWith", new LambdaFun((scope, args) => {
+				return new Bool(scope["this"].ToString().StartsWith(scope["other"].ToString()));
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			// Text -> Text -> Boolean
+			// let contains string suffix = ...
+			// Определяет, кончается ли строка string на строку prefix
+			this.SetMember("isEndsWith", new LambdaFun((scope, args) => {
+				return new Bool(scope["this"].ToString().EndsWith(scope["other"].ToString()));
+			}) {
+				Arguments = Const.SelfOther
+			});
+
+			// Text -> Stream
+			// let getCahrs self = ...
+			this.SetMember("getChars", new LambdaFun((scope, args) => {
+				String self = scope["self"].ToString();
+
+				return new Stream(self.Select<Char, Value>(x => new Number(x)));
+			}) {
+				Arguments = Const.Self
+			});
+
+			this.SetMember("toStream", new LambdaFun((e, args) => {
 				String v = e["values"].ToString();
 				return new Stream(this.GlobalizationEach(v));
 			}) {
@@ -214,51 +330,23 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toText", new LambdaFun((e, args) => {
-                return e["this"];
-            }));
-
-            this.SetMember("toUpper", new LambdaFun((e, args) => {
-                return new Text(e["this"].ToString().ToUpper());
-            }) {
-				Arguments = Const.This
+				return e["self"];
+			}) {
+				Arguments = Const.Self
 			});
 
-            this.SetMember("toLower", new LambdaFun((e, args) => {
-                return new Text(e["this"].ToString().ToLower());
-            }) {
-				Arguments = Const.This
-			});
-
-            this.SetMember("isAscii", new LambdaFun((e, args) => {
+          /*  this.SetMember("isAscii", new LambdaFun((e, args) => {
                 return (Bool)(e["this"].ToString()[0] < 255);
             }) {
-                Arguments = Const.This
-            });
-            
-            this.SetMember("contains", new LambdaFun((e, args) => {
-                return new Bool(e["this"].ToString().Contains(e["other"].ToString()));
-            }) {
-                Arguments = Const.ThisOther
-            });
-
-            this.SetMember("isStartsWith", new LambdaFun((e, args) => {
-                return new Bool(e["this"].ToString().StartsWith(e["other"].ToString()));
-            }) {
-                Arguments = Const.ThisOther
-            });
-
-            this.SetMember("isEndsWith", new LambdaFun((e, args) => {
-                return new Bool(e["this"].ToString().EndsWith(e["other"].ToString()));
-            }) {
-                Arguments = Const.ThisOther
-            });
-
+                Arguments = Const.Self
+            });*/
+ 
             this.SetMember("replace", new LambdaFun((e, args) => {
                 return new Text(e["this"].ToString().Replace(e["other"].ToString(), e["xother"].ToString()));
             }) {
                 Arguments = new List<IPattern> {
-                    Const.This[0],
-                    Const.ThisOther[1],
+                    Const.Self[0],
+                    Const.SelfOther[1],
                     new NamePattern("xother")
                 }
             });
@@ -266,30 +354,14 @@ namespace Lumen.Lang {
             this.SetMember("index", new LambdaFun((e, args) => {
                 return new Number(e["this"].ToString().IndexOf(e["other"].ToString()));
             }) {
-                Arguments = Const.ThisOther
-            });
-
-            this.SetMember("getChars", new LambdaFun((scope, args) => {
-				String s = scope["text"].ToString();
-				return new Array(s.Select<Char, Value>(x => new Number(x)).ToList());
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("text")
-				}
-			});
-
-            this.SetMember("isEmpty", new LambdaFun((e, args) => {
-                String s = e.Get("this").ToString();
-                return new Bool("" == s);
-            }) {
-                Arguments = Const.This
+                Arguments = Const.SelfOther
             });
 
             this.SetMember("size", new LambdaFun((e, args) => {
                 String s = e.Get("this").ToString();
                 return new Number(s.Length);
             }) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
 
             this.SetMember("tr", new LambdaFun((e, args) => {
@@ -359,28 +431,7 @@ namespace Lumen.Lang {
 
                 return new Array(s.Select<Char, Value>(x => new Bool(Char.IsWhiteSpace(x))).ToList());
             }));
-            this.SetMember("capitalize", new LambdaFun((e, args) => {
-                String s = e.Get("this").ToString().ToLower();
-                return new Text(Char.ToUpper(s[0]) + s.Substring(1));
-            }));
-            this.SetMember("toTitleCase", new LambdaFun((e, args) => {
-                String s = e.Get("this").ToString();
-                TextInfo t = CultureInfo.CurrentCulture.TextInfo;
-                return new Text(t.ToTitleCase(s));
-            }));
-            this.SetMember("swapCase", new LambdaFun((e, args) => {
-                String s = e.Get("this").ToString();
-                String result = "";
-                foreach (Char i in s) {
-                    if (Char.IsUpper(i)) {
-                        result += Char.ToLower(i);
-                    } else {
-                        result += Char.ToUpper(i);
-                    }
-                }
-
-                return new Text(result);
-            }));
+          
 			this.SetMember("ljust", new LambdaFun((e, args) => {
 				String s = e["text"].ToString();
 				return args.Length == 1
@@ -453,7 +504,7 @@ namespace Lumen.Lang {
 				String v = e.Get("this").ToString();
 				return new Text(v.Normalize());
 			}) {
-				Arguments = Const.This
+				Arguments = Const.Self
 			});
 
             this.SetMember("casecmp", new LambdaFun((scope, args) => {
@@ -517,14 +568,14 @@ namespace Lumen.Lang {
 			}));*/
 
             this.SetMember("toNumber", new LambdaFun((e, args) => {
-                String v = e.Get("this").ToString();
+                String v = e.Get("self").ToString();
                 try {
                     return new Number(Double.Parse(v));
                 } catch {
                     return Const.UNIT;
                 }
             }) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
 
             this.IncludeMixin(Prelude.Ord);

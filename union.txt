@@ -1,0 +1,4 @@
+Proposed to version 1.1
+
+@notextensionable
+type FactArg = Positive & Integer

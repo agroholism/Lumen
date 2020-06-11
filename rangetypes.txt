@@ -1,0 +1,37 @@
+Proposed to version 1.1
+
+Ввести специальное определение типа
+
+	type Age = 0...120
+
+эквивалентно
+
+	type Age = Age (value: 0...120)
+
+Тогда следующие определения не эквивалентны
+
+	// В данном случае age имеет тип Number
+	type Person = Person (age: 0...120)
+	let p = Person 45
+
+и
+	
+	// В данном случае age имеет тип Age
+	type Person = Person (age: Age)
+	let p = Person (Age 45)
+
+Это нормально, для эквивалентности данных объявлений можно ввести 
+специальный alias, поведение которого будет естественно:
+
+	type Age = alias 0...120
+	type Person = Person (age: Age)
+	let p = Person 45
+
+Возможно ли расширение данной формы на диапазоны других типов?
+Для Text - да
+Для Enum - да
+
+type Vowel = "a" | "e" | "i" | "o" | "u" | "y"
+
+match x 
+| Vowel x = 

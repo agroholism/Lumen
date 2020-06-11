@@ -1,0 +1,28 @@
+@Enum.flags
+type Direction = enum 
+    | North
+    | East
+    | South
+    | West
+    
+    type NorthWest = alias North || West
+    type NorthEast = alias North || East
+    type SouthWest = alias South || West
+    type SouthEast = alias South || East
+    
+    let || North South =
+        raise Enum.ImpossibleFlag North South
+    let || West East =
+        raise Enum.ImpossibleFlag West East
+
+type Direction = flag enum 
+    | North
+    | East
+    | South
+    | West
+    | NorthWest = North || West
+    | NorthEast = North || East
+    | SouthWest = South || West
+    | SouthEast = South || East
+    | impossible = North || South
+    | impossible = East || West

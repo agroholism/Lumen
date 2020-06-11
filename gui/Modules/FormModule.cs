@@ -21,7 +21,7 @@ namespace Lumen.Lang.Libraries.Visual {
                 item.Close();
                 return ex.Get("this");
             }) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
 
             this.SetMember("show", new LambdaFun((ex, argsx) => {
@@ -32,7 +32,7 @@ namespace Lumen.Lang.Libraries.Visual {
                     return ex.Get("this");
                 });
             }) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
 
             this.SetMember("showDialog", new LambdaFun((ex, argsx) => {
@@ -40,7 +40,7 @@ namespace Lumen.Lang.Libraries.Visual {
                 item.ShowDialog();
                 return ex.Get("this");
             }) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
 
 			this.SetMember("liftB", new LambdaFun((scope, args) => {

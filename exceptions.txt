@@ -1,0 +1,10 @@
+Proposed to version 0.8
+
+type Exception = class
+
+
+type FactException = exception NotInteger | ValueIsNegative
+
+    raise match n 
+    | _: Integer = ValueIsNegative
+    | _: Positive = NotInteger

@@ -13,13 +13,13 @@ namespace Lumen.Lang {
         /// <summary> const false </summary>
         public static Bool FALSE { get; } = new Bool(false);
 
-        public static List<IPattern> ThisOther { get; } = new List<IPattern> {
-                new NamePattern("this"),
+        public static List<IPattern> SelfOther { get; } = new List<IPattern> {
+                new NamePattern("self"),
                 new NamePattern("other")
             };
 
-        public static List<IPattern> This { get; } = new List<IPattern> {
-                new NamePattern("this")
+        public static List<IPattern> Self { get; } = new List<IPattern> {
+                new NamePattern("self")
             };
     }
 }

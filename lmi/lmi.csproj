@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassDeclaration.cs" />
+    <Compile Include="ExceptionDeclaration.cs" />
     <Compile Include="Expression\Application\Applicate.cs" />
     <Compile Include="Expression\BlockE.cs" />
     <Compile Include="Expression\Declarations\FunctionDeclaration.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Expression\Patterns\PairPattern.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Expression\Application\TailRecursion.cs" />
+    <Compile Include="Raise.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenType.cs" />
     <Compile Include="Expression\Patterns\WherePattern.cs" />

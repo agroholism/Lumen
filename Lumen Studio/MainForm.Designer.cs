@@ -31,11 +31,11 @@ namespace Lumen.Studio {
 			this.Output = new Lumen.Studio.ConsoleEmulator();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-			this.projectImages = new System.Windows.Forms.ImageList(this.components);
 			this.bottomPanel = new System.Windows.Forms.Panel();
 			this.BottomMenu = new System.Windows.Forms.MenuStrip();
 			this.BottomMenuOutput = new System.Windows.Forms.ToolStripMenuItem();
 			this.BottomMenuLumenIntercative = new System.Windows.Forms.ToolStripMenuItem();
+			this.projectImages = new System.Windows.Forms.ImageList(this.components);
 			this.TopMenu = new System.Windows.Forms.MenuStrip();
 			this.TopMenuFile = new System.Windows.Forms.ToolStripMenuItem();
 			this.TopMenuOpen = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,6 +56,7 @@ namespace Lumen.Studio {
 			this.TopMenuDelete = new System.Windows.Forms.ToolStripMenuItem();
 			this.TopMenuView = new System.Windows.Forms.ToolStripMenuItem();
 			this.TopMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+			this.studioHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.TopMenuPanels = new System.Windows.Forms.ToolStripMenuItem();
 			this.TopMenuSettings = new System.Windows.Forms.ToolStripMenuItem();
 			this.TopMenuRunner = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,7 +66,6 @@ namespace Lumen.Studio {
 			this.TopMenuClose = new System.Windows.Forms.Panel();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.TextBoxContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.studioHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.textBox)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.Output)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -74,7 +74,6 @@ namespace Lumen.Studio {
 			this.splitContainer1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
 			this.splitContainer2.Panel1.SuspendLayout();
-			this.splitContainer2.Panel2.SuspendLayout();
 			this.splitContainer2.SuspendLayout();
 			this.bottomPanel.SuspendLayout();
 			this.BottomMenu.SuspendLayout();
@@ -97,13 +96,13 @@ namespace Lumen.Studio {
         '\"'};
 			this.textBox.AutoIndent = false;
 			this.textBox.AutoIndentCharsPatterns = "^\\s*\\.+";
-			this.textBox.AutoScrollMinSize = new System.Drawing.Size(42, 17);
+			this.textBox.AutoScrollMinSize = new System.Drawing.Size(42, 16);
 			this.textBox.BackBrush = null;
 			this.textBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.textBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
 			this.textBox.BookmarkColor = System.Drawing.Color.BlueViolet;
 			this.textBox.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
-			this.textBox.CharHeight = 17;
+			this.textBox.CharHeight = 16;
 			this.textBox.CharWidth = 7;
 			this.textBox.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.textBox.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
@@ -213,19 +212,10 @@ namespace Lumen.Studio {
 			// splitContainer2.Panel1
 			// 
 			this.splitContainer2.Panel1.Controls.Add(this.textBox);
-			// 
-			// splitContainer2.Panel2
-			// 
 			this.splitContainer2.Size = new System.Drawing.Size(598, 210);
 			this.splitContainer2.SplitterDistance = 402;
 			this.splitContainer2.SplitterWidth = 1;
 			this.splitContainer2.TabIndex = 1;
-			// 
-			// projectImages
-			// 
-			this.projectImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-			this.projectImages.ImageSize = new System.Drawing.Size(16, 16);
-			this.projectImages.TransparentColor = System.Drawing.Color.Transparent;
 			// 
 			// bottomPanel
 			// 
@@ -262,6 +252,12 @@ namespace Lumen.Studio {
 			this.BottomMenuLumenIntercative.Text = "Interactive";
 			this.BottomMenuLumenIntercative.Click += new System.EventHandler(this.ShowInteractive);
 			// 
+			// projectImages
+			// 
+			this.projectImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+			this.projectImages.ImageSize = new System.Drawing.Size(16, 16);
+			this.projectImages.TransparentColor = System.Drawing.Color.Transparent;
+			// 
 			// TopMenu
 			// 
 			this.TopMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
@@ -274,7 +270,7 @@ namespace Lumen.Studio {
 			this.TopMenu.Location = new System.Drawing.Point(29, 2);
 			this.TopMenu.Name = "TopMenu";
 			this.TopMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-			this.TopMenu.Size = new System.Drawing.Size(276, 24);
+			this.TopMenu.Size = new System.Drawing.Size(156, 24);
 			this.TopMenu.TabIndex = 1;
 			this.TopMenu.Text = "menuStringip1";
 			// 
@@ -435,19 +431,26 @@ namespace Lumen.Studio {
             this.studioHelpToolStripMenuItem});
 			this.TopMenuTools.Margin = new System.Windows.Forms.Padding(0, -1, 0, 0);
 			this.TopMenuTools.Name = "TopMenuTools";
-			this.TopMenuTools.Size = new System.Drawing.Size(180, 22);
+			this.TopMenuTools.Size = new System.Drawing.Size(116, 22);
 			this.TopMenuTools.Text = "Tools";
+			// 
+			// studioHelpToolStripMenuItem
+			// 
+			this.studioHelpToolStripMenuItem.Name = "studioHelpToolStripMenuItem";
+			this.studioHelpToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+			this.studioHelpToolStripMenuItem.Text = "Studio Help";
+			this.studioHelpToolStripMenuItem.Click += new System.EventHandler(this.StudioHelpToolStripMenuItem_Click);
 			// 
 			// TopMenuPanels
 			// 
 			this.TopMenuPanels.Name = "TopMenuPanels";
-			this.TopMenuPanels.Size = new System.Drawing.Size(180, 22);
+			this.TopMenuPanels.Size = new System.Drawing.Size(116, 22);
 			this.TopMenuPanels.Text = "Panels";
 			// 
 			// TopMenuSettings
 			// 
 			this.TopMenuSettings.Name = "TopMenuSettings";
-			this.TopMenuSettings.Size = new System.Drawing.Size(180, 22);
+			this.TopMenuSettings.Size = new System.Drawing.Size(116, 22);
 			this.TopMenuSettings.Text = "Settings";
 			// 
 			// TopMenuRunner
@@ -463,11 +466,12 @@ namespace Lumen.Studio {
 			// 
 			this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
 			this.imageList1.TransparentColor = System.Drawing.Color.White;
-			this.imageList1.Images.SetKeyName(0, "fruit-apple-half.png");
-			this.imageList1.Images.SetKeyName(1, "fruit-grape.png");
-			this.imageList1.Images.SetKeyName(2, "fruit-lime.png");
-			this.imageList1.Images.SetKeyName(3, "fruit-orange.png");
-			this.imageList1.Images.SetKeyName(4, "fruit.png");
+			this.imageList1.Images.SetKeyName(0, "function.png");
+			this.imageList1.Images.SetKeyName(1, "enumMember.png");
+			this.imageList1.Images.SetKeyName(2, "variable.png");
+			this.imageList1.Images.SetKeyName(3, "module.png");
+			this.imageList1.Images.SetKeyName(4, "fruit-apple-half.png");
+			this.imageList1.Images.SetKeyName(5, "fruit-grape.png");
 			// 
 			// headerPanel
 			// 
@@ -519,13 +523,6 @@ namespace Lumen.Studio {
 			this.TextBoxContextMenu.Name = "TextBoxContextMenu";
 			this.TextBoxContextMenu.Size = new System.Drawing.Size(61, 4);
 			// 
-			// studioHelpToolStripMenuItem
-			// 
-			this.studioHelpToolStripMenuItem.Name = "studioHelpToolStripMenuItem";
-			this.studioHelpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.studioHelpToolStripMenuItem.Text = "Studio Help";
-			this.studioHelpToolStripMenuItem.Click += new System.EventHandler(this.StudioHelpToolStripMenuItem_Click);
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -552,7 +549,6 @@ namespace Lumen.Studio {
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
 			this.splitContainer2.Panel1.ResumeLayout(false);
-			this.splitContainer2.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
 			this.splitContainer2.ResumeLayout(false);
 			this.bottomPanel.ResumeLayout(false);

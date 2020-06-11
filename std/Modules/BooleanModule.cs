@@ -12,7 +12,7 @@ namespace Lumen.Lang {
 
                 return new Bool(!value);
             }) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
 
             this.SetMember(Op.OR, new LambdaFun((scope, args) => {
@@ -21,7 +21,7 @@ namespace Lumen.Lang {
 
                 return new Bool(value || other);
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember(Op.XOR, new LambdaFun((scope, args) => {
@@ -30,7 +30,7 @@ namespace Lumen.Lang {
 
                 return new Bool(value ^ other);
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember(Op.AND, new LambdaFun((scope, args) => {
@@ -39,7 +39,7 @@ namespace Lumen.Lang {
 
                 return new Bool(value && other);
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
 
             this.SetMember("compare", new LambdaFun((scope, args) => {
@@ -47,15 +47,15 @@ namespace Lumen.Lang {
 
                 return (Number)scope["this"].CompareTo(other);
             }) {
-                Arguments = Const.ThisOther
+                Arguments = Const.SelfOther
             });
             #endregion
 
             this.SetMember("String", new LambdaFun((e, args) => new Text(e["this"].ToString())) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
             this.SetMember("Number", new LambdaFun((e, args) => (Number)(Converter.ToBoolean(e["this"]) ? 1 : 0)) {
-                Arguments = Const.This
+                Arguments = Const.Self
             });
 
             this.IncludeMixin(Prelude.Ord);

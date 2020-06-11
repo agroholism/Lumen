@@ -1,0 +1,40 @@
+Proposed to version 1.1
+
+Предложение: 
+	добавить в версию 1.1 enum-типы
+
+Аргументация:
+	enum-типы - это дискретный тип, состоящий только из синглтон-конструкторов, автоматически реализующий
+	класс Enum
+
+	type Enum = class
+		implements Ord
+
+		@requirement 
+		let toNumber (n: 'T)
+
+		let pred (n: 'T) = ...
+		let succ (n: 'T) = ...
+
+		let getMax () = ...
+		let getMin () = ...
+
+		let compare x y = ...
+
+		let .. a b = ...
+		let ... a b = ...
+
+Дизайн:
+ 
+	type Nums = enum One | Two | Three
+	type Nums = variant One | Two | Three
+	  implements Enum
+
+	  let toNumber One = 0
+	  let toNumber Two = 1
+	  let toNumber Three = 2
+
+	  let getMax () = Three
+	  let getMin () = One
+
+	type Nums = closed enum One | Two | Three

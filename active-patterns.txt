@@ -1,0 +1,21 @@
+Proposed to version 0.8
+
+Предложение: 
+	добавить в версию 0.8 активные паттерны
+
+Аргументация:
+	Активный паттерн - специальная функция, которая может использоваться при сопоставлении с 
+	образцом. 
+
+Дизайн:
+	первоначальный дизайн предполагал следующий вид
+
+	  patternName ? (arguments) deconstruction
+	 
+	однако, он был изменён вследствие излишней сложности
+
+	  [? patternName arguments] deconstruction
+match x 
+| parseRegex? ("(\\d+) (\\w+)") fst snd =
+| [? parseRegex "(\\d+) (\\w+)"] fst snd =
+| ?[parseRegex "(\\d+) (\\w+)"] fst snd =

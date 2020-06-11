@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Lumen.Lang {
 	public static class Helper {
+		public static Value CallMethod(this Value self, String name, Scope scope) {
+			return self.Type.GetMember(name, scope).ToFunction(scope).Run(new Scope(scope), self);
+		}
+
 		public static Value CallMethod(this Value self, String name, Scope scope, Value arg) {
 			return self.Type.GetMember(name, scope).ToFunction(scope).Run(new Scope(scope), self, arg);
 		}

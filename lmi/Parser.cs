@@ -44,6 +44,9 @@ namespace Lumen.Lmi {
 					}
 
 					return new Return(this.Expression());
+				case TokenType.RAISE: // kk
+					this.Match(TokenType.RAISE);
+					return new Raise(this.Expression());
 				case TokenType.MATCH:
 					this.Match(TokenType.MATCH);
 					return this.ParseMatch();
@@ -112,6 +115,10 @@ namespace Lumen.Lmi {
 					this.Match(currentToken.Type);
 					return this.ParseVariantDeclaration(typeName);
 				}
+				else if (currentToken.Text == "exception") {
+					this.Match(currentToken.Type);
+					return this.ParseExceptionDeclaration(typeName);
+				}
 				else if (currentToken.Text == "class") {
 					this.Match(currentToken.Type);
 					return this.ParseClassDeclaration(typeName);
@@ -123,6 +130,32 @@ namespace Lumen.Lmi {
 			}
 
 			return this.ParseVariantDeclaration(typeName);
+		}
+
+		private Expression ParseExceptionDeclaration(String typeName) {
+			List<ConstructorMetadata> defaultConstructors = new List<ConstructorMetadata>();
+			while (!this.LookMatch(0, TokenType.DO)
+				&& !this.Match(TokenType.EOC)
+				&& !this.Match(TokenType.EOF)) {
+				this.ParseDefaultConstructor(defaultConstructors);
+			}
+
+			List<Expression> derivings = new List<Expression>();
+			List<Expression> members = new List<Expression>();
+
+			if (this.Match(TokenType.DO)) {
+				while (!this.Match(TokenType.END) && !this.Match(TokenType.EOF)) {
+					if (this.Match(TokenType.IMPLEMENTS)) {
+						derivings.Add(this.Expression());
+					}
+					else {
+						members.Add(this.Expression());
+					}
+					this.Match(TokenType.EOC);
+				}
+			}
+
+			return new ExceptionDeclaration(typeName, defaultConstructors, members, derivings);
 		}
 
 		private Expression ParseVariantDeclaration(String typeName) {
@@ -330,10 +363,12 @@ namespace Lumen.Lmi {
 
 		// TODO
 		private Expression ParseImport() {
+			// import x, || import x from
 			if (this.LookMatch(1, TokenType.SPLIT) || this.LookMatch(1, TokenType.FROM)) {
 				List<String> entities = new List<String>();
 				Boolean importAll = false;
 
+				// import * from
 				if (this.Match(TokenType.STAR)) {
 					importAll = true;
 				}
@@ -345,53 +380,26 @@ namespace Lumen.Lmi {
 					entities.Add(this.Consume(TokenType.WORD).Text);
 				}
 
-				this.Match(TokenType.FROM);
+				this.Consume(TokenType.FROM);
 
-				StringBuilder pathBuilder = new StringBuilder(this.Consume(TokenType.WORD).Text);
-
-				while (this.Match(TokenType.DOT)) {
-					pathBuilder.Append("\\").Append(this.Consume(TokenType.WORD).Text);
-				}
-
-				return new Import(pathBuilder.ToString(), /*isFrom*/true, importAll, entities, this.fileName, this.line);
-			}
-
-			Expression result = null;
-			do {
-				StringBuilder pathBuilder = new StringBuilder(this.Consume(TokenType.WORD).Text);
+				// name1.name2....
+				StringBuilder pathBuild = new StringBuilder(this.Consume(TokenType.WORD).Text);
 
 				while (this.Match(TokenType.DOT)) {
-					pathBuilder.Append("\\").Append(this.Consume(TokenType.WORD).Text);
+					pathBuild.Append("\\").Append(this.Consume(TokenType.WORD).Text);
 				}
 
-				List<String> entities = new List<String>();
-				Boolean importAll = false;
-				if (true) {
-					this.Match(TokenType.IMPORT);
-					if (this.Match(TokenType.STAR)) {
-						importAll = true;
-					}
-					else {
-						while (this.LookMatch(1, TokenType.SPLIT)) {
-							entities.Add(this.Consume(TokenType.WORD).Text);
-							this.Match(TokenType.SPLIT);
-						}
-						entities.Add(this.Consume(TokenType.WORD).Text);
-					}
-				}
-
-				if (result is Import) {
-					result = new BlockE(new List<Expression> { result, new Import(pathBuilder.ToString(), /*isFrom*/true, importAll, entities, this.fileName, this.line) });
-				}
-				else if (result is BlockE block) {
-					block.Add(new Import(pathBuilder.ToString(), /*isFrom*/true, importAll, entities, this.fileName, this.line));
-				}
-				else {
-					result = new Import(pathBuilder.ToString(), /*isFrom*/true, importAll, entities, this.fileName, this.line);
-				}
+				return new Import(pathBuild.ToString(), /*isFrom*/true, importAll, entities, this.fileName, this.line);
 			}
-			while (this.Match(TokenType.SPLIT));
-			return result;
+
+			// import x... (!from)
+			StringBuilder pathBuilder = new StringBuilder(this.Consume(TokenType.WORD).Text);
+
+			while (this.Match(TokenType.DOT)) {
+				pathBuilder.Append("\\").Append(this.Consume(TokenType.WORD).Text);
+			}
+
+			return new Import(pathBuilder.ToString(), false, false, null, this.fileName, this.line);
 		}
 
 		private Expression ParseModule() {

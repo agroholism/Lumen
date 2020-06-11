@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
 	public sealed class Prelude : Module {
 		#region Fields
+		public static Module Exception { get; } = new ExceptionClass();
 		public static Module Functor { get; } = new Functor();
 		public static Module Collection { get; } = new Collection();
 		public static Module Ord { get; } = new OrdModule();
@@ -48,7 +50,7 @@ namespace Lumen.Lang {
 		private Prelude() {
 			ConstructFail();
 
-			this.SetMember("prelude", this);
+			this.SetMember("Prelude", this);
 
 			this.SetMember("Ord", Ord);
 			this.SetMember("Format", Format);
@@ -81,6 +83,9 @@ namespace Lumen.Lang {
 
 			this.SetMember("true", Const.TRUE);
 			this.SetMember("false", Const.FALSE);
+
+			this.SetMember("inf", new Number(Double.PositiveInfinity));
+			this.SetMember("nan", new Number(Double.NaN));
 
 			this.SetMember("PI", (Number)Math.PI);
 			this.SetMember("E", (Number)Math.E);
@@ -175,37 +180,23 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("parseRegex", new LambdaFun((scope, args) => {
-				Value value = scope["value"];
+			// 23/04
+			this.SetMember("println", new LambdaFun((scope, args) => {
+				Value x = scope["x"];
 
-				if (!(value is Text)) {
-					return None;
-				}
+				Console.WriteLine(x.ToString());
 
-				Value regex = scope["args"].ToList(scope)[0];
-
-				var m = System.Text.RegularExpressions.Regex.Match(value.ToString(), regex.ToString());
-
-				if(m.Success) {
-					List<Value> results = new List<Value>();
-					for(var i = 1; i < m.Groups.Count; i++) {
-						results.Add(new Text(m.Groups[i].Value));
-					}
-					return Helper.CreateSome(new Array(results));
-				}
-
-				return None;
+				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("args"),
-					new NamePattern("value"),
+					new NamePattern("x")
 				}
 			});
 
 			this.SetMember("print", new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
-				Console.WriteLine(x.ToString());
+				Console.Write(x.ToString());
 
 				return Const.UNIT;
 			}) {
@@ -218,110 +209,15 @@ namespace Lumen.Lang {
 				return new Text(Console.ReadLine());
 			}));
 
-			/*this.SetMember("random", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+			this.SetMember("input", new LambdaFun((scope, args) => {
+				Value prompt = scope["prompt"];
 
-				return new Number(mainRandomObject.Next(x.To);
+				Console.Write(prompt.ToString());
+
+				return new Text(Console.ReadLine());
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("x")
-				}
-			});*///
-
-			this.SetMember("send", new LambdaFun((scope, args) => {
-				Value x = scope["gen"];
-
-				if (x is LumenIterator generator) {
-					return generator.Send(scope["value"]);
-				}
-
-				return x;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("gen"),
-					new NamePattern("value")
-				}
-			});
-
-			this.SetMember("getNext", new LambdaFun((scope, args) => {
-				Value x = scope["gen"];
-
-				if (x is LumenIterator generator) {
-					return generator.Next();
-				}
-
-				return x;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("gen")
-				}
-			});
-
-			this.SetMember("iter", new LambdaFun((scope, args) => {
-				Value x = scope["gen"];
-
-				if (x is Stream s && s.innerValue is LumenGenerator generator) {
-					return generator.GetEnumerator() as Value;
-				}
-
-				return x;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("gen")
-				}
-			});
-
-			this.SetMember("force", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-
-				if (x is Lazy lazy) {
-					return lazy.Force(scope);
-				}
-
-				return x;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("x")
-				}
-			});
-
-			this.SetMember("forceAll", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-
-				while (x is Lazy lazy) {
-					x = lazy.Force(scope);
-				}
-
-				return x;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("x")
-				}
-			});
-
-			this.SetMember("lazyret", new LambdaFun((scope, args) => {
-				Value x = scope["f"];
-
-				Fun f = null;
-
-				if (x is Lazy lazy) {
-					f = lazy.Force() as Fun;
-				}
-
-				if (x is Fun fun) {
-					f = fun;
-				}
-
-				return new LambdaFun((innerScope, innerArguments) => {
-					return new Lazy(new NativeExpression((_s, _a) => f.Run(innerScope, innerArguments)));
-				}) {
-					Arguments = new List<IPattern> {
-						new NamePattern("x")
-					}
-				};
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("f")
+					new NamePattern("prompt")
 				}
 			});
 
@@ -349,21 +245,9 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("timeof", new LambdaFun((scope, args) => {
-				Fun f = scope["f"] as Fun;
-				System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-				sw.Start();
-				f.Run(new Scope());
-				sw.Stop();
-				return new Number(sw.ElapsedMilliseconds);
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("f")
-				}
-			});
-
 			this.SetMember("assert", new LambdaFun((scope, args) => {
 				Assert(scope["condition"].ToBoolean());
+
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
@@ -378,32 +262,6 @@ namespace Lumen.Lang {
 				Arguments = new List<IPattern> {
 					new NamePattern("fName"),
 					new NamePattern("t")
-				}
-			});
-
-			this.SetMember("id", new LambdaFun((scope, args) => {
-				return scope["x"];
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("x")
-				}
-			});
-
-			this.SetMember("k", new LambdaFun((scope, args) => {
-				return scope["x"];
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("x"),
-					new NamePattern("y")
-				}
-			});
-
-			this.SetMember("ks", new LambdaFun((scope, args) => {
-				return scope["y"];
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("x"),
-					new NamePattern("y")
 				}
 			});
 
@@ -524,8 +382,8 @@ namespace Lumen.Lang {
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
-			var s = new Scope(AssociatedScope);
-			return new LumenIterator(f(s).GetEnumerator()) { Scope = s };
+			Scope s = new Scope(this.AssociatedScope);
+			return new LumenIterator(this.f(s).GetEnumerator()) { Scope = s };
 		}
 	}
 }

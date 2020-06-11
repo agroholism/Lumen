@@ -9,14 +9,13 @@ namespace Lumen.Studio {
 			this.Name = "Lumen";
 			this.Extensions = new List<String> { ".lm" };
 			this.IdentOn = true;
-			this.Styles.Add(new Regex("<\\[.*?\\]>", RegexOptions.Compiled | RegexOptions.Singleline), Settings.Interface);
 			this.Styles.Add(new Regex("(\"\")|\".*?[^\\\\]\"", RegexOptions.Compiled | RegexOptions.Singleline), Settings.String);
 			this.Styles.Add(new Regex("//.*"), Settings.Comment);
 			this.Styles.Add(new Regex("@[\\w\\d\\.]+"), Settings.Keyword);
 			this.Styles.Add(new Regex("'\\w+"), Settings.Keyword);
-			this.Styles.Add(new Regex("\\b(yield|alias|variant|class|extension|ref|use|import|rec|implements|tailrec|as|type|match|next|break|not|and|is|let|or|xor|if|else|for|in|while|from|return|true|false)\\b"), Settings.Keyword);
+			this.Styles.Add(new Regex("\\b(inf|nan|yield|exception|raise|try|except|finally|alias|variant|class|extension|ref|use|import|rec|implements|tailrec|as|type|match|next|break|not|and|is|let|or|xor|if|else|for|in|while|from|return|true|false)\\b"), Settings.Keyword);
 			this.Styles.Add(new Regex("\\b(Number|Unit|Ref|Fail|Success|Result|Stream|Text|Some|None|Option|Array|Boolean|Map|List|Function|Pair)\\b"), Settings.Type);
-			this.Styles.Add(new Regex("\\b(Functor|Context|Format|Monad|Applicative|Alternative|Ord|Collection)\\b"), Settings.Interface);
+			this.Styles.Add(new Regex("\\b(Functor|Context|Format|Monad|Applicative|Alternative|Ord|Collection|Exception|Enum)\\b"), Settings.Interface);
 		}
 
 		internal override void OnTextChanged(TextBoxManager manager, Range rng) {
