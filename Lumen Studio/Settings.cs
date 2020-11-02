@@ -91,7 +91,7 @@ namespace Lumen.Studio {
 					ExecutablePath = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
 				}
 
-				EmptyImage = Image.FromFile(ExecutablePath + $"\\settings\\themes\\icons\\standart\\empty.png");
+				// EmptyImage = Image.FromFile(ExecutablePath + $"\\settings\\themes\\icons\\standart\\empty.png");
 
 				MainSettings = new XmlDocument();
 				MainSettings.Load(ExecutablePath + "\\settings\\main.xml");

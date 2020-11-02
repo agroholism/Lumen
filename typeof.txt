@@ -1,0 +1,13 @@
+import * from reflect
+
+typeOf 8 // Number
+constructorOf 9 // ()
+
+while let trigger x: [x = "begin", x = "end"] = readLine () {
+	
+}
+
+let t = trigger [_ = "begin", _ = "end"]
+while t readline() {
+	
+}

@@ -34,7 +34,6 @@
 			// 
 			// fastColoredTextBox1
 			// 
-			this.fastColoredTextBox1._UnsafeText = "regex";
 			this.fastColoredTextBox1.AutoCompleteBracketsList = new char[] {
         '(',
         ')',
@@ -48,13 +47,13 @@
         '\''};
 			this.fastColoredTextBox1.AutoScrollMinSize = new System.Drawing.Size(37, 15);
 			this.fastColoredTextBox1.BackBrush = null;
-			this.fastColoredTextBox1.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
+			this.fastColoredTextBox1.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy1;
 			this.fastColoredTextBox1.CharHeight = 15;
 			this.fastColoredTextBox1.CharWidth = 7;
 			this.fastColoredTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.fastColoredTextBox1.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
 			this.fastColoredTextBox1.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.fastColoredTextBox1.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
+			this.fastColoredTextBox1.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.ChangedRange;
 			this.fastColoredTextBox1.Hotkeys = resources.GetString("fastColoredTextBox1.Hotkeys");
 			this.fastColoredTextBox1.IsReplaceMode = false;
 			this.fastColoredTextBox1.Location = new System.Drawing.Point(1, 1);
@@ -68,13 +67,12 @@
 			this.fastColoredTextBox1.Size = new System.Drawing.Size(427, 20);
 			this.fastColoredTextBox1.TabIndex = 0;
 			this.fastColoredTextBox1.Text = "regex";
-			this.fastColoredTextBox1.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
+			this.fastColoredTextBox1.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WordWrapControlWidth;
 			this.fastColoredTextBox1.Zoom = 100;
 			// 
 			// fastColoredTextBox2
 			// 
-			this.fastColoredTextBox2._UnsafeText = "Test of regex";
-			this.fastColoredTextBox2.AutoCompleteBracketsList = new char[] {
+	this.fastColoredTextBox2.AutoCompleteBracketsList = new char[] {
         '(',
         ')',
         '{',
@@ -87,13 +85,13 @@
         '\''};
 			this.fastColoredTextBox2.AutoScrollMinSize = new System.Drawing.Size(93, 15);
 			this.fastColoredTextBox2.BackBrush = null;
-			this.fastColoredTextBox2.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
+			this.fastColoredTextBox2.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy1;
 			this.fastColoredTextBox2.CharHeight = 15;
 			this.fastColoredTextBox2.CharWidth = 7;
 			this.fastColoredTextBox2.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.fastColoredTextBox2.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
 			this.fastColoredTextBox2.Font = new System.Drawing.Font("Consolas", 9.75F);
-			this.fastColoredTextBox2.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
+			this.fastColoredTextBox2.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.ChangedRange;
 			this.fastColoredTextBox2.Hotkeys = resources.GetString("fastColoredTextBox2.Hotkeys");
 			this.fastColoredTextBox2.IsReplaceMode = false;
 			this.fastColoredTextBox2.Location = new System.Drawing.Point(1, 22);
@@ -105,7 +103,7 @@
 			this.fastColoredTextBox2.Size = new System.Drawing.Size(428, 175);
 			this.fastColoredTextBox2.TabIndex = 1;
 			this.fastColoredTextBox2.Text = "Test of regex";
-			this.fastColoredTextBox2.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
+			this.fastColoredTextBox2.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WordWrapControlWidth;
 			this.fastColoredTextBox2.Zoom = 100;
 			// 
 			// label1

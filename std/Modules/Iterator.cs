@@ -92,6 +92,14 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("fromStream", new LambdaFun((scope, args) => {
+				return new LumenIterator(scope["x"].ToStream(scope).GetEnumerator());
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("x")
+				}
+			});
+
 			this.IncludeMixin(Prelude.Collection);
 		}
 	}

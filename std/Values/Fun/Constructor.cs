@@ -84,8 +84,8 @@ namespace Lumen.Lang {
 		public override IType Type => Prelude.Function;
 
 		public List<IPattern> Arguments {
-			get => InternalConstructor.Arguments;
-			set => InternalConstructor.Arguments = value;
+			get => this.InternalConstructor.Arguments;
+			set => this.InternalConstructor.Arguments = value;
 		}
 
 		public UserDefinedConstructor(Fun ctor, Module parent) {

@@ -31,7 +31,11 @@ namespace Lumen.Lang {
 				return result;
 			}
 
-			throw new LumenException($"Module does not contains a field {name}");
+			if(this.EntitiyType == EntitiyType.TYPE) {
+				throw new LumenException($"Type {this.Name} does not contains a field {name}");
+			}
+
+			throw new LumenException($"Module {this.Name} does not contains a field {name}");
 		}
 
 		public void SetMember(String name, Value value, Scope e = null) {

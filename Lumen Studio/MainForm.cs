@@ -104,7 +104,7 @@ namespace Lumen.Studio {
 			PictureBox backButton = new PictureBox {
 				Visible = false,
 				BackColor = Settings.BackgroundColor,
-				Image = Image.FromFile(Settings.ExecutablePath + $"\\settings\\themes\\icons\\standart\\back.png"),
+				// Image = Image.FromFile(Settings.ExecutablePath + $"\\settings\\themes\\icons\\standart\\back.png"),
 				Size = new Size(14, 15)
 			};
 
@@ -209,13 +209,13 @@ namespace Lumen.Studio {
 				MainTextBoxManager.Menu.listView.HoveredColor = Settings.AutocompleteMenu.SelectedBackground;
 				MainTextBoxManager.Menu.listView.SelectedColor = Settings.AutocompleteMenu.SelectedBackground;
 
-				MainTextBoxManager.Menu.listView.ToolTipBackgroundColor = Settings.AutocompleteMenu.ToolTipBackColor;
-				MainTextBoxManager.Menu.listView.ToolTipForegroundColor = Settings.AutocompleteMenu.ToolTipForeColor;
+				// MainTextBoxManager.Menu.listView.ToolTipBackgroundColor = Settings.AutocompleteMenu.ToolTipBackColor;
+				// MainTextBoxManager.Menu.listView.ToolTipForegroundColor = Settings.AutocompleteMenu.ToolTipForeColor;
 			}
 
 			MainTextBoxManager.Menu.BackColor = Settings.AutocompleteMenu.Background;
 			MainTextBoxManager.Menu.ForeColor = Settings.AutocompleteMenu.ForegroundColor;
-			MainTextBoxManager.Menu.BorderColor = Settings.AutocompleteMenu.BordersColor;
+			// MainTextBoxManager.Menu.BorderColor = Settings.AutocompleteMenu.BordersColor;
 
 			if (this.TopMenu.Renderer is LumenMenuRenderer lumenMenu) {
 				lumenMenu.ArrowColor = Settings.TopMenu.ArrowColor;
@@ -803,7 +803,7 @@ namespace Lumen.Studio {
 					MainTextBoxManager.TextBox.OnTextChanged(this.textBox.Range);
 				}
 				else {
-					this.textBox.Bookmarks.Add(new Bookmark(MainTextBoxManager.TextBox, "", place.iLine, Settings.TextBoxBookMarkColor));
+					this.textBox.Bookmarks.Add(new Bookmark(MainTextBoxManager.TextBox, "", place.iLine/*, Settings.TextBoxBookMarkColor*/));
 					this.textBox.GetLine(place.iLine).ClearStyle(Settings.UnactiveBreakpoint, Settings.Type, Settings.String, Settings.Keyword);
 					this.textBox.GetLine(place.iLine).SetStyle(Settings.UnactiveBreakpoint);
 				}
@@ -884,13 +884,13 @@ namespace Lumen.Studio {
 				this.tbmng.Menu.listView.HoveredColor = Settings.AutocompleteMenu.SelectedBackground;
 				this.tbmng.Menu.listView.SelectedColor = Settings.AutocompleteMenu.SelectedBackground;
 
-				this.tbmng.Menu.listView.ToolTipBackgroundColor = Settings.AutocompleteMenu.ToolTipBackColor;
-				this.tbmng.Menu.listView.ToolTipForegroundColor = Settings.AutocompleteMenu.ToolTipForeColor;
+				// this.tbmng.Menu.listView.ToolTipBackgroundColor = Settings.AutocompleteMenu.ToolTipBackColor;
+				// this.tbmng.Menu.listView.ToolTipForegroundColor = Settings.AutocompleteMenu.ToolTipForeColor;
 			}
 
 			this.tbmng.Menu.BackColor = Settings.AutocompleteMenu.Background;
 			this.tbmng.Menu.ForeColor = Settings.AutocompleteMenu.ForegroundColor;
-			this.tbmng.Menu.BorderColor = Settings.AutocompleteMenu.BordersColor;
+			// this.tbmng.Menu.BorderColor = Settings.AutocompleteMenu.BordersColor;
 
 			this.interactive.TextChanged += (sender, e) => {
 				Settings.Languages[0].OnTextChanged(this.tbmng, e.ChangedRange);

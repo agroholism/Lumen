@@ -43,6 +43,7 @@
     <Compile Include="Classes\Functor.cs" />
     <Compile Include="EntitiyType.cs" />
     <Compile Include="Expression\NativeExpression.cs" />
+    <Compile Include="Modules\LumenIterator.cs" />
     <Compile Include="Modules\Ref.cs" />
     <Compile Include="Modules\Iterator.cs" />
     <Compile Include="Regex.cs" />

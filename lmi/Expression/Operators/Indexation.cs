@@ -5,28 +5,29 @@ using System.Linq;
 using System;
 
 namespace Lumen.Lmi {
-    internal class GetIndexE : Expression {
-        internal Expression res;
+	internal class Indexation : Expression {
+        internal Expression expression;
         internal List<Expression> indices;
 		internal Int32 Line { get; private set; }
 		internal String File { get; private set; }
 
-		public GetIndexE(Expression res, List<Expression> indices, Int32 line, String file) {
-            this.res = res;
+		public Indexation(Expression expression, List<Expression> indices, Int32 line, String file) {
+            this.expression = expression;
             this.indices = indices;
 			this.Line = line;
 			this.File = file;
 		}
 
         public Expression Closure(ClosureManager manager) {
-            return new GetIndexE(this.res.Closure(manager), this.indices.Select(i => i.Closure(manager)).ToList(), this.Line, this.File);
+            return new Indexation(this.expression.Closure(manager), this.indices.Select(i => i.Closure(manager)).ToList(), this.Line, this.File);
         }
 
         public Value Eval(Scope e) {
-			var value = this.res.Eval(e);
-			List<Expression> exps = new List<Expression> { new ValueLiteral(value) };
-
-			exps.AddRange(this.indices);
+			Value value = this.expression.Eval(e);
+			List<Expression> exps = new List<Expression> { 
+				new ArrayLiteral(this.indices), 
+				new ValueLiteral(value) 
+			};
 
             return new Applicate(new DotOperator(new ValueLiteral(value.Type), Op.GETI, null, -1), exps, this.Line, this.File).Eval(e);
         }

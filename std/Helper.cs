@@ -49,13 +49,8 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public static Instance CreatePair(KeyValuePair<Value, Value> pair) {
-			Instance result = new Instance(MapModule.PairModule.ctor as Constructor);
-
-			result.items[0] = pair.Key;
-			result.items[1] = pair.Value;
-
-			return result;
+		public static Value CreatePair(KeyValuePair<Value, Value> pair) {
+			return new List(pair.Key, pair.Value);
 		}
 
 		internal static Value FromStream(IType type, IEnumerable<Value> values, Scope scope) {

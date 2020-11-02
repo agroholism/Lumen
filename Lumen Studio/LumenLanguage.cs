@@ -36,7 +36,7 @@ namespace Lumen.Studio {
 			}
 			catch { }
 
-			rng.ClearStyle(StyleIndex.ALL);
+			rng.ClearStyle(StyleIndex.All);
 
 			foreach (KeyValuePair<Regex, Style> i in this.Styles) {
 				if (i.Key.Options.HasFlag(RegexOptions.Singleline)) {

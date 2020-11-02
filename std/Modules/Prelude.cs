@@ -12,6 +12,7 @@ namespace Lumen.Lang {
 		#region Fields
 		public static Module Exception { get; } = new ExceptionClass();
 		public static Module Functor { get; } = new Functor();
+		public static Module Applicative { get; } = new Applicative();
 		public static Module Collection { get; } = new Collection();
 		public static Module Ord { get; } = new OrdModule();
 		public static Module Format { get; } = new Format();
@@ -55,6 +56,7 @@ namespace Lumen.Lang {
 			this.SetMember("Ord", Ord);
 			this.SetMember("Format", Format);
 			this.SetMember("Functor", Functor);
+			this.SetMember("Applicative", Applicative);
 			this.SetMember("Context", Context);
 
 			this.SetMember("Fail", Fail);
@@ -87,8 +89,8 @@ namespace Lumen.Lang {
 			this.SetMember("inf", new Number(Double.PositiveInfinity));
 			this.SetMember("nan", new Number(Double.NaN));
 
-			this.SetMember("PI", (Number)Math.PI);
-			this.SetMember("E", (Number)Math.E);
+			this.SetMember("pi", (Number)Math.PI);
+			this.SetMember("e", (Number)Math.E);
 
 			this.SetMember("writeFile", new LambdaFun((scope, args) => {
 				String fileName = scope["fileName"].ToString();
@@ -320,47 +322,6 @@ namespace Lumen.Lang {
 		}
 	}
 
-	public class LumenIterator : BaseValueImpl, IEnumerator<Value> {
-		public IEnumerator<Value> InnerValue { get; }
-		public Scope Scope { get; set; }
-
-		public override IType Type => Prelude.Iterator;
-
-		public Value Current => this.InnerValue.Current;
-
-		Object IEnumerator.Current => this.InnerValue.Current;
-
-		public LumenIterator(IEnumerator<Value> innerValue) {
-			this.InnerValue = innerValue;
-		}
-
-		public Value Send(Value value) {
-			if (this.Scope != null) {
-				this.Scope["<curr-gen-val>"] = value;
-			}
-
-			this.MoveNext();
-			return this.Current;
-		}
-
-		public Value Next() {
-			this.MoveNext();
-			return this.Current;
-		}
-
-		public void Dispose() {
-			InnerValue.Dispose();
-		}
-
-		public Boolean MoveNext() {
-			return InnerValue.MoveNext();
-		}
-
-		public void Reset() {
-			InnerValue.Reset();
-		}
-	}
-
 	public class LumenGenerator : IEnumerable<Value> {
 		public Expression generatorBody;
 		public IEnumerable<Value> Value { get; set; }
@@ -368,12 +329,12 @@ namespace Lumen.Lang {
 		public Scope AssociatedScope { get; set; }
 
 		public IEnumerator<Value> GetEnumerator() {
-			var s = new Scope(AssociatedScope);
-			return new LumenIterator(f(s).GetEnumerator()) { Scope = s };
+			var s = new Scope(this.AssociatedScope);
+			return new LumenIterator(this.f(s).GetEnumerator()) { Scope = s };
 		}
 
 		IEnumerable<Value> f(Scope s) {
-			foreach (Value i in generatorBody.EvalWithYield(s)) {
+			foreach (Value i in this.generatorBody.EvalWithYield(s)) {
 				if (i is StopIteration sit) {
 					yield break;
 				}

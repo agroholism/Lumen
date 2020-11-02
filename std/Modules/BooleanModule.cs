@@ -51,10 +51,10 @@ namespace Lumen.Lang {
             });
             #endregion
 
-            this.SetMember("String", new LambdaFun((e, args) => new Text(e["this"].ToString())) {
+            this.SetMember("toText", new LambdaFun((e, args) => new Text(e["this"].ToString())) {
                 Arguments = Const.Self
             });
-            this.SetMember("Number", new LambdaFun((e, args) => (Number)(Converter.ToBoolean(e["this"]) ? 1 : 0)) {
+            this.SetMember("toNumber", new LambdaFun((e, args) => (Number)(Converter.ToBoolean(e["this"]) ? 1 : 0)) {
                 Arguments = Const.Self
             });
 

@@ -83,7 +83,6 @@ namespace Lumen.Studio {
 			// 
 			// textBox
 			// 
-			this.textBox._UnsafeText = "";
 			this.textBox.AutoCompleteBrackets = true;
 			this.textBox.AutoCompleteBracketsList = new char[] {
         '(',
@@ -101,7 +100,7 @@ namespace Lumen.Studio {
 			this.textBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.textBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
 			this.textBox.BookmarkColor = System.Drawing.Color.BlueViolet;
-			this.textBox.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
+			this.textBox.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy1;
 			this.textBox.CharHeight = 16;
 			this.textBox.CharWidth = 7;
 			this.textBox.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -109,8 +108,7 @@ namespace Lumen.Studio {
 			this.textBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.textBox.Font = new System.Drawing.Font("Consolas", 9F);
 			this.textBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-			this.textBox.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.ALL_TEXT_RANGE;
-			this.textBox.Hotkeys = resources.GetString("textBox.Hotkeys");
+			this.textBox.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.AllTextRange;
 			this.textBox.IndentBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.textBox.IsReplaceMode = false;
 			this.textBox.LeftPadding = 10;
@@ -128,7 +126,7 @@ namespace Lumen.Studio {
 			this.textBox.TabIndex = 0;
 			this.textBox.TextAreaBorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
 			this.textBox.WordWrapIndent = 1;
-			this.textBox.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
+			this.textBox.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WordWrapControlWidth;
 			this.textBox.Zoom = 100;
 			this.textBox.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.TextBox_ToolTipNeeded);
 			this.textBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TextBox_TextChanged);
@@ -138,7 +136,6 @@ namespace Lumen.Studio {
 			// 
 			// Output
 			// 
-			this.Output._UnsafeText = "";
 			this.Output.AutoCompleteBracketsList = new char[] {
         '(',
         ')',
@@ -153,7 +150,7 @@ namespace Lumen.Studio {
 			this.Output.AutoScrollMinSize = new System.Drawing.Size(2, 13);
 			this.Output.BackBrush = null;
 			this.Output.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-			this.Output.BracketsHighlightStringategy = FastColoredTextBoxNS.BracketsHighlightStringategy.StringATEGY_1;
+			this.Output.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy1;
 			this.Output.CharHeight = 13;
 			this.Output.CharWidth = 7;
 			this.Output.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -161,8 +158,7 @@ namespace Lumen.Studio {
 			this.Output.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.Output.Font = new System.Drawing.Font("Courier New", 9F);
 			this.Output.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
-			this.Output.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.CHANGED_RANGE;
-			this.Output.Hotkeys = resources.GetString("Output.Hotkeys");
+			this.Output.HighlightingRangeType = FastColoredTextBoxNS.HighlightingRangeType.ChangedRange;
 			this.Output.IsReadLineMode = false;
 			this.Output.IsReplaceMode = false;
 			this.Output.Location = new System.Drawing.Point(0, 0);
@@ -174,7 +170,7 @@ namespace Lumen.Studio {
 			this.Output.Size = new System.Drawing.Size(598, 88);
 			this.Output.TabIndex = 1;
 			this.Output.TextAreaBorderColor = System.Drawing.Color.SlateGray;
-			this.Output.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WORD_WRAP_CONTROL_WIDTH;
+			this.Output.WordWrapMode = FastColoredTextBoxNS.WordWrapMode.WordWrapControlWidth;
 			this.Output.Zoom = 100;
 			// 
 			// splitContainer1
@@ -541,8 +537,6 @@ namespace Lumen.Studio {
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.Load += new System.EventHandler(this.FormLoad);
 			this.Shown += new System.EventHandler(this.MainForm_Shown);
-			((System.ComponentModel.ISupportInitialize)(this.textBox)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.Output)).EndInit();
 			this.splitContainer1.Panel1.ResumeLayout(false);
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			this.splitContainer1.Panel2.PerformLayout();

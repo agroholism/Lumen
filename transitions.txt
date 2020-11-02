@@ -1,0 +1,13 @@
+type Aggregate = machine Gas | Liquid | Solid
+	transition heat from Solid to Liquid
+	transition heat from Liquid to Gas
+	transition cool from Gas to Liquid
+	transition cool from Liquid to Solid
+	
+	ontransition
+
+type SubstanceType = enum Oxygen | Hydrogen | Lithium
+type Substance = Substance substanceType aggregateState
+
+let myMatter = Substance SubstanceType.Oxygen (Gas ())
+myMatter.aggregateState.onTransition.listen(println)

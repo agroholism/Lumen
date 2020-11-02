@@ -51,6 +51,8 @@
     <Compile Include="Expression\Control flow\Condition.cs" />
     <Compile Include="Expression\Control flow\ForCycle.cs" />
     <Compile Include="Expression\Control flow\WhileExpression.cs" />
+    <Compile Include="Expression\Operators\IndexationAssign.cs" />
+    <Compile Include="Expression\Operators\InOperator.cs" />
     <Compile Include="Expression\Patterns\ArrayPattern.cs" />
     <Compile Include="Expression\Patterns\EmptyArrayPattern.cs" />
     <Compile Include="Expression\Patterns\ValuePattern.cs" />
@@ -65,7 +67,7 @@
     <Compile Include="Expression\OpenModule.cs" />
     <Compile Include="Expression\Operators\ConsOperator.cs" />
     <Compile Include="Expression\Operators\BinaryOperator.cs" />
-    <Compile Include="Expression\Operators\GetIndexE.cs" />
+    <Compile Include="Expression\Operators\Indexation.cs" />
     <Compile Include="Expression\Operators\IsExpression.cs" />
     <Compile Include="Expression\Patterns\AsPattern.cs" />
     <Compile Include="Expression\Patterns\DiscordPattern.cs" />

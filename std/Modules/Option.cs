@@ -11,8 +11,9 @@ namespace Lumen.Lang {
             this.Name = "prelude.Option";
 
 			this.IncludeMixin(Prelude.Functor);
+            this.IncludeMixin(Prelude.Applicative);
 
-			this.Some = Helper.CreateConstructor("Option.Some", this, new List<String> { "x" }) as Constructor;
+            this.Some = Helper.CreateConstructor("Option.Some", this, new List<String> { "x" }) as Constructor;
 			this.None = Helper.CreateConstructor("Option.None", this, new List<String>());
 
             this.SetMember("Some", this.Some);
@@ -40,7 +41,7 @@ namespace Lumen.Lang {
 
             // Applicative
             this.SetMember("liftA", new LambdaFun((scope, args) => {
-                IType obj = scope["f"] as IType;
+                Value obj = scope["f"];
 
                 if (obj == this.None) {
                     return this.None;

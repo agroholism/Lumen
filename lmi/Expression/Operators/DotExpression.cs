@@ -46,14 +46,6 @@ namespace Lumen.Lmi {
 					return result;
 				}
 
-				if(value.Type.TryGetMember(this.memberName, out Value member)) {
-					return new Applicate(new ValueLiteral(member), new List<Expression> {
-						new ValueLiteral(value)
-					}, this.line, this.fileName).Eval(e);
-				}
-
-
-
 				// internal unification //
 
 				//if(value.Type.TryGetMember("<get>" + this.memberName, out Value property) && property is Fun funp) {

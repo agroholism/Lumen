@@ -198,7 +198,7 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.SetMember("toText", new LambdaFun((e, args) => {
+			this.SetMember("toText", new LambdaFun((e, args) => {
                 return new Text(e["this"].ToString());
             }) {
                 Arguments = new List<IPattern> {
@@ -220,7 +220,16 @@ namespace Lumen.Lang {
                 }
             });
 
-            this.IncludeMixin(Prelude.Collection);
+			this.SetMember("fromStream", new LambdaFun((scope, args) => {
+				return new List(scope["x"].ToStream(scope));
+			}) {
+				Name = "fromStream",
+				Arguments = new List<IPattern> {
+					new NamePattern("x")
+				}
+			});
+
+			this.IncludeMixin(Prelude.Collection);
         }
     }
 }

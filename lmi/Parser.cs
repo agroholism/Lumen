@@ -551,12 +551,12 @@ namespace Lumen.Lmi {
 
 				Int32 lineNumber = this.line;
 
-				return new BinaryOperator(new BinaryOperator(this.Expression(), exp, "contains", -1, ""), UnitLiteral.Instance, Op.NOT, lineNumber, this.fileName);
+				return new BinaryOperator(new InOperator(exp, this.FunctionalOperators(), -1, ""), UnitLiteral.Instance, Op.NOT, lineNumber, this.fileName);
 			}
 
 			if (this.Match(TokenType.IN)) {
 				Int32 lineNumber = this.line;
-				return new BinaryOperator(this.Expression(), exp, "contains", lineNumber, this.fileName);
+				return new InOperator(exp, this.FunctionalOperators(), lineNumber, this.fileName);
 			}
 
 			if (this.Match(TokenType.ASSIGN)) {
@@ -574,6 +574,7 @@ namespace Lumen.Lmi {
 
 			while (current.Type == TokenType.MIDDLE_PRIORITY_RIGTH || current.Type == TokenType.BIND) {
 				this.Match(current.Type);
+
 				expr = new BinaryOperator(expr, this.Range(), current.Text, this.line, this.fileName);
 				current = this.GetToken(0);
 			}
@@ -706,6 +707,11 @@ namespace Lumen.Lmi {
 				return new From(this.Expression());
 			}
 
+
+			if (this.Match(TokenType.NOT)) {
+				return new BinaryOperator(this.DoubleColon(), null, "not", line, this.fileName);
+			}
+
 			if (this.MatchAny(TokenType.MINUS, TokenType.NOT, TokenType.BANG,
 				TokenType.PLUS, TokenType.STAR, TokenType.TILDE, TokenType.BXOR, TokenType.AMP)) {
 				Int32 line = this.GetToken(-1).Line;
@@ -794,13 +800,13 @@ namespace Lumen.Lmi {
 					this.Match(TokenType.SPLIT);
 				}
 
-				sliced = new GetIndexE(sliced, indices, this.line, this.fileName);
+				sliced = new Indexation(sliced, indices, this.line, this.fileName);
 			}
 
 			if (this.Match(TokenType.ASSIGN)) {
-				List<Expression> args = (sliced as GetIndexE).indices;
-				args.Add(this.Expression());
-				return new Applicate(new DotOperator((sliced as GetIndexE).res, Op.SETI, this.fileName, this.line), args, this.line, this.fileName);
+				Expression assignable = this.Expression();
+
+				return new IndexationAssign(sliced as Indexation, assignable, this.line, this.fileName);
 			}
 
 			return sliced;

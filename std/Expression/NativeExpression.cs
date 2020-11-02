@@ -13,7 +13,7 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public Value Eval(Scope e) {
-			return function(e);
+			return this.function(e);
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

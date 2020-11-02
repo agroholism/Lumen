@@ -15,7 +15,7 @@ namespace Lumen.Lang {
 
 		public Int32 Sign {
 			get {
-				switch (numerator.Sign + denominator.Sign) {
+				switch (this.numerator.Sign + this.denominator.Sign) {
 					case 2:
 					case -2:
 						return 1;
@@ -29,8 +29,8 @@ namespace Lumen.Lang {
 
 		//constructors
 		public BigFloat() {
-			numerator = BigInteger.Zero;
-			denominator = BigInteger.One;
+			this.numerator = BigInteger.Zero;
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(string value) {
@@ -64,23 +64,23 @@ namespace Lumen.Lang {
 		}
 
 		public BigFloat(ulong value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(long value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(uint value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(int value) {
-			numerator = new BigInteger(value);
-			denominator = BigInteger.One;
+			this.numerator = new BigInteger(value);
+			this.denominator = BigInteger.One;
 		}
 
 		public BigFloat(float value) : this(value.ToString("N99")) {
@@ -159,66 +159,66 @@ namespace Lumen.Lang {
 		}
 
 		public BigFloat Pow(int exponent) {
-			if (numerator.IsZero) {
+			if (this.numerator.IsZero) {
 				// Nothing to do
 			}
 			else if (exponent < 0) {
-				BigInteger savedNumerator = numerator;
-				numerator = BigInteger.Pow(denominator, -exponent);
-				denominator = BigInteger.Pow(savedNumerator, -exponent);
+				BigInteger savedNumerator = this.numerator;
+				this.numerator = BigInteger.Pow(this.denominator, -exponent);
+				this.denominator = BigInteger.Pow(savedNumerator, -exponent);
 			}
 			else {
-				numerator = BigInteger.Pow(numerator, exponent);
-				denominator = BigInteger.Pow(denominator, exponent);
+				this.numerator = BigInteger.Pow(this.numerator, exponent);
+				this.denominator = BigInteger.Pow(this.denominator, exponent);
 			}
 
 			return this;
 		}
 
 		public BigFloat Abs() {
-			numerator = BigInteger.Abs(numerator);
+			this.numerator = BigInteger.Abs(this.numerator);
 			return this;
 		}
 
 		public BigFloat Negate() {
-			numerator = BigInteger.Negate(numerator);
+			this.numerator = BigInteger.Negate(this.numerator);
 			return this;
 		}
 
 		public BigFloat Inverse() {
-			BigInteger temp = numerator;
-			numerator = denominator;
-			denominator = temp;
+			BigInteger temp = this.numerator;
+			this.numerator = this.denominator;
+			this.denominator = temp;
 			return this;
 		}
 
 		public BigFloat Increment() {
-			numerator += denominator;
+			this.numerator += this.denominator;
 			return this;
 		}
 
 		public BigFloat Decrement() {
-			numerator -= denominator;
+			this.numerator -= this.denominator;
 			return this;
 		}
 
 		public BigFloat Ceil() {
-			if (numerator < 0)
-				numerator -= BigInteger.Remainder(numerator, denominator);
+			if (this.numerator < 0)
+				this.numerator -= BigInteger.Remainder(this.numerator, this.denominator);
 			else
-				numerator += denominator - BigInteger.Remainder(numerator, denominator);
+				this.numerator += this.denominator - BigInteger.Remainder(this.numerator, this.denominator);
 
-			Factor();
+			this.Factor();
 			return this;
 		}
 
 		public BigFloat Floor() {
-			if (numerator < 0)
-				numerator += denominator - BigInteger.Remainder(numerator, denominator);
+			if (this.numerator < 0)
+				this.numerator += this.denominator - BigInteger.Remainder(this.numerator, this.denominator);
 			else
-				numerator -= BigInteger.Remainder(numerator, denominator);
+				this.numerator -= BigInteger.Remainder(this.numerator, this.denominator);
 
-			Factor();
+			this.Factor();
 			return this;
 		}
 
@@ -235,54 +235,54 @@ namespace Lumen.Lang {
 		}
 
 		public BigFloat Truncate() {
-			numerator -= BigInteger.Remainder(numerator, denominator);
-			Factor();
+			this.numerator -= BigInteger.Remainder(this.numerator, this.denominator);
+			this.Factor();
 			return this;
 		}
 
 		public BigFloat Decimals() {
-			BigInteger result = BigInteger.Remainder(numerator, denominator);
+			BigInteger result = BigInteger.Remainder(this.numerator, this.denominator);
 
-			return new BigFloat(result, denominator);
+			return new BigFloat(result, this.denominator);
 		}
 
 		public BigFloat ShiftDecimalLeft(int shift) {
 			if (shift < 0)
-				return ShiftDecimalRight(-shift);
+				return this.ShiftDecimalRight(-shift);
 
-			numerator *= BigInteger.Pow(10, shift);
+			this.numerator *= BigInteger.Pow(10, shift);
 			return this;
 		}
 
 		public BigFloat ShiftDecimalRight(int shift) {
 			if (shift < 0)
-				return ShiftDecimalLeft(-shift);
-			denominator *= BigInteger.Pow(10, shift);
+				return this.ShiftDecimalLeft(-shift);
+			this.denominator *= BigInteger.Pow(10, shift);
 			return this;
 		}
 
 		public double Sqrt() {
-			return Math.Pow(10, BigInteger.Log10(numerator) / 2) / Math.Pow(10, BigInteger.Log10(denominator) / 2);
+			return Math.Pow(10, BigInteger.Log10(this.numerator) / 2) / Math.Pow(10, BigInteger.Log10(this.denominator) / 2);
 		}
 
 		public double Log10() {
-			return BigInteger.Log10(numerator) - BigInteger.Log10(denominator);
+			return BigInteger.Log10(this.numerator) - BigInteger.Log10(this.denominator);
 		}
 
 		public double Log(double baseValue) {
-			return BigInteger.Log(numerator, baseValue) - BigInteger.Log(numerator, baseValue);
+			return BigInteger.Log(this.numerator, baseValue) - BigInteger.Log(this.numerator, baseValue);
 		}
 
 		public override string ToString() {
 			//default precision = 100
-			return ToString(100);
+			return this.ToString(100);
 		}
 
 		public string ToString(int precision, bool trailingZeros = false) {
-			Factor();
+			this.Factor();
 
 			BigInteger remainder;
-			BigInteger result = BigInteger.DivRem(numerator, denominator, out remainder);
+			BigInteger result = BigInteger.DivRem(this.numerator, this.denominator, out remainder);
 
 			if (remainder == 0 && trailingZeros)
 				return result + ".0";
@@ -290,7 +290,7 @@ namespace Lumen.Lang {
 				return result.ToString();
 
 
-			BigInteger decimals = (numerator * BigInteger.Pow(10, precision)) / denominator;
+			BigInteger decimals = (this.numerator * BigInteger.Pow(10, precision)) / this.denominator;
 
 			if (decimals == 0 && trailingZeros)
 				return result + ".0";
@@ -313,21 +313,21 @@ namespace Lumen.Lang {
 		}
 
 		public string ToMixString() {
-			Factor();
+			this.Factor();
 
 			BigInteger remainder;
-			BigInteger result = BigInteger.DivRem(numerator, denominator, out remainder);
+			BigInteger result = BigInteger.DivRem(this.numerator, this.denominator, out remainder);
 
 			if (remainder == 0)
 				return result.ToString();
 			else
-				return result + ", " + remainder + "/" + denominator;
+				return result + ", " + remainder + "/" + this.denominator;
 		}
 
 		public string ToRationalString() {
-			Factor();
+			this.Factor();
 
-			return numerator + "/" + denominator;
+			return this.numerator + "/" + this.denominator;
 		}
 
 		public Int32 CompareTo(BigFloat other) {
@@ -354,11 +354,11 @@ namespace Lumen.Lang {
 			if (!(other is BigFloat))
 				throw new System.ArgumentException("other is not a BigFloat");
 
-			return CompareTo((BigFloat)other);
+			return this.CompareTo((BigFloat)other);
 		}
 
 		public override bool Equals(object other) {
-			if (other == null || GetType() != other.GetType()) {
+			if (other == null || this.GetType() != other.GetType()) {
 				return false;
 			}
 
@@ -655,14 +655,14 @@ namespace Lumen.Lang {
 		private BigFloat Factor() {
 			//factoring can be very slow. So use only when neccessary (ToString, and comparisons)
 
-			if (denominator == 1)
+			if (this.denominator == 1)
 				return this;
 
 			//factor numerator and denominator
-			BigInteger factor = BigInteger.GreatestCommonDivisor(numerator, denominator);
+			BigInteger factor = BigInteger.GreatestCommonDivisor(this.numerator, this.denominator);
 
-			numerator /= factor;
-			denominator /= factor;
+			this.numerator /= factor;
+			this.denominator /= factor;
 
 			return this;
 		}

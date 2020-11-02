@@ -222,12 +222,12 @@ Array.refs
 			});
 
 			this.SetMember("contains", new LambdaFun((scope, args) => {
-				List<Value> value = scope["this"].ToList(scope);
-				return (Bool)value.Contains(scope["elem"]);
+				List<Value> self = scope["self"].ToList(scope);
+				return (Bool)self.Contains(scope["elem"]);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("this"),
-					new NamePattern("elem")
+					new NamePattern("elem"),
+					new NamePattern("self")
 				}
 			});
 
@@ -303,6 +303,15 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = Const.Self
+			});
+
+			this.SetMember("fromStream", new LambdaFun((scope, args) => { 
+				return new Array(scope["x"].ToStream(scope));
+			}) {
+				Name = "fromStream",
+				Arguments = new List<IPattern> {
+					new NamePattern("x")
+				}
 			});
 
 			this.SetMember("toStream", new LambdaFun((e, args) => {

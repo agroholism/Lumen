@@ -9,7 +9,7 @@ namespace Lumen.Lang {
 			this.Mixins.Add(Prelude.Format);
 			this.Mixins.Add(Prelude.Functor);
 
-			this.SetMember("init", new LambdaFun((scope, args) => {
+			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				return new State(scope["state"]);
 			}) {
 				Arguments = new List<IPattern> {

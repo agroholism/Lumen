@@ -53,7 +53,7 @@ namespace Lumen.Studio {
 
 			textBox.Range.ClearFoldingMarkers();
 
-			textBox.Range.ClearStyle(StyleIndex.ALL);
+			textBox.Range.ClearStyle(StyleIndex.All);
 
 			foreach ((String, String) i in this.Folding) {
 				textBox.Range.SetFoldingMarkers(i.Item1, i.Item2);
@@ -65,7 +65,7 @@ namespace Lumen.Studio {
 				this.Ident(manager.TextBox);
 			}
 
-			rng.ClearStyle(StyleIndex.ALL);
+			rng.ClearStyle(StyleIndex.All);
 
 			foreach (KeyValuePair<Regex, Style> i in this.Styles) {
 				textBox.Range.SetStyle(i.Value, i.Key);
@@ -143,26 +143,26 @@ namespace Lumen.Studio {
 		public override CompareResult Compare(String fragmentText) {
 			Int32 i = fragmentText.LastIndexOf('.');
 			if (i < 0 || this.LastPartContainsPoints(this.Text, fragmentText)) {
-				return CompareResult.HIDDEN;
+				return CompareResult.Hidden;
 			}
 
 			if (this.Text.Contains(".")) {
 				if (!this.Text.StartsWith(fragmentText) /*&& !this.Extended(fragmentText)*/) {
-					return CompareResult.HIDDEN;
+					return CompareResult.Hidden;
 				}
-				return CompareResult.VISIBLE;
+				return CompareResult.Visible;
 			}
 
 			String lastPart = fragmentText.Substring(i + 1);
 			if (lastPart == "") {
-				return CompareResult.VISIBLE;
+				return CompareResult.Visible;
 			}
 
 			if (this.Text.StartsWith(lastPart, StringComparison.InvariantCultureIgnoreCase)  /*|| this.Extended(lastPart)*/) {
-				return CompareResult.VISIBLE_AND_SELECTED;
+				return CompareResult.VisibleAndSelected;
 			}
 
-			return CompareResult.HIDDEN;
+			return CompareResult.Hidden;
 		}
 
 		public Boolean LastPartContainsPoints(String s, String fragment) {

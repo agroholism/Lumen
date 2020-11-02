@@ -17,6 +17,7 @@ namespace Lumen.Lang {
 			this.Name = "Collection";
 
 			this.IncludeMixin(Prelude.Functor);
+			this.IncludeMixin(Prelude.Applicative);
 
 			this.SetMember("toStream", new LambdaFun((scope, args) => {
 				Prelude.FunctionIsNotImplementedForType("Collection.toStream", scope["x"].Type.ToString());
@@ -39,7 +40,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Op.GETI, new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["values"].ToStream(scope);
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
 
 				Value index = scope["indices"];
 
@@ -75,8 +76,8 @@ namespace Lumen.Lang {
 				}));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("values"),
-					new NamePattern("indices")
+					new NamePattern("indices"),
+					new NamePattern("self")
 				}
 			});
 
@@ -88,7 +89,7 @@ namespace Lumen.Lang {
 				IEnumerable<Value> value = scope["values"].ToStream(scope);
 				Value foldf = scope["foldf"];
 				if(foldf is Number num) {
-					return new Stream(Step(value, foldf.ToInt(scope)));
+					return new Stream(this.Step(value, foldf.ToInt(scope)));
 				}
 
 				Fun func = scope["foldf"].ToFunction(scope);
@@ -335,17 +336,13 @@ namespace Lumen.Lang {
 				}
 			});
 
-			/*LinkedList Flatten(IEnumerable<Value> list, Scope s) {
-				LinkedList result = new LinkedList();
-
-				foreach (Value i in list.Reverse()) {
-					foreach (Value j in i.ToLinkedList(s).Reverse()) {
-						result = new LinkedList(j, result);
+			static IEnumerable<Value> Flatten(IEnumerable<IEnumerable<Value>> list, Scope s) {
+				foreach (IEnumerable<Value> item in list) {
+					foreach (Value item2 in item) {
+						yield return item2;
 					}
 				}
-
-				return result;
-			}*/
+			}
 
 			Value Map(Scope scope, Value fc, Value fn) {
 				IType typeParameter = fc.Type;
@@ -405,18 +402,21 @@ namespace Lumen.Lang {
 			this.SetMember("mapi", mapi);
 
 			// Applicative
-			/*this.SetField("liftA", new LambdaFun((scope, args) => {
-				Value obj = scope["f"];
+			this.SetMember("liftA", new LambdaFun((scope, args) => {
+				IEnumerable<Value> obj = scope["f"].ToStream(scope);
 
-				return new List(
-					Flatten(obj.ToLinkedList(scope).Select(i =>
-					fmap.Run(new Scope(scope), i, scope["m"])), scope));
+				return Helper.FromStream(
+					scope["f"].Type,
+					Flatten(obj.Select(i => 
+						scope["m"].ToStream(scope).Select(j => 
+							i.ToFunction(scope).Run(new Scope(), j))), scope), 
+					scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("f"),
 					new NamePattern("m"),
+					new NamePattern("f"),
 				}
-			});*/
+			});
 
 
 			// Kernel.Function => Kernel.List
@@ -678,7 +678,7 @@ namespace Lumen.Lang {
 			this.SetMember("step", new LambdaFun((e, args) => {
 				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
 
-				return new Stream(Step(v, e["count"].ToInt(e)));
+				return new Stream(this.Step(v, e["count"].ToInt(e)));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("this"),
@@ -686,13 +686,13 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("contains", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e["s"], e);
-				return new Bool(v.Contains(e["e"]));
+			this.SetMember("contains", new LambdaFun((scope, args) => {
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
+				return new Bool(self.Contains(scope["elem"]));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("e")
+					new NamePattern("elem"),
+					new NamePattern("self")
 				}
 			});
 

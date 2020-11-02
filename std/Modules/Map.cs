@@ -8,68 +8,78 @@ namespace Lumen.Lang {
 		internal MapModule() {
 			this.Name = "Kernel.Map";
 
-			this.SetMember("get", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e["self"]).value;
-				if (dict.TryGetValue(e["key"], out Value result)) {
+			this.SetMember(Op.GETI, new LambdaFun((scope, args) => {
+				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+				List<Value> indices = scope["indices"].ToList(scope);
+
+				if (indices.Count == 1) {
+					Value index = indices[0];
+
+					if (self.TryGetValue(index, out Value result)) {
+						return result;
+					} else {
+						throw new LumenException($"key '{index}' does not exists in map");
+					}
+				}
+
+				throw new LumenException("function Map.getIndex supports only one argument");
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("indices"),
+					new NamePattern("self")
+				}
+			});
+
+			this.SetMember("get", new LambdaFun((scope, args) => {
+				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+
+				if (self.TryGetValue(scope["key"], out Value result)) {
 					return Helper.CreateSome(result);
 				}
-				return Const.UNIT;
+
+				return Prelude.None;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("key")
-				}
-			});
-
-			this.SetMember(Op.GETI, new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e["self"]).value;
-				if (dict.TryGetValue(e["key"].ToList(e)[0], out Value result)) {
-					return result;
-				}
-				throw new LumenException("данный ключ отсутствет в словаре");
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("key")
-				}
-			});
-
-			this.SetMember(Op.SETI, new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e.Get("self")).value;
-
-				dict[e["key"]] = e["value"];
-
-				return Const.UNIT;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("self"),
 					new NamePattern("key"),
-					new NamePattern("value"),
+					new NamePattern("self")
 				}
 			});
 
-			this.SetMember("init", new LambdaFun((e, args) => {
-				Value value = e["init"];
+			this.SetMember(Op.SETI, new LambdaFun((scope, args) => {
+				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+				List<Value> indices = scope["indices"].ToList(scope);
+
+				if (indices.Count == 1) {
+					self[indices[0]] = scope["value"];
+					return Const.UNIT;
+				}
+
+				throw new LumenException("function Map.setIndex supports only one argument");
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("indices"),
+					new NamePattern("value"),
+					new NamePattern("self"),
+				}
+			});
+
+			this.SetMember("<init>", new LambdaFun((e, args) => {
+				Value value = e["initValue"];
 				Map result = new Map();
 
-				if (value.Type.HasMixin(Prelude.Collection)) {
-					foreach (Value i in value.ToStream(e)) {
-						if (i is Instance ins && ins.Type == PairModule.ctor) {
-							result.value[ins.items[0]] = ins.items[1];
-						}
-						else {
-							var stream = i.ToStream(e);
-							var key = stream.First();
-							var val = stream.Last();
-							result.value[key] = val;
-						}
-					}
+				if(value == Const.UNIT) {
+					return result;
+				}
+
+				foreach (Value i in value.ToStream(e)) {
+					LinkedList stream = i.ToLinkedList(e);
+					result.value[stream.Head] = stream.Tail.Head;
 				}
 
 				return result;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("init")
+					new NamePattern("initValue")
 				}
 			});
 
@@ -91,6 +101,18 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("contains", new LambdaFun((scope, args) => {
+				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+				Value key = scope["key"];
+
+				return (Bool)self.ContainsKey(key);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("key"),
+					new NamePattern("self"),
+				}
+			});
+
 			/* LambdaFun to_l = new LambdaFun((e, args) => {
 				 Expando obj = e.Get("this") as Expando;
 				 List<Value> result = new List<Value> {
@@ -105,18 +127,9 @@ namespace Lumen.Lang {
 				Value value = e["stream"];
 				Map result = new Map();
 
-				if (value.Type.HasMixin(Prelude.Collection)) {
-					foreach (var i in value.ToStream(e)) {
-						if (i is Instance ins && ins.Type == PairModule.ctor) {
-							result.value[ins.items[0]] = ins.items[1];
-						}
-						else {
-							var stream = i.ToStream(e);
-							var key = stream.First();
-							var val = stream.Last();
-							result.value[key] = val;
-						}
-					}
+				foreach (Value i in value.ToStream(e)) {
+					LinkedList stream = i.ToLinkedList(e);
+					result.value[stream.Head] = stream.Tail.Head;
 				}
 
 				return result;
@@ -127,11 +140,11 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toStream", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e["m"]).value;
-				return new Stream(dict.Select(x => Helper.CreatePair(x)));
+				IDictionary<Value, Value> self = ((Map)e["self"]).value;
+				return new Stream(self.Select(Helper.CreatePair));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("m")
+					new NamePattern("self")
 				}
 			});
 
@@ -139,24 +152,6 @@ namespace Lumen.Lang {
                 IDictionary<Value, Value> dict = Converter.ToMap(e.Get("this"), e);
                 return new String("[" + String.Join(", ", dict) + "]");
             }));*/
-			this.SetMember("contains", new LambdaFun((e, args) => {
-				Value firstArg = e["m"];
-				Value secondArg = e["key"];
-
-				if (firstArg is Map map) {
-					return (Bool)map.value.ContainsKey(secondArg);
-				}
-				else if (secondArg is Map map1) {
-					return (Bool)map1.value.ContainsKey(firstArg);
-				}
-
-				return Const.FALSE;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("m"),
-					new NamePattern("key"),
-				}
-			});
 
 			this.IncludeMixin(Prelude.Collection);
 		}
