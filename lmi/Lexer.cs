@@ -353,6 +353,10 @@ namespace Lumen.Lmi {
 				current = this.Next();
 			}
 
+			if(current == '\r' || current == '\n') {
+				return;
+			}
+
 			if (newLevel < this.level) {
 				for (Int32 i = 0; i < this.level - newLevel; i += 4) {
 					this.AddToken(TokenType.END);

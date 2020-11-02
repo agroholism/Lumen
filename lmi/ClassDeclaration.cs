@@ -9,10 +9,12 @@ namespace Lumen.Lmi {
 	internal class ClassDeclaration : Expression {
 		private String typeName;
 		private List<Expression> members;
+		private List<Expression> derivings;
 
-		public ClassDeclaration(String typeName, List<Expression> members) {
+		public ClassDeclaration(String typeName, List<Expression> members, List<Expression> derivings)  {
 			this.typeName = typeName;
 			this.members = members;
+			this.derivings = derivings;
 		}
 
 		public Value Eval(Scope scope) {
@@ -28,6 +30,11 @@ namespace Lumen.Lmi {
 				moduleValue.SetMember(i.Key, i.Value);
 			}
 
+			foreach (Expression deriving in this.derivings) {
+				Module typeClass = deriving.Eval(scope) as Module;
+				moduleValue.IncludeMixin(typeClass);
+			}
+
 			// Add rename
 
 			scope[this.typeName] = moduleValue;
@@ -40,7 +47,7 @@ namespace Lumen.Lmi {
 
 			ClosureManager newManager = manager.Clone();
 
-			return new ModuleDeclaration(this.typeName, this.members.Select(i => i.Closure(newManager)).ToList());
+			return new ClassDeclaration(this.typeName, this.members.Select(i => i.Closure(newManager)).ToList(), this.derivings.Select(i => i.Closure(newManager)).ToList());
 		}
 
 		public override String ToString() {

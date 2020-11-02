@@ -1,6 +1,9 @@
 // TODO
 Fix imports!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+11.02.2020
++ readWith
+
 Lumen 0.6
 - 05.05.2019
 * improvements of curring

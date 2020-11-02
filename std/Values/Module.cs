@@ -95,7 +95,17 @@ namespace Lumen.Lang {
 		}
 
 		public Boolean HasMixin(Module typeClass) {
-			return this.Mixins.Contains(typeClass);
+			if( this.Mixins.Contains(typeClass)) {
+				return true;
+			}
+
+			foreach(var mixin in this.Mixins) {
+				if(mixin.HasMixin(typeClass)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public override String ToString() {

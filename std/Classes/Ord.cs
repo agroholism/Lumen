@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Lumen.Lang.Expressions;
+﻿using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
 	/// <summary>
@@ -171,34 +170,6 @@ namespace Lumen.Lang {
 					new NamePattern("x"),
 					new NamePattern("y"),
 					new NamePattern("z")
-				}
-			});
-		}
-	}
-
-	internal class ExceptionClass : Module {
-		internal ExceptionClass() {
-			this.Name = "Exception";
-
-			this.SetMember("message", new LambdaFun((scope, args) => {
-				return new Text($"exception raised");
-			}) {
-				Arguments = Const.Self
-			});
-		}
-	}
-
-	internal class Cloneable : Module {
-		internal Cloneable() {
-			this.Name = "Cloneable";
-			this.EntitiyType = EntitiyType.MODULE;
-
-			this.SetMember("clone", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Cloneable.clone", scope["x"].Type.ToString());
-				return Const.UNIT;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("self")
 				}
 			});
 		}

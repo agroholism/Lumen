@@ -40,6 +40,10 @@
     <NoStdLib>true</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Classes\Applicative.cs" />
+    <Compile Include="Classes\Cloneable.cs" />
+    <Compile Include="Classes\Context.cs" />
+    <Compile Include="Classes\ExceptionClass.cs" />
     <Compile Include="Classes\Functor.cs" />
     <Compile Include="EntitiyType.cs" />
     <Compile Include="Expression\NativeExpression.cs" />

@@ -190,15 +190,21 @@ namespace Lumen.Lmi {
 
 		private Expression ParseClassDeclaration(String typeName) {
 			List<Expression> members = new List<Expression>();
+			List<Expression> derivings = new List<Expression>();
 
 			if (this.Match(TokenType.DO)) {
 				while (!this.Match(TokenType.END) && !this.Match(TokenType.EOF)) {
-					members.Add(this.Expression());
+					if (this.Match(TokenType.IMPLEMENTS)) {
+						derivings.Add(this.Expression());
+					}
+					else {
+						members.Add(this.Expression());
+					}
 					this.Match(TokenType.EOC);
 				}
 			}
 
-			return new ClassDeclaration(typeName, members);
+			return new ClassDeclaration(typeName, members, derivings);
 		}
 
 		private void ParseDefaultConstructor(List<ConstructorMetadata> defaultConstructors) {
@@ -611,21 +617,28 @@ namespace Lumen.Lmi {
 		private Expression FunctionalOperators() {
 			Expression expr = this.Range();
 
-			Token current = this.GetToken(0);
+			while (true) {
+				Token current = this.GetToken(0);
 
-			while (current.Type == TokenType.MIDDLE_PRIORITY_RIGTH || current.Type == TokenType.BIND) {
-				this.Match(current.Type);
+				if (current.Type == TokenType.MIDDLE_PRIORITY_RIGTH) {
+					this.Match(current.Type);
 
-				expr = new BinaryOperator(expr, this.Range(), current.Text, this.line, this.fileName);
-				current = this.GetToken(0);
-			}
+					expr = new BinaryOperator(expr, this.Range(), current.Text, this.line, this.fileName);
+					current = this.GetToken(0);
+					continue;
+				}
 
-			while (this.Match(TokenType.FPIPE)) {
-				expr = new Applicate(this.Range(), new List<Expression> { expr }, this.line, this.fileName);
-			}
+				if (this.Match(TokenType.FPIPE)) {
+					expr = new Applicate(this.Range(), new List<Expression> { expr }, this.line, this.fileName);
+					continue;
+				}
 
-			while (this.Match(TokenType.BPIPE)) {
-				expr = new Applicate(expr, new List<Expression> { this.Range() }, this.line, this.fileName);
+				if (this.Match(TokenType.BPIPE)) {
+					expr = new Applicate(expr, new List<Expression> { this.Range() }, this.line, this.fileName);
+					continue;
+				}
+
+				break;
 			}
 
 			return expr;

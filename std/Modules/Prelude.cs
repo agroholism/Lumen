@@ -60,6 +60,7 @@ namespace Lumen.Lang {
 			this.SetMember("Applicative", Applicative);
 			this.SetMember("Context", Context);
 			this.SetMember("Cloneable", Cloneable);
+			this.SetMember("Exception", Exception);
 
 			this.SetMember("Fail", Fail);
 
@@ -215,40 +216,13 @@ namespace Lumen.Lang {
 				return new Text(Console.ReadLine());
 			}));
 
-			this.SetMember("input", new LambdaFun((scope, args) => {
-				Value prompt = scope["prompt"];
-
-				Console.Write(prompt.ToString());
-
+			this.SetMember("readWith", new LambdaFun((scope, args) => {
+				Console.Write(scope["prompt"]);
 				return new Text(Console.ReadLine());
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("prompt")
-				}
-			});
-
-			this.SetMember("require", new LambdaFun((scope, args) => {
-				String path = scope["name"].ToString() + ".dll";
-				if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + path)) {
-					Assembly ass = Assembly.LoadFile(AppDomain.CurrentDomain.BaseDirectory + path);
-					ass.GetType("Main").GetMethod("Import").Invoke(null, new Object[] { scope.parent, "" });
-					return Const.UNIT;
-				}
-				Console.WriteLine("FAILED");
-				return Const.UNIT;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("name")
-				}
-			});
-
-			this.SetMember("sleep", new LambdaFun((scope, args) => {
-				System.Threading.Thread.Sleep(scope["x"].ToInt(scope));
-				return Const.UNIT;
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("x")
-				}
+				new NamePattern("prompt")
+			}
 			});
 
 			this.SetMember("assert", new LambdaFun((scope, args) => {
