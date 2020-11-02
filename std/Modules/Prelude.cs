@@ -10,6 +10,7 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lang {
 	public sealed class Prelude : Module {
 		#region Fields
+		public static Module Cloneable { get; } = new Cloneable();
 		public static Module Exception { get; } = new ExceptionClass();
 		public static Module Functor { get; } = new Functor();
 		public static Module Applicative { get; } = new Applicative();
@@ -58,6 +59,7 @@ namespace Lumen.Lang {
 			this.SetMember("Functor", Functor);
 			this.SetMember("Applicative", Applicative);
 			this.SetMember("Context", Context);
+			this.SetMember("Cloneable", Cloneable);
 
 			this.SetMember("Fail", Fail);
 
@@ -88,6 +90,8 @@ namespace Lumen.Lang {
 
 			this.SetMember("inf", new Number(Double.PositiveInfinity));
 			this.SetMember("nan", new Number(Double.NaN));
+
+			this.SetMember("nl", new Text(Environment.NewLine));
 
 			this.SetMember("pi", (Number)Math.PI);
 			this.SetMember("e", (Number)Math.E);

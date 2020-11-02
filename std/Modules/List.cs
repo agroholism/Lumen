@@ -229,6 +229,13 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("clone", new LambdaFun((scope, args) => {
+				return scope["self"];
+			}) {
+				Arguments = Const.Self
+			});
+
+			this.IncludeMixin(Prelude.Cloneable);
 			this.IncludeMixin(Prelude.Collection);
         }
     }

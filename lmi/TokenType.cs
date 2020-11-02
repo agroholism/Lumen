@@ -107,6 +107,7 @@
 		REGEX_LITERAL,
 		QUESTION,
 		USE,
-		RAISE
+		RAISE,
+		BY
 	}
 }

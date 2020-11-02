@@ -51,6 +51,17 @@ Array.refs
 			});
 			#endregion
 
+			this.SetMember("clone", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
+
+				List<Value> clone = new List<Value>();
+				clone.AddRange(array);
+
+				return new Array(clone);
+			}) {
+				Arguments = Const.Self
+			});
+
 			this.SetMember("add", new LambdaFun((scope, args) => {
 				List<Value> array = scope["self"].ToList(scope);
 
@@ -59,8 +70,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("element")
+					new NamePattern("element"),
+					new NamePattern("self")
 				}
 			});
 
@@ -72,8 +83,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("elements")
+					new NamePattern("elements"),
+					new NamePattern("self")
 				}
 			});
 
@@ -88,8 +99,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("element")
+				new NamePattern("element"),
+					new NamePattern("self")
 				}
 			});
 
@@ -102,8 +113,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("element")
+					new NamePattern("element") , new NamePattern("self")
 				}
 			});
 
@@ -119,8 +129,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("element")
+					new NamePattern("element") , new NamePattern("self")
 				}
 			});
 
@@ -133,8 +142,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("self"),
-					new NamePattern("predicate")
+					new NamePattern("predicate") , new NamePattern("self")
 				}
 			});
 

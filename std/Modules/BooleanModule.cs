@@ -7,41 +7,6 @@ namespace Lumen.Lang {
 
 			#region operators
 
-			this.SetMember(Op.NOT, new LambdaFun((scope, args) => {
-                Boolean value = scope["this"].ToBoolean();
-
-                return new Bool(!value);
-            }) {
-                Arguments = Const.Self
-            });
-
-            this.SetMember(Op.OR, new LambdaFun((scope, args) => {
-                Boolean value = scope["this"].ToBoolean();
-                Boolean other = scope["other"].ToBoolean();
-
-                return new Bool(value || other);
-            }) {
-                Arguments = Const.SelfOther
-            });
-
-            this.SetMember(Op.XOR, new LambdaFun((scope, args) => {
-                Boolean value = scope["this"].ToBoolean();
-                Boolean other = scope["other"].ToBoolean();
-
-                return new Bool(value ^ other);
-            }) {
-                Arguments = Const.SelfOther
-            });
-
-            this.SetMember(Op.AND, new LambdaFun((scope, args) => {
-                Boolean value = scope["this"].ToBoolean();
-                Boolean other = scope["other"].ToBoolean();
-
-                return new Bool(value && other);
-            }) {
-                Arguments = Const.SelfOther
-            });
-
             this.SetMember("compare", new LambdaFun((scope, args) => {
                 Value other = scope["other"];
 
@@ -49,16 +14,25 @@ namespace Lumen.Lang {
             }) {
                 Arguments = Const.SelfOther
             });
+
             #endregion
 
             this.SetMember("toText", new LambdaFun((e, args) => new Text(e["this"].ToString())) {
                 Arguments = Const.Self
             });
+
             this.SetMember("toNumber", new LambdaFun((e, args) => (Number)(Converter.ToBoolean(e["this"]) ? 1 : 0)) {
                 Arguments = Const.Self
             });
 
+            this.SetMember("clone", new LambdaFun((scope, args) => {
+                return scope["self"];
+            }) {
+                Arguments = Const.Self
+            });
+
             this.IncludeMixin(Prelude.Ord);
+            this.IncludeMixin(Prelude.Cloneable);
         }
     }
 }

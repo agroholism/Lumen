@@ -4,6 +4,13 @@ using System.Linq;
 
 namespace Lumen.Lang {
 	public static class Helper {
+		public static Int32 Index(Int32 index, Int32 count) {
+			if (index < 0) {
+				return count + index;
+			}
+			return index;
+		}
+
 		public static Value CallMethod(this Value self, String name, Scope scope) {
 			return self.Type.GetMember(name, scope).ToFunction(scope).Run(new Scope(scope), self);
 		}

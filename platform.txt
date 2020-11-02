@@ -449,3 +449,53 @@ public Value this[Int32 index] {
                 this.value.Insert(first, value);
             }
         }
+
+            this.SetMember("inc", new LambdaFun((e, args) => {
+                String value = e["text"].ToString();
+                const String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                Int32 last_char = value.Length - 1;
+                while (true) {
+                    Int32 index = chars.IndexOf(value[last_char]);
+                    if (index == -1) {
+                        last_char--;
+                        if (last_char == -1) {
+                            return new Text(value.Substring(0, value.Length - 1) + (Char)(1 + value[value.Length - 1]));
+                        }
+                        continue;
+                    }
+                    while (true) {
+                        index = chars.IndexOf(value[last_char]);
+                        if (chars[index] == 'Z') {
+                            if (last_char == 0) {
+                                value = "AA" + value.Substring(1);
+                                break;
+                            }
+                            value = value.Substring(0, last_char) + "A" + value.Substring(last_char + 1);
+                            last_char--;
+                        } else if (chars[index] == 'z') {
+                            if (last_char == 0) {
+                                value = "aa" + value.Substring(1);
+                                break;
+                            }
+                            value = value.Substring(0, last_char) + "a" + value.Substring(last_char + 1);
+                            last_char--;
+                        } else if (chars[index] == '9') {
+                            if (last_char == 0) {
+                                value = "10" + value.Substring(1);
+                                break;
+                            }
+                            value = value.Substring(0, last_char) + "0" + value.Substring(last_char + 1);
+                            last_char--;
+                        } else {
+                            value = value.Substring(0, last_char) + (Char)(1 + chars[index]) + value.Substring(last_char + 1);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                return new Text(value);
+            }) {
+                Arguments = new List<IPattern> {
+					new NamePattern("text")
+				}
+            });

@@ -237,6 +237,24 @@ namespace Lumen.Lmi {
 		private IPattern ParsePattern() {
 			IPattern result = null;
 
+			if (this.Match(TokenType.DOTDOT)) {
+				if (!ValidToken()) {
+					result = new RangePattern(result, null, false);
+				}
+				else {
+					result = new RangePattern(result, this.ParsePattern(), false);
+				}
+			}
+
+			if (this.Match(TokenType.DOTDOTDOT)) {
+				if (!ValidToken()) {
+					result = new RangePattern(result, null, true);
+				}
+				else {
+					result = new RangePattern(result, this.ParsePattern(), true);
+				}
+			}
+
 			if (this.Match(TokenType.LPAREN)) {
 				result = this.ParsePattern();
 				if (this.Match(TokenType.SPLIT)) {
@@ -280,6 +298,9 @@ namespace Lumen.Lmi {
 			}
 			else if (this.LookMatch(0, TokenType.NUMBER)) {
 				result = new ValuePattern(new Number(Double.Parse(this.Consume(TokenType.NUMBER).Text)));
+			}
+			else if (this.LookMatch(0, TokenType.TEXT)) {
+				result = new ValuePattern(new Text(this.Consume(TokenType.TEXT).Text));
 			}
 			else if (this.LookMatch(0, TokenType.WORD)) {
 				String name = this.Consume(TokenType.WORD).Text;
@@ -328,6 +349,26 @@ namespace Lumen.Lmi {
 					}
 
 					result = new DeconstructPattern(constructor, subpatterns);
+				}
+			}
+
+			if (result is ValuePattern) {
+				if (this.Match(TokenType.DOTDOT)) {
+					if (!ValidToken()) {
+						result = new RangePattern(result, null, false);
+					}
+					else {
+						result = new RangePattern(result, this.ParsePattern(), false);
+					}
+				}
+
+				if (this.Match(TokenType.DOTDOTDOT)) {
+					if (!ValidToken()) {
+						result = new RangePattern(result, null, true);
+					}
+					else {
+						result = new RangePattern(result, this.ParsePattern(), true);
+					}
 				}
 			}
 
@@ -594,9 +635,7 @@ namespace Lumen.Lmi {
 			Expression result = this.Equality();
 
 			if (this.Match(TokenType.DOTDOT)) {
-
-
-				return new BinaryOperator(result, this.Equality(), Op.RANGE_EXCLUSIVE, this.line, this.fileName);
+				result = new BinaryOperator(result, this.Equality(), Op.RANGE_EXCLUSIVE, this.line, this.fileName);
 			}
 
 			if (this.Match(TokenType.DOTDOTDOT)) {

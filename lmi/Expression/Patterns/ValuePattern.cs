@@ -6,7 +6,7 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class ValuePattern : IPattern {
-        private Value value;
+        internal Value value;
 
 		public ValuePattern(Value value) {
             this.value = value;

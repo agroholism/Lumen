@@ -93,6 +93,7 @@
     <Compile Include="Parser.cs" />
     <Compile Include="Expression\Application\TailRecursion.cs" />
     <Compile Include="Raise.cs" />
+    <Compile Include="Expression\Patterns\RangePattern.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenType.cs" />
     <Compile Include="Expression\Patterns\WherePattern.cs" />

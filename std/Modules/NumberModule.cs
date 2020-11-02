@@ -373,7 +373,14 @@ namespace Lumen.Lang {
 
 			#endregion
 
+			this.SetMember("clone", new LambdaFun((scope, args) => {
+				return scope["self"];
+			}) {
+				Arguments = Const.Self
+			});
+
 			this.IncludeMixin(Prelude.Ord);
+			this.IncludeMixin(Prelude.Cloneable);
 			this.NameIt();
 		}
 

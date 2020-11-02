@@ -10,8 +10,6 @@ namespace Lumen.Lmi {
 	internal class ArrayPattern : IPattern {
 		private List<IPattern> subpatterns;
 
-		public Boolean IsNotEval { get; set; } = false;
-
 		public ArrayPattern(List<IPattern> patterns) {
 			this.subpatterns = patterns;
 		}

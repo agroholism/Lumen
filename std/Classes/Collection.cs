@@ -6,13 +6,6 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
 	internal class Collection : Module {
-		static Int32 Index(Int32 index, Int32 count) {
-			if (index < 0) {
-				return count + index;
-			}
-			return index;
-		}
-
 		internal Collection() {
 			this.Name = "Collection";
 
@@ -51,7 +44,7 @@ namespace Lumen.Lang {
 				Int32 count = values.Count();
 
 				if (index is Number) {
-					Int32 intIndex = Index(index.ToInt(scope), count);
+					Int32 intIndex = Helper.Index(index.ToInt(scope), count);
 
 					if (intIndex < 0 || intIndex >= count) {
 						throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
@@ -62,7 +55,7 @@ namespace Lumen.Lang {
 
 				return new Stream(index.ToStream(scope).Select(i => {
 					if (i is Number) {
-						Int32 index = Index(i.ToInt(scope), count);
+						Int32 index = Helper.Index(i.ToInt(scope), count);
 
 						if (index < 0 || index >= count) {
 							throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
@@ -426,54 +419,37 @@ namespace Lumen.Lang {
 				return new Array(v.Select(x => f.Run(new Scope(e), x)).ToList());
 			}));
 
-			this.SetMember("iter", new LambdaFun((e, args) => {
-				Fun action;
-				IEnumerable<Value> values;
+			this.SetMember("iter", new LambdaFun((scope, args) => {
+				Fun action = scope["action"].ToFunction(scope);
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
 
-				if (e["action"] is Fun) {
-					action = e["action"] as Fun;
-					values = e["list"].ToStream(e);
-				}
-				else {
-					values = e["action"].ToStream(e);
-					action = e["list"] as Fun;
+				foreach (Value i in self) {
+					action.Run(new Scope(scope), i);
 				}
 
-				foreach (Value i in values) {
-					action.Run(new Scope(e), i);
-				}
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("list"),
-					new NamePattern("action")
+					new NamePattern("action"),
+					new NamePattern("self")
 				}
 			});
 
-			this.SetMember("iteri", new LambdaFun((e, args) => {
-				Fun action;
-				IEnumerable<Value> values;
-
-				if (e["action"] is Fun) {
-					action = e["action"] as Fun;
-					values = e["list"].ToStream(e);
-				}
-				else {
-					values = e["action"].ToStream(e);
-					action = e["list"] as Fun;
-				}
+			this.SetMember("iteri", new LambdaFun((scope, args) => {
+				Fun action = scope["action"].ToFunction(scope);
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
 
 				Int32 index = 0;
-				foreach (Value i in values) {
-					action.Run(new Scope(e), new Number(index), i);
+				foreach (Value i in self) {
+					action.Run(new Scope(scope), new Number(index), i);
 					index++;
 				}
 
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("list"),
-					new NamePattern("action")
+					new NamePattern("action"),
+					new NamePattern("self")
 				}
 			});
 
