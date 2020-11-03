@@ -52,7 +52,7 @@ namespace Lumen.Lmi {
 			Value leftOperand = this.leftExpression.Eval(e);
 
 			if (rightOperand is List list) {
-				return new List(new LinkedList(leftOperand, list.value));
+				return new List(new LinkedList(leftOperand, list.Value));
 			}
 
 			IType type = rightOperand is SingletonConstructor sc ? sc : rightOperand.Type;
@@ -116,7 +116,7 @@ namespace Lumen.Lmi {
 
 
 			if (rightOperand is List list) {
-				yield return new GeneratorTerminalResult(new List(new LinkedList(leftOperand, list.value)));
+				yield return new GeneratorTerminalResult(new List(new LinkedList(leftOperand, list.Value)));
 			}
 
 			IType type = rightOperand is SingletonConstructor sc ? sc : rightOperand.Type;

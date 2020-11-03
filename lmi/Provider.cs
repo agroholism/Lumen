@@ -91,7 +91,7 @@ namespace Lumen.Lmi {
                         return false;
                     case TokenType.LET:
                         return false;
-                    case TokenType.DO:
+                    case TokenType.BLOCK_START:
                         return false;
                     case TokenType.DOT:
                         return false;
@@ -174,7 +174,7 @@ namespace Lumen.Lmi {
                 return false;
             }
 
-            if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.DO)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.END)).Count) {
+            if (Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.BLOCK_START)).Count != Result.FindAll(new Predicate<Token>(i => i.Type == TokenType.BLOCK_END)).Count) {
                 return false;
             }
 

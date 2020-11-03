@@ -13,12 +13,11 @@ namespace Lumen.Lang {
 	///			let format (x: 'T) (fstr: Text) =
 	///				functionIsNotImplementedForType "Format.format" 'T
 	internal class Format : Module {
-        internal Format() {
-            this.Name = "Format";
-			this.EntitiyType = EntitiyType.MODULE;
+		internal Format() {
+			this.Name = "Format";
 
 			this.SetMember("format", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Format.format", scope["x"].Type.ToString());
+				Prelude.FunctionIsNotImplementedForType("Format.format", scope["x"].Type, scope);
 				return Const.UNIT;
 			}) {
 				Name = "format",
@@ -28,5 +27,5 @@ namespace Lumen.Lang {
 				}
 			});
 		}
-    }
+	}
 }

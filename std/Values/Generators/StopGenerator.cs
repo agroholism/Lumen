@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public class StopIteration : Value {
+	public class StopGenerator : Value {
 		public IType Type => throw new NotImplementedException();
 
 		public Value Clone() {

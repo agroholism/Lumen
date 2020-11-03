@@ -39,8 +39,8 @@ namespace Lumen.Lmi {
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			List<Value> result = new List<Value>();
 
-			foreach(var i in this.elements) {
-				foreach(var j in i.EvalWithYield(scope)) {
+			foreach(Expression i in this.elements) {
+				foreach(Value j in i.EvalWithYield(scope)) {
 					if(j is GeneratorTerminalResult cgv) {
 						result.Add(cgv.Value);
 					} else {

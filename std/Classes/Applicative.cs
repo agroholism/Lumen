@@ -6,10 +6,9 @@ namespace Lumen.Lang {
 	internal class Applicative : Module {
 		internal Applicative() {
 			this.Name = "Applicative";
-			this.EntitiyType = EntitiyType.MODULE;
 
 			this.SetMember("liftA", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Applicative.liftA", scope["x"].Type.ToString());
+				Prelude.FunctionIsNotImplementedForType("Applicative.liftA", scope["x"].Type, scope);
 				return Const.UNIT;
 			}) {
 				Name = "liftA",

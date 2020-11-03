@@ -30,12 +30,13 @@ namespace Lumen.Lmi {
 				return this.CallFunction(callableValue.ToFunction(scope), scope);
 			}
 			catch (LumenException lex) {
-				lex.file ??= this.fileName;
-				lex.line = lex.line == -1 ? this.lineNumber : lex.line;
+				String currentFunctionName = null;
 
-				if (lex.functionName == null && scope.ExistsInThisScope("rec") && scope["rec"] is Fun fun1) {
-					lex.functionName = fun1.Name;
+				if (scope.ExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
+					currentFunctionName = currentFunction.Name;
 				}
+
+				lex.AddToCallStack(currentFunctionName, this.fileName, this.lineNumber);
 
 				throw;
 			}
@@ -51,12 +52,12 @@ namespace Lumen.Lmi {
 			try {
 				Value[] arguments = this.argumentsExpression.Select(i => i.Eval(e)).ToArray();
 
-				return this.ProcessCall(e, innerScope, function, arguments);
+				return this.ProcessCall(innerScope, function, arguments);
 			}
 			catch (TailRecursion.Tailrec tailrec) {
 TAIL_RECURSION:
 				try {
-					return this.ProcessCall(e, innerScope, function, tailrec.newArguments);
+					return this.ProcessCall(innerScope, function, tailrec.newArguments);
 				}
 				catch (TailRecursion.Tailrec _tailrec) {
 					tailrec = _tailrec;
@@ -65,27 +66,20 @@ TAIL_RECURSION:
 			}
 		}
 
-		private Value ProcessCall(Scope parent, Scope scope, Fun function, Value[] args) {
+		private Value ProcessCall(Scope scope, Fun function, Value[] args) {
 			try {
 				scope["rec"] = function;
 
 				return function.Run(scope, args);
 			}
 			catch (LumenException lex) {
-				lex.file ??= this.fileName;
-				lex.line = lex.line == -1 ? this.lineNumber : lex.line;
+				String currentFunctionName = null;
 
-				if (lex.functionName == null && scope.ExistsInThisScope("rec") && scope["rec"] is Fun fun) {
-					lex.functionName = fun.Name;
+				if (scope.ExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
+					currentFunctionName = currentFunction.Name;
 				}
-				else {
-					if (parent.ExistsInThisScope("rec") && scope["rec"] is Fun fun1) {
-						lex.AddToCallStack(fun1.Name, this.fileName, this.lineNumber);
-					}
-					else {
-						lex.AddToCallStack(null, this.fileName, this.lineNumber);
-					}
-				}
+
+				lex.SetDataIfAbsent(currentFunctionName, this.fileName, this.lineNumber);
 
 				throw;
 			}
@@ -135,12 +129,13 @@ TAIL_RECURSION:
 				results = this.CallFunctionWithYield(callableValue.ToFunction(scope), scope);
 			}
 			catch (LumenException lex) {
-				lex.file ??= this.fileName;
-				lex.line = lex.line == -1 ? this.lineNumber : lex.line;
+				String currentFunctionName = null;
 
-				if (lex.functionName == null && scope.ExistsInThisScope("rec") && scope["rec"] is Fun fun1) {
-					lex.functionName = fun1.Name;
+				if (scope.ExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
+					currentFunctionName = currentFunction.Name;
 				}
+
+				lex.AddToCallStack(currentFunctionName, this.fileName, this.lineNumber);
 
 				throw;
 			}
@@ -171,7 +166,7 @@ TAIL_RECURSION:
 				}
 			}
 
-			yield return new GeneratorTerminalResult(this.ProcessCall(e, innerScope, function, args.ToArray()));
+			yield return new GeneratorTerminalResult(this.ProcessCall(innerScope, function, args.ToArray()));
 		}
 
 		public Expression Closure(ClosureManager manager) {

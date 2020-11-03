@@ -50,7 +50,7 @@ namespace ldoc {
 
             if (value is List) {
 				list = value as List;
-                if(LinkedList.Count(list.value) != this.patterns.Count) {
+                if(LinkedList.Count(list.Value) != this.patterns.Count) {
                     return new MatchResult {
 						Success = false,
 						Note = $"function wait a List with length {this.patterns.Count}"
@@ -58,7 +58,7 @@ namespace ldoc {
                 }
 
                 Int32 index = 0;
-                foreach(Value i in list.value) {
+                foreach(Value i in list.Value) {
 					MatchResult result = this.patterns[index].Match(i, scope);
 					if (!result.Success) {
                         return result;

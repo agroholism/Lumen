@@ -51,7 +51,7 @@ namespace Lumen.Lmi {
 				}
 
 				if (y != null) {
-					foreach (var it in y) {
+					foreach (Value it in y) {
 						if (it is GeneratorTerminalResult) {
 							continue;
 						}

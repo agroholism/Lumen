@@ -15,7 +15,7 @@ namespace Lumen.Lmi {
 		}
 
         public MatchResult Match(Value value, Scope scope) {
-            if (value is List list && LinkedList.IsEmpty(list.value)) {
+            if (value is List list && LinkedList.IsEmpty(list.Value)) {
                 return MatchResult.True;
             }
 

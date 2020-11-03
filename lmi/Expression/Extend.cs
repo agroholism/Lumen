@@ -35,7 +35,7 @@ namespace Lumen.Lmi {
 					if(module.Contains(i.Key)) {
 						Value value = module.GetMember(i.Key, scope);
 						if(value is Fun function) {
-							Dispatcher disp = new Dispatcher(function.Name, function, i.Value as Fun);
+							DispatcherFunction disp = new DispatcherFunction(function.Name, function, i.Value as Fun);
 							module.SetMember(i.Key, disp);
 							continue;
 						}

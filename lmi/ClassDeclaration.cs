@@ -32,7 +32,7 @@ namespace Lumen.Lmi {
 
 			foreach (Expression deriving in this.derivings) {
 				Module typeClass = deriving.Eval(scope) as Module;
-				moduleValue.IncludeMixin(typeClass);
+				moduleValue.AppendImplementation(typeClass);
 			}
 
 			// Add rename

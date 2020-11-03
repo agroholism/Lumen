@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-    internal class StreamModule : Module {
-        public StreamModule() {
-            this.Name = "prelude.Stream";
+	internal class StreamModule : Module {
+		public StreamModule() {
+			this.Name = "Stream";
 
 			this.SetMember("toStream", new LambdaFun((e, args) => {
 				return new Stream(e["this"].ToList(e));
@@ -17,7 +15,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.IncludeMixin(Prelude.Collection);
-        }
-    }
+			this.AppendImplementation(Prelude.Collection);
+		}
+	}
 }

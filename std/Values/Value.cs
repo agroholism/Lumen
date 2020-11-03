@@ -2,8 +2,6 @@
 
 namespace Lumen.Lang {
 	public interface Value : IComparable, IFormattable {
-        IType Type { get; }
-
-		Value Clone();
+		IType Type { get; }
 	}
 }

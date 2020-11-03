@@ -29,11 +29,11 @@ namespace Lumen.Lmi {
 				manager.Declare(i.GetDeclaredVariables());
 			}
 
-			var x = this.body.Closure(manager);
+			Expression x = this.body.Closure(manager);
 
 			if (manager.HasYield) {
 				return new LambdaFun((s, a) => {
-					return new Stream(new LumenGenerator { generatorBody = x, AssociatedScope = s });
+					return new Stream(new LumenGenerator( x, s));
 				}) {
 					Arguments = arguments
 				};

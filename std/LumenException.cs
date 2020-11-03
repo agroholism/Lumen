@@ -3,40 +3,66 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Lumen.Lang {
-    public class LumenException : Exception {
-        public Int32 line;
-        public String file;
-        public String functionName;
-        public String Note { get; set; }
-		public Value AttachedObject { get; set; }
-        private List<Tuple<String, String, Int32>> callStack;
+	public class LumenException : Exception {
+		private class CallRecord {
+			public String FunctionName { get; set; }
+			public String FileName { get; set; }
+			public Int32 LineNumber { get; set; }
 
-        public LumenException(String message, String functionName=null, Int32 line=-1, String fileName=null) : base(message) {
-            this.callStack = new List<Tuple<String, String, Int32>>();
-            this.line = line;
-            this.file = fileName;
-            this.functionName = functionName;
-        }
+			public CallRecord(String functionName, String fileName, Int32 lineNumber) {
+				this.FunctionName = functionName;
+				this.FileName = fileName;
+				this.LineNumber = lineNumber;
+			}
+		}
 
-        public void AddToCallStack(String functionName, String fileName, Int32 line) {
-            this.callStack.Add(new Tuple<String, String, Int32>(functionName, fileName, line));
-        }
+		public Int32 Line => this.callStack.Count > 0 ? this.callStack[0].LineNumber : -1;
 
-        public override String ToString() {
-            StringBuilder result = new StringBuilder();
-            result.Append($"{this.AttachedObject?.Type?.ToString() ?? "Exception"}: {this.Message} {Environment.NewLine}\tin {this.functionName ?? "<main>"} at {this.file}:{this.line}");
+		public String Note { get; set; }
+		public Value LumenObject { get; set; }
+		private List<CallRecord> callStack;
 
-            if (this.callStack.Count > 0) {
-                foreach (Tuple<String, String, Int32> i in this.callStack) {
-                    if (i.Item1 == null) {
-                        result.Append(Environment.NewLine).Append($"\tin <main> at {i.Item2}:{i.Item3}");
-                    } else {
-                        result.Append(Environment.NewLine).Append($"\tin {i.Item1} at {i.Item2}:{i.Item3}");
-                    }
-                }
-            }
+		public LumenException(String message) : base(message) {
+			this.callStack = new List<CallRecord>();
+			this.AddToCallStack(null, null, -1);
+		}
 
-            return result.ToString();
-        }
-    }
+		public LumenException(String message, Int32 line = -1, String fileName = null) : this(message) {
+			this.AddToCallStack(null, fileName, line);
+		}
+
+		public void AddToCallStack(String functionName, String fileName, Int32 line) {
+			this.callStack.Add(new CallRecord(functionName, fileName, line));
+		}
+
+		public Boolean SetDataIfAbsent(String functionName, String fileName, Int32 line) {
+			CallRecord lastCall = this.callStack[this.callStack.Count - 1];
+
+			lastCall.FileName ??= fileName;
+			lastCall.LineNumber = lastCall.LineNumber == -1 ? line : lastCall.LineNumber;
+
+			if (lastCall.FunctionName == null) {
+				lastCall.FunctionName = functionName;
+				return true;
+			}
+
+			return false;
+		}
+
+		public override String ToString() {
+			StringBuilder result = new StringBuilder()
+				.Append(
+				$"{this.LumenObject?.Type?.ToString() ?? "Exception"}: {this.Message} {Environment.NewLine}");
+
+			for (Int32 i = this.callStack.Count - 1; i >= 0; i--) {
+				CallRecord call = this.callStack[i];
+
+				result
+				.Append(Environment.NewLine)
+				.Append($"\tin {call.FunctionName ?? "<main>"} at {call.FileName}:{call.LineNumber}");
+			}
+
+			return result.ToString();
+		}
+	}
 }

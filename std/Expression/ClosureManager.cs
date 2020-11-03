@@ -19,7 +19,7 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public void Declare(String name) {
-			if(!this.IsDeclared(name)) {
+			if (!this.IsDeclared(name)) {
 				this.declared.Add(name);
 			}
 		}
@@ -31,7 +31,7 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public Boolean IsDeclared(String name) {
-			if(name == "rec" || name == "_") {
+			if (name == "rec" || name == "_") {
 				return true;
 			}
 			return this.declared.Contains(name);

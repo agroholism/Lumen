@@ -53,7 +53,7 @@ namespace Lumen.Lmi {
 				Instance ins = value as Instance;
 				scope[typeParameter] = ins.Type;
 				for (Int32 i = 0; i < this.subpatterns.Count; i++) {
-					MatchResult res = this.subpatterns[i].Match(ins.items[i], scope);
+					MatchResult res = this.subpatterns[i].Match(ins.Items[i], scope);
 					if (!res.Success) {
 						return res;
 					}
@@ -65,7 +65,7 @@ namespace Lumen.Lmi {
 			if (requiredType is Constructor ctor && value is Instance instance) {
 				if (ctor.IsParentOf(value)) {
 					for (Int32 i = 0; i < ctor.Fields.Count; i++) {
-						MatchResult res = this.subpatterns[i].Match(instance.items[i], scope);
+						MatchResult res = this.subpatterns[i].Match(instance.Items[i], scope);
 						if (!res.Success) {
 							return res;
 						}

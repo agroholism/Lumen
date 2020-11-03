@@ -9,9 +9,9 @@ namespace Lumen.Lang.Expressions {
 
 		}
 
-        public Value Eval(Scope e) {
-            throw this;
-        }
+		public Value Eval(Scope e) {
+			throw this;
+		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			this.Eval(scope);
@@ -19,7 +19,7 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public Expression Closure(ClosureManager manager) {
-            return this;
-        }
-    }
+			return this;
+		}
+	}
 }

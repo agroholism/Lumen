@@ -28,7 +28,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-            return new List(LinkedList.Create(ToStream(this.elements)));
+            return new List(ToStream(this.elements));
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
@@ -45,7 +45,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			yield return new GeneratorTerminalResult(new List(LinkedList.Create(result)));
+			yield return new GeneratorTerminalResult(new List(result));
 		}
 
 		public override System.String ToString() {

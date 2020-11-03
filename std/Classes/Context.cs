@@ -11,7 +11,6 @@ namespace Lumen.Lang {
 	internal class Context : Module {
 		internal Context() {
 			this.Name = "Context";
-			this.EntitiyType = EntitiyType.MODULE;
 
 			this.SetMember("onEnter", new LambdaFun((scope, args) => {
 				return scope["x"];
@@ -23,7 +22,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("onExit", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Context.onExit", scope["x"].Type.ToString());
+				Prelude.FunctionIsNotImplementedForType("Context.onExit", scope["x"].Type, scope);
 				return Const.UNIT;
 			}) {
 				Name = "onExit",

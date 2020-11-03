@@ -34,8 +34,8 @@
         LPAREN,
         RPAREN,
 
-        DO,
-        END,
+        BLOCK_START,
+        BLOCK_END,
 
         LBRACKET,
         RBRACKET,
@@ -100,6 +100,9 @@
 		QUESTION,
 		USE,
 		RAISE,
-		FUN
+		FUN,
+		TRY,
+		EXCEPT,
+		FINALLY
 	}
 }

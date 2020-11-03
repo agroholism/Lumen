@@ -24,7 +24,7 @@ namespace Lumen.Lmi {
 									.OrderBy(i => Helper.Tanimoto(i, this.id))
 									.ToList();
 
-				throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(this.id), null, this.line, this.file) {
+				throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(this.id), this.line, this.file) {
 					Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}" : null
 				};
 			}
@@ -45,7 +45,7 @@ namespace Lumen.Lmi {
 						.OrderBy(i => Helper.Tanimoto(i, this.id))
 						.ToList();
 
-					throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(this.id), null, this.line, this.file) {
+					throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(this.id), this.line, this.file) {
 						Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", manager.Declarations.Concat(manager.Scope.variables.Keys).Where(i => Helper.Tanimoto(i, this.id) > 0.3).OrderBy(i => Helper.Tanimoto(i, this.id)))}" : null
 					};
 				}

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang.Expressions {
-    public interface IPattern : Expression {
+	public interface IPattern : Expression {
 		MatchResult Match(Value value, Scope scope);
 
-        List<String> GetDeclaredVariables();
-    }
+		List<String> GetDeclaredVariables();
+	}
 
 	public class MatchResult {
 		public Boolean Success { get; set; }

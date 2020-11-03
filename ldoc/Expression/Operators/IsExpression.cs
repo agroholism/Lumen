@@ -36,11 +36,11 @@ namespace ldoc {
 
 
             if (v is IType && p is IType io) {
-                return (Bool)io.IsParentOf(v);
+                return (Logical)io.IsParentOf(v);
             }
 
             if (v.Equals(p)) {
-                return new Bool(true);
+                return new Logical(true);
             }
 
             /*if (p is KInterface i) {
@@ -48,7 +48,7 @@ namespace ldoc {
 			}*/
 
 
-            return new Bool(false);
+            return new Logical(false);
         }
 
         public override String ToString() {

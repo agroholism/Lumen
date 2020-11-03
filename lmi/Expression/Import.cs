@@ -28,15 +28,15 @@ namespace Lumen.Lmi {
 		}
 
 		public Value Eval(Scope scope) {
-			Tuple<Module, Module> module = ImportFromPath(scope);
+			Tuple<Module, Module> module = this.ImportFromPath(scope);
 	
 			if(this.isFrom) {
 				if(this.importAll) {
-					foreach(var i in module.Item1.Members) {
+					foreach(KeyValuePair<String, Value> i in module.Item1.Members) {
 						scope.Bind(i.Key, i.Value);
 					}
 				} else {
-					foreach (var i in entities) {
+					foreach (String i in this.entities) {
 						scope.Bind(i, module.Item1.Members[i]);
 					}
 				}
@@ -78,8 +78,8 @@ namespace Lumen.Lmi {
 				Prelude.GlobalImportCache[fullPath] = topLevelModule;
 
 				if (this.isFrom) {
-					if (importAll) {
-						foreach (var i in lowLevelModule.Members) {
+					if (this.importAll) {
+						foreach (KeyValuePair<String, Value> i in lowLevelModule.Members) {
 							scope.Bind(i.Key, i.Value);
 						}
 					}
@@ -366,7 +366,7 @@ namespace Lumen.Lmi {
 		}
 
 		private List<String> GetModulePath(String requiredModulePath) {
-			return GetPathDiff(Interpriter.BasePath, requiredModulePath);
+			return this.GetPathDiff(Interpriter.BasePath, requiredModulePath);
 		}
 
 		private List<String> GetPathDiff(String currentModulePath, String requiredModulePath) {
@@ -386,7 +386,7 @@ namespace Lumen.Lmi {
 			Scope scope = new Scope();
 			this.Eval(scope);
 
-			foreach (var i in scope.variables) {
+			foreach (KeyValuePair<String, Value> i in scope.variables) {
 				manager.Declare(i.Key);
 			}
 

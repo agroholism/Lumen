@@ -67,12 +67,12 @@ TAIL_RECURSION:
 				return function.Run(scope, args);
 			}
 			catch (LumenException lex) {
-				if (lex.file == null) {
-					lex.file = this.File;
+				if (lex.File == null) {
+					lex.File = this.File;
 				}
 
-				if (lex.line == -1) {
-					lex.line = this.Line;
+				if (lex.Line == -1) {
+					lex.Line = this.Line;
 				}
 
 				if (lex.functionName == null) {

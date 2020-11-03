@@ -40,7 +40,7 @@ namespace Lumen.Lmi {
 		}
 
 		public List<String> GetDeclaredVariables() {
-			String typeParameter = FindTypeParameter();
+			String typeParameter = this.FindTypeParameter();
 			if (typeParameter != null) {
 				List<String> result = new List<String> { typeParameter };
 				result.AddRange(this.subpattern.GetDeclaredVariables());
@@ -59,14 +59,14 @@ namespace Lumen.Lmi {
 				Value requiredType = requirement.Eval(scope);
 
 				if (requiredType is Constructor ctor) {
-					requiredType = GetModule(ctor);
+					requiredType = this.GetModule(ctor);
 				}
 
 				if (requiredType is Module module && module.IsParentOf(value)) {
 					continue;
 				}
 
-				if (requiredType is Module typeClass && this.GetModule(value.Type).HasMixin(typeClass)) {
+				if (requiredType is Module typeClass && this.GetModule(value.Type).HasImplementation(typeClass)) {
 					continue;
 				}
 

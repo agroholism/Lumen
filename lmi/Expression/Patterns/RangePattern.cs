@@ -99,7 +99,7 @@ namespace Lumen.Lmi {
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			return new RangePattern(this.left?.Closure(manager) as IPattern, this.right?.Closure(manager) as IPattern, isInclusive);
+			return new RangePattern(this.left?.Closure(manager) as IPattern, this.right?.Closure(manager) as IPattern, this.isInclusive);
 		}
 
 		public override String ToString() {

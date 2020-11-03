@@ -43,19 +43,19 @@ namespace Lumen.Lmi {
 			Value operandOne = this.expressionOne.Eval(e);
 
 			if (this.operation == "and") {
-				return !Converter.ToBoolean(operandOne) ? false : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e));
+				return !Converter.ToBoolean(operandOne) ? new Logical(false) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e)));
 			}
 
 			if (this.operation == "or") {
-				return Converter.ToBoolean(operandOne) ? true : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e));
+				return Converter.ToBoolean(operandOne) ? new Logical(true) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e)));
 			}
 
 			if (this.operation == "xor") {
-				return (Bool)(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e)));
+				return new Logical(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e)));
 			}
 
-			if (this.operation == Op.NOT) {
-				return (Bool)!Converter.ToBoolean(operandOne);
+			if (this.operation == Constants.NOT) {
+				return new Logical(!Converter.ToBoolean(operandOne));
 			}
 
 			Value operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.UNIT;
@@ -97,7 +97,7 @@ namespace Lumen.Lmi {
 			IEnumerable<Value> ops = this.expressionOne.EvalWithYield(e);
 			Value operandOne = Const.UNIT;
 
-			foreach (var i in ops) {
+			foreach (Value i in ops) {
 				if (i is GeneratorTerminalResult cgv1) {
 					operandOne = cgv1.Value;
 				}
@@ -110,7 +110,7 @@ namespace Lumen.Lmi {
 
 			if (this.expressionTwo != null) {
 				IEnumerable<Value> ops2 = this.expressionTwo.EvalWithYield(e);
-				foreach (var i in ops2) {
+				foreach (Value i in ops2) {
 					if (i is GeneratorTerminalResult cgv2) {
 						operandTwo = cgv2.Value;
 					}
@@ -121,19 +121,19 @@ namespace Lumen.Lmi {
 			}
 
 			if (this.operation == "and") {
-				yield return new GeneratorTerminalResult(!Converter.ToBoolean(operandOne) ? false : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e)));
+				yield return new GeneratorTerminalResult(!Converter.ToBoolean(operandOne) ? new Logical(false) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e))));
 			}
 
 			if (this.operation == "or") {
-				yield return new GeneratorTerminalResult(Converter.ToBoolean(operandOne) ? true : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e)));
+				yield return new GeneratorTerminalResult(Converter.ToBoolean(operandOne) ? new Logical(true) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e))));
 			}
 
 			if (this.operation == "xor") {
-				yield return new GeneratorTerminalResult((Bool)(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e))));
+				yield return new GeneratorTerminalResult(new Logical(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e))));
 			}
 
 			if (this.operation == "@not") {
-				yield return new GeneratorTerminalResult((Bool)!Converter.ToBoolean(operandOne));
+				yield return new GeneratorTerminalResult(new Logical(!Converter.ToBoolean(operandOne)));
 			}
 
 			List<Expression> exps = new List<Expression> { new ValueLiteral(operandOne) };

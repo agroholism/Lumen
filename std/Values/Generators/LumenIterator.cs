@@ -4,26 +4,23 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang {
 	public class LumenIterator : BaseValueImpl, IEnumerator<Value> {
-		public IEnumerator<Value> InnerValue { get; }
-		public Scope Scope { get; set; }
+		private IEnumerator<Value> internalValue;
+		private Scope scope;
 
 		public override IType Type => Prelude.Iterator;
 
-		public Value Current => this.InnerValue.Current;
+		public Value Current => this.internalValue.Current;
+		Object IEnumerator.Current => this.internalValue.Current;
 
-		Object IEnumerator.Current => this.InnerValue.Current;
-
-		public LumenIterator(IEnumerator<Value> innerValue) {
-			this.InnerValue = innerValue;
+		public LumenIterator(IEnumerator<Value> internalValue, Scope scope) {
+			this.internalValue = internalValue;
+			this.scope = scope;
 		}
 
 		public Value Send(Value value) {
-			if (this.Scope != null) {
-				this.Scope["<curr-gen-val>"] = value;
-			}
+			this.scope?.Bind(Constants.YIELD_VALUE_SPECIAL_NAME, value);
 
-			this.MoveNext();
-			return this.Current;
+			return this.Next();
 		}
 
 		public Value Next() {
@@ -32,15 +29,15 @@ namespace Lumen.Lang {
 		}
 
 		public void Dispose() {
-			this.InnerValue.Dispose();
+			this.internalValue.Dispose();
 		}
 
 		public Boolean MoveNext() {
-			return this.InnerValue.MoveNext();
+			return this.internalValue.MoveNext();
 		}
 
 		public void Reset() {
-			this.InnerValue.Reset();
+			this.internalValue.Reset();
 		}
 
 		public override String ToString() {

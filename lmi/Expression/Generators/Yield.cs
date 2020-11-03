@@ -21,9 +21,9 @@ namespace Lumen.Lmi {
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			yield return this.expression.Eval(scope);
-			if (scope.IsExsists("<curr-gen-val>")) {
-				yield return new GeneratorTerminalResult( scope["<curr-gen-val>"]);
-				scope.Remove("<curr-gen-val>");
+			if (scope.IsExsists(Constants.YIELD_VALUE_SPECIAL_NAME)) {
+				yield return new GeneratorTerminalResult( scope[Constants.YIELD_VALUE_SPECIAL_NAME]);
+				scope.Remove(Constants.YIELD_VALUE_SPECIAL_NAME);
 			} else {
 				yield return new GeneratorTerminalResult(Const.UNIT);
 			}

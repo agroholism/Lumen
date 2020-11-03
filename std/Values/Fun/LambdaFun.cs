@@ -47,7 +47,7 @@ namespace Lumen.Lang {
 			Int32 delta = arguments.Length - this.Arguments.Count;
 			// If given too many arguments - try to apply to result
 			if (delta > 0) {
-				if(this.Arguments.Count == 0 && arguments[0] == Const.UNIT) {
+				if (this.Arguments.Count == 0 && arguments[0] == Const.UNIT) {
 					return result;
 				}
 
@@ -123,7 +123,7 @@ namespace Lumen.Lang {
 			throw new NotImplementedException();
 		}
 
-		public String ToString(Scope e) {
+		public override String ToString() {
 			return "partial";
 		}
 
@@ -132,10 +132,10 @@ namespace Lumen.Lang {
 		}
 
 		public String ToString(String format, IFormatProvider formatProvider) {
-			return this.ToString(null);
+			return this.ToString();
 		}
 
-		public Value Clone() {
+		/*public Value Clone() {
 			return new PartialFun {
 				Args = this.Args,
 				Arguments = this.Arguments,
@@ -145,7 +145,7 @@ namespace Lumen.Lang {
 				restArgs = this.restArgs
 			};
 		}
-
+		*/
 		public Int32 CompareTo(Object obj) {
 			throw new NotImplementedException();
 		}

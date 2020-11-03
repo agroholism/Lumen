@@ -81,7 +81,7 @@ namespace Lumen.Lmi {
 
 			IEnumerable<Value> ops2 = this.expressionTwo.EvalWithYield(e);
 			Value operandTwo = Const.UNIT;
-			foreach (var i in ops2) {
+			foreach (Value i in ops2) {
 				if (i is GeneratorTerminalResult cgv2) {
 					operandTwo = cgv2.Value;
 				}

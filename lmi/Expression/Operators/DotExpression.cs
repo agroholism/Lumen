@@ -54,16 +54,10 @@ namespace Lumen.Lmi {
 
 				//////////////////////////
 
-				throw new LumenException(Exceptions.INSTANCE_OF_DOES_NOT_CONTAINS_FIELD.F(value.Type, memberName));
+				throw new LumenException(Exceptions.INSTANCE_OF_DOES_NOT_CONTAINS_FIELD.F(value.Type, this.memberName));
 			}
 			catch (LumenException hex) {
-				if (hex.file == null) {
-					hex.file = this.fileName;
-				}
-
-				if (hex.line == -1) {
-					hex.line = this.line;
-				}
+				hex.SetDataIfAbsent(null, this.fileName, this.line);
 
 				throw;
 			}

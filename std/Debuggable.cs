@@ -2,6 +2,6 @@
 
 namespace Lumen.Lang {
 	interface Debuggable {
-        Object Inspect();
-    }
+		Object Inspect();
+	}
 }

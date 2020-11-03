@@ -64,17 +64,18 @@ Lumen 0.8
 + Text functions
 + Cloneable
 
-03.11.2020
+03.11.2020 0.8.7612.10426
 + Classes now can implement other classes.
 + Fix pipe operator parsing.
 + nl const
 + while let
++ fun keyword
++ fun + implicit match
 
 
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)
-- Pair - what is it?
 - module - it is required?
 
 MODULE unsafe - macro, that changes a parent scope
@@ -85,7 +86,6 @@ NON STRICT FOREACH
    and callFirst () = callSecond()
 10. operator in pattern matching?
 9. match operator for strings and regex
-4. ... in pattern matching
 6. map literal ?
 14. Result ?
 

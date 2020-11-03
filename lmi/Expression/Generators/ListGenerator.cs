@@ -15,7 +15,7 @@ namespace Lumen.Lmi {
         }
 
         public Value Eval(Scope e) {
-			var list = new List(this.sequenceGenerator.Generator(e));
+			List list = new List(this.sequenceGenerator.Generator(e));
 			return list;
         }
 

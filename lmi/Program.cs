@@ -37,7 +37,7 @@ namespace lmi {
                 }
 
                 if (command.Trim() == "#list;;") {
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
                     foreach (System.Collections.Generic.KeyValuePair<String, Value> i in mainScope.variables) {
                         Console.WriteLine($"{i.Key} = {i.Value} :: {i.Value.Type}");
                     }
@@ -46,7 +46,7 @@ namespace lmi {
                 }
 
                 Value result = Interpriter.Eval(command.TrimEnd(new Char[] { ' ', '\t', '\r', '\n', ';' }), "interactive" ,mainScope);
-                Console.ForegroundColor = ConsoleColor.Green;
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine($"//-> {result} :: {result.Type}");
                 Console.ForegroundColor = ConsoleColor.Gray;
             }

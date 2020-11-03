@@ -50,11 +50,11 @@ namespace Lumen.Lmi {
 			}
 
 			if (Prelude.Some.IsParentOf(result)) {
-				var inner = Prelude.DeconstructSome(result, scope);
+				Value inner = Prelude.DeconstructSome(result);
 
 				List<Value> results = inner.ToStream(scope).ToList();
 				Int32 index = 0;
-				foreach (var subpattern in this.subpatterns) {
+				foreach (IPattern subpattern in this.subpatterns) {
 					MatchResult matchResult = subpattern.Match(results[index], scope);
 					if (!matchResult.Success) {
 						return matchResult;

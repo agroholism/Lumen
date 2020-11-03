@@ -43,19 +43,19 @@ namespace Lumen.Lmi {
 				list = value as List;
 			}
 
-			if (list == null || LinkedList.IsEmpty(list.value)) {
+			if (list == null || LinkedList.IsEmpty(list.Value)) {
 				return new MatchResult {
 					Success = false,
 					Note = "function wait a non empty List"
 				};
 			}
 			else {
-				MatchResult x = this.xName.Match(list.value.Head, scope);
+				MatchResult x = this.xName.Match(list.Value.Head, scope);
 				if (!x.Success) {
 					return x;
 				}
 
-				return this.xsName.Match(new List(list.value.Tail), scope);
+				return this.xsName.Match(new List(list.Value.Tail), scope);
 			}
 		}
 

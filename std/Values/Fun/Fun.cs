@@ -9,15 +9,15 @@ namespace Lumen.Lang {
 	/// <param name="args"> Arguments that apply </param>
 	public delegate Value LumenFunc(Scope scope, params Value[] args);
 
-    /// <summary> Interface for any Lumen function value </summary>
-    public interface Fun : Value {
-        /// <summary> Name of function </summary>
-        String Name { get; set; }
+	/// <summary> Interface for any Lumen function value </summary>
+	public interface Fun : Value {
+		/// <summary> Name of function </summary>
+		String Name { get; set; }
 
 		/// <summary> Arguments of function </summary>
 		List<IPattern> Arguments { get; set; }
 
-        /// <summary> This method runs a function </summary>
-        Value Run(Scope e, params Value[] args);
-    }
+		/// <summary> This method runs a function </summary>
+		Value Run(Scope e, params Value[] args);
+	}
 }

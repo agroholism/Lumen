@@ -19,7 +19,7 @@ namespace Lumen.Lmi {
             if (value is List) {
 				List list = value as List;
 
-                if(LinkedList.Count(list.value) != this.subpatterns.Count) {
+                if(LinkedList.Count(list.Value) != this.subpatterns.Count) {
                     return new MatchResult {
 						Success = false,
 						Note = $"function wait a list with length {this.subpatterns.Count}"
@@ -27,7 +27,7 @@ namespace Lumen.Lmi {
                 }
 
                 Int32 index = 0;
-                foreach(Value i in list.value) {
+                foreach(Value i in list.Value) {
 					MatchResult result = this.subpatterns[index].Match(i, scope);
 					if (!result.Success) {
                         return result;

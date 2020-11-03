@@ -6,10 +6,10 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lang {
 	internal class MapModule : Module {
 		internal MapModule() {
-			this.Name = "Kernel.Map";
+			this.Name = "Map";
 
-			this.SetMember(Op.GETI, new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
+				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
 				List<Value> indices = scope["indices"].ToList(scope);
 
 				if (indices.Count == 1) {
@@ -17,7 +17,8 @@ namespace Lumen.Lang {
 
 					if (self.TryGetValue(index, out Value result)) {
 						return result;
-					} else {
+					}
+					else {
 						throw new LumenException($"key '{index}' does not exists in map");
 					}
 				}
@@ -31,7 +32,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("get", new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
 
 				if (self.TryGetValue(scope["key"], out Value result)) {
 					return Helper.CreateSome(result);
@@ -45,8 +46,8 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember(Op.SETI, new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+			this.SetMember(Constants.SETI, new LambdaFun((scope, args) => {
+				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
 				List<Value> indices = scope["indices"].ToList(scope);
 
 				if (indices.Count == 1) {
@@ -67,13 +68,13 @@ namespace Lumen.Lang {
 				Value value = e["initValue"];
 				Map result = new Map();
 
-				if(value == Const.UNIT) {
+				if (value == Const.UNIT) {
 					return result;
 				}
 
 				foreach (Value i in value.ToStream(e)) {
 					LinkedList stream = i.ToLinkedList(e);
-					result.value[stream.Head] = stream.Tail.Head;
+					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
 
 				return result;
@@ -84,7 +85,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("getValues", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e.Get("m")).value;
+				IDictionary<Value, Value> dict = ((Map)e.Get("m")).InternalValue;
 				return new Array(dict.Values.ToList());
 			}) {
 				Arguments = new List<IPattern> {
@@ -93,7 +94,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("getKeys", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e.Get("m")).value;
+				IDictionary<Value, Value> dict = ((Map)e.Get("m")).InternalValue;
 				return new Array(dict.Keys.ToList());
 			}) {
 				Arguments = new List<IPattern> {
@@ -102,10 +103,10 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("contains", new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToMap(scope);
+				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
 				Value key = scope["key"];
 
-				return (Bool)self.ContainsKey(key);
+				return new Logical(self.ContainsKey(key));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("key"),
@@ -129,7 +130,7 @@ namespace Lumen.Lang {
 
 				foreach (Value i in value.ToStream(e)) {
 					LinkedList stream = i.ToLinkedList(e);
-					result.value[stream.Head] = stream.Tail.Head;
+					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
 
 				return result;
@@ -140,7 +141,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toStream", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> self = ((Map)e["self"]).value;
+				IDictionary<Value, Value> self = ((Map)e["self"]).InternalValue;
 				return new Stream(self.Select(Helper.CreatePair));
 			}) {
 				Arguments = new List<IPattern> {
@@ -153,7 +154,7 @@ namespace Lumen.Lang {
                 return new String("[" + String.Join(", ", dict) + "]");
             }));*/
 
-			this.IncludeMixin(Prelude.Collection);
+			this.AppendImplementation(Prelude.Collection);
 		}
 
 		internal class PairModule : Module {
@@ -162,7 +163,7 @@ namespace Lumen.Lang {
 			public PairModule() {
 				this.Name = "Map.Pair";
 
-				ctor = Helper.CreateConstructor("Pair", this, new List<string> { "fst", "snd" });
+				ctor = Helper.CreateConstructor("Pair", this, new List<System.String> { "fst", "snd" });
 
 				this.SetMember("init", new LambdaFun((scope, args) => {
 					return Helper.CreatePair(scope["fst"], scope["snd"]);

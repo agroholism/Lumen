@@ -16,10 +16,6 @@ namespace Lumen.Lmi {
             this.result = new Number(Object);
         }
 
-		public ValueLiteral(System.Text.RegularExpressions.Regex regex) {
-			this.result = new Regex(regex);
-		}
-
 		public Value Eval(Scope e) {
             return this.result;
         }

@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -39,6 +42,7 @@
   <ItemGroup>
     <Compile Include="ClassDeclaration.cs" />
     <Compile Include="ExceptionDeclaration.cs" />
+    <Compile Include="ExceptionHandling.cs" />
     <Compile Include="Expression\Application\Applicate.cs" />
     <Compile Include="Expression\BlockE.cs" />
     <Compile Include="Expression\Declarations\FunctionDeclaration.cs" />
@@ -68,7 +72,6 @@
     <Compile Include="Expression\Operators\ConsOperator.cs" />
     <Compile Include="Expression\Operators\BinaryOperator.cs" />
     <Compile Include="Expression\Operators\Indexation.cs" />
-    <Compile Include="Expression\Operators\IsExpression.cs" />
     <Compile Include="Expression\Patterns\AsPattern.cs" />
     <Compile Include="Expression\Patterns\DiscordPattern.cs" />
     <Compile Include="Expression\Patterns\EmptyListPattern.cs" />
@@ -112,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="deprecated.txt" />
+    <Content Include="logo.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

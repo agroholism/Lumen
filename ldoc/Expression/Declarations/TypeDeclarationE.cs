@@ -58,7 +58,7 @@ namespace ldoc {
 
 			foreach (Expression deriving in this.derivings) {
 				Module typeClass = deriving.Eval(e) as Module;
-				mainType.IncludeMixin(typeClass);
+				mainType.AppendImplementation(typeClass);
 			}
 
 			return Const.UNIT;

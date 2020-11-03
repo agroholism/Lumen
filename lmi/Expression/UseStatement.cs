@@ -5,51 +5,55 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class UseStatement : Expression {
-		private System.String name;
+		private IPattern pattern;
 		private Expression assignable;
 		private Expression body;
 
-		public UseStatement(System.String name, Expression assignable, Expression body) {
-			this.name = name;
+		public UseStatement(IPattern pattern, Expression assignable, Expression body) {
+			this.pattern = pattern;
 			this.assignable = assignable;
 			this.body = body;
 		}
 
-		public Expression Closure(ClosureManager manager) {
-			ClosureManager manager2 = manager.Clone();
-			manager2.Declare(name);
-			return new UseStatement(name, this.assignable.Closure(manager), this.body.Closure(manager2));
-		}
+		public Value Eval(Scope scope) {
+			Value context = this.assignable.Eval(scope);
 
-		public Value Eval(Scope e) {
-			Value context = this.assignable.Eval(e);
-			Fun onEnter = context.Type.GetMember("onEnter", e).ToFunction(e);
-			Fun onExit = context.Type.GetMember("onExit", e).ToFunction(e);
-			Value value = Const.UNIT;
-			Value result = Const.UNIT;
+			Fun onEnter = context.Type.GetMember("onEnter", scope).ToFunction(scope);
+			Fun onExit = context.Type.GetMember("onExit", scope).ToFunction(scope);
 
-			Exception ex = null;
+			Value value = onEnter.Run(new Scope(scope), context);
 
-			Value endres;
-			try {
-				value = onEnter.Run(new Scope(e), context);
-				e[this.name] = value;
-
-				result = this.body.Eval(e);
+			MatchResult matchResult = this.pattern.Match(value, scope);
+			if (!matchResult.Success) {
+				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: -1, fileName: "") {
+					Note = matchResult.Note
+				};
 			}
-			catch (Exception exep) {
-				ex = exep;
+
+			Value bodyEvaluationResult = Const.UNIT;
+
+			Value raisedException = Prelude.None;
+			Value useEvaluationResult;
+			try {
+				bodyEvaluationResult = this.body.Eval(scope);
+			}
+			catch (LumenException lumenException) {
+				raisedException = Helper.CreateSome(lumenException.LumenObject);;
+			}
+			catch (Exception exception) {
+				raisedException = Helper.CreateSome(Helper.Error(exception.Message));
 			}
 			finally {
-				if (ex == null) {
-					endres = onExit.Run(new Scope(e), context, value, result);
-				}
-				else {
-					endres = onExit.Run(new Scope(e), context, value, result, new Text(ex.Message));
-				}
+				List<Value> arguments = new List<Value> {
+					value,
+					bodyEvaluationResult,
+					raisedException
+				};
+
+				useEvaluationResult = onExit.Run(new Scope(scope), context, new List(arguments));
 			}
 
-			return endres;
+			return useEvaluationResult;
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
@@ -58,7 +62,13 @@ namespace Lumen.Lmi {
 			Fun onExit = context.Type.GetMember("onExit", scope).ToFunction(scope);
 
 			Value value = onEnter.Run(new Scope(scope), context);
-			scope[this.name] = value;
+
+			MatchResult matchResult = this.pattern.Match(value, scope);
+			if (!matchResult.Success) {
+				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: -1, fileName: "") {
+					Note = matchResult.Note
+				};
+			}
 
 			IEnumerable<Value> result = this.body.EvalWithYield(scope);
 			foreach (Value i in result) {
@@ -66,6 +76,12 @@ namespace Lumen.Lmi {
 			}
 
 			onExit.Run(new Scope(scope), context, value);
+		}
+
+		public Expression Closure(ClosureManager manager) {
+			ClosureManager manager2 = manager.Clone();
+			return new UseStatement(this.pattern.Closure(manager2) as IPattern,
+				this.assignable.Closure(manager), this.body.Closure(manager2));
 		}
 	}
 }

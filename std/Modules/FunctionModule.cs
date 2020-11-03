@@ -1,15 +1,14 @@
-﻿using Lumen.Lang.Expressions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal sealed class Function : Module {
-		internal Function() {
-			this.Name = "prelude.Function";
+	internal sealed class FunctionModule : Module {
+		internal FunctionModule() {
+			this.Name = "Function";
 
-			this.IncludeMixin(Prelude.Functor);
-			this.IncludeMixin(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Functor);
+			this.AppendImplementation(Prelude.Applicative);
 
 			LambdaFun RCombine = new LambdaFun((e, args) => {
 				Fun m = Converter.ToFunction(e["m"], e);
@@ -29,7 +28,7 @@ namespace Lumen.Lang {
 				Fun m = Converter.ToFunction(e["fc"], e);
 				Fun f = Converter.ToFunction(e["fn"], e);
 
-				return new LambdaFun((scope, arguments) => 
+				return new LambdaFun((scope, arguments) =>
 				f.Run(new Scope(scope), m.Run(new Scope(scope), arguments))) {
 					Arguments = m.Arguments
 				};
@@ -40,7 +39,7 @@ namespace Lumen.Lang {
 				}
 			};
 
-			this.SetMember(Op.PLUS, new LambdaFun((e, args) => {
+			this.SetMember(Constants.PLUS, new LambdaFun((e, args) => {
 				Fun m = Converter.ToFunction(e["fc"], e);
 				Fun f = Converter.ToFunction(e["fn"], e);
 
@@ -57,7 +56,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember(Op.STAR, new LambdaFun((e, args) => {
+			this.SetMember(Constants.STAR, new LambdaFun((e, args) => {
 				Fun m = Converter.ToFunction(e["fn"], e);
 				Int32 f = e["n"].ToInt(e);
 
@@ -88,9 +87,9 @@ namespace Lumen.Lang {
 				Fun obj2 = scope["m"].ToFunction(scope);
 
 				return new LambdaFun((e, a) => {
-					var al = e["x'"];
+					Value al = e["x'"];
 
-					var z = obj2.Run(new Scope(), al).ToFunction(e);
+					Fun z = obj2.Run(new Scope(), al).ToFunction(e);
 
 					return z.Run(new Scope(), obj.Run(new Scope(), al));
 				}) {

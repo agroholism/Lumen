@@ -51,7 +51,7 @@ namespace Lumen.Lmi {
 					IEnumerable<Value> result = i.Value.EvalWithYield(scope);
 
 					if (result != null) {
-						foreach(var x in result)
+						foreach(Value x in result)
 						yield return x;
 					}
 

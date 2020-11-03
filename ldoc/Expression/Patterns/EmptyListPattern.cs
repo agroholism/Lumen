@@ -21,7 +21,7 @@ namespace ldoc {
         }
 
         public MatchResult Match(Value value, Scope scope) {
-            if (value is List list && LinkedList.IsEmpty(list.value)) {
+            if (value is List list && LinkedList.IsEmpty(list.Value)) {
                 return MatchResult.True;
             }
 
@@ -30,7 +30,7 @@ namespace ldoc {
 					return MatchResult.True;
 			}
 
-			if (value is Lazy lazy && lazy.Force() is List ll && LinkedList.IsEmpty(ll.value)) {
+			if (value is Lazy lazy && lazy.Force() is List ll && LinkedList.IsEmpty(ll.Value)) {
 				return MatchResult.True;
 			}
 

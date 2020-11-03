@@ -1,16 +1,20 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public class SingletonConstructor : BaseValueImpl, IType {
+	public class SingletonConstructor : BaseValueImpl, IConstructor {
 		public String Name { get; set; }
 
 		public override IType Type => this.Parent;
 
-		public Module Parent { get ; set ; }
+		public Module Parent { get; set; }
 
 		public SingletonConstructor(String name, Module parent) {
 			this.Parent = parent;
 			this.Name = name;
+		}
+
+		public Value MakeInstance(params Value[] values) {
+			return this;
 		}
 
 		public Value GetMember(String name, Scope scope) {
@@ -30,14 +34,8 @@ namespace Lumen.Lang {
 		}
 
 		public Boolean TryGetMember(String name, out Value result) {
-			if(this.Parent.TryGetMember(name, out result)) {
+			if (this.Parent.TryGetMember(name, out result)) {
 				return true;
-			}
-
-			foreach (Module i in this.Parent.Mixins) {
-				if (i.TryGetMember(name, out result)) {
-					return true;
-				}
 			}
 
 			return this.Type.TryGetMember(name, out result);
@@ -47,8 +45,8 @@ namespace Lumen.Lang {
 			return value == this;
 		}
 
-		public Boolean HasMixin(Module typeClass) {
-			return this.Parent.HasMixin(typeClass);
+		public Boolean HasImplementation(Module typeClass) {
+			return this.Parent.HasImplementation(typeClass);
 		}
 	}
 }

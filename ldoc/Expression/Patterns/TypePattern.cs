@@ -37,7 +37,7 @@ namespace ldoc {
 					continue;
 				}
 
-				if (requiredType is Module typeClass && GetModule(value.Type).HasMixin(typeClass)) {
+				if (requiredType is Module typeClass && GetModule(value.Type).HasImplementation(typeClass)) {
 					continue;
 				}
 

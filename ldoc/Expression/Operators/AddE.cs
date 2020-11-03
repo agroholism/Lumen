@@ -26,7 +26,7 @@ namespace ldoc {
 			Value right = this.right.Eval(e);
 
 			if (right is List list) {
-				return new List(new LinkedList(this.result.Eval(e), list.value));
+				return new List(new LinkedList(this.result.Eval(e), list.Value));
 			}
 
 			if (right is Lazy lazy) {

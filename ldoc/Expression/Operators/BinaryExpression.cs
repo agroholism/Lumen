@@ -45,19 +45,19 @@ namespace ldoc {
             Value operandOne = this.expressionOne.Eval(e);
 
             if (this.operation == "and") {
-                return !Converter.ToBoolean(operandOne) ? false : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e));
+                return !Converter.ToBoolean(operandOne) ? false : (Logical)Converter.ToBoolean(this.expressionTwo.Eval(e));
             }
 
             if (this.operation == "or") {
-                return Converter.ToBoolean(operandOne) ? true : (Bool)Converter.ToBoolean(this.expressionTwo.Eval(e));
+                return Converter.ToBoolean(operandOne) ? true : (Logical)Converter.ToBoolean(this.expressionTwo.Eval(e));
             }
 
             if (this.operation == "xor") {
-                return (Bool)(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e)));
+                return (Logical)(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e)));
             }
 
             if (this.operation == "@not") {
-                return (Bool)!Converter.ToBoolean(operandOne);
+                return (Logical)!Converter.ToBoolean(operandOne);
             }
 
 			Value operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.UNIT;

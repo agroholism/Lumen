@@ -57,12 +57,12 @@ namespace ldoc {
 
                 return Const.UNIT;
             } catch (LumenException hex) {
-                if (hex.file == null) {
-                    hex.file = this.fileName;
+                if (hex.File == null) {
+                    hex.File = this.fileName;
                 }
 
-                if (hex.line == -1) {
-                    hex.line = this.line;
+                if (hex.Line == -1) {
+                    hex.Line = this.line;
                 }
 
                 throw;

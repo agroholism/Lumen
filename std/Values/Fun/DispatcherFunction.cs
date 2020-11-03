@@ -4,59 +4,57 @@ using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	public class Dispatcher : Fun {
-		internal List<Fun> functions = new List<Fun>();
+	public class DispatcherFunction : Fun {
+		private List<Fun> functions;
 		public String Name { get; set; }
-
 		public List<IPattern> Arguments { get; set; }
 
 		public IType Type => Prelude.Function;
 
-		public Dispatcher(String name) {
+		public DispatcherFunction(String name) {
 			this.Name = name;
+			this.functions = new List<Fun>();
 		}
 
-		public Dispatcher(String name, Fun first, Fun second) {
-			this.Name = name;
+		public DispatcherFunction(String name, Fun first, Fun second) : this(name) {
 			this.Append(first);
 			this.Append(second);
 		}
 
-		public void Append(Fun f) {
-			if (!this.functions.Contains(f)) {
-				this.functions.Add(f);
+		public void Append(Fun function) {
+			if (!this.functions.Contains(function)) {
+				this.functions.Add(function);
 			}
 		}
 
 		public Value Run(Scope scope, params Value[] args) {
-			foreach (Fun i in this.functions) {
-				if (i.Arguments.Count != args.Length) {
-					continue;
-				}
+			if (this.Arguments.Count > args.Length) {
+				return Helper.MakePartial(this, args);
+			}
 
+			foreach (Fun function in this.functions) {
+				Scope s = new Scope(scope);
+				Boolean isFit = true;
 				Int32 counter = 0;
 
-				Scope s = new Scope(scope);
-
-				Boolean ok = false;
-
-				foreach (IPattern j in i.Arguments) {
-					MatchResult m = j.Match(args[counter], s);
+				foreach (Value arg in args) {
+					MatchResult m = function.Arguments[counter].Match(arg, s);
 
 					if (!m.Success) {
-						ok = true;
+						isFit = false;
 						break;
 					}
+
 					counter++;
 				}
 
-				if (ok) {
+				if (!isFit) {
 					continue;
 				}
 
 				Value result = null;
 				try {
-					result = i.Run(scope, args);
+					result = function.Run(scope, args);
 				}
 				catch (Return rt) {
 					result = rt.Result;
@@ -74,16 +72,12 @@ namespace Lumen.Lang {
 			return 0;
 		}
 
-		public Value Clone() {
-			return (Value)this.MemberwiseClone();
-		}
-
 		public String ToString(String format, IFormatProvider formatProvider) {
-			return this.ToString(null);
+			return this.ToString();
 		}
 
-		public String ToString(Scope scope) {
-			return "dispatcher";
+		public override String ToString() {
+			return $"[Function #{this.GetHashCode()}]";
 		}
 	}
 }

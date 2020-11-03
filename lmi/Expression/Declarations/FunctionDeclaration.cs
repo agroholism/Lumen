@@ -39,10 +39,8 @@ namespace Lumen.Lmi {
 					throw new LumenException("function can not have tail recursion and yield at the same time");
 				}
 
-				result = new LambdaFun((scope1, args) => new Stream(new LumenGenerator {
-					generatorBody = closuredBody,
-					AssociatedScope = scope1
-				})) {
+				result = new LambdaFun((scope1, args) => 
+					new Stream(new LumenGenerator(closuredBody, scope1))) {
 					Arguments = closuredPatterns,
 					Name = this.name
 				};
@@ -56,13 +54,13 @@ namespace Lumen.Lmi {
 			if (scope.ExistsInThisScope(this.name)) {
 				Value value = scope[this.name];
 
-				if (value is Dispatcher dispatcher) {
+				if (value is DispatcherFunction dispatcher) {
 					// Dispatcher is already exists
 					dispatcher.Append(result);
 				}
 				else if (value is Fun f) {
 					// Exists just function - we should make a dispatcher
-					scope.Bind(this.name, new Dispatcher(this.name, f, result));
+					scope.Bind(this.name, new DispatcherFunction(this.name, f, result));
 				}
 				else {
 					// Ii is not a function - we can not define function

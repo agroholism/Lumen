@@ -37,7 +37,7 @@ namespace Lumen.Lmi {
 			yield break;
 		}
 		public MatchResult Match(Value value, Scope scope) {
-			var result1 = this.result.Match(value, scope);
+			MatchResult result1 = this.result.Match(value, scope);
 
 			if(!result1.Success) {
 				result1 = this.second.Match(value, scope);

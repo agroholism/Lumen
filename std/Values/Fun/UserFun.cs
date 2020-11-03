@@ -4,28 +4,28 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-    public class UserFun : Fun {
-        public Expression Body;
-        public List<IPattern> Arguments { get; set; } = new List<IPattern>();
-        public String Name { get; set; }
+	public class UserFun : Fun {
+		public Expression Body;
+		public List<IPattern> Arguments { get; set; } = new List<IPattern>();
+		public String Name { get; set; }
 		public IType Type => Prelude.Function;
 
-        public UserFun(List<IPattern> arguments, Expression Body) {
-            this.Arguments = arguments;
-            this.Body = Body;
-        }
+		public UserFun(List<IPattern> arguments, Expression Body) {
+			this.Arguments = arguments;
+			this.Body = Body;
+		}
 
 		public UserFun(List<IPattern> arguments, Expression Body, String name) : this(arguments, Body) {
 			this.Name = name;
 		}
 
-        public override String ToString() {
-            return this.Name ?? $"[Function {this.GetHashCode()}]";
+		public override String ToString() {
+			return this.Name ?? $"[Function {this.GetHashCode()}]";
 		}
 
-        public Value Run(Scope e, params Value[] arguments) {
+		public Value Run(Scope e, params Value[] arguments) {
 			if (this.Arguments.Count > arguments.Length) {
-				return this.MakePartial(arguments);
+				return Helper.MakePartial(this, arguments);
 			}
 
 			Int32 counter = 0;
@@ -63,20 +63,6 @@ namespace Lumen.Lang {
 			}
 
 			return result;
-        }
-
-		private Value MakePartial(Value[] vals) {
-            return new PartialFun {
-                InnerFunction = this,
-                Args = vals,
-                restArgs = this.Arguments.Count - vals.Length
-            };
-        }
-
-		public Value Clone() {
-			return new UserFun(this.Arguments, this.Body) {
-				Name = this.Name,
-			};
 		}
 
 		public Int32 CompareTo(Object obj) {

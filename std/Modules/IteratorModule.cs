@@ -1,24 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class Iterator : Module {
-		public Iterator() {
-			this.Name = "prelude.Iterator";
+	internal class IteratorModule : Module {
+		public IteratorModule() {
+			this.Name = "Iterator";
 
-			this.SetMember("init", new LambdaFun((scope, args) => {
+			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				Value x = scope["stream"];
 
-				if (x is Stream s && s.innerValue is LumenGenerator lgn) {
+				if (x is Stream s && s.InternalValue is LumenGenerator lgn) {
 					return lgn.GetEnumerator() as Value;
 				}
 
 				IEnumerable<Value> stream = x.ToStream(scope);
 
-				return new LumenIterator(stream.GetEnumerator());
+				return new LumenIterator(stream.GetEnumerator(), scope);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("stream")
@@ -93,14 +91,22 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("fromStream", new LambdaFun((scope, args) => {
-				return new LumenIterator(scope["x"].ToStream(scope).GetEnumerator());
+				Value x = scope["stream"];
+
+				if (x is Stream s && s.InternalValue is LumenGenerator lgn) {
+					return lgn.GetEnumerator() as Value;
+				}
+
+				IEnumerable<Value> stream = x.ToStream(scope);
+
+				return new LumenIterator(stream.GetEnumerator(), scope);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});
 
-			this.IncludeMixin(Prelude.Collection);
+			this.AppendImplementation(Prelude.Collection);
 		}
 	}
 }

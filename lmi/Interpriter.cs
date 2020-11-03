@@ -46,11 +46,12 @@ namespace Lumen.Lmi {
         }
 
         public static Value Eval(String source, String fileName="", Scope? scope = null) {
-            try {
+          try {
                 List<Token> tokens = new Lexer(source, fileName).Tokenization();
                 return new Parser(tokens, fileName).Parse().Select(i => 
                     i.Eval(scope ?? mainScope)).Last();
-           }
+			//try { 
+        }
 			catch (LumenException uex) {
                 WriteException(uex.ToString());
 
@@ -59,10 +60,10 @@ namespace Lumen.Lmi {
                     WriteException(uex.Note);
                 }
 
-                if (uex.line != -1) {
+                if (uex.Line != -1) {
                     Console.Write(Environment.NewLine);
                     String[] strs = source.Split(new String[] { Environment.NewLine }, StringSplitOptions.None);
-                    WriteException($"{uex.line}| {strs[uex.line - 1]}");
+                    WriteException($"{uex.Line}| {strs[uex.Line - 1]}");
                 }
 
             } catch (System.Threading.ThreadAbortException threadAbortException) {

@@ -49,10 +49,10 @@ namespace Lumen.Lmi {
 
 			foreach (Expression deriving in this.derivings) {
 				Module typeClass = deriving.Eval(scope) as Module;
-				createdType.IncludeMixin(typeClass);
+				createdType.AppendImplementation(typeClass);
 			}
 
-			createdType.IncludeMixin(Prelude.Exception);
+			createdType.AppendImplementation(Prelude.Exception);
 
 			return Const.UNIT;
 		}

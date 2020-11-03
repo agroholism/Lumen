@@ -30,7 +30,7 @@ namespace Lumen.Lmi {
 			};
 
 			return new Applicate(
-				new DotOperator(new ValueLiteral(value.Type), Op.SETI, null, -1), exps, this.Line, this.File).Eval(e);
+				new DotOperator(new ValueLiteral(value.Type), Constants.SETI, null, -1), exps, this.Line, this.File).Eval(e);
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

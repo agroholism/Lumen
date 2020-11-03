@@ -395,7 +395,7 @@ namespace Lumen.Studio {
 			else if(value is Lang.List list) {
 				this.ChangeNameColumn("Index", 1);
 				Int32 index = 0;
-				foreach (Lang.Value i in list.value) {
+				foreach (Lang.Value i in list.Value) {
 					DataGridViewRow row = new DataGridViewRow();
 					row.Cells.Add(new DataGridViewImageCell() { Value = Settings.EmptyImage });
 					row.Cells.Add(new DataGridViewTextBoxCell() { Value = index });
@@ -479,11 +479,11 @@ namespace Lumen.Studio {
 
 		public static String Rename(Lang.Value value) {
 			if (value is Lang.List list) {
-				if (list.value.Count() < 10) {
+				if (list.Value.Count() < 10) {
 					return list.ToString();
 				}
 				else {
-					return $"List ({list.value.Count()} elems)";
+					return $"List ({list.Value.Count()} elems)";
 				}
 			}
 

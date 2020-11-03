@@ -1,13 +1,14 @@
-﻿using Lumen.Lang.Expressions;
-using System;
+﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
+using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
 	internal sealed class NumberModule : Module {
 		internal NumberModule() {
 			this.Name = "Number";
 
-			IEnumerable<Value> Range(Double from, Double to) {
+			static IEnumerable<Value> Range(Double from, Double to) {
 				yield return new Number(from);
 				if (from < to) {
 					while (from < to) {
@@ -27,7 +28,7 @@ namespace Lumen.Lang {
 
 			// self...other
 			// Number -> Number -> Stream
-			this.SetMember(Op.RANGE_INCLUSIVE, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.RANGE_INCLUSIVE, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				/*if (other == Const.UNIT) {
@@ -41,7 +42,7 @@ namespace Lumen.Lang {
 
 			// self..other
 			// Number -> Number -> Stream
-			this.SetMember(Op.RANGE_EXCLUSIVE, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.RANGE_EXCLUSIVE, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				/*if (other == Const.UNIT) {
@@ -55,7 +56,7 @@ namespace Lumen.Lang {
 
 			// self + other
 			// Number -> Number -> Number
-			this.SetMember(Op.PLUS, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other == Const.UNIT) {
@@ -69,7 +70,7 @@ namespace Lumen.Lang {
 
 			// self - other
 			// Number -> Number -> Number
-			this.SetMember(Op.MINUS, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.MINUS, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				if (other == Const.UNIT) {
@@ -83,7 +84,7 @@ namespace Lumen.Lang {
 
 			// self / other
 			// Number -> Number -> Number
-			this.SetMember(Op.SLASH, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.SLASH, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				return new Number(scope["self"].ToDouble(scope) / other.ToDouble(scope));
@@ -93,7 +94,7 @@ namespace Lumen.Lang {
 
 			// self * other
 			// Number -> Number -> Number
-			this.SetMember(Op.STAR, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.STAR, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				return new Number(scope["self"].ToDouble(scope) * other.ToDouble(scope));
@@ -103,7 +104,7 @@ namespace Lumen.Lang {
 
 			// self ^ other
 			// Number -> Number -> Number
-			this.SetMember(Op.POW, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.POW, new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
 				return new Number(Math.Pow(scope["self"].ToDouble(scope), other.ToDouble(scope)));
@@ -239,14 +240,12 @@ namespace Lumen.Lang {
 				Double num = scope["self"].ToDouble(scope);
 				Double to = scope["to"].ToDouble(scope);
 
-				switch (to) {
-					case 1:
-						return new Number(Math.Ceiling(num));
-					case -1:
-						return new Number(Math.Floor(num));
-					default:
-						return new Number(Math.Round(num));
-				}
+				return to switch
+				{
+					1 => new Number(Math.Ceiling(num)),
+					-1 => new Number(Math.Floor(num)),
+					_ => new Number(Math.Round(num)),
+				};
 			}) {
 				Arguments = new List<IPattern> {
 					Const.Self[0],
@@ -327,12 +326,12 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("isnan", new LambdaFun((scope, args) => {
-				return new Bool(Double.IsNaN(scope["self"].ToDouble(scope)));
+				return new Logical(Double.IsNaN(scope["self"].ToDouble(scope)));
 			}) {
 				Arguments = Const.Self
 			});
 
-			this.SetMember("withBase", new LambdaFun((scope, args) => {
+			/*this.SetMember("withBase", new LambdaFun((scope, args) => {
 				Value num = scope["self"];
 				Double basis = Converter.ToDouble(scope["base"], scope);
 
@@ -346,12 +345,12 @@ namespace Lumen.Lang {
 					Const.Self[0],
 					new NamePattern("base")
 				}
-			});
+			});*/
 
 			this.SetMember("parse", new LambdaFun((scope, args) => {
 				String str = scope["self"].ToString();
 
-				if(Double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out var result)) {
+				if (Double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result)) {
 					return Helper.CreateSome(new Number(result));
 				}
 
@@ -379,8 +378,8 @@ namespace Lumen.Lang {
 				Arguments = Const.Self
 			});
 
-			this.IncludeMixin(Prelude.Ord);
-			this.IncludeMixin(Prelude.Cloneable);
+			this.AppendImplementation(Prelude.Ord);
+			this.AppendImplementation(Prelude.Cloneable);
 			this.NameIt();
 		}
 

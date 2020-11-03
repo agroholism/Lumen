@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 using Lumen.Lang.Expressions;
 
@@ -19,34 +17,37 @@ namespace Lumen.Lang {
 		public static Module Format { get; } = new Format();
 		public static Module Context { get; } = new Context();
 
+		public static FunctionIsNotImplemented FunctionIsNotImplemented { get; } = new FunctionIsNotImplemented();
+		public static AssertError AssertError { get; } = new AssertError();
+		public static ConvertError ConvertError { get; } = new ConvertError();
+		public static Error Error { get; } = new Error();
+
 		public static Module Any { get; } = new AnyModule();
 
 		public static Module Unit { get; } = new UnitModule();
 
-		public static Module Iterator { get; } = new Iterator();
-		public static Module Ref { get; } = new StateModule();
+		public static Module Iterator { get; } = new IteratorModule();
+		public static Module Ref { get; } = new RefModule();
 		public static Module Stream { get; } = new StreamModule();
 		public static Module Array { get; } = new ArrayModule();
-		public static Module Function { get; } = new Function();
+		public static Module Function { get; } = new FunctionModule();
 		public static Module Number { get; } = new NumberModule();
 		public static Module Map { get; } = new MapModule();
 		public static Module Pair { get; } = new MapModule.PairModule();
 		public static Module Text { get; } = new TextModule();
 		public static Module List { get; } = new ListModule();
 
-		public static Module Boolean { get; } = new BooleanModule();
+		public static Module Logical { get; } = new LogicalModule();
 
 		public static IType Fail { get; private set; }
-		public static Module Option { get; } = new Option();
-		public static IType None { get; } = (Option as Option).None;
-		public static Constructor Some { get; } = (Option as Option).Some;
-
-		public static Module Regex { get; } = new RegexModule();
+		public static Module Option { get; } = new OptionModule();
+		public static IType None { get; } = (Option as OptionModule).None;
+		public static Constructor Some { get; } = (Option as OptionModule).Some;
 
 		public static Prelude Instance { get; } = new Prelude();
 
 		#endregion
-		private static readonly Random mainRandomObject = new Random();
+
 		public static Dictionary<String, Module> GlobalImportCache { get; } = new Dictionary<String, Module>();
 
 		private Prelude() {
@@ -62,6 +63,11 @@ namespace Lumen.Lang {
 			this.SetMember("Cloneable", Cloneable);
 			this.SetMember("Exception", Exception);
 
+			this.SetMember("FunctionIsNotImplemented", FunctionIsNotImplemented);
+			this.SetMember("AssertError", AssertError);
+			this.SetMember("ConvertError", ConvertError);
+			this.SetMember("Error", Error);
+
 			this.SetMember("Fail", Fail);
 
 			this.SetMember("Pair", MapModule.PairModule.ctor);
@@ -69,8 +75,8 @@ namespace Lumen.Lang {
 			this.SetMember("Unit", Unit);
 
 			this.SetMember("Option", Option);
-			this.SetMember("Some", (Option as Option).Some);
-			this.SetMember("None", (Option as Option).None);
+			this.SetMember("Some", (Option as OptionModule).Some);
+			this.SetMember("None", (Option as OptionModule).None);
 
 			this.SetMember("Iterator", Iterator);
 			this.SetMember("Ref", Ref);
@@ -79,7 +85,7 @@ namespace Lumen.Lang {
 			this.SetMember("Stream", Stream);
 			this.SetMember("Array", Array);
 			this.SetMember("Number", Number);
-			this.SetMember("Boolean", Boolean);
+			this.SetMember("Logical", Logical);
 			this.SetMember("Text", Text);
 			this.SetMember("Function", Function);
 			this.SetMember("Collection", Collection);
@@ -226,7 +232,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("assert", new LambdaFun((scope, args) => {
-				Assert(scope["condition"].ToBoolean());
+				Assert(scope["condition"].ToBoolean(), scope);
 
 				return Const.UNIT;
 			}) {
@@ -236,7 +242,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("functionIsNotImplementedForType", new LambdaFun((scope, args) => {
-				FunctionIsNotImplementedForType(scope["fName"].ToString(), scope["t"].ToString());
+				FunctionIsNotImplementedForType(scope["fName"].ToString(), scope["t"], scope);
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
@@ -248,7 +254,7 @@ namespace Lumen.Lang {
 			this.SetMember("parsen", new LambdaFun((scope, args) => {
 				String str = scope["inputStr"].ToString();
 
-				if (Double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out var result)) {
+				if (Double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result)) {
 					return Helper.CreateSome(new Number(result));
 				}
 
@@ -267,7 +273,7 @@ namespace Lumen.Lang {
 			FailModule.SetMember("String", new LambdaFun((scope, args) => {
 				IType obj = scope["this"] as IType;
 				if (obj.TryGetMember("message", out Value result)) {
-					return new Text($"Failed with message '{result.ToString()}'");
+					return new Text($"Failed with message '{result}'");
 				}
 
 				throw new LumenException("failed in fail.tos");
@@ -277,52 +283,27 @@ namespace Lumen.Lang {
 				}
 			}, null);
 
-			Fail = Helper.CreateConstructor("prelude.Fail", FailModule, new List<string> { "message" });
+			Fail = Helper.CreateConstructor("prelude.Fail", FailModule, new List<String> { "message" });
 		}
 
-		public static Value DeconstructSome(Value some, Scope scope) {
+		public static Value DeconstructSome(Value some) {
 			if (Some.IsParentOf(some)) {
 				Instance someInstance = some as Instance;
-				return someInstance.GetField("x", scope);
+				return someInstance.GetField("x");
 			}
 
 			return some;
 		}
 
-		public static void Assert(Boolean condition, String message = null) {
+		public static void Assert(Boolean condition, Scope scope) {
 			if (!condition) {
-				throw new LumenException(Exceptions.ASSERT_IS_BROKEN + (message == null ? "" : ": " + message));
+				throw AssertError.constructor.ToException(scope);
 			}
 		}
 
-		public static void FunctionIsNotImplementedForType(String functionName, String typeName) {
-			throw new LumenException(Exceptions.FUNCTION_IS_NOT_IMPLEMENTED_FOR_TYPE.F(functionName, typeName));
-		}
-	}
+		public static void FunctionIsNotImplementedForType(String functionName, Value typeName, Scope scope) {
+			throw FunctionIsNotImplemented.constructor.MakeInstance(typeName, new Text(functionName)).ToException(scope);
 
-	public class LumenGenerator : IEnumerable<Value> {
-		public Expression generatorBody;
-		public IEnumerable<Value> Value { get; set; }
-
-		public Scope AssociatedScope { get; set; }
-
-		public IEnumerator<Value> GetEnumerator() {
-			var s = new Scope(this.AssociatedScope);
-			return new LumenIterator(this.f(s).GetEnumerator()) { Scope = s };
-		}
-
-		IEnumerable<Value> f(Scope s) {
-			foreach (Value i in this.generatorBody.EvalWithYield(s)) {
-				if (i is StopIteration sit) {
-					yield break;
-				}
-				yield return i;
-			}
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() {
-			Scope s = new Scope(this.AssociatedScope);
-			return new LumenIterator(this.f(s).GetEnumerator()) { Scope = s };
 		}
 	}
 }

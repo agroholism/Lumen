@@ -2,15 +2,16 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class StateModule : Module {
-		public StateModule() {
+	internal class RefModule : Module {
+		public RefModule() {
 			this.Name = "Ref";
 
 			this.Mixins.Add(Prelude.Format);
 			this.Mixins.Add(Prelude.Functor);
+			this.Mixins.Add(Prelude.Applicative);
 
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
-				return new State(scope["state"]);
+				return new Ref(scope["state"]);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("state")
@@ -18,10 +19,10 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("fmap", new LambdaFun((scope, args) => {
-				State functor = scope["fc"] as State;
+				Ref functor = scope["fc"] as Ref;
 				Fun mapper = scope["fn"].ToFunction(scope);
 
-				return new State(mapper.Run(new Scope(scope), functor.Value));
+				return new Ref(mapper.Run(new Scope(scope), functor.Value));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("fn"),
@@ -29,12 +30,19 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("!", new LambdaFun((scope, args) => {
-				if (scope["state"] is ArrayRef arrref) {
-					return arrref.Value.InternalValue[arrref.Index];
+			this.SetMember("liftA", new LambdaFun((scope, args) => {
+				Ref functor = scope["f"] as Ref;
+				var m = scope["m"];
+				return m.CallMethodFlip("fmap", scope, functor.Value);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("m"),
+					new NamePattern("f"),
 				}
+			});
 
-				return (scope["state"] as State).Value;
+			this.SetMember("!", new LambdaFun((scope, args) => {
+				return (scope["state"] as Ref).Value;
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("state"),
@@ -43,11 +51,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("<-", new LambdaFun((scope, args) => {
-				if(scope["state"] is ArrayRef arrref) {
-					return arrref.Value.InternalValue[arrref.Index] = scope["value"];
-				}
-
-				State state = scope["state"] as State;
+				Ref state = scope["state"] as Ref;
 				return state.Value = scope["value"];
 			}) {
 				Arguments = new List<IPattern> {
@@ -57,8 +61,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("swap", new LambdaFun((scope, args) => {
-				State state = scope["state"] as State;
-				State state2 = scope["state'"] as State;
+				Ref state = scope["state"] as Ref;
+				Ref state2 = scope["state'"] as Ref;
 				Value temp = state.Value;
 				state.Value = state2.Value;
 				state2.Value = temp;
@@ -71,7 +75,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("inc", new LambdaFun((scope, args) => {
-				State state = scope["state"] as State;
+				Ref state = scope["state"] as Ref;
 				state.Value = new Number(state.Value.ToDouble(scope) + 1);
 				return state;
 			}) {
@@ -81,7 +85,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("dec", new LambdaFun((scope, args) => {
-				State state = scope["state"] as State;
+				Ref state = scope["state"] as Ref;
 				state.Value = new Number(state.Value.ToDouble(scope) - 1);
 				return state;
 			}) {
@@ -91,7 +95,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("format", new LambdaFun((scope, args) => {
-				State inc = scope.Get("state") as State;
+				Ref inc = scope.Get("state") as Ref;
 				System.String fstr = scope.Get("fstr").ToString();
 				if (fstr == "v") {
 					return new Text(inc.Value.ToString());

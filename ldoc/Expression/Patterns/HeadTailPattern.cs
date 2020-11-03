@@ -62,15 +62,15 @@ namespace ldoc {
 				list = value as List;
 			}
 
-			if (list == null || LinkedList.IsEmpty(list.value)) {
+			if (list == null || LinkedList.IsEmpty(list.Value)) {
 				return new MatchResult {
 					Success = false,
 					Note = "function wait a non empty List"
 				};
 			}
 			else {
-				scope.Bind(this.xName, list.value.Head);
-				scope.Bind(this.xsName, new List(list.value.Tail));
+				scope.Bind(this.xName, list.Value.Head);
+				scope.Bind(this.xsName, new List(list.Value.Tail));
 				return MatchResult.True;
 			}
 		}

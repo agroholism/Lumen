@@ -16,7 +16,9 @@ namespace Lumen.Lmi {
 
 		public MatchResult Match(Value value, Scope scope) {
 			if (value is Lang.Array array) {
-				if (array.InternalValue.Count != this.subpatterns.Count) {
+				List<Value> castedArray = array.ToList(scope);
+
+				if (castedArray.Count != this.subpatterns.Count) {
 					return new MatchResult {
 						Success = false,
 						Note = $"function wait an array with length {this.subpatterns.Count}"
@@ -24,7 +26,7 @@ namespace Lumen.Lmi {
 				}
 
 				Int32 index = 0;
-				foreach (Value i in array.InternalValue) {
+				foreach (Value i in castedArray) {
 					MatchResult result = this.subpatterns[index].Match(i, scope);
 					if (!result.Success) {
 						return result;

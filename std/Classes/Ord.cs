@@ -23,10 +23,10 @@ namespace Lumen.Lang {
 			});*/
 
 			// let < x y = x.compare y < 0
-			this.SetMember(Op.LT, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.LT, new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
-				return new Bool(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0);
+				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
@@ -35,10 +35,10 @@ namespace Lumen.Lang {
 			});
 
 			// <=
-			this.SetMember(Op.LTEQ, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.LTEQ, new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
-				return new Bool(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) <= 0);
+				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) <= 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
@@ -47,10 +47,10 @@ namespace Lumen.Lang {
 			});
 
 			// >
-			this.SetMember(Op.GT, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.GT, new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
-				return new Bool(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) > 0);
+				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) > 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
@@ -59,10 +59,10 @@ namespace Lumen.Lang {
 			});
 
 			// >=
-			this.SetMember(Op.GTEQ, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.GTEQ, new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
-				return new Bool(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) >= 0);
+				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) >= 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
@@ -71,7 +71,7 @@ namespace Lumen.Lang {
 			});
 
 			// <=>
-			this.SetMember(Op.SHIP, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.SHIP, new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 				return new Number(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope));
 			}) {
@@ -112,7 +112,7 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Bool(comparator.Run(new Scope(scope), y, x).ToDouble(scope) <= 0 
+				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) <= 0
 				&& comparator.Run(scope, x, z).ToDouble(scope) <= 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {
@@ -129,7 +129,7 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Bool(comparator.Run(new Scope(scope), y, x).ToDouble(scope) < 0
+				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) < 0
 				&& comparator.Run(scope, x, z).ToDouble(scope) <= 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {
@@ -146,7 +146,7 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Bool(comparator.Run(new Scope(scope), y, x).ToDouble(scope) <= 0
+				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) <= 0
 				&& comparator.Run(scope, x, z).ToDouble(scope) < 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {
@@ -163,7 +163,7 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Bool(comparator.Run(new Scope(scope), y, x).ToDouble(scope) < 0
+				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) < 0
 				&& comparator.Run(scope, x, z).ToDouble(scope) < 0);
 			}) {
 				Arguments = new System.Collections.Generic.List<IPattern> {

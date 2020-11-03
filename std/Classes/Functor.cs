@@ -12,10 +12,9 @@ namespace Lumen.Lang {
 	internal class Functor : Module {
 		internal Functor() {
 			this.Name = "Functor";
-			this.EntitiyType = EntitiyType.MODULE;
 
 			this.SetMember("fmap", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Functor.fmap", scope["x"].Type.ToString());
+				Prelude.FunctionIsNotImplementedForType("Functor.fmap", scope["x"].Type, scope);
 				return Const.UNIT;
 			}) {
 				Name = "fmap",

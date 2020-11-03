@@ -1031,8 +1031,8 @@ namespace ldoc {
 			while (!this.Match(TokenType.END)) {
 				if (this.Match(TokenType.EOF)) {
 					throw new LumenException("пропущена закрывающая фигурная скобка") {
-						line = line,
-						file = this.fileName
+						Line = line,
+						File = this.fileName
 					};
 				}
 

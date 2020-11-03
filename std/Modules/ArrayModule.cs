@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 using Lumen.Lang.Expressions;
-using System.Linq;
 
 namespace Lumen.Lang {
 	internal class ArrayModule : Module {
@@ -28,7 +27,7 @@ Array.refs
 			 */
 
 			#region operators
-			this.SetMember(Op.SETI, new LambdaFun((e, args) => {
+			this.SetMember(Constants.SETI, new LambdaFun((e, args) => {
 				List<Value> exemplare = e.Get("array").ToList(e);
 
 				List<Value> result = new List<Value>();
@@ -113,7 +112,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("element") , new NamePattern("self")
+					new NamePattern("element") ,
+					new NamePattern("self")
 				}
 			});
 
@@ -129,7 +129,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("element") , new NamePattern("self")
+					new NamePattern("element"),
+					new NamePattern("self")
 				}
 			});
 
@@ -142,19 +143,31 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("predicate") , new NamePattern("self")
+					new NamePattern("predicate"),
+					new NamePattern("self")
 				}
 			});
 
 			this.SetMember("toText", new LambdaFun((e, args) => {
-				Array v = e["self"].ToArray(e);
-				return new Text(v.ToString());
+				return new Text(e["self"].ToString());
+			}) {
+				Arguments = Const.Self
+			});
+
+			this.SetMember("sort", new LambdaFun((scope, args) => {
+				List<Value> value = new List<Value>();
+				value.AddRange(scope["self"].ToList(scope));
+
+				value.Sort();
+
+				return new Array(value);
 			}) {
 				Arguments = Const.Self
 			});
 
 			this.SetMember("sortBy", new LambdaFun((scope, args) => {
-				List<Value> value = scope["self"].Clone().ToList(scope);
+				List<Value> value = new List<Value>();
+				value.AddRange(scope["self"].ToList(scope));
 
 				Fun mutator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
@@ -165,21 +178,15 @@ Array.refs
 
 				return new Array(value);
 			}) {
-				Arguments = Const.SelfOther
-			});
-
-			this.SetMember("sort", new LambdaFun((e, args) => {
-				List<Value> value = e["self"].Clone().ToList(e);
-
-				value.Sort();
-
-				return new Array(value);
-			}) {
-				Arguments = Const.Self
+				Arguments = new List<IPattern> {
+					new NamePattern("other"),
+					new NamePattern("self")
+				}
 			});
 
 			this.SetMember("sortWith", new LambdaFun((scope, args) => {
-				List<Value> value = scope["self"].Clone().ToList(scope);
+				List<Value> value = new List<Value>();
+				value.AddRange(scope["self"].ToList(scope));
 
 				Fun comparator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
@@ -188,11 +195,15 @@ Array.refs
 
 				return new Array(value);
 			}) {
-				Arguments = Const.SelfOther
+				Arguments = new List<IPattern> {
+					new NamePattern("other"),
+					new NamePattern("self")
+				}
 			});
 
-			this.SetMember("sortDescending", new LambdaFun((e, args) => {
-				List<Value> value = e["self"].Clone().ToList(e);
+			this.SetMember("sortDescending", new LambdaFun((scope, args) => {
+				List<Value> value = new List<Value>();
+				value.AddRange(scope["self"].ToList(scope));
 
 				value.Sort((i, j) => j.CompareTo(i));
 
@@ -202,7 +213,8 @@ Array.refs
 			});
 
 			this.SetMember("sortDescendingBy", new LambdaFun((scope, args) => {
-				List<Value> value = scope["self"].Clone().ToList(scope);
+				List<Value> value = new List<Value>();
+				value.AddRange(scope["self"].ToList(scope));
 
 				Fun mutator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
@@ -213,11 +225,15 @@ Array.refs
 
 				return new Array(value);
 			}) {
-				Arguments = Const.SelfOther
+				Arguments = new List<IPattern> {
+					new NamePattern("other"),
+					new NamePattern("self")
+				}
 			});
 
 			this.SetMember("sortDescendingWith", new LambdaFun((scope, args) => {
-				List<Value> value = scope["self"].Clone().ToList(scope);
+				List<Value> value = new List<Value>();
+				value.AddRange(scope["self"].ToList(scope));
 
 				Fun comparator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
@@ -226,12 +242,15 @@ Array.refs
 
 				return new Array(value);
 			}) {
-				Arguments = Const.SelfOther
+				Arguments = new List<IPattern> {
+					new NamePattern("other"),
+					new NamePattern("self")
+				}
 			});
 
 			this.SetMember("contains", new LambdaFun((scope, args) => {
 				List<Value> self = scope["self"].ToList(scope);
-				return (Bool)self.Contains(scope["elem"]);
+				return new Logical(self.Contains(scope["elem"]));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("elem"),
@@ -313,7 +332,7 @@ Array.refs
 				Arguments = Const.Self
 			});
 
-			this.SetMember("fromStream", new LambdaFun((scope, args) => { 
+			this.SetMember("fromStream", new LambdaFun((scope, args) => {
 				return new Array(scope["x"].ToStream(scope));
 			}) {
 				Name = "fromStream",
@@ -330,7 +349,7 @@ Array.refs
 				}
 			});
 
-			this.IncludeMixin(Prelude.Collection);
+			this.AppendImplementation(Prelude.Collection);
 		}
 
 		private static Int32 Index(Int32 index, Int32 count) {

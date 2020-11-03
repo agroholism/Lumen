@@ -13,13 +13,13 @@ namespace Lumen.Lang {
 
 			#region operators
 
-			this.SetMember(Op.PLUS, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				return new Text(scope["self"].ToString() + scope["other"].ToString());
 			}) {
 				Arguments = Const.SelfOther
 			});
 
-			this.SetMember(Op.STAR, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.STAR, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 				Value other = scope["other"];
 
@@ -49,7 +49,7 @@ namespace Lumen.Lang {
 				Arguments = Const.SelfOther
 			});
 
-			this.SetMember(Op.MOD, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.MOD, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 				Value other = scope["other"];
 
@@ -58,7 +58,7 @@ namespace Lumen.Lang {
 				Arguments = Const.SelfOther
 			});
 
-			this.SetMember(Op.SLASH, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.SLASH, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 				Value other = scope["other"];
 
@@ -91,7 +91,7 @@ namespace Lumen.Lang {
 				Arguments = Const.SelfOther
 			});
 
-			this.SetMember(Op.GETI, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
 				List<Value> indices = scope["indices"].ToList(scope);
@@ -231,7 +231,7 @@ namespace Lumen.Lang {
 			// let contains substring self = ...
 			// Определяет, содержится ли подстрока substring в строке string
 			this.SetMember("contains", new LambdaFun((scope, args) => {
-				return new Bool(scope["self"].ToString().Contains(scope["substring"].ToString()));
+				return new Logical(scope["self"].ToString().Contains(scope["substring"].ToString()));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("substring"),
@@ -243,7 +243,7 @@ namespace Lumen.Lang {
 			this.SetMember("isEmpty", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				return new Bool("" == self);
+				return new Logical("" == self);
 			}) {
 				Arguments = Const.Self
 			});
@@ -251,7 +251,7 @@ namespace Lumen.Lang {
 			this.SetMember("isWhiteSpace", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				return new Bool(String.IsNullOrWhiteSpace(self));
+				return new Logical(String.IsNullOrWhiteSpace(self));
 			}) {
 				Arguments = Const.Self
 			});
@@ -260,7 +260,7 @@ namespace Lumen.Lang {
 			// let contains prefix self = ...
 			// Определяет, начинается ли строка string со строки prefix
 			this.SetMember("isStartsWith", new LambdaFun((scope, args) => {
-				return new Bool(scope["self"].ToString().StartsWith(scope["prefix"].ToString()));
+				return new Logical(scope["self"].ToString().StartsWith(scope["prefix"].ToString()));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("prefix"),
@@ -272,7 +272,7 @@ namespace Lumen.Lang {
 			// let contains suffix self = ...
 			// Определяет, кончается ли строка string на строку prefix
 			this.SetMember("isEndsWith", new LambdaFun((scope, args) => {
-				return new Bool(scope["self"].ToString().EndsWith(scope["suffix"].ToString()));
+				return new Logical(scope["self"].ToString().EndsWith(scope["suffix"].ToString()));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("suffix"),
@@ -554,7 +554,7 @@ namespace Lumen.Lang {
 			this.SetMember("iterLine", new LambdaFun((scope, args) => {
 				Fun action = scope["action"].ToFunction(scope);
 				String[] self = scope["self"].ToString().Split(
-					new[] { Environment.NewLine }, 
+					new[] { Environment.NewLine },
 					StringSplitOptions.None);
 
 				foreach (String i in self) {
@@ -596,9 +596,9 @@ namespace Lumen.Lang {
 			});
 
 
-			this.IncludeMixin(Prelude.Ord);
-			this.IncludeMixin(Prelude.Collection);
-			this.IncludeMixin(Prelude.Cloneable);
+			this.AppendImplementation(Prelude.Ord);
+			this.AppendImplementation(Prelude.Collection);
+			this.AppendImplementation(Prelude.Cloneable);
 		}
 
 		public IEnumerable<Value> GlobalizationEach(String str) {
