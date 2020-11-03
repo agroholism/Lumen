@@ -59,27 +59,64 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
-			/*IEnumerator<Value> enumerator = this.tryBody.EvalWithYield(scope).GetEnumerator();
+			IEnumerator<Value> enumerator = this.tryBody.EvalWithYield(scope).GetEnumerator();
+
+			GeneratorTerminalResult terminalResult = null;
 
 			Exception exception = null;
+			Boolean canNext = true;
 			while (true) {
 				Value val;
 
 				try {
+					if(!canNext) {
+						break;
+					}
+
+					canNext = enumerator.MoveNext();
 					val = enumerator.Current;
-					enumerator.MoveNext();
+					
 				}
 				catch (Exception ex) {
 					exception = ex;
 					break;
 				}
 
-				yield return val;
+				if (val is GeneratorTerminalResult gtr) {
+					terminalResult = gtr;
+				}
+				else {
+					yield return val;
+				}
 			}
 
-			if()*/
+			if(exception != null) {
+				Value raisedException = exception is LumenException lumenException 
+					? lumenException.LumenObject
+					: Helper.Error(exception.Message);
+
+				foreach (KeyValuePair<IPattern, Expression> i in this.patterns) {
+					if (i.Key.Match(raisedException, scope).Success) {
+						 foreach(var x in i.Value.EvalWithYield(scope)) {
+							if (x is GeneratorTerminalResult gtr) {
+								terminalResult = gtr;
+							}
+							else {
+								yield return x;
+							}
+						}
+						break;
+					}
+				}
+			}
+
+			if(this.finallyBody != null) {
+				foreach (var x in this.finallyBody.EvalWithYield(scope)) {
+					yield return x;
+				}
+			}
+
+			yield return terminalResult;
 		}
 	}
 }

@@ -91,7 +91,6 @@
     <Compile Include="Lexer.cs" />
     <Compile Include="Expression\Literals\MapLiteral.cs" />
     <Compile Include="Expression\Generators\ListGenerator.cs" />
-    <Compile Include="Expression\Literals\PairLiteral.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Expression\Application\TailRecursion.cs" />
     <Compile Include="Raise.cs" />

@@ -46,11 +46,11 @@ namespace Lumen.Lmi {
         }
 
         public static Value Eval(String source, String fileName="", Scope? scope = null) {
-          try {
+         // try {
                 List<Token> tokens = new Lexer(source, fileName).Tokenization();
                 return new Parser(tokens, fileName).Parse().Select(i => 
                     i.Eval(scope ?? mainScope)).Last();
-			//try { 
+			try { 
         }
 			catch (LumenException uex) {
                 WriteException(uex.ToString());

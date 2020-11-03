@@ -11,7 +11,6 @@ namespace lmi {
                 RunInteractive();
             } else {
                 Interpriter.Start(args[0]);
-                Console.ReadKey();
             }
         }
 

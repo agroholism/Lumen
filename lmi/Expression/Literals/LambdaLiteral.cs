@@ -44,8 +44,7 @@ namespace Lumen.Lmi {
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
+			yield return new GeneratorTerminalResult(this.Eval(scope));
 		}
 
 		/*public override String ToString() {

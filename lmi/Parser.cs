@@ -109,7 +109,7 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.EXCEPT)) {
 				this.Match(TokenType.COLON);
 
-				while (this.Match( TokenType.BAR)) {
+				while (this.Match(TokenType.BAR)) {
 					IPattern pattern = this.ParsePattern();
 					this.Match(TokenType.LAMBDA);
 
@@ -120,7 +120,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			if(this.Match(TokenType.FINALLY)) {
+			if (this.Match(TokenType.FINALLY)) {
 				this.Match(TokenType.COLON);
 
 				finallyBody = Expression();
@@ -176,7 +176,7 @@ namespace Lumen.Lmi {
 				this.ParseDefaultConstructor(defaultConstructors);
 			}
 
-			if(defaultConstructors.Count == 0) {
+			if (defaultConstructors.Count == 0) {
 				defaultConstructors.Add(new ConstructorMetadata(typeName, new List<String>()));
 			}
 
@@ -956,7 +956,7 @@ namespace Lumen.Lmi {
 					elements.Add(this.Expression());
 					this.MatchAny(TokenType.SPLIT, TokenType.EOC);
 
-					if(shouldExpectEndToken && this.LookMatch(0, TokenType.BLOCK_END) && this.LookMatch(1, TokenType.RBRACKET)) {
+					if (shouldExpectEndToken && this.LookMatch(0, TokenType.BLOCK_END) && this.LookMatch(1, TokenType.RBRACKET)) {
 						this.Match(TokenType.BLOCK_END);
 					}
 				}
@@ -1027,8 +1027,8 @@ namespace Lumen.Lmi {
 				return new SequenceGenerator(result.pattern, result.expression, result.body);
 			}
 
-			if(this.Match(TokenType.FUN)) {
-				if(this.LookMatch(0, TokenType.BAR)) {
+			if (this.Match(TokenType.FUN)) {
+				if (this.LookMatch(0, TokenType.BAR)) {
 					return this.ParseLambdaMatch();
 				}
 
@@ -1048,10 +1048,6 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.LPAREN)) {
 				Int32 line = this.line;
 				Expression result = this.Expression();
-				if (this.Match(TokenType.SPLIT)) {
-					Expression sndExpression = this.Expression();
-					result = new PairLiteral(result, sndExpression, line, this.fileName);
-				}
 				this.Match(TokenType.RPAREN);
 				return result;
 			}
@@ -1075,7 +1071,7 @@ namespace Lumen.Lmi {
 				patterns.Add(pattern, body);
 			}
 
-			return new LambdaLiteral(new List<IPattern> { new NamePattern("<x>") }, 
+			return new LambdaLiteral(new List<IPattern> { new NamePattern("<x>") },
 				new MatchE(new IdExpression("<x>", this.line, this.fileName), patterns));
 		}
 
