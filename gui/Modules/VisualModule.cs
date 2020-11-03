@@ -2,7 +2,7 @@
 
 namespace Lumen.Lang.Libraries.Visual {
     public class Visual : Module {
-        public static TypeClass Control { get; } = new ControlTC();
+      //  public static TypeClass Control { get; } = new ControlTC();
 
         public static FormModule RForm { get; } = new FormModule();
 
@@ -17,7 +17,7 @@ namespace Lumen.Lang.Libraries.Visual {
         public static Visual Instance { get; } = new Visual();
 
         private Visual() {
-            this.SetMember("Control", Control);
+       //     this.SetMember("Control", Control);
             this.SetMember("Form", RForm);
             this.SetMember("Color", ColorType);
             this.SetMember("Button", Button);

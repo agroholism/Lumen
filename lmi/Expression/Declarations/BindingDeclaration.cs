@@ -37,7 +37,7 @@ namespace Lumen.Lmi {
 
 			Value assignableValue = Const.UNIT;
 			foreach (Value result in assignableExpressionEvaluationResults) {
-				if (result is CurrGeenVal cgv) {
+				if (result is GeneratorTerminalResult cgv) {
 					assignableValue = cgv.Value;
 					break;
 				}
@@ -52,7 +52,7 @@ namespace Lumen.Lmi {
 				};
 			}
 
-			yield return new CurrGeenVal(assignableValue);
+			yield return new GeneratorTerminalResult(assignableValue);
 		}
 
 		public Expression Closure(ClosureManager manager) {

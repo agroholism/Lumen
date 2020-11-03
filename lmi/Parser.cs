@@ -244,7 +244,7 @@ namespace Lumen.Lmi {
 			IPattern result = null;
 
 			if (this.Match(TokenType.DOTDOT)) {
-				if (!ValidToken()) {
+				if (!this.ValidToken()) {
 					result = new RangePattern(result, null, false);
 				}
 				else {
@@ -253,7 +253,7 @@ namespace Lumen.Lmi {
 			}
 
 			if (this.Match(TokenType.DOTDOTDOT)) {
-				if (!ValidToken()) {
+				if (!this.ValidToken()) {
 					result = new RangePattern(result, null, true);
 				}
 				else {
@@ -263,10 +263,6 @@ namespace Lumen.Lmi {
 
 			if (this.Match(TokenType.LPAREN)) {
 				result = this.ParsePattern();
-				if (this.Match(TokenType.SPLIT)) {
-					IPattern subp = this.ParsePattern();
-					result = new PairPattern(result, subp);
-				}
 				this.Match(TokenType.RPAREN);
 			}
 			else if (this.Match(TokenType.VOID)) {
@@ -360,7 +356,7 @@ namespace Lumen.Lmi {
 
 			if (result is ValuePattern) {
 				if (this.Match(TokenType.DOTDOT)) {
-					if (!ValidToken()) {
+					if (!this.ValidToken()) {
 						result = new RangePattern(result, null, false);
 					}
 					else {
@@ -369,7 +365,7 @@ namespace Lumen.Lmi {
 				}
 
 				if (this.Match(TokenType.DOTDOTDOT)) {
-					if (!ValidToken()) {
+					if (!this.ValidToken()) {
 						result = new RangePattern(result, null, true);
 					}
 					else {
@@ -543,10 +539,22 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseWhile() {
-			Expression condition = this.Expression();
-			this.Match(TokenType.COLON);
-			Expression body = this.Expression();
-			return new WhileExpression(condition, body);
+			if (this.Match(TokenType.LET)) {
+				IPattern pattern = this.ParsePattern();
+				this.Match(TokenType.EQUALS);
+				Expression assinableExpression = this.Expression();
+
+				this.Match(TokenType.COLON);
+				Expression body = this.Expression();
+
+				return new WhileLet(pattern, assinableExpression, body);
+			}
+			else {
+				Expression condition = this.Expression();
+				this.Match(TokenType.COLON);
+				Expression body = this.Expression();
+				return new WhileExpression(condition, body);
+			}
 		}
 
 		private Expression LogikOr() {
@@ -761,7 +769,7 @@ namespace Lumen.Lmi {
 
 
 			if (this.Match(TokenType.NOT)) {
-				return new BinaryOperator(this.DoubleColon(), null, "not", line, this.fileName);
+				return new BinaryOperator(this.DoubleColon(), null, "not", this.line, this.fileName);
 			}
 
 			if (this.MatchAny(TokenType.MINUS, TokenType.NOT, TokenType.BANG,
@@ -800,6 +808,7 @@ namespace Lumen.Lmi {
 				|| this.LookMatch(0, TokenType.TEXT)
 				|| this.LookMatch(0, TokenType.VOID)
 				|| this.LookMatch(0, TokenType.YIELD)
+				|| this.LookMatch(0, TokenType.FUN)
 				|| this.LookMatch(0, TokenType.WORD);
 		}
 
@@ -867,14 +876,7 @@ namespace Lumen.Lmi {
 		private Expression Primary() {
 			Token Current = this.GetToken(0);
 
-			// Identifiters
 			if (this.Match(TokenType.WORD)) {
-				// Lambdas x -> ...
-				if (this.Match(TokenType.LAMBDA)) {
-					NamePattern argument = new NamePattern(Current.Text);
-					return new LambdaLiteral(new List<IPattern> { argument }, this.Expression());
-				}
-
 				return new IdExpression(Current.Text, Current.Line, this.fileName);
 			}
 
@@ -960,10 +962,6 @@ namespace Lumen.Lmi {
 				return new ValueLiteral(Double.Parse(Current.Text, System.Globalization.NumberFormatInfo.InvariantInfo));
 			}
 
-			if (this.Match(TokenType.REGEX_LITERAL)) {
-				return new ValueLiteral(new System.Text.RegularExpressions.Regex(Current.Text));
-			}
-
 			// Sequence generators
 			if (this.LookMatch(0, TokenType.LPAREN) && this.LookMatch(1, TokenType.FOR)) {
 				this.Match(TokenType.LPAREN);
@@ -976,42 +974,18 @@ namespace Lumen.Lmi {
 				return new SequenceGenerator(result.pattern, result.expression, result.body);
 			}
 
-			// Lambdas () -> ...
-			if (this.LookMatch(0, TokenType.VOID) && this.LookMatch(1, TokenType.LAMBDA)) {
-				this.Match(TokenType.VOID);
-				this.Match(TokenType.LAMBDA);
-				return new LambdaLiteral(new List<IPattern>(), this.Expression());
-			}
-
-			// Lambdas (x) -> ...
-			if (this.LookMatch(0, TokenType.LPAREN) && this.LookMatch(1, TokenType.WORD)
-				&& this.LookMatch(2, TokenType.RPAREN) && this.LookMatch(3, TokenType.LAMBDA)) {
-				this.Match(TokenType.LPAREN);
-				NamePattern arg = new NamePattern(this.Consume(TokenType.WORD).Text);
-				this.Match(TokenType.RPAREN);
-				this.Match(TokenType.LAMBDA);
-				return new LambdaLiteral(new List<IPattern> { arg }, this.Expression());
-			}
-
-
-			// Lambdas (x, ...) -> ...
-			if (this.LookMatch(0, TokenType.LPAREN) && this.LookMatch(1, TokenType.WORD)
-				&& this.LookMatch(2, TokenType.SPLIT)) {
-				this.Match(TokenType.LPAREN);
-
-				List<IPattern> args = new List<IPattern>();
-
-				while (!this.Match(TokenType.RPAREN)) {
-					args.Add(new NamePattern(this.Consume(TokenType.WORD).Text));
-					this.Match(TokenType.SPLIT);
-
-					if (this.Match(TokenType.EOF)) {
-						throw new LumenException(Exceptions.UNCLOSED_LAMBDA, line: Current.Line, fileName: this.fileName);
-					}
+			if(this.Match(TokenType.FUN)) {
+				if(this.LookMatch(0, TokenType.BAR)) {
+					return this.ParseLambdaMatch();
 				}
 
-				this.Consume(TokenType.LAMBDA);
-				return new LambdaLiteral(args, this.Expression());
+				List<IPattern> patterns = new List<IPattern>();
+
+				while (!this.Match(TokenType.LAMBDA)) {
+					patterns.Add(this.ParsePattern());
+				}
+
+				return new LambdaLiteral(patterns, this.Expression());
 			}
 
 			if (this.Match(TokenType.VOID)) {
@@ -1034,6 +1008,22 @@ namespace Lumen.Lmi {
 			}
 
 			return this.BlockExpression();
+		}
+
+		private Expression ParseLambdaMatch() {
+			Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
+
+			while (this.Match(TokenType.BAR)) {
+				IPattern pattern = this.ParsePattern();
+				this.Match(TokenType.LAMBDA);
+
+				Expression body = this.Expression();
+
+				patterns.Add(pattern, body);
+			}
+
+			return new LambdaLiteral(new List<IPattern> { new NamePattern("<x>") }, 
+				new MatchE(new IdExpression("<x>", this.line, this.fileName), patterns));
 		}
 
 		private Expression BlockExpression() {

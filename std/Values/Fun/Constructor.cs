@@ -57,7 +57,7 @@ namespace Lumen.Lang {
 				return result;
 			}
 
-			throw new LumenException("fne");
+			throw new LumenException($"fne {name} {this.Name}");
 		}
 
 		public Value Run(Scope e, params Value[] arguments) {

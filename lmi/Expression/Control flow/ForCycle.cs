@@ -88,7 +88,7 @@ namespace Lumen.Lmi {
 
 				if(y != null) {
 					foreach (Value it in y) {
-						if(it is CurrGeenVal) {
+						if(it is GeneratorTerminalResult) {
 							break;
 						}
 						yield return it;

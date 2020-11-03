@@ -29,7 +29,7 @@ namespace Lumen.Lmi {
 
 		public Value Eval(Scope scope) {
 			Tuple<Module, Module> module = ImportFromPath(scope);
-
+	
 			if(this.isFrom) {
 				if(this.importAll) {
 					foreach(var i in module.Item1.Members) {
@@ -232,10 +232,11 @@ namespace Lumen.Lmi {
 			if (Prelude.GlobalImportCache.ContainsKey(fullPath)) {
 				return new Tuple<Module, Module>(this.GetRequiredModule(Prelude.GlobalImportCache[fullPath], diffbc, scope), Prelude.GlobalImportCache[fullPath]);
 			}
-
+		
 			Module lowLevelModule = this.CreateModules(diffbr, scope, out Module topLevelModule);
 			this.ImportFileIntoModule(scope, fullPath, lowLevelModule);
 			Prelude.GlobalImportCache[fullPath] = topLevelModule;
+		
 			return new Tuple<Module, Module>(lowLevelModule, topLevelModule);
 						/*if (Directory.Exists(this.path)) {
 				if (this.importAll) {

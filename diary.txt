@@ -1,9 +1,6 @@
 // TODO
 Fix imports!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-11.02.2020
-+ readWith
-
 Lumen 0.6
 - 05.05.2019
 * improvements of curring
@@ -48,7 +45,7 @@ Lumen 0.6
 Lumen 0.8
 - 01.04.2020
 * function can not have tail recursion and yield at the same time
-* [||] and where patterns
+* [||] and if patterns
 * return in generators now allowed
 * from in array/list literals
 * assert function
@@ -59,12 +56,25 @@ Lumen 0.8
 * exception types
 * raise operator
 
+02.11.2020
++ readWith
++ class Applicative
++ Text patterns
++ Range patterns
++ Text functions
++ Cloneable
+
+03.11.2020
++ Classes now can implement other classes.
++ Fix pipe operator parsing.
++ nl const
++ while let
+
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)
-- while let
 - Pair - what is it?
-- functors
 - module - it is required?
 
 MODULE unsafe - macro, that changes a parent scope
@@ -75,15 +85,9 @@ NON STRICT FOREACH
    and callFirst () = callSecond()
 10. operator in pattern matching?
 9. match operator for strings and regex
-12 range pattern
 4. ... in pattern matching
 6. map literal ?
 14. Result ?
-let m = {| x: val, y: val2 |}
-let p = {| 1, 2, 3, 4, 5 |}
-let x = anoymous (| x = 5, y = 3 |)
-let x = type { x = 5, y = 3 }  
-let y = type { x with y = 9 }
 
 			if (ActiveBottomControl == control) {
 				return;

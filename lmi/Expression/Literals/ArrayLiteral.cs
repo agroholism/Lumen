@@ -41,7 +41,7 @@ namespace Lumen.Lmi {
 
 			foreach(var i in this.elements) {
 				foreach(var j in i.EvalWithYield(scope)) {
-					if(j is CurrGeenVal cgv) {
+					if(j is GeneratorTerminalResult cgv) {
 						result.Add(cgv.Value);
 					} else {
 						yield return j;
@@ -49,7 +49,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			yield return new CurrGeenVal(new Array(result));
+			yield return new GeneratorTerminalResult(new Array(result));
 		}
 	}
 }

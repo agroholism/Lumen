@@ -8,11 +8,11 @@ using System.Text;
 using Lumen;
 
 public static class Main {
-    public static void Import(Scope scope, String s) {
+  /*  public static void Import(Scope scope, String s) {
         StandartModule.__Kernel__.Set("web", web.Web.Instance);
-    }
+    }*/
 }
-
+/*
 namespace web {
     public class Web : Module {
         public static Web Instance { get; } = new Web();
@@ -60,3 +60,4 @@ namespace web {
         }
     }
 }
+*/

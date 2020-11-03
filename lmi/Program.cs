@@ -1,10 +1,12 @@
 ﻿using Lumen.Lmi;
 using System;
 using Lumen.Lang;
+using System.IO;
 
 namespace lmi {
 	public class Program {
         public static void Main(String[] args) {
+            Interpriter.BasePath = Directory.GetCurrentDirectory();
             if (args.Length == 0) {
                 RunInteractive();
             } else {

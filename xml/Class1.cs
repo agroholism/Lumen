@@ -8,7 +8,7 @@ using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
 public static class Main {
-	public static void Import(Scope scope, String s) {
+/*	public static void Import(Scope scope, String s) {
 		scope.Bind("Xml", XMLModule.Instance);
 	}
 
@@ -197,8 +197,8 @@ public static class Main {
 			return Document.ToString();
 		}
 	}
-
-	public class XmlElement : Value {
+*/
+	/*public class XmlElement : Value {
 		internal XElement Element { get; set; }
 
 		public XmlElement(XElement node) {
@@ -249,8 +249,8 @@ public static class Main {
 			return Attribute.ToString();
 		}
 	}
-
-	public class XmlName : Value {
+	*/
+	/*public class XmlName : Value {
 		internal XName Value { get; set; }
 
 		public XmlName(XName value) {
@@ -274,5 +274,5 @@ public static class Main {
 		public override String ToString() {
 			return Value.ToString();
 		}
-	}
+	}*/
 }

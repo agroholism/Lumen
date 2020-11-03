@@ -15,7 +15,7 @@ namespace Lumen.Anatomy {
 
 			this.SetMember("host", new Text(project.GetHost()));
 
-			this.SetField("rel x", (scope, args) => {
+			/*this.SetField("rel x", (scope, args) => {
 				return new Text(this.GetMember("host", scope) + scope["x"].ToString(scope));
 			});
 
@@ -34,7 +34,7 @@ namespace Lumen.Anatomy {
 
 			this.SetField("getTemplate name", (scope, args) => {
 				return new Template(scope["name"].ToString(scope), project);
-			});
+			});*/
 		}
 	}
 

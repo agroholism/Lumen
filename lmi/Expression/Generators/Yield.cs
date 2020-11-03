@@ -22,16 +22,16 @@ namespace Lumen.Lmi {
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			yield return this.expression.Eval(scope);
 			if (scope.IsExsists("<curr-gen-val>")) {
-				yield return new CurrGeenVal( scope["<curr-gen-val>"]);
+				yield return new GeneratorTerminalResult( scope["<curr-gen-val>"]);
 				scope.Remove("<curr-gen-val>");
 			} else {
-				yield return new CurrGeenVal(Const.UNIT);
+				yield return new GeneratorTerminalResult(Const.UNIT);
 			}
 		}
 	}
 
-	class CurrGeenVal : BaseValueImpl {
-		public CurrGeenVal(Value value) {
+	class GeneratorTerminalResult : BaseValueImpl {
+		public GeneratorTerminalResult(Value value) {
 			this.Value = value;
 		}
 

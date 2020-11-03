@@ -62,7 +62,7 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			yield return new CurrGeenVal(this.Eval(scope));
+			yield return new GeneratorTerminalResult(this.Eval(scope));
 		}
 	}
 }

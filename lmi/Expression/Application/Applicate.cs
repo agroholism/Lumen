@@ -116,7 +116,7 @@ TAIL_RECURSION:
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			Value callableValue = Const.UNIT;
 			foreach (Value result in this.callableExpression.EvalWithYield(scope)) {
-				if (result is CurrGeenVal cgv) {
+				if (result is GeneratorTerminalResult cgv) {
 					callableValue = cgv.Value;
 				}
 				else {
@@ -125,7 +125,7 @@ TAIL_RECURSION:
 			}
 
 			if (callableValue is SingletonConstructor) {
-				yield return new CurrGeenVal(callableValue);
+				yield return new GeneratorTerminalResult(callableValue);
 				yield break;
 			}
 
@@ -152,7 +152,7 @@ TAIL_RECURSION:
 
 		private IEnumerable<Value> CallFunctionWithYield(Fun function, Scope e) {
 			if (this.argumentsExpression.Any(i => i is IdExpression id && id.id == "_")) {
-				yield return new CurrGeenVal(this.MakePartial(function, e));
+				yield return new GeneratorTerminalResult(this.MakePartial(function, e));
 			}
 
 			Scope innerScope = new Scope(e);
@@ -161,7 +161,7 @@ TAIL_RECURSION:
 			foreach (Expression i in this.argumentsExpression) {
 				foreach (Value j in i.EvalWithYield(e)) {
 					switch (j) {
-						case CurrGeenVal cgv:
+						case GeneratorTerminalResult cgv:
 							args.Add(cgv.Value);
 							break;
 						default:
@@ -171,7 +171,7 @@ TAIL_RECURSION:
 				}
 			}
 
-			yield return new CurrGeenVal(this.ProcessCall(e, innerScope, function, args.ToArray()));
+			yield return new GeneratorTerminalResult(this.ProcessCall(e, innerScope, function, args.ToArray()));
 		}
 
 		public Expression Closure(ClosureManager manager) {

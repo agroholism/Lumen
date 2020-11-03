@@ -28,22 +28,23 @@ namespace Lumen.Lmi {
 			Value value = Const.UNIT;
 			Value result = Const.UNIT;
 
-			Value endres = Const.UNIT;
-
-
 			Exception ex = null;
+
+			Value endres;
 			try {
 				value = onEnter.Run(new Scope(e), context);
 				e[this.name] = value;
 
 				result = this.body.Eval(e);
-			} catch (Exception exep) {
+			}
+			catch (Exception exep) {
 				ex = exep;
 			}
 			finally {
-				if(ex == null) {
+				if (ex == null) {
 					endres = onExit.Run(new Scope(e), context, value, result);
-				} else {
+				}
+				else {
 					endres = onExit.Run(new Scope(e), context, value, result, new Text(ex.Message));
 				}
 			}

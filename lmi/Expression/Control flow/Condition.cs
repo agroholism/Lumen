@@ -27,7 +27,7 @@ namespace Lumen.Lmi {
 
 			Value condition = Const.UNIT;
 			foreach (Value result in conditionEvaluationResult) {
-				if (result is CurrGeenVal cgv) {
+				if (result is GeneratorTerminalResult cgv) {
 					condition = cgv.Value;
 					break;
 				}

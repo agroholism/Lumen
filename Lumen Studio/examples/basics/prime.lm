@@ -24,7 +24,7 @@ let primes p::xs =
 
 let primes''' [] = [] 
 let primes''' x::xs =
-    x :: rec xs.[i -> mod i x > 0]
+    x :: rec xs.[fun i -> mod i x > 0]
 
 // Erathosphene sieve with tail recursion
 let primes' xs =
@@ -36,7 +36,7 @@ let primes' xs =
 let primes'' xs =
     let sieve res [] = res
     let sieve res x::xs =
-        tailrec (res + [x]) xs.[i -> mod i x > 0]
+        tailrec (res + [x]) xs.[fun i -> mod i x > 0]
     return sieve [] xs
 
 print (primes [for i in 2...10: i])  //-> [2, 3, 5, 7] 

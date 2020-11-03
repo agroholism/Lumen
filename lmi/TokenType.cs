@@ -87,27 +87,19 @@
         ARRAY_OPEN,
         ARRAY_CLOSED,
         TAIL_REC,
-        FUNCTORBIND,
-        BIND,
-        APPLICATIVEF,
-        BFUNCTORBIND,
-        MUTABLE,
         CONTEXT,
         IMPLEMENTS,
 		CLASS,
 		REC,
 		YIELD,
 		FROM,
-		CONSTRUCTOR,
 		BANG,
-		EXTEND,
 		MIDDLE_PRIORITY_RIGTH,
 		ATTRIBUTE,
 		WHEN,
-		REGEX_LITERAL,
 		QUESTION,
 		USE,
 		RAISE,
-		BY
+		FUN
 	}
 }

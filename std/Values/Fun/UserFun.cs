@@ -84,7 +84,7 @@ namespace Lumen.Lang {
 		}
 
 		public String ToString(String format, IFormatProvider formatProvider) {
-			throw new NotImplementedException();
+			return "user fun";
 		}
 	}
 }

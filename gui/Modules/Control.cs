@@ -7,7 +7,7 @@ using Lumen.Lang.Expressions;
 using System;
 
 namespace Lumen.Lang.Libraries.Visual {
-    public class ControlTC : TypeClass {
+    /*public class ControlTC : TypeClass {
         public ControlTC() {
             this.Name = "Visual.Control";
 
@@ -146,5 +146,5 @@ namespace Lumen.Lang.Libraries.Visual {
                 }
             });
         }
-    }
+    }*/
 }

@@ -34,8 +34,25 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
+			IEnumerable<Value> conditionEvaluationResult = this.assinableExpression.EvalWithYield(scope);
+
+			Value valueToCheck = Const.UNIT;
+			foreach (Value result in conditionEvaluationResult) {
+				if (result is GeneratorTerminalResult generatorResult) {
+					valueToCheck = generatorResult.Value;
+					break;
+				}
+
+				yield return result;
+			}
+
+			Boolean matchResult = this.pattern.Match(valueToCheck, scope).Success;
+
+			IEnumerable<Value> expressionResults = matchResult ? this.trueExpression.EvalWithYield(scope) : this.falseExpression.EvalWithYield(scope);
+
+			foreach (Value result in expressionResults) {
+				yield return result;
+			}
 		}
 	}
 }

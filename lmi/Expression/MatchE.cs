@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
+using System;
 
 namespace Lumen.Lmi {
 	internal class MatchE : Expression {
@@ -14,11 +15,12 @@ namespace Lumen.Lmi {
 
         public Expression Closure(ClosureManager manager) {
             Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
+
             foreach(KeyValuePair<IPattern, Expression> i in this.patterns) {
 				ClosureManager manager2 = manager.Clone();
 
                 IPattern ip = i.Key.Closure(manager2) as IPattern;
-
+               
                 patterns.Add(ip, i.Value.Closure(manager2));
 
 				if(manager2.HasYield) {
@@ -31,7 +33,7 @@ namespace Lumen.Lmi {
 
         public Value Eval(Scope e) {
             Value value = this.matchedExpression.Eval(e);
-
+ 
             foreach(KeyValuePair<IPattern, Expression> i in this.patterns) {
                 if(i.Key.Match(value, e).Success) {
                     return i.Value.Eval(e);

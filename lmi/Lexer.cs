@@ -31,14 +31,12 @@ namespace Lumen.Lmi {
 			[">>-"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, ">>-"),
 			["-<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "-<"),
 			["-<<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "-<<"),
-			[">>="] = new Token(TokenType.BIND, ">>="),
 
 			["=>"] = new Token(TokenType.CONTEXT, Op.RSH),
 
 			["("] = new Token(TokenType.LPAREN),
 			[")"] = new Token(TokenType.RPAREN),
 
-			["<$"] = new Token(TokenType.NOT_EQUALS),
 			["<$>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH),
 
 			["="] = new Token(TokenType.EQUALS, Op.EQUALS),
@@ -394,7 +392,6 @@ namespace Lumen.Lmi {
 				&& last != TokenType.AS
 				&& last != TokenType.ASSIGN
 				&& last != TokenType.ATTRIBUTE_OPEN
-				&& last != TokenType.BIND
 				&& last != TokenType.BPIPE
 				&& last != TokenType.BRIGTH
 				&& last != TokenType.BXOR
@@ -407,7 +404,6 @@ namespace Lumen.Lmi {
 				&& last != TokenType.EQUALS
 				&& last != TokenType.FOR
 				&& last != TokenType.FPIPE
-				&& last != TokenType.FUNCTORBIND
 				&& last != TokenType.GT
 				&& last != TokenType.GTEQ
 				&& last != TokenType.IF
@@ -454,6 +450,9 @@ namespace Lumen.Lmi {
 					break;
 				case "for":
 					this.AddToken(TokenType.FOR);
+					break;
+				case "fun":
+					this.AddToken(TokenType.FUN);
 					break;
 				case "import":
 					this.AddToken(TokenType.IMPORT);

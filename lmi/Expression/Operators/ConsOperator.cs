@@ -64,7 +64,7 @@ namespace Lumen.Lmi {
 			if (this.leftExpression is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.rightExpression is IdExpression ide2 && ide2.id == "_") {
-						yield return new CurrGeenVal(new UserFun(
+						yield return new GeneratorTerminalResult(new UserFun(
 							new List<IPattern> { new NamePattern("x"), new NamePattern("y") },
 							new ConsOperator(
 								new IdExpression("x", ide.line, ide.file),
@@ -72,7 +72,7 @@ namespace Lumen.Lmi {
 								this.fileName, this.lineNumber)));
 					}
 					else {
-						yield return new CurrGeenVal(new UserFun(
+						yield return new GeneratorTerminalResult(new UserFun(
 							new List<IPattern> { new NamePattern("x") },
 							new ConsOperator(
 								new IdExpression("x", ide.line, ide.file),
@@ -82,7 +82,7 @@ namespace Lumen.Lmi {
 				}
 			}
 			else if (this.rightExpression is IdExpression _ide && _ide.id == "_") {
-				yield return new CurrGeenVal(new UserFun(
+				yield return new GeneratorTerminalResult(new UserFun(
 					new List<IPattern> { new NamePattern("x") },
 					new ConsOperator(
 						new ValueLiteral(this.leftExpression.Eval(e)),
@@ -97,7 +97,7 @@ namespace Lumen.Lmi {
 			IEnumerable<Value> leftExpressionEvaluationResults = this.leftExpression.EvalWithYield(e);
 
 			foreach (Value result in rightExpressionEvaluationResults) {
-				if (result is CurrGeenVal cgv1) {
+				if (result is GeneratorTerminalResult cgv1) {
 					rightOperand = cgv1.Value;
 				}
 				else {
@@ -106,7 +106,7 @@ namespace Lumen.Lmi {
 			}
 
 			foreach (Value result in leftExpressionEvaluationResults) {
-				if (result is CurrGeenVal cgv1) {
+				if (result is GeneratorTerminalResult cgv1) {
 					leftOperand = cgv1.Value;
 				}
 				else {
@@ -116,12 +116,12 @@ namespace Lumen.Lmi {
 
 
 			if (rightOperand is List list) {
-				yield return new CurrGeenVal(new List(new LinkedList(leftOperand, list.value)));
+				yield return new GeneratorTerminalResult(new List(new LinkedList(leftOperand, list.value)));
 			}
 
 			IType type = rightOperand is SingletonConstructor sc ? sc : rightOperand.Type;
 
-			yield return new CurrGeenVal(new Applicate(new DotOperator(new ValueLiteral(type), "::", this.fileName, this.lineNumber), new List<Expression> { new ValueLiteral(leftOperand), new ValueLiteral(rightOperand) }, this.lineNumber, this.fileName).Eval(e));
+			yield return new GeneratorTerminalResult(new Applicate(new DotOperator(new ValueLiteral(type), "::", this.fileName, this.lineNumber), new List<Expression> { new ValueLiteral(leftOperand), new ValueLiteral(rightOperand) }, this.lineNumber, this.fileName).Eval(e));
 		}
 
 		public Expression Closure(ClosureManager manager) {

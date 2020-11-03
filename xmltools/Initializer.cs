@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace xmltools {
 	public static class Intitializer {
 		public static void Inititalize() {
-			ToolStripItem xmlize = new ToolStripButton("Xmlize");
+		/*	ToolStripItem xmlize = new ToolStripButton("Xmlize");
 			xmlize.Click += (sender, e) => {
 				Lumen.Studio.MainForm.MainTextBoxManager.TextBox.SelectedText = Lumen.Studio.MainForm.MainTextBoxManager.TextBox.SelectedText.Replace("&", "&amp;")
 				.Replace("<", "&lt;").Replace(">", "&gt;")
@@ -41,7 +41,7 @@ namespace xmltools {
 					}
 				};
 			}
-
+		*/
 			// Solve a problem
 			/*Lumen.Studio.MainForm.Instance.TextBoxContextMenu.Opening += (sender, e) => {
 				if (!Lumen.Studio.MainForm.MainTextBoxManager.TextBox.Selection.IsEmpty) {
