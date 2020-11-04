@@ -28,10 +28,6 @@ namespace Lumen.Lang {
 		}
 
 		public Value Run(Scope scope, params Value[] args) {
-			if (this.Arguments.Count > args.Length) {
-				return Helper.MakePartial(this, args);
-			}
-
 			foreach (Fun function in this.functions) {
 				Scope s = new Scope(scope);
 				Boolean isFit = true;

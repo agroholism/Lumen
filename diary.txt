@@ -64,13 +64,22 @@ Lumen 0.8
 + Text functions
 + Cloneable
 
-03.11.2020 0.8.7612.10426
+03.11.2020 (0.8.7612.10426)
 + Classes now can implement other classes.
 + Fix pipe operator parsing.
 + nl const
 + while let
 + fun keyword
 + fun + implicit match
+
+04.11.2020 (0.8.7613.4268)
++ try+except+finally
++ try+except+finally+yield
++ type X = exception
++ Error, AssertError
++ fix [(Some x)] to [Some x]
++ changed match syntax from = sign to ->
++ not Type pattern
 
 
 TODO:
