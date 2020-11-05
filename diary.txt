@@ -84,6 +84,8 @@ Lumen 0.8
 + Unknown escape sequences in text literal are errors now
 + Hexadecimal, decimal and octal unicode char codes in text literals
 + Raw text literals
+
+05.11.2020
 + Named for and while cycles
 + Operators retry, redo
 + Operators break when, raise when, return when, retry when, redo when
@@ -94,6 +96,7 @@ Lumen 0.8
 + Keyword 'finally' renamed to 'ensure'
 + Keyword 'if' in pattern matching now replaced with 'when'
 + Allowed when in for cycle
++ Tanimoto switched to Levenshtein
 
 + bug #1 fix "\((1 + 1) + 2)"
 
@@ -102,7 +105,7 @@ TODO:
 - let Left v | Right v = i  YES (make pattern parsing rules)
 - module - it is required?
 
-@intern let
+tests (D)
 
 MODULE unsafe - macro, that changes a parent scope
 

@@ -1,55 +1,133 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections;
 using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
+	public class InfinityRange : BaseValueImpl {
+		public Double Step { get; private set; }
+
+		public Boolean HasStart => false;
+		public Boolean HasEnd => false;
+		public Boolean IsInclusive => false;
+		public Boolean IsDownToUp => this.Step >= 0;
+
+		public override IType Type => Prelude.Stream;
+
+		public InfinityRange() {
+			this.Step = 1;
+		}
+
+		public InfinityRange(Double step) {
+			this.Step = step;
+		}
+
+		public override String ToString() {
+			return $"...";
+		}
+	}
+
+	public class NumberRange : BaseValueImpl, IEnumerable<Value> {
+		public Double? Start { get; private set; }
+		private Double? end;
+		public Double? End =>
+			this.IsInclusive && this.end.HasValue
+				? (this.IsDownToUp ? this.end.Value + 1 : this.end.Value - 1)
+				: this.end;
+
+		public Double Step { get; private set; }
+
+		public Boolean HasStart => this.Start != null;
+		public Boolean HasEnd => this.end != null;
+		public Boolean IsInclusive { get; private set; }
+		public Boolean IsDownToUp => (this.Start ?? 0) <= (this.end ?? Double.PositiveInfinity);
+
+		public override IType Type => Prelude.Stream;
+
+		public NumberRange Clone(Double step) {
+			return new NumberRange(this.Start ?? Double.PositiveInfinity,
+				this.end ?? Double.PositiveInfinity, step, this.IsInclusive);
+		}
+
+		public NumberRange(Double begin, Double end, Boolean isInclusive)
+			: this(begin, end, begin <= end ? 1 : -1, isInclusive) { }
+
+		public NumberRange(Double begin, Double end, Double step, Boolean isInclusive) {
+			this.Start = Double.IsInfinity(begin) ? null : (Double?)begin;
+			this.end = Double.IsInfinity(end) ? null : (Double?)end;
+			this.Step = step;
+			this.IsInclusive = isInclusive;
+
+			if (this.IsDownToUp && step < 0) {
+				// can not be
+			}
+			else if (step > 0) {
+				// can not be
+			}
+		}
+
+		public Double StartOr(Double or) {
+			return this.Start ?? or;
+		}
+
+		public Double EndOr(Double or) {
+			return this.end ?? or;
+		}
+
+		public IEnumerator<Value> GetEnumerator() {
+			Double current = this.Start ?? 0;
+			Double end = this.End ?? Double.PositiveInfinity;
+
+			if (this.IsDownToUp) {
+				while (current < end) {
+					yield return new Number(current);
+					current += this.Step;
+				}
+			} else {
+				while (current > end) {
+					yield return new Number(current);
+					current += this.Step;
+				}
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return this.GetEnumerator();
+		}
+
+		public override String ToString() {
+			return $"({this.Start?.ToString() ?? ""}{(this.IsInclusive ? "..." : "..")}{this.end?.ToString() ?? ""}) / {this.Step}";
+		}
+	}
+
 	internal sealed class NumberModule : Module {
 		internal NumberModule() {
 			this.Name = "Number";
 
-			static IEnumerable<Value> Range(Double from, Double to) {
-				yield return new Number(from);
-				if (from < to) {
-					while (from < to) {
-						from += 1;
-						yield return new Number(from);
-					}
-				}
-				else if (from >= to) {
-					while (from > to) {
-						from -= 1;
-						yield return new Number(from);
-					}
-				}
-			}
-
 			#region operators
 
 			// self...other
-			// Number -> Number -> Stream
 			this.SetMember(Constants.RANGE_INCLUSIVE, new LambdaFun((scope, args) => {
+				Value self = scope["self"];
 				Value other = scope["other"];
 
-				/*if (other == Const.UNIT) {
-					return new Stream(Range(scope["self"].ToDouble(scope), Double.PositiveInfinity));
-				}*/
-
-				return new Stream(Range(scope["self"].ToDouble(scope), other.ToDouble(scope)));
+				Double selfDouble = self == Const.UNIT ? Double.PositiveInfinity : self.ToDouble(scope);
+				Double otherDouble = other == Const.UNIT ? Double.PositiveInfinity : other.ToDouble(scope);
+	
+				return new NumberRange(selfDouble, otherDouble, true);
 			}) {
 				Arguments = Const.SelfOther
 			});
 
 			// self..other
-			// Number -> Number -> Stream
 			this.SetMember(Constants.RANGE_EXCLUSIVE, new LambdaFun((scope, args) => {
+				Value self = scope["self"];
 				Value other = scope["other"];
 
-				/*if (other == Const.UNIT) {
-					return new Stream(Range(scope["self"].ToDouble(scope), Double.PositiveInfinity));
-				}*/
+				Double selfDouble = self == Const.UNIT ? Double.PositiveInfinity : self.ToDouble(scope);
+				Double otherDouble = other == Const.UNIT ? Double.PositiveInfinity : other.ToDouble(scope);
 
-				return new Stream(Range(scope["self"].ToDouble(scope), other.ToDouble(scope) - 1));
+				return new NumberRange(selfDouble, otherDouble, false);
 			}) {
 				Arguments = Const.SelfOther
 			});

@@ -3,6 +3,19 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang {
 	public static class Converter {
+		public static LumenException From(this LumenException value, LumenException other) {
+			value.Cause = other;
+			return value;
+		}
+
+		public static Boolean IsFailed(this Value value) {
+			return Prelude.Failed.IsParentOf(value);
+		}
+
+		public static Boolean IsSuccess(this Value value) {
+			return Prelude.Success.IsParentOf(value);
+		}
+
 		public static Boolean ToBoolean(this Value value) {
 			return value is Logical logical ? logical : value != Const.UNIT;
 		}
@@ -37,31 +50,47 @@ namespace Lumen.Lang {
 
 		public static Fun ToFunction(this Value value, Scope scope) {
 			return value.TryConvertToFunction(out Fun result) ? result :
-				throw Helper.CreateConvertError(value.Type, Prelude.Function).ToException(scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.Function).ToException();
 		}
 
 		public static Dictionary<Value, Value> ToDictionary(this Value value, Scope scope) {
 			return value is Map map ? map.InternalValue :
-				throw Helper.CreateConvertError(value.Type, Prelude.Map).ToException(scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.Map).ToException();
 		}
 
 		public static List<Value> ToList(this Value value, Scope scope) {
 			return value is Array array ? array.InternalValue :
-				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException(scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException();
 		}
 
-		public static IEnumerable<Value> ToStream(this Value val, Scope scope) {
-			if (val is Stream stream) {
-				return stream.InternalValue;
+		public static Boolean TryConvertToStream(this Value value, Scope scope, out IEnumerable<Value> result) {
+			if (value is Stream stream) {
+				result = stream.InternalValue;
+				return true;
 			}
 
-			if (val.Type.HasImplementation(Prelude.Collection)
-				&& val.Type.TryGetMember("toStream", out Value converterPrototype)
+			if (value is NumberRange numberRange) {
+				result = numberRange;
+				return true;
+			}
+
+			if (value.Type.HasImplementation(Prelude.Collection)
+				&& value.Type.TryGetMember("toStream", out Value converterPrototype)
 				&& converterPrototype.TryConvertToFunction(out Fun converter)) {
-				return converter.Run(new Scope(scope), val).ToStream(scope);
+				result = converter.Run(new Scope(scope), value).ToStream(scope);
+				return true;
 			}
 
-			throw Helper.CreateConvertError(val.Type, Prelude.Stream).ToException(scope);
+			result = null;
+			return false;
+		}
+
+		public static IEnumerable<Value> ToStream(this Value value, Scope scope) {
+			if(value.TryConvertToStream(scope, out var result)) {
+				return result;
+			}
+
+			throw Helper.CreateConvertError(value.Type, Prelude.Stream).ToException();
 		}
 
 		public static Boolean TryConvertToException(this Value value, out LumenException result) {
@@ -84,14 +113,14 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public static LumenException ToException(this Value value, Scope scope) {
+		public static LumenException ToException(this Value value) {
 			return value.TryConvertToException(out LumenException result) ? result 
-				: Helper.CreateConvertError(value.Type, Prelude.Collection).ToException(scope);
+				: Helper.CreateConvertError(value.Type, Prelude.Collection).ToException();
 		}
 
 		internal static LinkedList ToLinkedList(this Value value, Scope scope) {
 			return value is List list ? list.Value :
-				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException(scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException();
 		}
 
 		private static Number ToNum(this Value value, Scope scope) {
@@ -104,7 +133,7 @@ namespace Lumen.Lang {
 				return ToNum(converter.Run(new Scope(scope), value), scope);
 			}
 
-			throw Helper.CreateConvertError(value.Type, Prelude.Number).ToException(scope);
+			throw Helper.CreateConvertError(value.Type, Prelude.Number).ToException();
 		}
 	}
 }

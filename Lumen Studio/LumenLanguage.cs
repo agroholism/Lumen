@@ -177,7 +177,7 @@ namespace Lumen.Studio {
 					return new AutocompleteItem(name, (Int32)Images.SUBTYPE, name, name, "");
 				}
 
-				if (value is Lang.Module module) {
+			/*	if (value is Lang.Module module) {
 					foreach (var i in module.Members) {
 						if (!memory.Contains(i.Value)) {
 							items.Add(Process(i.Key, name, i.Value));
@@ -191,7 +191,7 @@ namespace Lumen.Studio {
 					}
 
 					return new AutocompleteItem(name, (Int32)Images.SUBTYPE, name, "\0module \0" + name, "\t\t");
-				}
+				}*/
 
 				return new AutocompleteItem(name, 0, name, name, "\t\t");
 			}

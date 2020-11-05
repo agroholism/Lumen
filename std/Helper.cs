@@ -11,6 +11,14 @@ namespace Lumen.Lang {
 			return index;
 		}
 
+		public static LumenException IndexOutOfRange() {
+			return Prelude.IndexOutOfRange.MakeExceptionInstance();
+		}
+
+		public static LumenException InvalidOperation(String message) {
+			return Prelude.InvalidOperation.MakeExceptionInstance(new Text(message));
+		}
+
 		public static LumenException CreateConvertError(IType fromType, IType targetType) {
 			return Prelude.ConvertError.MakeExceptionInstance(fromType, targetType);
 		}
@@ -44,6 +52,18 @@ namespace Lumen.Lang {
 
 			Constructor result = new Constructor(name, baseType, fields.ToList());
 
+			return result;
+		}
+
+		public static Instance Success(Value value) {
+			Instance result = new Instance(Prelude.Success);
+			result.Items[0] = value;
+			return result;
+		}
+
+		public static Instance Failed(Value value) {
+			Instance result = new Instance(Prelude.Failed);
+			result.Items[0] = value;
 			return result;
 		}
 
@@ -92,18 +112,44 @@ namespace Lumen.Lang {
 			};
 		}
 
-		public static Double Tanimoto(String first, String second) {
-			first = first.ToLower();
-			second = second.ToLower();
+		public static Int32 Levenshtein(String s, String t) {
+			Int32 n = s.Length;
+			Int32 m = t.Length;
+			Int32[,] d = new Int32[n + 1, m + 1];
 
-			Int32 c = 0;
-			foreach (Char i in first) {
-				if (second.Contains(i)) {
-					c++;
-				}
+			// Verify arguments.
+			if (n == 0) {
+				return m;
 			}
 
-			return c / (first.Length + second.Length - c);
+			if (m == 0) {
+				return n;
+			}
+
+			// Initialize arrays.
+			for (Int32 i = 0; i <= n; d[i, 0] = i++) {
+			}
+
+			for (Int32 j = 0; j <= m; d[0, j] = j++) {
+			}
+
+			// Begin looping.
+			for (Int32 i = 1; i <= n; i++) {
+				for (Int32 j = 1; j <= m; j++) {
+					// Compute cost.
+					Int32 cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+					d[i, j] = Math.Min(
+						Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
+						d[i - 1, j - 1] + cost
+					);
+				}
+			}
+			// Return cost.
+			return d[n, m];
+		}
+
+		internal static LumenException InvalidArgument(String name, String message) {
+			return Prelude.InvalidArgument.MakeExceptionInstance(new Text(name), new Text(message));
 		}
 	}
 }

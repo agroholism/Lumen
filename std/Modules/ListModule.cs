@@ -24,48 +24,6 @@ namespace Lumen.Lang {
 				return index;
 			}
 
-			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["values"].ToStream(scope);
-
-				Value index = scope["indices"];
-
-				if (index is Fun fun) {
-					return new List(values.Where(x => fun.Run(new Scope(scope), x).ToBoolean()));
-				}
-
-				Int32 count = values.Count();
-
-				if (index is Number) {
-					Int32 intIndex = Index(index.ToInt(scope), count);
-
-					if (intIndex < 0 || intIndex >= count) {
-						throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
-					}
-
-					return values.ElementAt(intIndex);
-				}
-
-				return new List(index.ToStream(scope).Select(i => {
-					if (i is Number) {
-						Int32 index = Index(i.ToInt(scope), count);
-
-						if (index < 0 || index >= count) {
-							throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
-						}
-
-						return values.ElementAt(index);
-					}
-					else {
-						throw new LumenException(Exceptions.TYPE_ERROR.F(Prelude.Number, i.Type));
-					}
-				}));
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("values"),
-					new NamePattern("indices")
-				}
-			});
-
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				IType typeParameter = scope["values"].Type;
 				IEnumerable<Value> values = scope["values"].ToStream(scope);

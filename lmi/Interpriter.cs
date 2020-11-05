@@ -50,7 +50,7 @@ namespace Lumen.Lmi {
 				List<Token> tokens = new Lexer(source, fileName).Tokenization();
 				return new Parser(tokens, fileName).Parse().Select(i =>
 					i.Eval(scope ?? mainScope)).Last();
-				//try { 
+			//	try { 
 			}
 			catch (LumenException uex) {
 				WriteException(uex.ToString());

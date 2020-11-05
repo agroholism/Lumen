@@ -27,7 +27,7 @@ namespace Lumen.Lmi {
 				return new UserFun(
 					new List<IPattern> { new NamePattern("<de-generated-arg>") },
 					new DotOperator(
-						new IdExpression("<de-generated-arg>", this.line, this.fileName), this.memberName, this.fileName, this.line), "<de-generated-fun>");
+						new IdExpression("<de-generated-arg>", this.fileName, this.line), this.memberName, this.fileName, this.line), "<de-generated-fun>");
 			}
 			
 			try {

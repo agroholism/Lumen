@@ -8,18 +8,18 @@
 			this.SetMember("compare", new LambdaFun((scope, args) => {
 				Value other = scope["other"];
 
-				return (Number)scope["this"].CompareTo(other);
+				return (Number)scope["self"].CompareTo(other);
 			}) {
 				Arguments = Const.SelfOther
 			});
 
 			#endregion
 
-			this.SetMember("toText", new LambdaFun((e, args) => new Text(e["this"].ToString())) {
+			this.SetMember("toText", new LambdaFun((e, args) => new Text(e["self"].ToString())) {
 				Arguments = Const.Self
 			});
 
-			this.SetMember("toNumber", new LambdaFun((e, args) => (Number)(Converter.ToBoolean(e["this"]) ? 1 : 0)) {
+			this.SetMember("toNumber", new LambdaFun((e, args) => (Number)(Converter.ToBoolean(e["self"]) ? 1 : 0)) {
 				Arguments = Const.Self
 			});
 

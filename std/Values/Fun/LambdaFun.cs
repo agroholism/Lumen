@@ -29,9 +29,11 @@ namespace Lumen.Lang {
 			while (counter < this.Arguments.Count) {
 				MatchResult match = this.Arguments[counter].Match(arguments[counter], e);
 				if (!match.Success) {
-					throw new LumenException(Exceptions.FUNCTION_CAN_NOT_BE_APPLIED.F(String.Join(" ", this.Arguments))) {
-						Note = $"Details: {match.Note}"
-					};
+					LumenException exception = Helper.InvalidArgument(
+							this.Arguments[counter].ToString(),
+							Exceptions.FUNCTION_CAN_NOT_BE_APPLIED.F(String.Join(" ", this.Arguments)));
+					exception.Note = $"Details: {match.Note}";
+					throw exception;
 				}
 				counter++;
 			}

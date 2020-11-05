@@ -32,10 +32,54 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("message", new LambdaFun((e, args) => {
+			this.SetMember("getMessage", new LambdaFun((e, args) => {
 				Instance self = e["self"] as Instance;
 
 				return self.GetField("message");
+			}) {
+				Arguments = Const.Self
+			});
+		}
+	}
+
+	public sealed class InvalidOperation : ErrorModule {
+		internal InvalidOperation() : base() {
+			this.Name = "InvalidOperation";
+
+			this.constructor = new ExceptionConstructor("InvalidOperation", this, "message");
+
+			this.SetMember("<init>", new LambdaFun((e, args) => {
+				return this.MakeExceptionInstance(e["message"]);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("message")
+				}
+			});
+
+			this.SetMember("getMessage", new LambdaFun((e, args) => {
+				Instance self = e["self"] as Instance;
+
+				return self.GetField("message");
+			}) {
+				Arguments = Const.Self
+			});
+		}
+	}
+
+	public sealed class CollectionIsEmpty : ErrorModule {
+		internal CollectionIsEmpty() : base() {
+			this.Name = "CollectionIsEmpty";
+
+			this.constructor = new ExceptionConstructor("CollectionIsEmpty", this);
+
+			this.SetMember("<init>", new LambdaFun((e, args) => {
+				return this.MakeExceptionInstance();
+			}) {
+				Arguments = new List<IPattern>()
+			});
+
+			this.SetMember("getMessage", new LambdaFun((e, args) => {
+				return new Text("required not empty collection");
 			}) {
 				Arguments = Const.Self
 			});
@@ -52,7 +96,7 @@ namespace Lumen.Lang {
 				return this.MakeExceptionInstance();
 			}));
 
-			this.SetMember("message", new LambdaFun((e, args) => {
+			this.SetMember("getMessage", new LambdaFun((e, args) => {
 				return new Text(Exceptions.ASSERT_IS_BROKEN);
 			}) {
 				Arguments = Const.Self
@@ -75,11 +119,36 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("message", new LambdaFun((e, args) => {
+			this.SetMember("getMessage", new LambdaFun((e, args) => {
 				Instance self = e["self"] as Instance;
 
 				return new Text(
 					Exceptions.CONVERT_ERROR.F(self.GetField("fromType"), self.GetField("targetType")));
+			}) {
+				Arguments = Const.Self
+			});
+		}
+	}
+
+	public sealed class InvalidArgument : ErrorModule {
+		internal InvalidArgument() : base() {
+			this.Name = "InvalidArgument";
+
+			this.constructor = new ExceptionConstructor("InvalidArgument", this, "name", "message");
+
+			this.SetMember("<init>", new LambdaFun((scope, args) => {
+				return this.MakeExceptionInstance(scope["name"], scope["message"]);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("name"),
+					new NamePattern("message")
+				}
+			});
+
+			this.SetMember("getMessage", new LambdaFun((scope, args) => {
+				Instance self = scope["self"] as Instance;
+
+				return new Text($"[{self.GetField("name")}] {self.GetField("message")}");
 			}) {
 				Arguments = Const.Self
 			});
@@ -102,10 +171,32 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("message", new LambdaFun((e, args) => {
+			this.SetMember("getMessage", new LambdaFun((e, args) => {
 				Instance self = e["self"] as Instance;
 
 				return new Text(Exceptions.FUNCTION_IS_NOT_IMPLEMENTED_FOR_TYPE.F(self.GetField("functionName"), self.GetField("typeObject")));
+			}) {
+				Arguments = Const.Self
+			});
+		}
+	}
+
+	public sealed class IndexOutOfRange : ErrorModule {
+		internal IndexOutOfRange() : base() {
+			this.Name = "IndexOutOfRange";
+
+			this.constructor = new ExceptionConstructor("IndexOutOfRange", this);
+
+			this.SetMember("<init>", new LambdaFun((scope, args) => {
+				return this.MakeExceptionInstance();
+			}) {
+				Arguments = new List<IPattern> {
+
+				}
+			});
+
+			this.SetMember("getMessage", new LambdaFun((scope, args) => {
+				return new Text(Exceptions.INDEX_OUT_OF_RANGE);
 			}) {
 				Arguments = Const.Self
 			});

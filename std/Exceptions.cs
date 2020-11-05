@@ -20,7 +20,7 @@ namespace Lumen.Lang {
 
 		public const String NOT_A_FUNCTION = "value of type \"{0}\" is not a function";
 		public const String MODULE_DOES_NOT_CONTAINS_FUNCTION = "function \"{0}\" does not exists in module \"{1}\"";
-		public const String UNKNOWN_IDENTIFITER = "unknown identifiter \"{0}\"";
+		public const String UNKNOWN_NAME = "unknown name \"{0}\"";
 		public const String TYPE_ERROR = "expected value of type \"{0}\", passed value of type \"{1}\"";
 		public const String CONVERT_ERROR = "can not convert a value of type \"{0}\" to value of type \"{1}\"";
 

@@ -25,15 +25,15 @@ namespace Lumen.Lmi {
 						return new UserFun(
 							new List<IPattern> { new NamePattern("x"), new NamePattern("y") }, 
 							new ConsOperator(
-								new IdExpression("x", ide.line, ide.file), 
-								new IdExpression("y", ide2.line, ide2.file), 
+								new IdExpression("x", ide.file, ide.line), 
+								new IdExpression("y", ide2.file, ide2.line), 
 								this.fileName, this.lineNumber));
 					}
 					else {
 						return new UserFun(
 							new List<IPattern> { new NamePattern("x") },
 							new ConsOperator(
-								new IdExpression("x", ide.line, ide.file), 
+								new IdExpression("x", ide.file, ide.line), 
 								new ValueLiteral(this.rightExpression.Eval(e)), 
 								this.fileName, this.lineNumber));
 					}
@@ -44,7 +44,7 @@ namespace Lumen.Lmi {
 					new List<IPattern> { new NamePattern("x") }, 
 					new ConsOperator(
 						new ValueLiteral(this.leftExpression.Eval(e)), 
-						new IdExpression("x", _ide.line, _ide.file), 
+						new IdExpression("x", _ide.file, _ide.line), 
 						this.fileName, this.lineNumber));
 			}
 
@@ -67,15 +67,15 @@ namespace Lumen.Lmi {
 						yield return new GeneratorTerminalResult(new UserFun(
 							new List<IPattern> { new NamePattern("x"), new NamePattern("y") },
 							new ConsOperator(
-								new IdExpression("x", ide.line, ide.file),
-								new IdExpression("y", ide2.line, ide2.file),
+								new IdExpression("x", ide.file, ide.line),
+								new IdExpression("y", ide2.file, ide2.line),
 								this.fileName, this.lineNumber)));
 					}
 					else {
 						yield return new GeneratorTerminalResult(new UserFun(
 							new List<IPattern> { new NamePattern("x") },
 							new ConsOperator(
-								new IdExpression("x", ide.line, ide.file),
+								new IdExpression("x", ide.file, ide.line),
 								new ValueLiteral(this.rightExpression.Eval(e)),
 								this.fileName, this.lineNumber)));
 					}
@@ -86,7 +86,7 @@ namespace Lumen.Lmi {
 					new List<IPattern> { new NamePattern("x") },
 					new ConsOperator(
 						new ValueLiteral(this.leftExpression.Eval(e)),
-						new IdExpression("x", _ide.line, _ide.file),
+						new IdExpression("x", _ide.file, _ide.line),
 						this.fileName, this.lineNumber)));
 			}
 

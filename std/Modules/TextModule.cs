@@ -110,7 +110,7 @@ namespace Lumen.Lang {
 						Int32 intIndex = Helper.Index(index.ToInt(scope), self.Length);
 
 						if (intIndex < 0 || intIndex >= self.Length) {
-							throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
+							throw Helper.IndexOutOfRange();
 						}
 
 						return new Text(self[intIndex].ToString());
@@ -123,7 +123,7 @@ namespace Lumen.Lang {
 							Int32 newIndex = Helper.Index(i.ToInt(scope), self.Length);
 
 							if (newIndex < 0 || newIndex >= self.Length) {
-								throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
+								throw Helper.IndexOutOfRange();
 							}
 
 							buffer.Append(self[newIndex]);

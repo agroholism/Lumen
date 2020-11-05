@@ -8,11 +8,15 @@ namespace Lumen.Lmi {
 		private IPattern pattern;
 		private Expression assignable;
 		private Expression body;
+		private Int32 line;
+		private String file;
 
-		public UseStatement(IPattern pattern, Expression assignable, Expression body) {
+		public UseStatement(IPattern pattern, Expression assignable, Expression body, String file, Int32 line) {
 			this.pattern = pattern;
 			this.assignable = assignable;
 			this.body = body;
+			this.file = file;
+			this.line = line;
 		}
 
 		public Value Eval(Scope scope) {
@@ -25,7 +29,7 @@ namespace Lumen.Lmi {
 
 			MatchResult matchResult = this.pattern.Match(value, scope);
 			if (!matchResult.Success) {
-				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: -1, fileName: "") {
+				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line, file) {
 					Note = matchResult.Note
 				};
 			}
@@ -65,7 +69,7 @@ namespace Lumen.Lmi {
 
 			MatchResult matchResult = this.pattern.Match(value, scope);
 			if (!matchResult.Success) {
-				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: -1, fileName: "") {
+				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line, file) {
 					Note = matchResult.Note
 				};
 			}
@@ -81,7 +85,7 @@ namespace Lumen.Lmi {
 		public Expression Closure(ClosureManager manager) {
 			ClosureManager manager2 = manager.Clone();
 			return new UseStatement(this.pattern.Closure(manager2) as IPattern,
-				this.assignable.Closure(manager), this.body.Closure(manager2));
+				this.assignable.Closure(manager), this.body.Closure(manager2), this.file, this.line);
 		}
 	}
 }

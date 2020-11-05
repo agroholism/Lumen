@@ -42,7 +42,7 @@ namespace Lumen.Anatomy {
 		public static Module Template = new TemplateType();
 
 		public TemplateType() {
-			this.SetField("buildInto self params", (scope, args) => {
+			/*this.SetField("buildInto self params", (scope, args) => {
 				Template template = scope["self"] as Template;
 
 				String old = Directory.GetCurrentDirectory();
@@ -52,7 +52,7 @@ namespace Lumen.Anatomy {
 				Directory.SetCurrentDirectory(old);
 
 				return Const.UNIT;
-			});
+			});*/
 		}
 	}
 

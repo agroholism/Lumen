@@ -18,10 +18,14 @@ namespace Lumen.Lang {
 		public static Module Format { get; } = new Format();
 		public static Module Context { get; } = new Context();
 
-		public static FunctionIsNotImplemented FunctionIsNotImplemented { get; } = new FunctionIsNotImplemented();
-		public static AssertError AssertError { get; } = new AssertError();
-		public static ConvertError ConvertError { get; } = new ConvertError();
-		public static Error Error { get; } = new Error();
+		public static ErrorModule IndexOutOfRange { get; } = new IndexOutOfRange();
+		public static ErrorModule FunctionIsNotImplemented { get; } = new FunctionIsNotImplemented();
+		public static ErrorModule AssertError { get; } = new AssertError();
+		public static ErrorModule ConvertError { get; } = new ConvertError();
+		public static ErrorModule CollectionIsEmpty { get; } = new CollectionIsEmpty();
+		public static ErrorModule InvalidOperation { get; } = new InvalidOperation();
+		public static ErrorModule InvalidArgument { get; } = new InvalidArgument();
+		public static ErrorModule Error { get; } = new Error();
 
 		public static Module Any { get; } = new AnyModule();
 
@@ -40,10 +44,13 @@ namespace Lumen.Lang {
 
 		public static Module Logical { get; } = new LogicalModule();
 
-		public static IType Fail { get; private set; }
 		public static Module Option { get; } = new OptionModule();
 		public static IType None { get; } = (Option as OptionModule).None;
 		public static Constructor Some { get; } = (Option as OptionModule).Some;
+
+		public static Module Result { get; } = new ResultModule();
+		public static Constructor Success { get; } = (Result as ResultModule).Success;
+		public static Constructor Failed { get; } = (Result as ResultModule).Failed;
 
 		public static Prelude Instance { get; } = new Prelude();
 
@@ -52,8 +59,6 @@ namespace Lumen.Lang {
 		public static Dictionary<String, Module> GlobalImportCache { get; } = new Dictionary<String, Module>();
 
 		private Prelude() {
-			ConstructFail();
-
 			this.SetMember("Prelude", this);
 
 			this.SetMember("Ord", Ord);
@@ -64,20 +69,26 @@ namespace Lumen.Lang {
 			this.SetMember("Cloneable", Cloneable);
 			this.SetMember("Exception", Exception);
 
+			this.SetMember("IndexOutOfRange", IndexOutOfRange);
+			this.SetMember("CollectionIsEmpty", CollectionIsEmpty);
+			this.SetMember("InvalidOperation", InvalidOperation);
+			this.SetMember("InvalidArgument", InvalidArgument);
 			this.SetMember("FunctionIsNotImplemented", FunctionIsNotImplemented);
 			this.SetMember("AssertError", AssertError);
 			this.SetMember("ConvertError", ConvertError);
 			this.SetMember("Error", Error);
-
-			this.SetMember("Fail", Fail);
 
 			this.SetMember("Pair", MapModule.PairModule.ctor);
 
 			this.SetMember("Unit", Unit);
 
 			this.SetMember("Option", Option);
-			this.SetMember("Some", (Option as OptionModule).Some);
-			this.SetMember("None", (Option as OptionModule).None);
+			this.SetMember("Some", Some);
+			this.SetMember("None", None);
+
+			this.SetMember("Result", Result);
+			this.SetMember("Success", Success);
+			this.SetMember("Failed", Failed);
 
 			this.SetMember("Iterator", Iterator);
 			this.SetMember("Ref", Ref);
@@ -282,26 +293,6 @@ namespace Lumen.Lang {
 			});
 		}
 
-		private static void ConstructFail() {
-			Module FailModule = new Module("_") {
-			};
-
-			FailModule.SetMember("String", new LambdaFun((scope, args) => {
-				IType obj = scope["this"] as IType;
-				if (obj.TryGetMember("message", out Value result)) {
-					return new Text($"Failed with message '{result}'");
-				}
-
-				throw new LumenException("failed in fail.tos");
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("this")
-				}
-			}, null);
-
-			Fail = Helper.CreateConstructor("prelude.Fail", FailModule, new List<String> { "message" });
-		}
-
 		public static Value DeconstructSome(Value some) {
 			if (Some.IsParentOf(some)) {
 				Instance someInstance = some as Instance;
@@ -313,12 +304,12 @@ namespace Lumen.Lang {
 
 		public static void Assert(Boolean condition, Scope scope) {
 			if (!condition) {
-				throw AssertError.constructor.ToException(scope);
+				throw AssertError.constructor.ToException();
 			}
 		}
 
 		public static void FunctionIsNotImplementedForType(String functionName, Value typeName, Scope scope) {
-			throw FunctionIsNotImplemented.constructor.MakeInstance(typeName, new Text(functionName)).ToException(scope);
+			throw FunctionIsNotImplemented.constructor.MakeInstance(typeName, new Text(functionName)).ToException();
 
 		}
 	}

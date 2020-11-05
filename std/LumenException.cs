@@ -63,6 +63,10 @@ namespace Lumen.Lang {
 			for (Int32 i = this.callStack.Count - 1; i >= 0; i--) {
 				CallStackRecord call = this.callStack[i];
 
+				if(call.FileName == null && call.FunctionName == null && call.LineNumber == -1) {
+					continue;
+				}
+
 				result
 				.Append(Environment.NewLine)
 				.Append($"\tat \"{call.FileName}\" on {call.LineNumber}");

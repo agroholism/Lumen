@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lumen.Lang {
 	public class Scope {
@@ -7,6 +8,27 @@ namespace Lumen.Lang {
 		public List<Module> usings;
 		public Scope parent;
 		public Dictionary<String, List<Value>> attributes;
+
+		private IEnumerable<String> AvailableNames {
+			get {
+				foreach (var item in this.variables) {
+					yield return item.Key;
+				}
+
+
+				foreach (Module use in this.usings) {
+					foreach(var item in use.Members) {
+						yield return item.Key;
+					}
+				}
+
+				if (this.parent != null) {
+					foreach (var item in parent.AvailableNames) {
+						yield return item;
+					}
+				}
+			}
+		}
 
 		public Value this[String name] {
 			get => this.Get(name);
@@ -96,13 +118,13 @@ namespace Lumen.Lang {
 			}
 
 			List<String> maybe = new List<String>();
-			foreach (KeyValuePair<String, Value> i in this.variables) {
+		/*	foreach (KeyValuePair<String, Value> i in this.variables) {
 				if (Helper.Tanimoto(i.Key, name) > 0.4) {
 					maybe.Add(i.Key);
 				}
-			}
+			}*/
 
-			throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(name)) {
+			throw new LumenException(Exceptions.UNKNOWN_NAME.F(name)) {
 				Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}{String.Join(Environment.NewLine, maybe)}" : null
 			};
 		}
@@ -113,6 +135,15 @@ namespace Lumen.Lang {
 
 		public void AddUsing(Module obj) {
 			this.usings.Add(obj);
+		}
+
+		public List<String> FindClosestNames(Double maxValue, String key) {
+			List<String> maybe = this.AvailableNames
+								.Where(i => Helper.Levenshtein(i, key) < maxValue)
+								.OrderBy(i => Helper.Levenshtein(i, key))
+								.Distinct()
+								.ToList();
+			return maybe;
 		}
 	}
 }

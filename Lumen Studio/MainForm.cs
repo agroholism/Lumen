@@ -404,7 +404,7 @@ namespace Lumen.Studio {
 					index++;
 				}
 			}
-			else if (value is Lang.Array array) {
+			/*else if (value is Lang.Array array) {
 				this.ChangeNameColumn("Index", 1);
 				Int32 index = 0;
 				foreach (Lang.Value i in array.InternalValue) {
@@ -415,7 +415,7 @@ namespace Lumen.Studio {
 					DebugGrid.Rows.Add(row);
 					index++;
 				}
-			}
+			}*/
 			else if (value is Lang.Module module) {
 				this.ModuleUpdate(module);
 			}
@@ -434,7 +434,7 @@ namespace Lumen.Studio {
 
 		private void ObjectUpdate(Lang.Instance value) {
 			this.ChangeNameColumn("Fields", 1);
-			DataGridViewRow row;
+			/*DataGridViewRow row;
 			foreach (String field in (value.Type as Lang.Constructor).Fields) {
 				Lang.Value valueOfField = value.GetField(field, null);
 				row = new DataGridViewRow();
@@ -442,7 +442,7 @@ namespace Lumen.Studio {
 				row.Cells.Add(new DataGridViewTextBoxCell { Value = field });
 				row.Cells.Add(new DataCell(valueOfField) { Value = Rename(valueOfField) });
 				DebugGrid.Rows.Add(row);
-			}
+			}*/
 		}
 
 		private void ReBreakpointLine() {

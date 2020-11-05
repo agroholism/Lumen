@@ -13,63 +13,200 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Applicative);
 
 			this.SetMember("toStream", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Collection.toStream", scope["x"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Collection.toStream", scope["self"].Type, scope);
 				return Const.UNIT;
 			}) {
 				Name = "toStream",
 				Arguments = new List<IPattern> {
-					new NamePattern("x")
+					new NamePattern("self")
 				}
 			});
 
 			this.SetMember("fromStream", new LambdaFun((scope, args) => {
-				return scope["x"];
+				return scope["self"];
 			}) {
 				Name = "fromStream",
 				Arguments = new List<IPattern> {
-					new NamePattern("x")
+					new NamePattern("self")
 				}
 			});
 
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["self"].ToStream(scope);
+				Value self = scope["self"];
+				IType typeParameter = self.Type;
+				IEnumerable<Value> values = self.ToStream(scope);
 
-				Value index = scope["indices"];
+				List<Value> indices = scope["indices"].ToList(scope);
 
-				if (index is Fun fun) {
-					return new Stream(values.Where(x => fun.Run(new Scope(scope), x).ToBoolean()));
-				}
+				if (indices.Count == 1) {
+					Value index = indices[0];
 
-				Int32 count = values.Count();
-
-				if (index is Number) {
-					Int32 intIndex = Helper.Index(index.ToInt(scope), count);
-
-					if (intIndex < 0 || intIndex >= count) {
-						throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
+					if (index is Fun fun) {
+						return Helper.FromStream(typeParameter,
+							values.Where(x => fun.Run(new Scope(scope), x).ToBoolean()), scope);
 					}
 
-					return values.ElementAt(intIndex);
-				}
-
-				return new Stream(index.ToStream(scope).Select(i => {
-					if (i is Number) {
-						Int32 index = Helper.Index(i.ToInt(scope), count);
-
-						if (index < 0 || index >= count) {
-							throw new LumenException(Exceptions.INDEX_OUT_OF_RANGE);
+					static (Int32, Int32?) NormalizeIndex(Int32 index, IEnumerable<Value> values) {
+						if (index < 0) {
+							Int32 count = values.Count();
+							return (Helper.Index(index, count), count);
 						}
 
-						return values.ElementAt(index);
+						return (index, null);
 					}
-					else {
-						throw new LumenException(Exceptions.TYPE_ERROR.F(Prelude.Number, i.Type));
+
+					if (index is Number) {
+						(Int32 intIndex, Int32? count) = NormalizeIndex(index.ToInt(scope), values);
+
+						if (intIndex < 0 || (count != null && intIndex >= count)) {
+							throw Helper.IndexOutOfRange();
+						}
+
+						try {
+							return values.ElementAt(intIndex);
+						}
+						catch (ArgumentOutOfRangeException) {
+							throw Helper.IndexOutOfRange();
+						}
 					}
-				}));
+
+					if(index is InfinityRange infinityRange) {
+						if (infinityRange.Step == 1 || infinityRange.Step == 0) {
+							return Helper.FromStream(typeParameter, values.Select(i => i), scope);
+						} else if(infinityRange.IsDownToUp) {
+							return Helper.FromStream(typeParameter, Step(values.Select(i => i), (Int32)infinityRange.Step), scope);
+						} else {
+							return Helper.FromStream(typeParameter, 
+								Step(values, Math.Abs((Int32)infinityRange.Step)).Reverse(), scope);
+						}
+					}
+
+					if (index is NumberRange numberRange) {
+						Int32 start = (Int32)numberRange.StartOr(0);
+						Int32 step = (Int32)numberRange.Step;
+
+						// start...
+						if (!numberRange.HasEnd) {
+							if (start < 0) {
+								(start, _) = NormalizeIndex(start, values);
+							}
+
+							if (step == 1 || step == 0) {
+								return Helper.FromStream(typeParameter, values.Skip(start), scope);
+							}
+							else {
+								return Helper.FromStream(typeParameter, 
+									Step(values.Skip(start).Reverse(), Math.Abs(step)), scope);
+							}
+						}
+						else {
+							// start..end, start...end
+							Int32 end = (Int32)numberRange.End.Value;
+
+							Int32? count = null;
+							if (start < 0) {
+								(start, count) = NormalizeIndex(start, values);
+							}
+
+							if (end < 0) {
+								if (count.HasValue) {
+									end = Helper.Index(end, count.Value);
+								}
+								else {
+									(end, count) = NormalizeIndex(end, values);
+								}
+							}
+
+							if(numberRange.IsInclusive && !numberRange.IsDownToUp && start <= end) {
+								end += 2;
+							}
+
+							if (start < 0 || (count != null && start >= count)) {
+								throw Helper.IndexOutOfRange();
+							}
+
+							if (end < 0 || (count != null && end >= count)) {
+								throw Helper.IndexOutOfRange();
+							}
+
+							if (numberRange.IsInclusive && numberRange.IsDownToUp && start >= end) {
+								end -= 2;
+							}
+
+							static IEnumerable<Value> RangeIt(IEnumerable<Value>
+								source, Int32 start, Int32 end, Int32 step) {
+
+								Int32 current = start;
+
+								Boolean isDownToUp = start <= end;
+
+								Value currentValue = null;
+								if (isDownToUp) {
+									while (current < end) {
+										try {
+											currentValue= source.ElementAt(current);
+										}
+										catch (ArgumentOutOfRangeException) {
+											throw Helper.IndexOutOfRange();
+										}
+										current += step;
+										yield return currentValue;
+									}
+								}
+								else {
+									while (current > end) {
+										try {
+											currentValue = source.ElementAt(current);
+										}
+										catch (ArgumentOutOfRangeException) {
+											throw Helper.IndexOutOfRange();
+										}
+										current -= step;
+										yield return currentValue;
+									}
+								}
+							}
+
+							return Helper.FromStream(typeParameter,
+								RangeIt(values, start, end, Math.Abs(step)), scope);
+						}
+
+					}
+
+					Int32 actualIndex = 0;
+					Int32? counted = null;
+
+					return Helper.FromStream(typeParameter, index.ToStream(scope).Select(i => {
+						if (i is Number) {
+							if (counted == null) {
+								(actualIndex, counted) = NormalizeIndex(i.ToInt(scope), values);
+							}
+							else {
+								actualIndex = Helper.Index(i.ToInt(scope), counted.Value);
+							}
+
+							if (actualIndex < 0 || (counted != null && actualIndex >= counted)) {
+								throw Helper.IndexOutOfRange();
+							}
+
+							try {
+								return values.ElementAt(actualIndex);
+							}
+							catch (ArgumentOutOfRangeException) {
+								throw Helper.IndexOutOfRange();
+							}
+						}
+						else {
+							throw new LumenException(Exceptions.TYPE_ERROR.F(Prelude.Number, i.Type));
+						}
+					}), scope);
+				}
+
+				throw Helper.InvalidArgument("indices", "indexation support only one index");
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("indices"),
-					new NamePattern("self")
+					new TypePattern("self", this)
 				}
 			});
 
@@ -78,18 +215,31 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.SLASH, new LambdaFun((scope, args) => {
-				IEnumerable<Value> value = scope["values"].ToStream(scope);
+				Value self = scope["self"];
 				Value foldf = scope["foldf"];
+
 				if (foldf is Number num) {
-					return new Stream(this.Step(value, foldf.ToInt(scope)));
+					if(self is NumberRange numberRange) {
+						return numberRange.Clone(num.value);
+					}
+
+					if (self is InfinityRange infinityRange) {
+						return new InfinityRange(num.value);
+					}
+
+					IEnumerable<Value> value = self.ToStream(scope);
+
+					return new Stream(Step(value, foldf.ToInt(scope)));
 				}
+
+				IEnumerable<Value> values = self.ToStream(scope);
 
 				Fun func = scope["foldf"].ToFunction(scope);
 
-				return value.Aggregate((x, y) => func.Run(new Scope(scope), x, y));
+				return values.Aggregate((x, y) => func.Run(new Scope(scope), x, y));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("values"),
+					new NamePattern("self"),
 					new NamePattern("foldf")
 				}
 			});
@@ -141,192 +291,294 @@ namespace Lumen.Lang {
 				}
 			});
 
-			// Collection 'T => xs: 'T -> 'U
-			this.SetMember("average", new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["values"].ToStream(scope);
 
-				Value sum = values.Aggregate((x, y) => {
-					return (x.Type.GetMember(Constants.PLUS, scope) as Fun).Run(scope, x, y);
+			static Value Sum(IEnumerable<Value> values, Scope scope) {
+				return values.Aggregate((x, y) => {
+					if (x.Type.TryGetMember(Constants.PLUS, out Value plusUnchecked)
+							&& plusUnchecked.TryConvertToFunction(out Fun plus)) {
+						return plus.Run(scope, x, y);
+					}
+
+					throw Helper.InvalidOperation("all the values in collection should support + operator");
 				});
+			}
 
-				return (sum.Type.GetMember(Constants.SLASH, scope) as Fun).Run(scope, sum, new Number(values.Count()));
+			static Value Min(IEnumerable<Value> values, Scope scope) {
+				return values.Aggregate((x, y) => {
+					if (x.Type.TryGetMember(Constants.SHIP, out Value comparatorUnchecked)
+							&& comparatorUnchecked.TryConvertToFunction(out Fun plus)) {
+						return plus.Run(scope, x, y).ToInt(scope) < 0 ? x : y;
+					}
+
+					throw Helper.InvalidOperation("all the values in collection should implement Ord class");
+				});
+			}
+
+			static Value Max(IEnumerable<Value> values, Scope scope) {
+				return values.Aggregate((x, y) => {
+					if (x.Type.TryGetMember(Constants.SHIP, out Value plusUnchecked)
+							&& plusUnchecked.TryConvertToFunction(out Fun plus)) {
+						return plus.Run(scope, x, y).ToInt(scope) > 0 ? x : y;
+					}
+
+					throw Helper.InvalidOperation("all the values in collection should implement Ord class");
+				});
+			}
+
+			this.SetMember("average", new LambdaFun((scope, args) => {
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
+
+				try {
+					Value sum = Sum(values, scope);
+
+					if (sum.Type.TryGetMember(Constants.SLASH, out Value divUnchecked)
+						&& divUnchecked.TryConvertToFunction(out Fun div)) {
+						return div.Run(scope, sum, new Number(values.Count()));
+					}
+
+					throw Prelude.InvalidOperation.MakeExceptionInstance(
+						new Text("all the values in collection should support / operator"));
+				}
+				catch (InvalidOperationException) {
+					throw Prelude.CollectionIsEmpty.MakeExceptionInstance();
+				}
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("values")
+					new TypePattern("self", this)
 				}
 			});
 
-			this.SetMember("fold", new LambdaFun((scope, args) => {
-				Fun folder = scope["folder"] as Fun;
-				IEnumerable<Value> values = scope["values"].ToStream(scope);
+			this.SetMember("min", new LambdaFun((scope, args) => {
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
 
-				return values.Aggregate((x, y) => folder.Run(new Scope(scope), x, y));
+				try {
+					return Min(values, scope);
+				}
+				catch (InvalidOperationException) {
+					throw Prelude.CollectionIsEmpty.MakeExceptionInstance();
+				}
+			}) {
+				Arguments = new List<IPattern> {
+					new TypePattern("self", this)
+				}
+			});
+
+			this.SetMember("max", new LambdaFun((scope, args) => {
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
+
+				try {
+					return Max(values, scope);
+				}
+				catch (InvalidOperationException) {
+					throw Prelude.CollectionIsEmpty.MakeExceptionInstance();
+				}
+			}) {
+				Arguments = new List<IPattern> {
+					new TypePattern("self", this)
+				}
+			});
+
+
+			this.SetMember("fold", new LambdaFun((scope, args) => {
+				Fun folder = scope["folder"].ToFunction(scope);
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
+
+				try {
+					return values.Aggregate((x, y) => folder.Run(new Scope(scope), x, y));
+				}
+				catch (InvalidOperationException) {
+					throw Prelude.CollectionIsEmpty.MakeExceptionInstance();
+				}
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("folder"),
-					new NamePattern("values")
+					new TypePattern("self", this)
 				}
 			});
+
 			this.SetMember("foldInit", new LambdaFun((scope, args) => {
-				Fun folder;
-				IEnumerable<Value> values;
+				Fun folder = scope["folder"].ToFunction(scope);
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
 
 				Value init = scope["init"];
-				folder = scope["folder"] as Fun;
-				values = scope["values"].ToStream(scope);
 
 				return values.Aggregate(init, (x, y) => folder.Run(new Scope(scope), x, y));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("init"),
 					new NamePattern("folder"),
-					new NamePattern("values")
+					new TypePattern("self", this)
 				}
 			});
+
 			this.SetMember("foldr", new LambdaFun((scope, args) => {
-				Fun folder;
-				IEnumerable<Value> values;
+				Fun folder = scope["folder"].ToFunction(scope);
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
 
-				folder = scope["folder"] as Fun;
-				values = scope["values"].ToStream(scope);
-
-				return values.Reverse().Aggregate((x, y) => folder.Run(new Scope(scope), x, y));
+				try {
+					return values.Reverse().Aggregate((x, y) => folder.Run(new Scope(scope), x, y));
+				}
+				catch (InvalidOperationException) {
+					throw Prelude.CollectionIsEmpty.MakeExceptionInstance();
+				}
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("folder"),
-					new NamePattern("values")
+					new TypePattern("self", this)
 				}
 			});
+
 			this.SetMember("foldrInit", new LambdaFun((scope, args) => {
-				Fun folder;
-				IEnumerable<Value> values;
+				Fun folder = scope["folder"].ToFunction(scope);
+				IEnumerable<Value> values = scope["self"].ToStream(scope);
 
 				Value init = scope["init"];
-				folder = scope["folder"] as Fun;
-				values = scope["values"].ToStream(scope);
 
 				return values.Reverse().Aggregate(init, (x, y) => folder.Run(new Scope(scope), x, y));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("init"),
 					new NamePattern("folder"),
-					new NamePattern("values")
+					new TypePattern("self", this)
 				}
 			});
 
+
 			this.SetMember("first", new LambdaFun((scope, args) => {
-				IEnumerable<Value> s1 = scope["s"].ToStream(scope);
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
 
-				Value res = s1.FirstOrDefault();
+				Value result = self.FirstOrDefault();
 
-				if (res == null) {
-					return Prelude.None;
-				}
-
-				return Helper.CreateSome(res);
+				return (result == null) ? Prelude.None : (Value)Helper.CreateSome(result);
 			}) {
-				Arguments = new List<IPattern> { new NamePattern("s") }
+				Arguments = new List<IPattern> {
+					new TypePattern("self", this)
+				}
 			});
 
 			this.SetMember("last", new LambdaFun((scope, args) => {
-				IEnumerable<Value> s1 = scope["s"].ToStream(scope);
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
 
-				Value res = s1.LastOrDefault();
+				Value result = self.LastOrDefault();
 
-				if (res == null) {
-					return Prelude.None;
-				}
-
-				return Helper.CreateSome(res);
-			}) {
-				Arguments = new List<IPattern> { new NamePattern("s") }
-			});
-
-			this.SetMember("count", new LambdaFun((scope, args) => {
-				IEnumerable<Value> stream = scope["values"].ToStream(scope);
-
-				return new Number(stream.Count());
+				return (result == null) ? Prelude.None : (Value)Helper.CreateSome(result);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("values")
+					new TypePattern("self", this)
+				}
+			});
+
+
+			this.SetMember("count", new LambdaFun((scope, args) => {
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
+
+				return new Number(self.Count());
+			}) {
+				Arguments = new List<IPattern> {
+					new TypePattern("self", this)
 				}
 			});
 
 			this.SetMember("countOf", new LambdaFun((scope, args) => {
 				Value elem = scope["elem"];
-				IEnumerable<Value> stream = scope["values"].ToStream(scope);
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
 
-				return new Number(stream.Count(i => elem.Equals(i)));
+				return new Number(self.Count(i => elem.Equals(i)));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("elem"),
-					new NamePattern("values")
+					new TypePattern("self", this)
 				}
 			});
 
 			this.SetMember("countWhen", new LambdaFun((scope, args) => {
 				Value pred = scope["pred"];
-				IEnumerable<Value> stream = scope["values"].ToStream(scope);
+				IEnumerable<Value> stream = scope["self"].ToStream(scope);
 
 				Fun fun = pred.ToFunction(scope);
 				return new Number(stream.Count(i => fun.Run(new Scope(scope), i).ToBoolean()));
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("pred"),
-					new NamePattern("values")
+				new TypePattern("self", this),
 				}
 			});
 
-			// [Kernel.Function (predicate)] => Kernel.Boolean
-			this.SetMember("isAll", new LambdaFun((e, args) => {
-				Fun f = e["f"] as Fun;
-				IEnumerable<Value> s = e["s"].ToStream(e);
 
-				return new Logical(s.All(x => Converter.ToBoolean(f.Run(new Scope(e), x))));
+			this.SetMember("isAll", new LambdaFun((scope, args) => {
+				Fun predicate = scope["predicate"].ToFunction(scope);
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
+
+				return new Logical(self.All(x => predicate.Run(new Scope(scope), x).ToBoolean()));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("f")
+					new NamePattern("predicate"),
+					new TypePattern("self", this),
 				}
 			});
 
-			// [Kernel.Function (predicate)] => Kernel.Boolean
-			this.SetMember("isAny", new LambdaFun((e, args) => {
-				Fun f = e["f"] as Fun;
-				IEnumerable<Value> s = e["s"].ToStream(e);
+			this.SetMember("isAny", new LambdaFun((scope, args) => {
+				Fun predicate = scope["predicate"].ToFunction(scope);
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
 
-				return new Logical(s.Any(x => Converter.ToBoolean(f.Run(new Scope(e), x))));
+				return new Logical(self.Any(x => predicate.Run(new Scope(scope), x).ToBoolean()));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("f")
+					new NamePattern("predicate"),
+					new TypePattern("self", this),
 				}
 			});
 
-			// Kernel.Function (predicate) => Kernel.Iterator
-			this.SetMember("filter", new LambdaFun((e, args) => {
-				IType typeParameter = e["values"].Type;
-				Fun mapper;
-				IEnumerable<Value> values;
 
-				if (e["fn"] is Fun) {
-					mapper = e["fn"] as Fun;
-					values = e["fc"].ToStream(e);
-				}
-				else {
-					values = e["fn"].ToStream(e);
-					mapper = e["fc"] as Fun;
-				}
+			this.SetMember("filter", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+				Fun predicate = scope["predicate"].ToFunction(scope);
+				IEnumerable<Value> values = self.ToStream(scope);
+				IType typeParameter = self.Type;
 
-				return Helper.FromStream(typeParameter, values.Where(i => mapper.Run(new Scope(e), i).ToBoolean()), e);
+				return Helper.FromStream(typeParameter, values.Where(i => predicate.Run(new Scope(scope), i).ToBoolean()), scope);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("predicate"),
+					new TypePattern("self", this),
+				}
+			});
+
+			LambdaFun map = new LambdaFun((scope, args) => {
+				Value fc = scope["fc"];
+				IType typeParameter = fc.Type;
+				Fun mapper = scope["fn"].ToFunction(scope);
+				IEnumerable<Value> values = fc.ToStream(scope);
+
+				return Helper.FromStream(typeParameter,
+					values.Select(i => mapper.Run(new Scope(scope), i)), scope);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("fn"),
-					new NamePattern("fc"),
+					new TypePattern("fc", this),
+				}
+			};
+
+			this.SetMember("fmap", map);
+
+			this.SetMember("map", map);
+
+			this.SetMember("mapi", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+				Fun mapper = scope["mapper"].ToFunction(scope);
+				IEnumerable<Value> values = self.ToStream(scope);
+				IType typeParameter = self.Type;
+
+				return Helper.FromStream(typeParameter, values.Select((i, index) => mapper.Run(new Scope(scope), new Number(index), i)), scope);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("mapper"),
+					new TypePattern("self", this),
 				}
 			});
 
-			static IEnumerable<Value> Flatten(IEnumerable<IEnumerable<Value>> list, Scope s) {
+
+			static IEnumerable<Value> Flatten2(IEnumerable<IEnumerable<Value>> list, Scope s) {
 				foreach (IEnumerable<Value> item in list) {
 					foreach (Value item2 in item) {
 						yield return item2;
@@ -334,87 +586,24 @@ namespace Lumen.Lang {
 				}
 			}
 
-			Value Map(Scope scope, Value fc, Value fn) {
-				IType typeParameter = fc.Type;
-				Fun mapper = fn.ToFunction(scope);
-				IEnumerable<Value> values = fc.ToStream(scope);
-
-				return Helper.FromStream(typeParameter,
-					values.Select(i => mapper.Run(new Scope(scope), i)), scope);
-			}
-
-			// Collection -> Function -> Stream
-			this.SetMember("map", new LambdaFun((scope, args) => {
-				Fun mapper = scope["fn"].ToFunction(scope);
-				IEnumerable<Value> values = scope["fc"].ToStream(scope);
-
-				return new Stream(values.Select(i => mapper.Run(new Scope(scope), i)));
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("fn"),
-					new NamePattern("fc")
-				}
-			});
-
-			// Functor realization
-			// Collection 'T -> Function -> Collection 'T
-			this.SetMember("fmap", new LambdaFun((scope, args) => {
-				return Map(scope, scope["fc"], scope["fn"]);
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("fn"),
-					new NamePattern("fc"),
-				}
-			});
-
-			LambdaFun mapi = new LambdaFun((e, args) => {
-				IType typeParameter = e["values"].Type;
-				Fun mapper;
-				IEnumerable<Value> values;
-
-				if (e["fn"] is Fun) {
-					mapper = e["fn"] as Fun;
-					values = e["fc"].ToStream(e);
-				}
-				else {
-					values = e["fn"].ToStream(e);
-					mapper = e["fc"] as Fun;
-				}
-
-				return Helper.FromStream(typeParameter, values.Select((i, index) => mapper.Run(new Scope(e), new Number(index), i)), e);
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("fn"),
-					new NamePattern("fc"),
-				}
-			};
-
-			this.SetMember("mapi", mapi);
-
-			// Applicative
 			this.SetMember("liftA", new LambdaFun((scope, args) => {
-				IEnumerable<Value> obj = scope["f"].ToStream(scope);
+				IEnumerable<Value> obj = scope["other"].ToStream(scope);
+				Value self = scope["self"];
+				IEnumerable<Value> selfStream = self.ToStream(scope);
 
 				return Helper.FromStream(
-					scope["f"].Type,
-					Flatten(obj.Select(i =>
-						scope["m"].ToStream(scope).Select(j =>
+					scope["other"].Type,
+					Flatten2(obj.Select(i =>
+						selfStream.Select(j =>
 							i.ToFunction(scope).Run(new Scope(), j))), scope),
 					scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("m"),
-					new NamePattern("f"),
+			new TypePattern("self", this),
+					new NamePattern("other"),
 				}
 			});
 
-
-			// Kernel.Function => Kernel.List
-			this.SetMember("collect", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				Fun f = (Fun)args[0];
-				return new Array(v.Select(x => f.Run(new Scope(e), x)).ToList());
-			}));
 
 			this.SetMember("iter", new LambdaFun((scope, args) => {
 				Fun action = scope["action"].ToFunction(scope);
@@ -428,7 +617,7 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("action"),
-					new NamePattern("self")
+					new TypePattern("self", this),
 				}
 			});
 
@@ -446,79 +635,45 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("action"),
-					new NamePattern("self")
+					new TypePattern("self", this),
 				}
 			});
 
-			// Kernel.Function => Kernel.List
-			/*this.scope.Set("cycle", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
-				if (args.Length == 0) {
-					return new Enumerator(CycleInf(v));
-				}
-				return new Enumerator(Cycle(v, (Int32)Converter.ToDouble(args[0], e)));
-			}));*/
-			// Помещает каждую запись массива в блок. 
-			// Возвращает первое вхождение для которого блок не false.
-			// Если ни один объект не подошел вызывается переменная ifnone, если она не задана возвращается null.
-			this.SetMember("find", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e["s"], e);
-				Fun f = (Fun)e["f"];
 
-				foreach (Value i in v) {
-					if (Converter.ToBoolean(f.Run(new Scope(e), i))) {
-						return i;
+			this.SetMember("find", new LambdaFun((scope, args) => {
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
+				Fun predicate = scope["predicate"].ToFunction(scope);
+
+				foreach (Value i in self) {
+					if (predicate.Run(new Scope(scope), i).ToBoolean()) {
+						return Helper.CreateSome(i);
 					}
 				}
 
-				return Const.UNIT;
+				return Prelude.None;
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("f")
+					new NamePattern("predicate"),
+					new TypePattern("self", this),
 				}
 			});
 
-			// Возвращает массив, содержащий все элементы из перечисления для которых переданный блок возвращает значение true
-			this.SetMember("findAll", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e["s"], e);
-				Fun f = (Fun)e["f"];
+			this.SetMember("findAll", new LambdaFun((scope, args) => {
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
+				Fun predicate = scope["predicate"].ToFunction(scope);
 
 				List<Value> result = new List<Value>();
-				foreach (Value i in v) {
-					if (Converter.ToBoolean(f.Run(new Scope(e), i))) {
+				foreach (Value i in self) {
+					if (predicate.Run(new Scope(scope), i).ToBoolean()) {
 						result.Add(i);
 					}
 				}
+
 				return new Array(result);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("f")
-				}
-			});
-
-			//this.SetField("reduce", this.scope["/"]);
-			this.SetMember("min", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("s"), e);
-				return v.Aggregate((x, y) => {
-					Scope s = new Scope(e);
-					return x.CompareTo(y) < 0 ? x : y;
-				});
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("s")
-				}
-			});
-			this.SetMember("max", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("s"), e);
-				return v.Aggregate((x, y) => {
-					Scope s = new Scope(e);
-					return x.CompareTo(y) > 0 ? x : y;
-				});
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("s")
+					new NamePattern("predicate"),
+						new TypePattern("self", this),
 				}
 			});
 
@@ -541,7 +696,7 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("other"),
-					new NamePattern("self")
+						new TypePattern("self", this),
 				}
 			});
 
@@ -554,7 +709,7 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("other"),
-					new NamePattern("self")
+						new TypePattern("self", this),
 				}
 			});
 
@@ -576,7 +731,7 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("other"),
-					new NamePattern("self")
+						new TypePattern("self", this),
 				}
 			});
 
@@ -589,80 +744,115 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("other"),
-					new NamePattern("self")
+						new TypePattern("self", this),
 				}
 			});
 
 
-			/*this.scope.Set("take", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
-				return new Enumerator(v.Take((int)Converter.ToDouble(args[0], e)));
-			}));*/
-			this.SetMember("take_while", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				Fun f = (Fun)args[0];
-				return new Stream(v.TakeWhile(x => Converter.ToBoolean(f.Run(new Scope(e), x))));
+			this.SetMember("take", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+				IEnumerable<Value> value = self.ToStream(scope);
+
+				Int32 count = scope["count"].ToInt(scope);
+
+				return Helper.FromStream(self.Type, value.Take(count), scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("act")
+					new NamePattern("count"),
+					new TypePattern("self", this),
 				}
 			});
-			/*this.scope.Set("skip", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
-				return new Enumerator(v.Skip((int)Converter.ToDouble(args[0], e)));
-			}));*/
-			this.SetMember("skip_while", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				Fun f = (Fun)args[0];
-				return new Stream(v.SkipWhile(x => Converter.ToBoolean(f.Run(new Scope(e), x))));
+
+			this.SetMember("takeWhile", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+				IEnumerable<Value> value = self.ToStream(scope);
+
+				Fun predicate = scope["predicate"].ToFunction(scope);
+
+				return Helper.FromStream(self.Type, value.TakeWhile(i => predicate.Run(new Scope(scope), i).ToBoolean()), scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("act")
+					new NamePattern("predicate"),
+						new TypePattern("self", this),
+				}
+			});
+
+			this.SetMember("skip", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+				IEnumerable<Value> value = self.ToStream(scope);
+
+				Int32 count = scope["count"].ToInt(scope);
+
+				return Helper.FromStream(self.Type, value.Skip(count), scope);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("count"),
+						new TypePattern("self", this),
+				}
+			});
+
+			this.SetMember("skipWhile", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+				IEnumerable<Value> value = self.ToStream(scope);
+
+				Fun predicate = scope["predicate"].ToFunction(scope);
+
+				return Helper.FromStream(self.Type, value.SkipWhile(i => predicate.Run(new Scope(scope), i).ToBoolean()), scope);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("predicate"),
+						new TypePattern("self", this),
 				}
 			});
 
 
-			this.SetMember("unique", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				return new Stream(v.Distinct());
+			this.SetMember("unique", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+
+				return Helper.FromStream(self.Type, self.ToStream(scope).Distinct(), scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("act")
+					new TypePattern("self", this),
 				}
 			});
 
-			this.SetMember("except", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				return new Stream(v.Except(Converter.ToStream(args[0], e)));
+			this.SetMember("difference", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+
+				return Helper.FromStream(self.Type,
+					self.ToStream(scope).Except(scope["other"].ToStream(scope)), scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("act")
+					new NamePattern("other"),
+					new TypePattern("self", this),
 				}
 			});
 
-			this.SetMember("intersect", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				return new Stream(v.Intersect(Converter.ToStream(args[0], e)));
+			this.SetMember("intersection", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+
+				return Helper.FromStream(self.Type,
+					self.ToStream(scope).Intersect(scope["other"].ToStream(scope)), scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("act")
+						new TypePattern("other", this),
+						new TypePattern("self", this),
 				}
 			});
 
-			this.SetMember("union", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				return new Stream(v.Union(Converter.ToStream(args[0], e)));
+			this.SetMember("union", new LambdaFun((scope, args) => {
+				Value self = scope["self"];
+
+				return Helper.FromStream(self.Type,
+					self.ToStream(scope).Union(scope["other"].ToStream(scope)), scope);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("s"),
-					new NamePattern("act")
+					new NamePattern("other"),
+					new TypePattern("self", this),
 				}
 			});
+			// isSubset
+
 
 			this.SetMember("zip", new LambdaFun((e, args) => {
 				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
@@ -674,38 +864,24 @@ namespace Lumen.Lang {
 			}));
 
 			this.SetMember("join", new LambdaFun((e, args) => {
-				IEnumerable<Value> values = e["values"].ToStream(e);
+				IEnumerable<Value> self = e["self"].ToStream(e);
 				String delim = e["delim"].ToString();
 
-				return new Text(String.Join(delim, values));
+				return new Text(String.Join(delim, self));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("values"),
-					new NamePattern("delim")
+					new NamePattern("delim"),
+					new TypePattern("self", this),
 				}
 			});
 
-			this.SetMember("Array", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				return new Array(v.ToList());
-			}) {
-				Arguments = Const.Self
-			});
-
-			this.SetMember("Text", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
-				return new Text("[seq]");
-			}) {
-				Arguments = Const.Self
-			});
-
 			this.SetMember("step", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToStream(e.Get("this"), e);
+				IEnumerable<Value> v = Converter.ToStream(e.Get("self"), e);
 
-				return new Stream(this.Step(v, e["count"].ToInt(e)));
+				return new Stream(Step(v, e["count"].ToInt(e)));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("this"),
+					new TypePattern("self", this),
 					new NamePattern("count")
 				}
 			});
@@ -716,7 +892,7 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("elem"),
-					new NamePattern("self")
+					new TypePattern("self", this)
 				}
 			});
 
@@ -731,25 +907,34 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toList", new LambdaFun((scope, args) => {
-				IEnumerable<Value> s = scope["x"].ToStream(scope);
-				return new List(LinkedList.Create(s));
+				IEnumerable<Value> self = scope["self"].ToStream(scope);
+				return new List(LinkedList.Create(self));
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("x")
+					new TypePattern("self", this)
 				}
 			});
 
 			this.SetMember("fromList", new LambdaFun((scope, args) => {
-				IEnumerable<Value> s = scope["x"].ToLinkedList(scope);
-				return new Stream(s);
+				IEnumerable<Value> result = scope["self"].ToLinkedList(scope);
+				return new Stream(result);
 			}) {
 				Arguments = new List<IPattern> {
-					new NamePattern("x")
+					new NamePattern("self")
 				}
 			});
+
+			// Kernel.Function => Kernel.List
+			/*this.scope.Set("cycle", new LambdaFun((e, args) => {
+				IEnumerable<Value> v = Converter.ToIterator(e.Get("this"), e);
+				if (args.Length == 0) {
+					return new Enumerator(CycleInf(v));
+				}
+				return new Enumerator(Cycle(v, (Int32)Converter.ToDouble(args[0], e)));
+			}));*/
 		}
 
-		private IEnumerable<Value> Step(IEnumerable<Value> val, Int32 by) {
+		private static IEnumerable<Value> Step(IEnumerable<Value> val, Int32 by) {
 			Int32 indexer = by;
 			foreach (Value i in val) {
 				if (by == indexer) {

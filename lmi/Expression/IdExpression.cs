@@ -8,28 +8,37 @@ using Lumen.Lang;
 namespace Lumen.Lmi {
 	public class IdExpression : Expression {
 		public String id;
-		public Int32 line;
 		public String file;
+		public Int32 line;
 
-		public IdExpression(String id, Int32 line, String file) {
+		public IdExpression(String id, String file, Int32 line) {
 			this.id = id;
-			this.line = line;
 			this.file = file;
+			this.line = line;
 		}
 
-		public Value Eval(Scope e) {
-			if (!e.IsExsists(this.id)) {
-				List<String> maybe = e.variables.Keys
-									.Where(i => Helper.Tanimoto(i, this.id) > 0.3)
-									.OrderBy(i => Helper.Tanimoto(i, this.id))
-									.ToList();
+		public Value Eval(Scope scope) {
+			if (!scope.IsExsists(this.id)) {
+				List<String> maybe = scope.FindClosestNames(5, this.id);
 
-				throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(this.id), this.line, this.file) {
-					Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}" : null
+				String note = null;
+
+				if (maybe.Count == 1) {
+					note = $"Perhaps you meant '{maybe[0]}'?";
+				}
+				else if (maybe.Count > 3) {
+					note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe.Take(3))}";
+				}
+				else if (maybe.Count > 1) {
+					note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}";
+				}
+
+				throw new LumenException(Exceptions.UNKNOWN_NAME.F(this.id), this.line, this.file) {
+					Note = note
 				};
 			}
 
-			return e.Get(this.id);
+			return scope.Get(this.id);
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
@@ -39,14 +48,22 @@ namespace Lumen.Lmi {
 		public Expression Closure(ClosureManager manager) {
 			if (!manager.IsDeclared(this.id)) {
 				if (!manager.Scope.IsExsists(this.id)) {
-					List<String> maybe = manager.Declarations
-						.Concat(manager.Scope.variables.Keys)
-						.Where(i => Helper.Tanimoto(i, this.id) > 0.3)
-						.OrderBy(i => Helper.Tanimoto(i, this.id))
-						.ToList();
+					List<String> maybe = manager.Scope.FindClosestNames(5, this.id);
 
-					throw new LumenException(Exceptions.UNKNOWN_IDENTIFITER.F(this.id), this.line, this.file) {
-						Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", manager.Declarations.Concat(manager.Scope.variables.Keys).Where(i => Helper.Tanimoto(i, this.id) > 0.3).OrderBy(i => Helper.Tanimoto(i, this.id)))}" : null
+					String note = null;
+
+					if (maybe.Count == 1) {
+						note = $"Perhaps you meant '{maybe[0]}'?";
+					}
+					else if (maybe.Count > 3) {
+						note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe.Take(3))}";
+					}
+					else if (maybe.Count > 1) {
+						note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}";
+					}
+
+					throw new LumenException(Exceptions.UNKNOWN_NAME.F(this.id), this.line, this.file) {
+						Note = note
 					};
 				}
 

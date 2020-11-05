@@ -23,6 +23,30 @@ namespace Lumen.Lang {
 			return this.Members.ContainsKey(name) || this.Mixins.Any(i => i.Contains(name));
 		}
 
+		private IEnumerable<String> AvailableNames {
+			get {
+				foreach (var item in this.Members) {
+					yield return item.Key;
+				}
+
+
+				foreach (Module use in this.Mixins) {
+					foreach (KeyValuePair<String, Value> item in use.Members) {
+						yield return item.Key;
+					}
+				}
+			}
+		}
+
+		public List<String> FindClosestNames(Double maxValue, String key) {
+			List<String> maybe = this.AvailableNames
+								.Where(i => Helper.Levenshtein(i, key) < maxValue)
+								.OrderBy(i => Helper.Levenshtein(i, key))
+								.Distinct()
+								.ToList();
+			return maybe;
+		}
+
 		public Boolean TryGetMember(String name, out Value result) {
 			if (this.Members.TryGetValue(name, out result)) {
 				return true;
@@ -46,7 +70,23 @@ namespace Lumen.Lang {
 				return result;
 			}
 
-			throw new LumenException($"Module {this.Name} does not contains a field {name}");
+			List<String> maybe = this.FindClosestNames(5, name);
+
+			String note = null;
+
+			if (maybe.Count == 1) {
+				note = $"Perhaps you meant '{maybe[0]}'?";
+			}
+			else if (maybe.Count > 3) {
+				note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe.Take(3))}";
+			}
+			else if (maybe.Count > 1) {
+				note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}";
+			}
+
+			throw new LumenException($"Module {this.Name} does not contains a name \"{name}\"") {
+				Note = note
+			};
 		}
 
 		public void SetMember(String name, Value value, Scope _ = null) {
@@ -64,7 +104,7 @@ namespace Lumen.Lang {
 				return constructor.Parent == this;
 			}
 
-			return false;
+			return value.Type.HasImplementation(this);
 		}
 
 		public void AppendImplementation(Module classModule) {

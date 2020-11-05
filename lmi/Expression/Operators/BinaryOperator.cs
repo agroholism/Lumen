@@ -24,20 +24,20 @@ namespace Lumen.Lmi {
 			if (this.expressionOne is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.expressionTwo == null) {
-						return new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new IdExpression("x", ide.line, ide.file), null, this.operation, this.line, this.fileName));
+						return new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), null, this.operation, this.line, this.fileName));
 					}
 
 					if (this.expressionTwo is IdExpression ide2 && ide2.id == "_") {
-						return new UserFun(new List<IPattern> { new NamePattern("x"), new NamePattern("y") }, new BinaryOperator(new IdExpression("x", ide.line, ide.file), new IdExpression("y", ide2.line, ide2.file), this.operation, this.line, this.fileName));
+						return new UserFun(new List<IPattern> { new NamePattern("x"), new NamePattern("y") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), new IdExpression("y", ide2.file, ide2.line), this.operation, this.line, this.fileName));
 					}
 					else {
 						return new UserFun(new List<IPattern> { new NamePattern("x") },
-							new BinaryOperator(new IdExpression("x", ide.line, ide.file), new ValueLiteral(this.expressionTwo.Eval(e)), this.operation, this.line, this.fileName));
+							new BinaryOperator(new IdExpression("x", ide.file, ide.line), new ValueLiteral(this.expressionTwo.Eval(e)), this.operation, this.line, this.fileName));
 					}
 				}
 			}
 			else if (this.expressionTwo is IdExpression _ide && _ide.id == "_") {
-				return new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.line, _ide.file), this.operation, this.line, this.fileName));
+				return new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.file, _ide.line), this.operation, this.line, this.fileName));
 			}
 
 			Value operandOne = this.expressionOne.Eval(e);
@@ -78,20 +78,20 @@ namespace Lumen.Lmi {
 			if (this.expressionOne is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.expressionTwo == null) {
-						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new IdExpression("x", ide.line, ide.file), null, this.operation, this.line, this.fileName)));
+						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), null, this.operation, this.line, this.fileName)));
 					}
 
 					if (this.expressionTwo is IdExpression ide2 && ide2.id == "_") {
-						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x"), new NamePattern("y") }, new BinaryOperator(new IdExpression("x", ide.line, ide.file), new IdExpression("y", ide2.line, ide2.file), this.operation, this.line, this.fileName)));
+						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x"), new NamePattern("y") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), new IdExpression("y", ide2.file, ide2.line), this.operation, this.line, this.fileName)));
 					}
 					else {
 						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") },
-							new BinaryOperator(new IdExpression("x", ide.line, ide.file), new ValueLiteral(this.expressionTwo.Eval(e)), this.operation, this.line, this.fileName)));
+							new BinaryOperator(new IdExpression("x", ide.file, ide.line), new ValueLiteral(this.expressionTwo.Eval(e)), this.operation, this.line, this.fileName)));
 					}
 				}
 			}
 			else if (this.expressionTwo is IdExpression _ide && _ide.id == "_") {
-				yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.line, _ide.file), this.operation, this.line, this.fileName)));
+				yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.file, _ide.line), this.operation, this.line, this.fileName)));
 			}
 
 			IEnumerable<Value> ops = this.expressionOne.EvalWithYield(e);

@@ -45,11 +45,5 @@
     <Compile Include="Initializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lumen Studio\Lumen Studio.csproj">
-      <Project>{bae2519a-c953-457f-9cd2-d17844fd4440}</Project>
-      <Name>Lumen Studio</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
