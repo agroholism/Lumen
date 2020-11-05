@@ -57,7 +57,7 @@ namespace Lumen.Lmi {
 				throw new LumenException(Exceptions.INSTANCE_OF_DOES_NOT_CONTAINS_FIELD.F(value.Type, this.memberName));
 			}
 			catch (LumenException hex) {
-				hex.SetDataIfAbsent(null, this.fileName, this.line);
+				hex.SetLastCallDataIfAbsent(null, this.fileName, this.line);
 
 				throw;
 			}

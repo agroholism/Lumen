@@ -2,16 +2,30 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	public sealed class Error : Module {
-		public IConstructor constructor;
+	interface IExceptionConstructor {
+		public LumenException MakeExceptionInstance(params Value[] values);
+	}
 
-		internal Error() {
+	public abstract class ErrorModule : Module, IExceptionConstructor {
+		public ExceptionConstructor constructor;
+
+		public ErrorModule() {
+			this.AppendImplementation(Prelude.Exception);
+		}
+
+		public LumenException MakeExceptionInstance(params Value[] values) {
+			return this.constructor.MakeExceptionInstance(values);
+		}
+	}
+
+	public sealed class Error : ErrorModule {
+		internal Error() : base() {
 			this.Name = "Error";
 
-			this.constructor = Helper.CreateConstructor("Error", this, "message");
+			this.constructor = new ExceptionConstructor("Error", this, "message");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
-				return this.constructor.MakeInstance(e["message"]);
+				return this.MakeExceptionInstance(e["message"]);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("message")
@@ -25,45 +39,35 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = Const.Self
 			});
-
-			this.AppendImplementation(Prelude.Exception);
 		}
 	}
 
-	public sealed class AssertError : Module {
-		public IConstructor constructor;
-
-		internal AssertError() {
+	public sealed class AssertError : ErrorModule {
+		internal AssertError() : base() {
 			this.Name = "AssertError";
 
-			this.constructor = Helper.CreateConstructor("AssertError", this);
+			this.constructor = new ExceptionConstructor("AssertError", this);
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
-				return this.constructor;
+				return this.MakeExceptionInstance();
 			}));
 
 			this.SetMember("message", new LambdaFun((e, args) => {
-				Instance self = e["self"] as Instance;
-
 				return new Text(Exceptions.ASSERT_IS_BROKEN);
 			}) {
 				Arguments = Const.Self
 			});
-
-			this.AppendImplementation(Prelude.Exception);
 		}
 	}
 
-	public sealed class ConvertError : Module {
-		public IConstructor constructor;
-
-		internal ConvertError() {
+	public sealed class ConvertError : ErrorModule {
+		internal ConvertError() : base() {
 			this.Name = "ConvertError";
 
-			this.constructor = Helper.CreateConstructor("ConvertError", this, new[] { "fromType", "targetType" });
+			this.constructor = new ExceptionConstructor("ConvertError", this, "fromType", "targetType");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
-				return this.constructor.MakeInstance(e["fromType"], e["targetType"]);
+				return this.MakeExceptionInstance(e["fromType"], e["targetType"]);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("fromType"),
@@ -79,22 +83,18 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = Const.Self
 			});
-
-			this.AppendImplementation(Prelude.Exception);
 		}
 	}
 
-	public sealed class FunctionIsNotImplemented : Module {
-		public IConstructor constructor;
-
-		internal FunctionIsNotImplemented() {
+	public sealed class FunctionIsNotImplemented : ErrorModule {
+		internal FunctionIsNotImplemented() : base() {
 			this.Name = "FunctionIsNotImplemented";
 
 			this.constructor =
-			   Helper.CreateConstructor("FunctionIsNotImplemented", this, new[] { "typeObject", "functionName" });
+			   new ExceptionConstructor("FunctionIsNotImplemented", this, "typeObject", "functionName");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
-				return this.constructor.MakeInstance(e["typeObject"], e["functionName"]);
+				return this.MakeExceptionInstance(e["typeObject"], e["functionName"]);
 			}) {
 				Arguments = new List<IPattern> {
 					new NamePattern("typeObject"),
@@ -109,8 +109,6 @@ namespace Lumen.Lang {
 			}) {
 				Arguments = Const.Self
 			});
-
-			this.AppendImplementation(Prelude.Exception);
 		}
 	}
 }

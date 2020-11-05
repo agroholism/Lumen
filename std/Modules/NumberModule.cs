@@ -112,6 +112,14 @@ namespace Lumen.Lang {
 				Arguments = Const.SelfOther
 			});
 
+			this.SetMember(Constants.MOD, new LambdaFun((scope, args) => {
+				Value other = scope["other"];
+
+				return new Number(scope["self"].ToDouble(scope) % other.ToDouble(scope));
+			}) {
+				Arguments = Const.SelfOther
+			});
+
 			#endregion
 
 			// Number -> Number -> Number

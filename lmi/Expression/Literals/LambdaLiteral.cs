@@ -9,8 +9,10 @@ namespace Lumen.Lmi {
     public class LambdaLiteral : Expression {
         public List<IPattern> arguments;
         public Expression body;
- 
-        public LambdaLiteral(List<IPattern> arguments, Expression body) {
+
+		public Boolean isIntern = false;
+
+		public LambdaLiteral(List<IPattern> arguments, Expression body) {
             this.arguments = arguments;
             this.body = body;
         }
@@ -40,7 +42,7 @@ namespace Lumen.Lmi {
 			}
 
 			// todo
-			return new UserFun(this.arguments, x);
+			return new UserFun(this.arguments, x, "[lambda]");
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

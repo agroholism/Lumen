@@ -36,23 +36,39 @@ namespace Lumen.Lmi {
 		public Value Eval(Scope scope) {
 			Value expressionResult = null;
 
+RETRY_OUTER:
+			Boolean isRetry = false;
+
 			try {
 				expressionResult = this.tryBody.Eval(scope);
 			}
 			catch (Exception ex) {
-				Value raisedException = ex is LumenException lumenException ? lumenException.LumenObject
-					: Helper.Error(ex.Message);
+				Value raisedException = ex as LumenException ?? new LumenException(ex.Message);
 
-				foreach (KeyValuePair<IPattern, Expression> i in this.patterns) {
-					if (i.Key.Match(raisedException, scope).Success) {
-						return i.Value.Eval(scope);
+				scope[Constants.LAST_EXCEPTION_SPECIAL_NAME] = raisedException;
+RETRY:
+				if (isRetry) {
+					goto RETRY_OUTER;
+				}
+
+				try {
+					foreach (KeyValuePair<IPattern, Expression> i in this.patterns) {
+						if (i.Key.Match(raisedException, scope).Success) {
+							return i.Value.Eval(scope);
+						}
 					}
+				}
+				catch (Retry) {
+					isRetry = true;
+					goto RETRY;
 				}
 
 				throw;
 			}
 			finally {
-				this.finallyBody?.Eval(scope);
+				if (!isRetry) {
+					this.finallyBody?.Eval(scope);
+				}
 			}
 
 			return expressionResult;
@@ -69,13 +85,13 @@ namespace Lumen.Lmi {
 				Value val;
 
 				try {
-					if(!canNext) {
+					if (!canNext) {
 						break;
 					}
 
 					canNext = enumerator.MoveNext();
 					val = enumerator.Current;
-					
+
 				}
 				catch (Exception ex) {
 					exception = ex;
@@ -90,14 +106,12 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			if(exception != null) {
-				Value raisedException = exception is LumenException lumenException 
-					? lumenException.LumenObject
-					: Helper.Error(exception.Message);
+			if (exception != null) {
+				Value raisedException = exception as LumenException ?? new LumenException(exception.Message);
 
 				foreach (KeyValuePair<IPattern, Expression> i in this.patterns) {
 					if (i.Key.Match(raisedException, scope).Success) {
-						 foreach(var x in i.Value.EvalWithYield(scope)) {
+						foreach (Value x in i.Value.EvalWithYield(scope)) {
 							if (x is GeneratorTerminalResult gtr) {
 								terminalResult = gtr;
 							}
@@ -110,8 +124,8 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			if(this.finallyBody != null) {
-				foreach (var x in this.finallyBody.EvalWithYield(scope)) {
+			if (this.finallyBody != null) {
+				foreach (Value x in this.finallyBody.EvalWithYield(scope)) {
 					yield return x;
 				}
 			}

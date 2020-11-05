@@ -32,7 +32,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("liftA", new LambdaFun((scope, args) => {
 				Ref functor = scope["f"] as Ref;
-				var m = scope["m"];
+				Value m = scope["m"];
 				return m.CallMethodFlip("fmap", scope, functor.Value);
 			}) {
 				Arguments = new List<IPattern> {

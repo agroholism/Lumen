@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Lumen.Lang {
 	public static class Converter {
 		public static Boolean ToBoolean(this Value value) {
-			return value is Logical logical ? (Boolean)logical : value != Const.UNIT;
+			return value is Logical logical ? logical : value != Const.UNIT;
 		}
 
 		public static Double ToDouble(this Value value, Scope scope) {
@@ -37,17 +37,17 @@ namespace Lumen.Lang {
 
 		public static Fun ToFunction(this Value value, Scope scope) {
 			return value.TryConvertToFunction(out Fun result) ? result :
-				throw Helper.ConvertError(value.Type, Prelude.Function, scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.Function).ToException(scope);
 		}
 
 		public static Dictionary<Value, Value> ToDictionary(this Value value, Scope scope) {
 			return value is Map map ? map.InternalValue :
-				throw Helper.ConvertError(value.Type, Prelude.Map, scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.Map).ToException(scope);
 		}
 
 		public static List<Value> ToList(this Value value, Scope scope) {
 			return value is Array array ? array.InternalValue :
-				throw Helper.ConvertError(value.Type, Prelude.List, scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException(scope);
 		}
 
 		public static IEnumerable<Value> ToStream(this Value val, Scope scope) {
@@ -61,21 +61,37 @@ namespace Lumen.Lang {
 				return converter.Run(new Scope(scope), val).ToStream(scope);
 			}
 
-			throw Helper.ConvertError(val.Type, Prelude.Stream, scope);
+			throw Helper.CreateConvertError(val.Type, Prelude.Stream).ToException(scope);
+		}
+
+		public static Boolean TryConvertToException(this Value value, out LumenException result) {
+			if (value is Text) {
+				result = new LumenException(value.ToString());
+				return true;
+			}
+
+			if (value is IExceptionConstructor exc) {
+				result = exc.MakeExceptionInstance();
+				return true;
+			}
+
+			if (value is LumenException lev) {
+				result = lev;
+				return true;
+			}
+
+			result = null;
+			return false;
 		}
 
 		public static LumenException ToException(this Value value, Scope scope) {
-			String message = value.Type.GetMember("message", scope).ToFunction(scope)
-				.Run(new Scope(scope), value).ToString();
-
-			return new LumenException(message) {
-				LumenObject = value
-			};
+			return value.TryConvertToException(out LumenException result) ? result 
+				: Helper.CreateConvertError(value.Type, Prelude.Collection).ToException(scope);
 		}
 
 		internal static LinkedList ToLinkedList(this Value value, Scope scope) {
 			return value is List list ? list.Value :
-				throw Helper.ConvertError(value.Type, Prelude.List, scope);
+				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException(scope);
 		}
 
 		private static Number ToNum(this Value value, Scope scope) {
@@ -88,7 +104,7 @@ namespace Lumen.Lang {
 				return ToNum(converter.Run(new Scope(scope), value), scope);
 			}
 
-			throw Helper.ConvertError(value.Type, Prelude.Number, scope);
+			throw Helper.CreateConvertError(value.Type, Prelude.Number).ToException(scope);
 		}
 	}
 }

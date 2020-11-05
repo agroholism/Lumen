@@ -1,108 +1,103 @@
 ﻿namespace Lumen.Lmi {
 	public enum TokenType {
-        OPEN,
-
         NUMBER,
-        HARDNUMBER,
-
         WORD,
         TEXT,
-        IS,
 
         COLON,
+        COLON2,
+
         PLUS,
         MINUS,
         STAR,
         SLASH,
         POWER,
-        ASSIGN,
-        EQUALS,
-        LT,
-        LTEQ,
-        NOT,
-        NOT_EQUALS,
-        GT,
-        GTEQ,
-        MOD,
-        DOT,
-        XOR,
-        BAR,
-        OR,
-        AMP,
-        AND,
+        MODULUS,
 
-        LPAREN,
-        RPAREN,
+        ASSIGN, // <-
+        LAMBDA, // ->
+
+        TILDE,
+        AMP,
+        BAR,
+        BANG,
+
+        MIDDLE_PRIORITY_RIGTH,
+
+        SHIFT_LEFT,
+        SHIFT_RIGTH,
+
+        SHIP,
+        MATCH_EQUALS,
+        NOT_MATCH_EQUALS,
+        EQUALS,
+        NOT_EQUALS,
+        LESS,
+        LESS_EQUALS,
+        GREATER,
+        GREATER_EQUALS,
+
+        NOT,
+        OR,
+        AND,
+        XOR,
+
+        DOT,
+        DOT2,
+        DOT3,
+
+        PAREN_OPEN,
+        PAREN_CLOSE,
 
         BLOCK_START,
         BLOCK_END,
 
-        LBRACKET,
-        RBRACKET,
+        LIST_OPEN,
+        LIST_CLOSE,
 
-        EOC,
+        ARRAY_OPEN,
+        ARRAY_CLOSE,
 
         SPLIT,
 
+        EOC,
+        EOF,
+
+        VOID,
+
+        FORWARD_PIPE,
+        BACKWARD_PIPE,
+
         LET,
-
         RETURN,
-
-        LAMBDA,
-
         IF,
         ELSE,
         WHILE,
         FOR,
         IN,
         BREAK,
-        CONTINUE,
-
-        EOF,
-        SHIP,
-        TILDE,
-        BLEFT,
-        BRIGTH,
-        BXOR,
-        EQMATCH,
-        EQNOTMATCH,
-        DOTDOT,
-        DOTDOTDOT,
         MODULE,
         NEXT,
-        FPIPE,
-        BNUMBER,
-        BIG_NUMBER,
-        ASYNC,
-        VOID,
-        BPIPE,
-        ATTRIBUTE_OPEN,
-        ATTRIBUTE_CLOSE,
-        COLONCOLON,
         MATCH,
         TYPE,
-        WHERE,
         IMPORT,
         AS,
-        ARRAY_OPEN,
-        ARRAY_CLOSED,
         TAIL_REC,
-        CONTEXT,
         IMPLEMENTS,
-		CLASS,
 		REC,
 		YIELD,
 		FROM,
-		BANG,
-		MIDDLE_PRIORITY_RIGTH,
 		ATTRIBUTE,
-		WHEN,
 		QUESTION,
 		USE,
 		RAISE,
 		FUN,
 		TRY,
 		EXCEPT,
-		FINALLY
+		ENSURE,
+		WHEN,
+		REDO,
+		RETRY,
+		ANNOTATION
 	}
 }

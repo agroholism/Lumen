@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class WhileLet : Expression {
+		private String cycleName;
 		private IPattern pattern;
 		private Expression assinableExpression;
 		private Expression body;
 
-		public WhileLet(IPattern pattern, Expression assinableExpression, Expression body) {
+		public WhileLet(String cycleName, IPattern pattern, Expression assinableExpression, Expression body) {
+			this.cycleName = cycleName;
 			this.pattern = pattern;
 			this.assinableExpression = assinableExpression;
 			this.body = body;
@@ -18,18 +21,27 @@ namespace Lumen.Lmi {
 			Value value = this.assinableExpression.Eval(scope);
 
 			while (this.pattern.Match(value, scope).Success) {
+				REDO:
 				try {
 					this.body.Eval(scope);
 					value = this.assinableExpression.Eval(scope);
 				}
-				catch (Break bs) {
-					if (bs.UseLabel() > 0) {
-						throw bs;
+				catch (Break breakException) {
+					if (breakException.IsMatch(this.cycleName)) {
+						break;
 					}
-					break;
+
+					throw breakException;
 				}
 				catch (Next) {
 					continue;
+				}
+				catch (Redo redoException) {
+					if (redoException.IsMatch(this.cycleName)) {
+						goto REDO;
+					}
+
+					throw redoException;
 				}
 			}
 
@@ -41,19 +53,27 @@ namespace Lumen.Lmi {
 	
 			while (this.pattern.Match(value, scope).Success) {
 				IEnumerable<Value> yieldedValues;
-
+REDO:
 				try {
 					yieldedValues = this.body.EvalWithYield(scope);
 					value = this.assinableExpression.Eval(scope);
 				}
-				catch (Break bs) {
-					if (bs.UseLabel() > 0) {
-						throw bs;
+				catch (Break breakException) {
+					if (breakException.IsMatch(this.cycleName)) {
+						break;
 					}
-					break;
+
+					throw breakException;
 				}
 				catch (Next) {
 					continue;
+				}
+				catch (Redo redoException) {
+					if (redoException.IsMatch(this.cycleName)) {
+						goto REDO;
+					}
+
+					throw redoException;
 				}
 
 				if (yieldedValues != null) {
@@ -69,7 +89,7 @@ namespace Lumen.Lmi {
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			return new WhileLet(this.pattern.Closure(manager) as IPattern,
+			return new WhileLet(this.cycleName, this.pattern.Closure(manager) as IPattern,
 				this.assinableExpression.Closure(manager), this.body.Closure(manager));
 		}
 	}

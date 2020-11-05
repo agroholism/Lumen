@@ -18,7 +18,7 @@ namespace Lumen.Lmi {
         }
 
         public Value Eval(Scope e) {
-            throw new Tailrec(this.argumentsExpression.Select(i => i.Eval(e)).ToArray());
+            throw new Return(new Tailrec(this.argumentsExpression.Select(i => i.Eval(e)).ToArray()));
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
@@ -36,11 +36,21 @@ namespace Lumen.Lmi {
 			return "tailrec " + Utils.ArgumentsToString(this.argumentsExpression);
 		}
 
-		public class Tailrec : Exception {
+		public class Tailrec : Exception, Value {
 			public Value[] newArguments;
 
 			public Tailrec(Value[] result) {
 				this.newArguments = result;
+			}
+
+			public IType Type => throw new NotImplementedException();
+
+			public Int32 CompareTo(Object obj) {
+				throw new NotImplementedException();
+			}
+
+			public String ToString(String format, IFormatProvider formatProvider) {
+				throw new NotImplementedException();
 			}
 		}
 	}

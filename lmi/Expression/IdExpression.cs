@@ -37,7 +37,7 @@ namespace Lumen.Lmi {
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			if (!(manager.IsDeclared(this.id))) {
+			if (!manager.IsDeclared(this.id)) {
 				if (!manager.Scope.IsExsists(this.id)) {
 					List<String> maybe = manager.Declarations
 						.Concat(manager.Scope.variables.Keys)
@@ -49,6 +49,7 @@ namespace Lumen.Lmi {
 						Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", manager.Declarations.Concat(manager.Scope.variables.Keys).Where(i => Helper.Tanimoto(i, this.id) > 0.3).OrderBy(i => Helper.Tanimoto(i, this.id)))}" : null
 					};
 				}
+
 				return new ValueLiteral(manager.Scope.Get(this.id));
 			}
 

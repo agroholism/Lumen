@@ -5,49 +5,71 @@ using System.Collections.Generic;
 
 namespace Lumen.Lmi {
 	internal class WhileExpression : Expression {
-        internal Expression condition;
-        internal Expression body;
+		internal String cycleName;
+		internal Expression condition;
+		internal Expression body;
 
-        internal WhileExpression(Expression condition, Expression body) {
-            this.condition = condition;
-            this.body = body;
-        }
+		internal WhileExpression(String cycleName, Expression condition, Expression body) {
+			this.cycleName = cycleName;
+			this.condition = condition;
+			this.body = body;
+		}
 
-        public Value Eval(Scope scope) {
-            while (this.condition.Eval(scope).ToBoolean()) {
-                try {
-                    this.body.Eval(scope);
-                } catch (Break bs) {
-                    if (bs.UseLabel() > 0) {
-                        throw bs;
-                    }
-                    break;
-                } catch (Next) {
-                    continue;
-                }
-            }
+		public Value Eval(Scope scope) {
+			while (this.condition.Eval(scope).ToBoolean()) {
+REDO:
+				try {
+					this.body.Eval(scope);
+				}
+				catch (Break breakException) {
+					if (breakException.IsMatch(this.cycleName)) {
+						break;
+					}
 
-            return Const.UNIT;
-        }
+					throw breakException;
+				}
+				catch (Redo redoException) {
+					if (redoException.IsMatch(this.cycleName)) {
+						goto REDO;
+					}
 
-        public Expression Closure(ClosureManager manager) {
-            return new WhileExpression(this.condition.Closure(manager), this.body.Closure(manager));
-        }
+					throw redoException;
+				}
+				catch (Next) {
+					continue;
+				}
+			}
+
+			return Const.UNIT;
+		}
+
+		public Expression Closure(ClosureManager manager) {
+			return new WhileExpression(this.cycleName, this.condition.Closure(manager), this.body.Closure(manager));
+		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			while (this.condition.Eval(scope).ToBoolean()) {
+REDO:
 				IEnumerable<Value> y = null;
 				try {
 					y = this.body.EvalWithYield(scope);
 				}
-				catch (Break bs) {
-					if (bs.UseLabel() > 0) {
-						throw bs;
+				catch (Break breakException) {
+					if (breakException.IsMatch(this.cycleName)) {
+						break;
 					}
-					break;
+
+					throw breakException;
 				}
 				catch (Next) {
 					continue;
+				}
+				catch (Redo redoException) {
+					if (redoException.IsMatch(this.cycleName)) {
+						goto REDO;
+					}
+
+					throw redoException;
 				}
 
 				if (y != null) {

@@ -54,8 +54,13 @@ namespace Lumen.Lang {
 				CurrencyGroupSeparator = " ",
 				CurrencyDecimalSeparator = ".",
 				PercentGroupSeparator = " ",
-				NumberGroupSeparator = " "
+				NumberGroupSeparator = " ",
 			};
+
+			if (format == "X" || format == "x") {
+				return ((Int32)this.value).ToString(format, n);
+			} 
+
 			return this.value.ToString(format, n);
 		}
 	}

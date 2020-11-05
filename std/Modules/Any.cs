@@ -37,7 +37,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember(Constants.NOT_EQL, new LambdaFun((e, args) => {
+			this.SetMember(Constants.NOT_EQUALS, new LambdaFun((e, args) => {
 				Value first = e["x"];
 				Value second = e["y"];
 

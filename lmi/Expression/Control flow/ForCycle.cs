@@ -5,22 +5,24 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class ForCycle : Expression {
+		internal String cycleName;
 		internal Expression expression;
 		internal Expression body;
 		internal IPattern pattern;
 
-        public ForCycle(IPattern pattern, Expression expressions, Expression statement) {
-            this.pattern = pattern;
-            this.expression = expressions;
-            this.body = statement;
-        }
+		public ForCycle(String cycleName, IPattern pattern, Expression container, Expression body) {
+			this.cycleName = cycleName;
+			this.pattern = pattern;
+			this.body = body;
+			this.expression = container;
+		}
 
-        public Expression Closure(ClosureManager manager) {
+		public Expression Closure(ClosureManager manager) {
 			ClosureManager manager2 = manager.Clone();
 
 			manager2.Declare(this.pattern.GetDeclaredVariables());
 
-			ForCycle res =  new ForCycle(this.pattern, this.expression.Closure(manager), this.body.Closure(manager2));
+			ForCycle res = new ForCycle(this.cycleName, this.pattern, this.expression.Closure(manager), this.body.Closure(manager2));
 
 			if (!manager.HasYield) {
 				manager.HasYield = manager2.HasYield;
@@ -29,11 +31,12 @@ namespace Lumen.Lmi {
 			return res;
 		}
 
-        public Value Eval(Scope scope) {
-            Value container = this.expression.Eval(scope);
+		public Value Eval(Scope scope) {
+			Value container = this.expression.Eval(scope);
 
 			List<String> declared = this.pattern.GetDeclaredVariables();
-            foreach (Value i in container.ToStream(scope)) {
+			foreach (Value i in container.ToStream(scope)) {
+REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.Success) {
 					throw new LumenException(matchResult.Note);
@@ -41,28 +44,40 @@ namespace Lumen.Lmi {
 
 				try {
 					this.body.Eval(scope);
-				} catch (Break bs) {
-					if (bs.UseLabel() > 0) {
-						throw bs;
+				}
+				catch (Break breakException) {
+					if (breakException.IsMatch(this.cycleName)) {
+						break;
 					}
-					break;
-				} catch (Next) {
+
+					throw breakException;
+
+				}
+				catch (Redo redoException) {
+					if (redoException.IsMatch(this.cycleName)) {
+						goto REDO;
+					}
+
+					throw redoException;
+				}
+				catch (Next) {
 					continue;
-				} finally {
-					foreach(String declaration in declared) {
+				}
+				finally {
+					foreach (String declaration in declared) {
 						scope.Remove(declaration);
 					}
 				}
-            }
+			}
 
-            return Const.UNIT;
-        }
+			return Const.UNIT;
+		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			Value container = this.expression.Eval(scope);
 
-			List<String> declared = this.pattern.GetDeclaredVariables();
 			foreach (Value i in container.ToStream(scope)) {
+REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.Success) {
 					throw new LumenException(matchResult.Note);
@@ -73,22 +88,30 @@ namespace Lumen.Lmi {
 				try {
 					y = this.body.EvalWithYield(scope);
 				}
-				catch (Break bs) {
-					if (bs.UseLabel() > 0) {
-						throw bs;
+				catch (Break breakException) {
+					if (breakException.IsMatch(this.cycleName)) {
+						break;
 					}
-					break;
+
+					throw breakException;
 				}
-				catch(Return ret) {
+				catch (Redo redoException) {
+					if (redoException.IsMatch(this.cycleName)) {
+						goto REDO;
+					}
+
+					throw redoException;
+				}
+				catch (Return) {
 					yield break;
 				}
 				catch (Next) {
 					continue;
 				}
 
-				if(y != null) {
+				if (y != null) {
 					foreach (Value it in y) {
-						if(it is GeneratorTerminalResult) {
+						if (it is GeneratorTerminalResult) {
 							break;
 						}
 						yield return it;

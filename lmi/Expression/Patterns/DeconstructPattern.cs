@@ -62,6 +62,25 @@ namespace Lumen.Lmi {
 				return MatchResult.True;
 			}
 
+			if (requiredType is ExceptionConstructor exceptionConstructor 
+				&& value is LumenException exceptionValue) {
+				if (exceptionConstructor.IsParentOf(value)) {
+					for (Int32 i = 0; i < exceptionConstructor.Fields.Count; i++) {
+						MatchResult res = this.subpatterns[i].Match(exceptionValue.items[i], scope);
+						if (!res.Success) {
+							return res;
+						}
+					}
+
+					return MatchResult.True;
+				}
+
+				return new MatchResult {
+					Success = false,
+					Note = $"can not deconstruct a value of type {exceptionValue.Type}"
+				};
+			}
+
 			if (requiredType is Constructor ctor && value is Instance instance) {
 				if (ctor.IsParentOf(value)) {
 					for (Int32 i = 0; i < ctor.Fields.Count; i++) {

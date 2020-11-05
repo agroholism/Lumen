@@ -60,7 +60,7 @@ namespace Lumen.Lang {
 			throw new LumenException($"fne {name} {this.Name}");
 		}
 
-		public Value Run(Scope e, params Value[] arguments) {
+		public virtual Value Run(Scope e, params Value[] arguments) {
 			if (this.Arguments.Count > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
 			}

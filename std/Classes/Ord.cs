@@ -35,7 +35,7 @@ namespace Lumen.Lang {
 			});
 
 			// <=
-			this.SetMember(Constants.LTEQ, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.LESS_EQUALS, new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) <= 0);
@@ -59,7 +59,7 @@ namespace Lumen.Lang {
 			});
 
 			// >=
-			this.SetMember(Constants.GTEQ, new LambdaFun((scope, args) => {
+			this.SetMember(Constants.GREATER_EQUALS, new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) >= 0);

@@ -8,6 +8,14 @@
 			}) {
 				Arguments = Const.Self
 			});
+
+			this.SetMember("cause", new LambdaFun((scope, args) => {
+				LumenException exception = scope["self"].ToException(scope);
+
+				return exception.Cause == null ? Prelude.None : (Value)Helper.CreateSome(exception.Cause);
+			}) {
+				Arguments = Const.Self
+			});
 		}
 	}
 }

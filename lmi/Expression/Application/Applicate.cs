@@ -32,55 +32,51 @@ namespace Lumen.Lmi {
 			catch (LumenException lex) {
 				String currentFunctionName = null;
 
-				if (scope.ExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
+				if (scope.ExistsInThisScope("rec") && scope["rec"].TryConvertToFunction(out Fun currentFunction)) {
 					currentFunctionName = currentFunction.Name;
 				}
 
-				lex.AddToCallStack(currentFunctionName, this.fileName, this.lineNumber);
+				lex.SetLastCallDataIfAbsent(currentFunctionName, this.fileName, this.lineNumber);
 
 				throw;
 			}
 		}
 
-		private Value CallFunction(Fun function, Scope e) {
+		private Value CallFunction(Fun function, Scope scope) {
 			if (this.argumentsExpression.Any(i => i is IdExpression id && id.id == "_")) {
-				return this.MakePartial(function, e);
+				return this.MakePartial(function, scope);
 			}
 
-			Scope innerScope = new Scope(e);
+			Scope innerScope = new Scope(scope) {
+				["rec"] = function
+			};
 
+			Value result;
+			Value[] arguments = this.argumentsExpression.Select(i => i.Eval(scope)).ToArray();
+
+TAIL_REC:
 			try {
-				Value[] arguments = this.argumentsExpression.Select(i => i.Eval(e)).ToArray();
+				result = function.Run(innerScope, arguments);
+			}
+			catch (LumenException lex) {
+				lex.AddToCallStack(null, this.fileName, this.lineNumber);
+				throw;
+			}
 
-				return this.ProcessCall(innerScope, function, arguments);
+			if (result is TailRecursion.Tailrec tr) {
+				arguments = tr.newArguments;
+				goto TAIL_REC;
 			}
-			catch (TailRecursion.Tailrec tailrec) {
-TAIL_RECURSION:
-				try {
-					return this.ProcessCall(innerScope, function, tailrec.newArguments);
-				}
-				catch (TailRecursion.Tailrec _tailrec) {
-					tailrec = _tailrec;
-					goto TAIL_RECURSION;
-				}
-			}
+
+			return result;
 		}
 
 		private Value ProcessCall(Scope scope, Fun function, Value[] args) {
 			try {
-				scope["rec"] = function;
-
 				return function.Run(scope, args);
 			}
 			catch (LumenException lex) {
-				String currentFunctionName = null;
-
-				if (scope.ExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
-					currentFunctionName = currentFunction.Name;
-				}
-
-				lex.SetDataIfAbsent(currentFunctionName, this.fileName, this.lineNumber);
-
+				lex.AddToCallStack(null, this.fileName, this.lineNumber);
 				throw;
 			}
 		}
@@ -165,6 +161,8 @@ TAIL_RECURSION:
 					}
 				}
 			}
+
+			innerScope["rec"] = function;
 
 			yield return new GeneratorTerminalResult(this.ProcessCall(innerScope, function, args.ToArray()));
 		}

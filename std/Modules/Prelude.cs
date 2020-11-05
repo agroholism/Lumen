@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -102,6 +103,21 @@ namespace Lumen.Lang {
 
 			this.SetMember("pi", (Number)Math.PI);
 			this.SetMember("e", (Number)Math.E);
+
+			this.SetMember("time", new LambdaFun((scope, args) => {
+				Fun fun = scope["fun"].ToFunction(scope);
+
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+				fun.Run(new Scope(scope));
+				sw.Stop();
+
+				return new Number(sw.ElapsedMilliseconds);
+			}) {
+				Arguments = new List<IPattern> {
+					new NamePattern("fun")
+				}
+			});
 
 			this.SetMember("writeFile", new LambdaFun((scope, args) => {
 				String fileName = scope["fileName"].ToString();

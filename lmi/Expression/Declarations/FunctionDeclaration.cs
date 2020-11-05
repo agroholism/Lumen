@@ -13,6 +13,8 @@ namespace Lumen.Lmi {
 		private Int32 lineNumber;
 		private String fileName;
 
+		public Boolean isIntern = false;
+
 		public FunctionDeclaration(String name, List<IPattern> arguments, Expression body, Int32 lineNumber, String fileName) {
 			this.name = name;
 			this.arguments = arguments;
@@ -57,17 +59,19 @@ namespace Lumen.Lmi {
 				if (value is DispatcherFunction dispatcher) {
 					// Dispatcher is already exists
 					dispatcher.Append(result);
+
 				}
 				else if (value is Fun f) {
+					value = new DispatcherFunction(this.name, f, result);
 					// Exists just function - we should make a dispatcher
-					scope.Bind(this.name, new DispatcherFunction(this.name, f, result));
+					scope.Bind(this.name, value);
 				}
 				else {
 					// Ii is not a function - we can not define function
 					throw new LumenException(Exceptions.IDENTIFIER_IS_ALREADY_EXISTS_IN_MODULE.F(this.name, "<main>"));
 				}
 
-				return result;
+				return value;
 			}
 
 			// Binding with this name does not exists yet - create it

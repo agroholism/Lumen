@@ -81,11 +81,28 @@ Lumen 0.8
 + changed match syntax from = sign to ->
 + not Type pattern
 
++ Unknown escape sequences in text literal are errors now
++ Hexadecimal, decimal and octal unicode char codes in text literals
++ Raw text literals
++ Named for and while cycles
++ Operators retry, redo
++ Operators break when, raise when, return when, retry when, redo when
++ Operator raise now creates instance of Error when argument is Text
++ Operator raise from
++ Exception messages updated, now they can include notes and help links
++ Experimental: @intern annotation
++ Keyword 'finally' renamed to 'ensure'
++ Keyword 'if' in pattern matching now replaced with 'when'
++ Allowed when in for cycle
+
++ bug #1 fix "\((1 + 1) + 2)"
 
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)
 - module - it is required?
+
+@intern let
 
 MODULE unsafe - macro, that changes a parent scope
 

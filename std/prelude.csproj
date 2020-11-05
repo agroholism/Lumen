@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lumen.Lang.Prelude</RootNamespace>
     <AssemblyName>prelude</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -38,6 +38,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>preview</LangVersion>
     <NoStdLib>true</NoStdLib>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Classes\Applicative.cs" />
@@ -45,8 +46,10 @@
     <Compile Include="Classes\Context.cs" />
     <Compile Include="Classes\ExceptionClass.cs" />
     <Compile Include="Classes\Functor.cs" />
+    <Compile Include="CallStackRecord.cs" />
     <Compile Include="Expression\NativeExpression.cs" />
     <Compile Include="Modules\ConvertError.cs" />
+    <Compile Include="Values\Constructors\ExceptionConstructor.cs" />
     <Compile Include="Values\Constructors\IConstructor.cs" />
     <Compile Include="Values\Generators\LumenGenerator.cs" />
     <Compile Include="Values\Generators\LumenIterator.cs" />

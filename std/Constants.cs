@@ -3,6 +3,7 @@
 namespace Lumen.Lang {
 	public static class Constants {
 		public const String YIELD_VALUE_SPECIAL_NAME = "[yield-value]";
+		public const String LAST_EXCEPTION_SPECIAL_NAME = "[last-exception]";
 
 		public const String NOT = "not";
 		public const String AND = "and";
@@ -10,11 +11,11 @@ namespace Lumen.Lang {
 		public const String XOR = "xor";
 
 		public const String EQUALS = "=";
-		public const String NOT_EQL = "<>";
+		public const String NOT_EQUALS = "<>";
 		public const String LT = "<";
 		public const String GT = ">";
-		public const String LTEQ = "<=";
-		public const String GTEQ = ">=";
+		public const String LESS_EQUALS = "<=";
+		public const String GREATER_EQUALS = ">=";
 		public const String SHIP = "<=>";
 
 		public const String PLUS = "+";
@@ -49,8 +50,8 @@ namespace Lumen.Lang {
 		public const String APOW = "op_apow";
 		public const String AMOD = "op_amod";
 
-		public const String MATCH = "op_match";
-		public const String NOT_MATCH = "op_not_match";
+		public const String MATCH_EQUALS = "op_match";
+		public const String NOT_MATCH_EQUALS = "op_not_match";
 
 		public const String RANGE_EXCLUSIVE = "rangeExcl";
 		public const String RANGE_INCLUSIVE = "rangeIncl";

@@ -38,10 +38,10 @@ namespace Lumen.Lmi {
 				bodyEvaluationResult = this.body.Eval(scope);
 			}
 			catch (LumenException lumenException) {
-				raisedException = Helper.CreateSome(lumenException.LumenObject);;
+				raisedException = Helper.CreateSome(lumenException);;
 			}
 			catch (Exception exception) {
-				raisedException = Helper.CreateSome(Helper.Error(exception.Message));
+				raisedException = Helper.CreateSome(new LumenException(exception.Message));
 			}
 			finally {
 				List<Value> arguments = new List<Value> {

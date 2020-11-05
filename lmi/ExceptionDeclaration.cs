@@ -27,7 +27,7 @@ namespace Lumen.Lmi {
 			Module createdType = new Module(this.typeName);
 
 			foreach (ConstructorMetadata i in this.constructors) {
-				IType constructor = Helper.CreateConstructor(i.Name, createdType, i.Parameters);
+				IType constructor = new ExceptionConstructor(i.Name, createdType, i.Parameters);
 
 				createdType.SetMember(i.Name, constructor);
 				scope.Bind(i.Name, constructor);

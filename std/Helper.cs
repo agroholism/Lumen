@@ -11,12 +11,8 @@ namespace Lumen.Lang {
 			return index;
 		}
 
-		public static Value Error(String message) {
-			return Prelude.Error.constructor.MakeInstance(new Text(message));
-		}
-
-		public static LumenException ConvertError(IType fromType, IType targetType, Scope scope) {
-			return Prelude.ConvertError.constructor.MakeInstance(fromType, targetType).ToException(scope);
+		public static LumenException CreateConvertError(IType fromType, IType targetType) {
+			return Prelude.ConvertError.MakeExceptionInstance(fromType, targetType);
 		}
 
 		public static Value CallMethod(this Value self, String name, Scope scope) {

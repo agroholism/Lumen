@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using Lumen.Lang;
 
 namespace Lumen.Lmi {
 	internal sealed class Lexer {
-		private const String operatorsString = "+-\\*/%(){}=<>!$&|;:?,[]^.~$";
+		private const String operatorsString = "+-\\*/%(){}=<>!$&|;:?,[]^.~$@";
 		private static readonly IDictionary<String, Token> operatorsDictionary = new Dictionary<String, Token>() {
 			["()"] = new Token(TokenType.VOID, "()"),
+
+			["@"] = new Token(TokenType.ANNOTATION, "@"),
 
 			["?"] = new Token(TokenType.QUESTION, "?"),
 			["~"] = new Token(TokenType.TILDE, Constants.BNOT),
@@ -19,63 +22,57 @@ namespace Lumen.Lmi {
 			["/"] = new Token(TokenType.SLASH, Constants.SLASH),
 			["!"] = new Token(TokenType.BANG, "!"),
 
-			["%"] = new Token(TokenType.MOD, Constants.MOD),
-			["^"] = new Token(TokenType.BXOR, Constants.POW),
+			["%"] = new Token(TokenType.MODULUS, Constants.MOD),
+			["^"] = new Token(TokenType.POWER, Constants.POW),
 			["&"] = new Token(TokenType.AMP, Constants.BAND),
 			["|"] = new Token(TokenType.BAR, Constants.BOR),
 
-			["<<"] = new Token(TokenType.BLEFT, Constants.LSH),
-			[">>"] = new Token(TokenType.BRIGTH, Constants.RSH),
+			["<<"] = new Token(TokenType.SHIFT_LEFT, Constants.LSH),
+			[">>"] = new Token(TokenType.SHIFT_RIGTH, Constants.RSH),
 
-			["<<="] = new Token(TokenType.BLEFT, "<<="),
+			["<<="] = new Token(TokenType.SHIFT_LEFT, "<<="),
 			[">>-"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, ">>-"),
 			["-<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "-<"),
 			["-<<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "-<<"),
+			["<*"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<*"),
+			["<*>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<*>"),
+			["<$>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<$>"),
 
-			["=>"] = new Token(TokenType.CONTEXT, Constants.RSH),
-
-			["("] = new Token(TokenType.LPAREN),
-			[")"] = new Token(TokenType.RPAREN),
-
-			["<$>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH),
+			["("] = new Token(TokenType.PAREN_OPEN),
+			[")"] = new Token(TokenType.PAREN_CLOSE),
 
 			["="] = new Token(TokenType.EQUALS, Constants.EQUALS),
-			["<"] = new Token(TokenType.LT, Constants.LT),
-			[">"] = new Token(TokenType.GT, Constants.GT),
-			["<*"] = new Token(TokenType.NOT_EQUALS, Constants.NOT_EQL),
-			["<*>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<*>"),
-			["<>"] = new Token(TokenType.NOT_EQUALS, Constants.NOT_EQL),
-			["<="] = new Token(TokenType.LTEQ, Constants.LTEQ),
-			[">="] = new Token(TokenType.GTEQ, Constants.GTEQ),
+			["<"] = new Token(TokenType.LESS, Constants.LT),
+			[">"] = new Token(TokenType.GREATER, Constants.GT),
+			["<>"] = new Token(TokenType.NOT_EQUALS, Constants.NOT_EQUALS),
+			["<="] = new Token(TokenType.LESS_EQUALS, Constants.LESS_EQUALS),
+			[">="] = new Token(TokenType.GREATER_EQUALS, Constants.GREATER_EQUALS),
 			["<=>"] = new Token(TokenType.SHIP, Constants.SHIP),
 
-			["=~"] = new Token(TokenType.EQMATCH, Constants.MATCH),
-			["!~"] = new Token(TokenType.EQNOTMATCH, Constants.NOT_MATCH),
+			["=~"] = new Token(TokenType.MATCH_EQUALS, Constants.MATCH_EQUALS),
+			["!~"] = new Token(TokenType.NOT_MATCH_EQUALS, Constants.NOT_MATCH_EQUALS),
 
-			["->"] = new Token(TokenType.LAMBDA, Constants.STAR),
+			["->"] = new Token(TokenType.LAMBDA, "->"),
 			["<-"] = new Token(TokenType.ASSIGN, "<-"),
 
-			["::"] = new Token(TokenType.COLONCOLON),
+			["::"] = new Token(TokenType.COLON2, "::"),
 
-			[":"] = new Token(TokenType.COLON),
+			[":"] = new Token(TokenType.COLON, ":"),
 			[";"] = new Token(TokenType.EOC, ";"),
 			[","] = new Token(TokenType.SPLIT, ","),
 			["."] = new Token(TokenType.DOT, "."),
 
-			[".."] = new Token(TokenType.DOTDOT, Constants.RANGE_EXCLUSIVE),
-			["..."] = new Token(TokenType.DOTDOTDOT, Constants.RANGE_INCLUSIVE),
+			[".."] = new Token(TokenType.DOT2, Constants.RANGE_EXCLUSIVE),
+			["..."] = new Token(TokenType.DOT3, Constants.RANGE_INCLUSIVE),
 
-			["["] = new Token(TokenType.LBRACKET, "["),
-			["]"] = new Token(TokenType.RBRACKET, "]"),
+			["["] = new Token(TokenType.LIST_OPEN, "["),
+			["]"] = new Token(TokenType.LIST_CLOSE, "]"),
 
 			["[|"] = new Token(TokenType.ARRAY_OPEN, "[|"),
-			["|]"] = new Token(TokenType.ARRAY_CLOSED, "|]"),
+			["|]"] = new Token(TokenType.ARRAY_CLOSE, "|]"),
 
-			["[<"] = new Token(TokenType.ATTRIBUTE_OPEN, "[<"),
-			[">]"] = new Token(TokenType.ATTRIBUTE_CLOSE, ">]"),
-
-			["|>"] = new Token(TokenType.FPIPE, "|>"),
-			["<|"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<|")
+			["|>"] = new Token(TokenType.FORWARD_PIPE, "|>"),
+			["<|"] = new Token(TokenType.BACKWARD_PIPE, "<|")
 		};
 		private readonly String source;
 		private readonly Int32 length;
@@ -113,9 +110,6 @@ namespace Lumen.Lmi {
 				else if (current == '\n') {
 					this.Tabs();
 				}
-				else if (current == '@') {
-					this.Attribute();
-				}
 				else {
 					this.Next();
 				}
@@ -130,29 +124,88 @@ namespace Lumen.Lmi {
 			return this.tokens;
 		}
 
-		private void Attribute() {
-			this.Next(); // @
-			StringBuilder buffer = new StringBuilder();
+		private static Boolean IsValidChar(Char ch, Int32 numberBase) {
+			return "0123456789ABCDEF".Substring(0, numberBase).IndexOf(Char.ToUpper(ch)) != -1;
+		}
 
-			Char current = this.Peek(0);
+		private String NumberBase(Int32 numberBase, Int32 maxLength = -1) {
+			Char currentChar = this.Peek();
+			String number = "";
+
+			while (IsValidChar(currentChar, numberBase)) {
+				number += currentChar;
+				currentChar = this.Next();
+
+				if (number.Length == maxLength) {
+					break;
+				}
+			}
+
+			return number;
+		}
+
+		// Reads hexadecimal unicode code with length from current position 
+		// and returns appropriate string
+		private String UnicodeCode(Int32 length, Int32 numberBase) {
+			this.Next();
+			String code = this.NumberBase(numberBase, length);
+
+			if (code.Length < length) {
+				throw new LumenException($"character '{this.Peek()}' is invalid for char code", this.line, this.file);
+			}
+
+			try {
+				return Char.ConvertFromUtf32(Convert.ToInt32(code, numberBase));
+			}
+			catch {
+				throw new LumenException($"value '{code}' is invalid code of character", this.line, this.file);
+			}
+		}
+
+		// Reads hexadecimal unicode code with length from current position 
+		// and returns appropriate string
+		private String UnicodeCode(Char until, Int32 numberBase) {
+			Char currentChar = this.Next();
+			List<String> charCodes = new List<String>();
+
+			while (Char.IsWhiteSpace(currentChar)) {
+				currentChar = this.Next();
+			}
 
 			while (true) {
-				if (!Char.IsLetterOrDigit(current)
-					&& current != '_' && current != '\'') {
+				charCodes.Add(this.NumberBase(numberBase));
+				currentChar = this.Peek();
+
+				if (currentChar == until) {
 					break;
 				}
 
-				buffer.Append(current);
+				if (!Char.IsWhiteSpace(currentChar)) {
+					throw new LumenException($"character '{currentChar}' is invalid for code", this.line, this.file);
+				}
 
-				current = this.Next();
+				while (Char.IsWhiteSpace(currentChar)) {
+					currentChar = this.Next();
+				}
+
+				if (currentChar == until) {
+					break;
+				}
 			}
 
-			String word = buffer.ToString();
+			this.Next();
 
-			this.AddToken(TokenType.ATTRIBUTE, word);
+			return String.Concat(charCodes.Select(charCode => {
+				try {
+					return Char.ConvertFromUtf32(Convert.ToInt32(charCode, numberBase));
+				}
+				catch {
+					throw new LumenException($"value '{charCode}' is invalid code of character", this.line, this.file);
+				}
+			}));
 		}
 
-		private void Text() {
+		private void Text(Boolean isRaw = false) {
 			this.Next();
 
 			Int32 line = this.line;
@@ -166,15 +219,21 @@ namespace Lumen.Lmi {
 			List<String> substitutes = new List<String>();
 
 			while (true) {
-				if (current == '\\') {
+				if (!isRaw && current == '\\') {
 					current = this.Next();
+
 					switch (current) {
 						case '"':
 							current = this.Next();
 							builder.Append('"');
 							continue;
-						case '\r': // edit this
-							this.Next();
+						case '\r':
+							current = this.Next();
+							if (current == '\n') {
+								current = this.Next();
+							}
+							continue;
+						case '\n':
 							current = this.Next();
 							continue;
 						case 'f':
@@ -217,8 +276,37 @@ namespace Lumen.Lmi {
 							current = this.Next();
 							builder.Append('\t');
 							continue;
+						case 'd':
+							if (this.Peek(1) == '(') {
+								this.Next();
+								builder.Append(this.UnicodeCode(')', 10));
+							}
+							else {
+								builder.Append(this.UnicodeCode(4, 10));
+							}
+							current = this.Peek();
+							continue;
+						case 'o':
+							if (this.Peek(1) == '(') {
+								this.Next();
+								builder.Append(this.UnicodeCode(')', 8));
+							}
+							else {
+								builder.Append(this.UnicodeCode(4, 8));
+							}
+							current = this.Peek();
+							continue;
+						case 'x':
+							if (this.Peek(1) == '(') {
+								this.Next();
+								builder.Append(this.UnicodeCode(')', 16));
+							}
+							else {
+								builder.Append(this.UnicodeCode(4, 16));
+							}
+							current = this.Peek();
+							continue;
 						case '(':
-							// ...\("
 							if (current == '"') {
 								builder.Append('(');
 								break;
@@ -229,10 +317,8 @@ namespace Lumen.Lmi {
 
 							Int32 level = 1;
 							current = this.Next();
-							while (level > 0 && current != ')') {
+							while (true) {
 								this.CheckOutOfRange();
-								buffer.Append(current);
-								current = this.Next();
 
 								if (current == '(') {
 									level++;
@@ -242,14 +328,25 @@ namespace Lumen.Lmi {
 									level--;
 								}
 
+								if (level == 0) {
+									break;
+								}
+
 								if (current == ':' && level == 1) {
 									current = this.Next();
 									while (current != ')') {
 										modifiers.Append(current);
 										current = this.Next();
 									}
+
 									level--;
+									if (level == 0) {
+										break;
+									}
 								}
+
+								buffer.Append(current);
+								current = this.Next();
 							}
 
 							current = this.Next();
@@ -279,17 +376,16 @@ namespace Lumen.Lmi {
 							}
 							continue;
 						default:
-							builder.Append('\\');
-							continue;
+							throw new LumenException($"unknown escape character '\\{current}'", this.line, this.file);
 					}
 				}
 
-				if (current == '{') {
+				if (!isRaw && current == '{') {
 					current = this.Next();
 					builder.Append("{{");
 				}
 
-				if (current == '}') {
+				else if (!isRaw && current == '}') {
 					current = this.Next();
 					builder.Append("}}");
 				}
@@ -307,22 +403,27 @@ namespace Lumen.Lmi {
 
 			this.Next();
 
+			if(isRaw) {
+				this.AddToken(TokenType.TEXT, builder.ToString());
+				return;
+			}
+
 			if (substitutes.Count == 0) {
 				this.AddToken(TokenType.TEXT, builder.ToString().F());
 			}
 			else {
-				this.AddToken(TokenType.LPAREN);
+				this.AddToken(TokenType.PAREN_OPEN);
 				this.AddToken(TokenType.TEXT, builder.ToString());
 
-				this.AddToken(TokenType.MOD, Constants.MOD);
-				this.AddToken(TokenType.LBRACKET);
+				this.AddToken(TokenType.MODULUS, Constants.MOD);
+				this.AddToken(TokenType.LIST_OPEN);
 
 				List<Token> zzz = new Lexer(String.Join(", ", substitutes), this.file).Tokenization();
 				foreach (Token i in zzz) {
 					this.AddToken(i);
 				}
-				this.AddToken(TokenType.RBRACKET);
-				this.AddToken(TokenType.RPAREN);
+				this.AddToken(TokenType.LIST_CLOSE);
+				this.AddToken(TokenType.PAREN_CLOSE);
 			}
 		}
 
@@ -351,7 +452,7 @@ namespace Lumen.Lmi {
 				current = this.Next();
 			}
 
-			if(current == '\r' || current == '\n') {
+			if (current == '\n' || current == '\r') {
 				return;
 			}
 
@@ -372,10 +473,7 @@ namespace Lumen.Lmi {
 			if (this.tokens.Count > 0) {
 				TokenType typeOfLast = this.tokens[this.tokens.Count - 1].Type;
 
-				if (typeOfLast == TokenType.BREAK || typeOfLast == TokenType.RETURN) {
-					this.AddToken(TokenType.NUMBER, "1");
-				}
-				else if (this.CanInsert()) {
+				if (this.CanInsert()) {
 					this.AddToken(TokenType.EOC);
 				}
 			}
@@ -384,39 +482,37 @@ namespace Lumen.Lmi {
 		private Boolean CanInsert() {
 			TokenType last = this.tokens[this.tokens.Count - 1].Type;
 			return last != TokenType.BLOCK_START
-				&& last != TokenType.AMP
+				&& last != TokenType.FUN
 				&& last != TokenType.AND
 				&& last != TokenType.BAR
-				&& last != TokenType.BLEFT
+				&& last != TokenType.SHIFT_LEFT
 				&& last != TokenType.ARRAY_OPEN
 				&& last != TokenType.AS
 				&& last != TokenType.ASSIGN
-				&& last != TokenType.ATTRIBUTE_OPEN
-				&& last != TokenType.BPIPE
-				&& last != TokenType.BRIGTH
-				&& last != TokenType.BXOR
+				&& last != TokenType.BACKWARD_PIPE
+				&& last != TokenType.SHIFT_RIGTH
+				&& last != TokenType.POWER
 				&& last != TokenType.DOT
-				&& last != TokenType.DOTDOT
-				&& last != TokenType.DOTDOTDOT
+				&& last != TokenType.DOT2
+				&& last != TokenType.DOT3
 				&& last != TokenType.ARRAY_OPEN
-				&& last != TokenType.EQMATCH
-				&& last != TokenType.EQNOTMATCH
+				&& last != TokenType.MATCH_EQUALS
+				&& last != TokenType.NOT_MATCH_EQUALS
 				&& last != TokenType.EQUALS
 				&& last != TokenType.FOR
-				&& last != TokenType.FPIPE
-				&& last != TokenType.GT
-				&& last != TokenType.GTEQ
+				&& last != TokenType.FORWARD_PIPE
+				&& last != TokenType.GREATER
+				&& last != TokenType.GREATER_EQUALS
 				&& last != TokenType.IF
 				&& last != TokenType.IN
-				&& last != TokenType.IS
 				&& last != TokenType.LAMBDA
-				&& last != TokenType.LBRACKET
+				&& last != TokenType.LIST_OPEN
 				&& last != TokenType.LET
-				&& last != TokenType.LT
-				&& last != TokenType.LTEQ
+				&& last != TokenType.LESS
+				&& last != TokenType.LESS_EQUALS
 				&& last != TokenType.MATCH
 				&& last != TokenType.MINUS
-				&& last != TokenType.MOD
+				&& last != TokenType.MODULUS
 				&& last != TokenType.COLON
 				&& last != TokenType.SPLIT
 				&& last != TokenType.ELSE
@@ -428,6 +524,12 @@ namespace Lumen.Lmi {
 			StringBuilder buffer = new StringBuilder();
 
 			Char current = this.Peek(0);
+
+			if(current == 'r' && this.Peek(1) == '"') {
+				this.Next();
+				this.Text(true);
+				return;
+			}
 
 			while (true) {
 				if (!Char.IsLetterOrDigit(current)
@@ -443,12 +545,13 @@ namespace Lumen.Lmi {
 			String word = buffer.ToString();
 
 			switch (word) {
-				case "__LINE__":
+				case "LINE":
 					this.AddToken(TokenType.NUMBER, this.line.ToString());
 					break;
-				case "__FILE__":
+				case "FILE":
 					this.AddToken(TokenType.TEXT, this.file);
 					break;
+
 				case "for":
 					this.AddToken(TokenType.FOR);
 					break;
@@ -470,17 +573,14 @@ namespace Lumen.Lmi {
 				case "raise":
 					this.AddToken(TokenType.RAISE);
 					break;
-				case "is":
-					this.AddToken(TokenType.IS);
-					break;
 				case "try":
 					this.AddToken(TokenType.TRY);
 					break;
 				case "except":
 					this.AddToken(TokenType.EXCEPT);
 					break;
-				case "finally":
-					this.AddToken(TokenType.FINALLY);
+				case "ensure":
+					this.AddToken(TokenType.ENSURE);
 					break;
 				case "type":
 					this.AddToken(TokenType.TYPE);
@@ -536,6 +636,15 @@ namespace Lumen.Lmi {
 				case "next":
 					this.AddToken(TokenType.NEXT);
 					break;
+				case "when":
+					this.AddToken(TokenType.WHEN);
+					break;
+				case "redo":
+					this.AddToken(TokenType.REDO);
+					break;
+				case "retry":
+					this.AddToken(TokenType.RETRY);
+					break;
 				default:
 					this.AddToken(TokenType.WORD, word);
 					break;
@@ -549,7 +658,7 @@ namespace Lumen.Lmi {
 				current = this.Peek(1);
 
 				if (current == '/') {
-					this.MultilineComment();
+					this.Comment();
 					return;
 				}
 
@@ -564,21 +673,29 @@ namespace Lumen.Lmi {
 				if (!operatorsDictionary.ContainsKey(buffer.ToString() + current)) {
 					Token t = operatorsDictionary[buffer.ToString()];
 
-					if (t.Type != TokenType.LPAREN && this.tokens.Count > 0 && 
-						this.tokens[this.tokens.Count - 1].Type == TokenType.EOC) {
-						this.tokens.RemoveAt(this.tokens.Count - 1);
+					if (this.tokens.Count > 0) {
+						TokenType last = this.tokens[this.tokens.Count - 1].Type;
+
+						if (t.Type != TokenType.PAREN_OPEN
+							&& last == TokenType.EOC) {
+							this.tokens.RemoveAt(this.tokens.Count - 1);
+						}
+
+						if (last == TokenType.BLOCK_START
+							&& !this.IsStartlineToken(t.Type)) {
+							this.tokens.RemoveAt(this.tokens.Count - 1);
+							this.level -= 4;
+						}
 					}
 
-					if (this.tokens.Count > 0 &&
-						this.tokens[this.tokens.Count - 1].Type == TokenType.BLOCK_START) {
-						this.tokens.RemoveAt(this.tokens.Count - 1);
-						this.level -= 4;
-					}
-
-					this.AddToken(new Token(t.Type, t.Text));
+					this.AddToken(t);
 					return;
 				}
 			}
+		}
+
+		private Boolean IsStartlineToken(TokenType tokenType) {
+			return tokenType == TokenType.BAR || tokenType == TokenType.ANNOTATION;
 		}
 
 		private void SuperText() {
@@ -605,18 +722,16 @@ namespace Lumen.Lmi {
 			this.AddToken(TokenType.TEXT, builder.ToString());
 		}
 
-		private void MultilineComment() {
+		private void Comment() {
 			Char current = this.Peek(0);
-
-			StringBuilder sb = new StringBuilder();
 
 			while (true) {
 				if ("\r\n\0".IndexOf(current) != -1) {
 					break;
 				}
 				current = this.Next();
-				sb.Append(current);
 			}
+
 			this.Next();
 		}
 
@@ -636,7 +751,7 @@ namespace Lumen.Lmi {
 					if (this.Peek(1) == '.') {
 						if (this.Peek(2) == '.') {
 							this.AddToken(TokenType.NUMBER, buffer.ToString());
-							this.AddToken(TokenType.DOTDOTDOT);
+							this.AddToken(TokenType.DOT3);
 							this.Next();
 							this.Next();
 							this.Next();
@@ -644,7 +759,7 @@ namespace Lumen.Lmi {
 						}
 						else {
 							this.AddToken(TokenType.NUMBER, buffer.ToString());
-							this.AddToken(TokenType.DOTDOT);
+							this.AddToken(TokenType.DOT2);
 							this.Next();
 							this.Next();
 							return;
@@ -663,14 +778,12 @@ namespace Lumen.Lmi {
 					if (current == 'e' || current == 'E') {
 						buffer.Append(current);
 						current = this.Next();
-						if (current == '-') {
+
+						if (current == '-' || current == '+') {
 							buffer.Append(current);
 							current = this.Next();
 						}
-						else if (current == '+') {
-							buffer.Append(current);
-							current = this.Next();
-						}
+
 						continue;
 					}
 					break;
@@ -685,19 +798,6 @@ namespace Lumen.Lmi {
 				current = this.Next();
 			}
 
-			if (literal.Length > 0) {
-				if (Double.TryParse(buffer.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result1)) {
-					this.AddToken(TokenType.LPAREN);
-					this.AddToken(TokenType.WORD, literal);
-					this.AddToken(TokenType.NUMBER, result1.ToString(System.Globalization.NumberFormatInfo.InvariantInfo));
-					this.AddToken(TokenType.RPAREN);
-				}
-				else {
-					throw new LumenException(Exceptions.INCORRECT_NUMBER_LITERAL, line: this.line, fileName: this.file);
-				}
-				return;
-			}
-
 			if (Double.TryParse(buffer.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result)) {
 				this.AddToken(TokenType.NUMBER, result.ToString(System.Globalization.NumberFormatInfo.InvariantInfo));
 			}
@@ -706,70 +806,12 @@ namespace Lumen.Lmi {
 			}
 		}
 
-		private Double NumberAnalyze() {
-			StringBuilder buffer = new StringBuilder();
-			Char current = this.Peek(0);
-
-			/*if (this.Peek(2) == 'x') {
-				String numberBase = this.Peek(0) + "" + this.Peek(1);
-
-				this.Next();
-				this.Next();
-
-				current = this.Next();
-
-				while (Char.IsLetterOrDigit(current)) {
-					buffer.Append(current);
-					current = this.Next();
-					while (current == '_') {
-						current = this.Next();
-					}
-				}
-
-				return Convert.ToDouble(Converter.FromN(buffer.ToString(), numberBase));
-			}
-			*/
-			while (true) {
-				if (current == '.') {
-					if (buffer.ToString().IndexOf('.') != -1) {
-						throw new LumenException("incorrect Number literal", line: this.line, fileName: this.file);
-					}
-				}
-				else if (current == '_') {
-					current = this.Next();
-					continue;
-				}
-				else if (!Char.IsDigit(current)) {
-					if (current == 'e') {
-
-						buffer.Append(current);
-						current = this.Next();
-						if (current == '-') {
-							buffer.Append(current);
-							current = this.Next();
-						}
-						else if (current == '+') {
-							buffer.Append(current);
-							current = this.Next();
-						}
-						continue;
-					}
-					break;
-				}
-				buffer.Append(current);
-				current = this.Next();
-			}
-
-
-			return Double.Parse(buffer.ToString().Replace(".", ","), System.Globalization.NumberStyles.Any);
+		private Char Next(Int32 times = 1) {
+			this.position += times;
+			return this.Peek();
 		}
 
-		private Char Next() {
-			this.position++;
-			return this.Peek(0);
-		}
-
-		private Char Peek(Int32 relativePosition) {
+		private Char Peek(Int32 relativePosition = 0) {
 			Int32 position = this.position + relativePosition;
 
 			if (position >= this.length) {
@@ -780,15 +822,10 @@ namespace Lumen.Lmi {
 		}
 
 		private void AddToken(Token token) {
-			token.Line = this.line;
-			this.tokens.Add(token);
+			this.AddToken(token.Type, token.Text);
 		}
 
-		private void AddToken(TokenType type) {
-			this.AddToken(type, "");
-		}
-
-		private void AddToken(TokenType type, String text) {
+		private void AddToken(TokenType type, String text = "") {
 			this.tokens.Add(new Token(type, text, this.line));
 		}
 	}
