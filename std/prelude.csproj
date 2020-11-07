@@ -23,7 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>preview</LangVersion>
     <DocumentationFile>
     </DocumentationFile>
     <NoStdLib>true</NoStdLib>
@@ -42,13 +42,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Classes\Applicative.cs" />
-    <Compile Include="Classes\Cloneable.cs" />
+    <Compile Include="Classes\Clone.cs" />
     <Compile Include="Classes\Context.cs" />
+    <Compile Include="Classes\Default.cs" />
     <Compile Include="Classes\ExceptionClass.cs" />
     <Compile Include="Classes\Functor.cs" />
     <Compile Include="CallStackRecord.cs" />
     <Compile Include="Expression\NativeExpression.cs" />
     <Compile Include="Modules\ConvertError.cs" />
+    <Compile Include="Modules\TailRecursion.cs" />
     <Compile Include="Values\Constructors\ExceptionConstructor.cs" />
     <Compile Include="Values\Constructors\IConstructor.cs" />
     <Compile Include="Values\Generators\LumenGenerator.cs" />
@@ -78,7 +80,7 @@
     <Compile Include="Modules\Any.cs" />
     <Compile Include="Expression\Break.cs" />
     <Compile Include="Modules\FunctionModule.cs" />
-    <Compile Include="Modules\MapModule.cs" />
+    <Compile Include="Modules\MutableMapModule.cs" />
     <Compile Include="Modules\LogicalModule.cs" />
     <Compile Include="Classes\Collection.cs" />
     <Compile Include="Modules\TextModule.cs" />
@@ -87,7 +89,7 @@
     <Compile Include="Values\Fun\LambdaFun.cs" />
     <Compile Include="Values\Fun\UserFun.cs" />
     <Compile Include="Values\IType.cs" />
-    <Compile Include="Values\Collections\Map.cs" />
+    <Compile Include="Values\Collections\MutableMap.cs" />
     <Compile Include="Modules\NumberModule.cs" />
     <Compile Include="Converter.cs" />
     <Compile Include="LumenException.cs" />
@@ -96,7 +98,7 @@
     <Compile Include="Const.cs" />
     <Compile Include="Values\Logical.cs" />
     <Compile Include="Values\Fun\Fun.cs" />
-    <Compile Include="Values\Collections\Array.cs" />
+    <Compile Include="Values\Collections\MutableArray.cs" />
     <Compile Include="Modules\Prelude.cs" />
     <Compile Include="Expression\Expression.cs" />
     <Compile Include="Values\Number.cs" />
@@ -105,7 +107,7 @@
     <Compile Include="Values\Text.cs" />
     <Compile Include="Values\Value.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Modules\ArrayModule.cs" />
+    <Compile Include="Modules\MutableArrayModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

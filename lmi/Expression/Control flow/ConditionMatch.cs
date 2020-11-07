@@ -28,7 +28,7 @@ namespace Lumen.Lmi {
 
 		public Value Eval(Scope scope) {
 			Value matchable = this.assinableExpression.Eval(scope);
-			Boolean result = this.pattern.Match(matchable, scope).Success;
+			Boolean result = this.pattern.Match(matchable, scope).IsSuccess;
 
 			return result ? this.trueExpression.Eval(scope) : this.falseExpression.Eval(scope);
 		}
@@ -38,7 +38,7 @@ namespace Lumen.Lmi {
 
 			Value valueToCheck = Const.UNIT;
 			foreach (Value result in conditionEvaluationResult) {
-				if (result is GeneratorTerminalResult generatorResult) {
+				if (result is GeneratorExpressionTerminalResult generatorResult) {
 					valueToCheck = generatorResult.Value;
 					break;
 				}
@@ -46,7 +46,7 @@ namespace Lumen.Lmi {
 				yield return result;
 			}
 
-			Boolean matchResult = this.pattern.Match(valueToCheck, scope).Success;
+			Boolean matchResult = this.pattern.Match(valueToCheck, scope).IsSuccess;
 
 			IEnumerable<Value> expressionResults = matchResult ? this.trueExpression.EvalWithYield(scope) : this.falseExpression.EvalWithYield(scope);
 

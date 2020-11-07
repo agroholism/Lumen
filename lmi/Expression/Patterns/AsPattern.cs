@@ -31,9 +31,9 @@ namespace Lumen.Lmi {
         public MatchResult Match(Value value, Scope scope) {
 			MatchResult result = this.innerPattern.Match(value, scope);
 
-			if (result.Success) {
+			if (result.IsSuccess) {
                 scope[this.identifier] = value;
-                return MatchResult.True;
+                return MatchResult.Success;
             }
 
             return result;

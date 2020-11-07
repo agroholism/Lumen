@@ -43,10 +43,10 @@ namespace Lumen.Lmi {
 			Value result;
 			if (this.arguments.Count > 0) {
 				List<Value> l = this.arguments.Select(i => i.Eval(scope)).ToList();
-				result = f.Run(new Scope(scope), new Lang.Array(l), value);
+				result = f.Call(new Scope(scope), new Lang.MutableArray(l), value);
 			}
 			else {
-				result = f.Run(new Scope(scope), value);
+				result = f.Call(new Scope(scope), value);
 			}
 
 			if (Prelude.Some.IsParentOf(result)) {
@@ -56,17 +56,17 @@ namespace Lumen.Lmi {
 				Int32 index = 0;
 				foreach (IPattern subpattern in this.subpatterns) {
 					MatchResult matchResult = subpattern.Match(results[index], scope);
-					if (!matchResult.Success) {
+					if (!matchResult.IsSuccess) {
 						return matchResult;
 					}
 					index++;
 				}
-				return MatchResult.True;
+				return MatchResult.Success;
 			}
 
-			return new MatchResult {
-				Success = false
-			};
+			return new MatchResult(
+				MatchResultKind.Fail
+			);
 		}
 	}
 }

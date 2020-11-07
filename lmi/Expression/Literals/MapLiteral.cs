@@ -21,11 +21,11 @@ namespace Lumen.Lmi {
                 res.Add(i.Key.Eval(e), i.Value.Eval(e));
             }
 
-            return new Map(res);
+            return new MutableMap(res);
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-            yield return new GeneratorTerminalResult(this.Eval(scope));
+            yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
         }
 	}
 }

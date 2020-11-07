@@ -39,7 +39,7 @@ namespace Lumen.Lmi {
 		public MatchResult Match(Value value, Scope scope) {
 			MatchResult result1 = this.result.Match(value, scope);
 
-			if(!result1.Success) {
+			if(!result1.IsSuccess) {
 				result1 = this.second.Match(value, scope);
 			}
 

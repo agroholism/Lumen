@@ -6,7 +6,7 @@ using Lumen.Lang;
 
 namespace Lumen.Lmi {
 	/// <summary> Pattern () </summary>
-    internal class UnitPattern : IPattern {
+	internal class UnitPattern : IPattern {
 		public static UnitPattern Instance = new UnitPattern();
 
 		public Boolean IsNotEval => false;
@@ -15,9 +15,9 @@ namespace Lumen.Lmi {
 
 		}
 
-        public MatchResult Match(Value value, Scope scope) {
-            return new MatchResult { Success = value == Const.UNIT };
-        }
+		public MatchResult Match(Value value, Scope scope) {
+			return new MatchResult(value == Const.UNIT);
+		}
 
 		public List<String> GetDeclaredVariables() {
 			return new List<String>();

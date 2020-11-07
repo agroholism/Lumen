@@ -15,31 +15,31 @@ namespace Lumen.Lmi {
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
-			if (value is Lang.Array array) {
+			if (value is Lang.MutableArray array) {
 				List<Value> castedArray = array.ToList(scope);
 
 				if (castedArray.Count != this.subpatterns.Count) {
-					return new MatchResult {
-						Success = false,
-						Note = $"function wait an array with length {this.subpatterns.Count}"
-					};
+					return new MatchResult(
+						MatchResultKind.Fail,
+						$"function wait an array with length {this.subpatterns.Count}"
+					);
 				}
 
 				Int32 index = 0;
 				foreach (Value i in castedArray) {
 					MatchResult result = this.subpatterns[index].Match(i, scope);
-					if (!result.Success) {
+					if (!result.IsSuccess) {
 						return result;
 					}
 					index++;
 				}
-				return MatchResult.True;
+				return MatchResult.Success;
 			}
 
-			return new MatchResult {
-				Success = false,
-				Note = $"function wait an array with length {this.subpatterns.Count}"
-			};
+			return new MatchResult(
+				MatchResultKind.Fail,
+				$"function wait an array with length {this.subpatterns.Count}"
+			);
 		}
 
 

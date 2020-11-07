@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class ArrayModule : Module {
-		public ArrayModule() {
-			this.Name = "Array";
+	internal class MutableArrayModule : Module {
+		public MutableArrayModule() {
+			this.Name = "MutableArray";
 
 			/*
 Array.add+2404
@@ -42,7 +42,7 @@ Array.refs
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("array"),
 					new NamePattern("index"),
 					new NamePattern("value")
@@ -50,15 +50,21 @@ Array.refs
 			});
 			#endregion
 
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return new MutableArray();
+			}) {
+				Parameters = new List<IPattern> { }
+			});
+
 			this.SetMember("clone", new LambdaFun((scope, args) => {
 				List<Value> array = scope["self"].ToList(scope);
 
 				List<Value> clone = new List<Value>();
 				clone.AddRange(array);
 
-				return new Array(clone);
+				return new MutableArray(clone);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("add", new LambdaFun((scope, args) => {
@@ -68,7 +74,7 @@ Array.refs
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("element"),
 					new NamePattern("self")
 				}
@@ -81,7 +87,7 @@ Array.refs
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("elements"),
 					new NamePattern("self")
 				}
@@ -97,7 +103,7 @@ Array.refs
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 				new NamePattern("element"),
 					new NamePattern("self")
 				}
@@ -111,7 +117,7 @@ Array.refs
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("element") ,
 					new NamePattern("self")
 				}
@@ -128,7 +134,7 @@ Array.refs
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("element"),
 					new NamePattern("self")
 				}
@@ -138,11 +144,11 @@ Array.refs
 				List<Value> array = scope["self"].ToList(scope);
 
 				Fun predicate = scope["predicate"].ToFunction(scope);
-				array.RemoveAll(x => predicate.Run(new Scope(scope), x).ToBoolean());
+				array.RemoveAll(x => predicate.Call(new Scope(scope), x).ToBoolean());
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("predicate"),
 					new NamePattern("self")
 				}
@@ -151,7 +157,7 @@ Array.refs
 			this.SetMember("toText", new LambdaFun((e, args) => {
 				return new Text(e["self"].ToString());
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("sort", new LambdaFun((scope, args) => {
@@ -160,9 +166,9 @@ Array.refs
 
 				value.Sort();
 
-				return new Array(value);
+				return new MutableArray(value);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("sortBy", new LambdaFun((scope, args) => {
@@ -171,14 +177,14 @@ Array.refs
 
 				Fun mutator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
-					Value first = mutator.Run(new Scope(scope), i);
-					Value second = mutator.Run(new Scope(scope), j);
+					Value first = mutator.Call(new Scope(scope), i);
+					Value second = mutator.Call(new Scope(scope), j);
 					return first.CompareTo(second);
 				});
 
-				return new Array(value);
+				return new MutableArray(value);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("other"),
 					new NamePattern("self")
 				}
@@ -190,12 +196,12 @@ Array.refs
 
 				Fun comparator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
-					return (Int32)Converter.ToDouble(comparator.Run(new Scope(scope), i, j), scope);
+					return (Int32)Converter.ToDouble(comparator.Call(new Scope(scope), i, j), scope);
 				});
 
-				return new Array(value);
+				return new MutableArray(value);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("other"),
 					new NamePattern("self")
 				}
@@ -207,9 +213,9 @@ Array.refs
 
 				value.Sort((i, j) => j.CompareTo(i));
 
-				return new Array(value);
+				return new MutableArray(value);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("sortDescendingBy", new LambdaFun((scope, args) => {
@@ -218,14 +224,14 @@ Array.refs
 
 				Fun mutator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
-					Value first = mutator.Run(new Scope(scope), i);
-					Value second = mutator.Run(new Scope(scope), j);
+					Value first = mutator.Call(new Scope(scope), i);
+					Value second = mutator.Call(new Scope(scope), j);
 					return second.CompareTo(first);
 				});
 
-				return new Array(value);
+				return new MutableArray(value);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("other"),
 					new NamePattern("self")
 				}
@@ -237,12 +243,12 @@ Array.refs
 
 				Fun comparator = scope["other"].ToFunction(scope);
 				value.Sort((i, j) => {
-					return -(Int32)Converter.ToDouble(comparator.Run(new Scope(scope), i, j), scope);
+					return -(Int32)Converter.ToDouble(comparator.Call(new Scope(scope), i, j), scope);
 				});
 
-				return new Array(value);
+				return new MutableArray(value);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("other"),
 					new NamePattern("self")
 				}
@@ -252,7 +258,7 @@ Array.refs
 				List<Value> self = scope["self"].ToList(scope);
 				return new Logical(self.Contains(scope["elem"]));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("elem"),
 					new NamePattern("self")
 				}
@@ -264,7 +270,7 @@ Array.refs
 
 				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("lastIndexOf", new LambdaFun((scope, args) => {
@@ -273,7 +279,7 @@ Array.refs
 
 				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("findIndex", new LambdaFun((scope, args) => {
@@ -281,11 +287,11 @@ Array.refs
 
 				Fun other = scope["other"].ToFunction(scope);
 
-				Int32 result = self.FindIndex(i => other.Run(new Scope(scope), i).ToBoolean());
+				Int32 result = self.FindIndex(i => other.Call(new Scope(scope), i).ToBoolean());
 
 				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("find", new LambdaFun((scope, args) => {
@@ -293,11 +299,11 @@ Array.refs
 
 				Fun other = scope["other"].ToFunction(scope);
 
-				Value result = self.Find(i => other.Run(new Scope(scope), i).ToBoolean());
+				Value result = self.Find(i => other.Call(new Scope(scope), i).ToBoolean());
 
 				return result == null ? Prelude.None : (Value)Helper.CreateSome(result);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("findLast", new LambdaFun((scope, args) => {
@@ -305,11 +311,11 @@ Array.refs
 
 				Fun other = scope["other"].ToFunction(scope);
 
-				Value result = self.FindLast(i => other.Run(new Scope(scope), i).ToBoolean());
+				Value result = self.FindLast(i => other.Call(new Scope(scope), i).ToBoolean());
 
 				return result == null ? Prelude.None : (Value)Helper.CreateSome(result);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("findLastIndex", new LambdaFun((scope, args) => {
@@ -317,11 +323,11 @@ Array.refs
 
 				Fun other = scope["other"].ToFunction(scope);
 
-				Int32 result = self.FindLastIndex(i => other.Run(new Scope(scope), i).ToBoolean());
+				Int32 result = self.FindLastIndex(i => other.Call(new Scope(scope), i).ToBoolean());
 
 				return result == -1 ? Prelude.None : (Value)Helper.CreateSome((Number)result);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("clear", new LambdaFun((scope, args) => {
@@ -329,14 +335,14 @@ Array.refs
 				self.Clear();
 				return Const.UNIT;
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("fromStream", new LambdaFun((scope, args) => {
-				return new Array(scope["x"].ToStream(scope));
+				return new MutableArray(scope["x"].ToStream(scope));
 			}) {
 				Name = "fromStream",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});
@@ -344,11 +350,12 @@ Array.refs
 			this.SetMember("toStream", new LambdaFun((e, args) => {
 				return new Stream(e["array"].ToList(e));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("array")
 				}
 			});
 
+			this.AppendImplementation(Prelude.Default);
 			this.AppendImplementation(Prelude.Collection);
 		}
 

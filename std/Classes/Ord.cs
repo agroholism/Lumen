@@ -28,7 +28,7 @@ namespace Lumen.Lang {
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -40,7 +40,7 @@ namespace Lumen.Lang {
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) <= 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -52,7 +52,7 @@ namespace Lumen.Lang {
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) > 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -64,7 +64,7 @@ namespace Lumen.Lang {
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) >= 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -75,7 +75,7 @@ namespace Lumen.Lang {
 				Value x = scope["x"];
 				return new Number(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope));
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -87,7 +87,7 @@ namespace Lumen.Lang {
 
 				return x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0 ? x : y;
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -99,7 +99,7 @@ namespace Lumen.Lang {
 
 				return x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0 ? y : x;
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -112,10 +112,10 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) <= 0
-				&& comparator.Run(scope, x, z).ToDouble(scope) <= 0);
+				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) <= 0
+				&& comparator.Call(scope, x, z).ToDouble(scope) <= 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 					new NamePattern("z")
@@ -129,10 +129,10 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) < 0
-				&& comparator.Run(scope, x, z).ToDouble(scope) <= 0);
+				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) < 0
+				&& comparator.Call(scope, x, z).ToDouble(scope) <= 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 					new NamePattern("z")
@@ -146,10 +146,10 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) <= 0
-				&& comparator.Run(scope, x, z).ToDouble(scope) < 0);
+				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) <= 0
+				&& comparator.Call(scope, x, z).ToDouble(scope) < 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 					new NamePattern("z")
@@ -163,10 +163,10 @@ namespace Lumen.Lang {
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
-				return new Logical(comparator.Run(new Scope(scope), y, x).ToDouble(scope) < 0
-				&& comparator.Run(scope, x, z).ToDouble(scope) < 0);
+				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) < 0
+				&& comparator.Call(scope, x, z).ToDouble(scope) < 0);
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 					new NamePattern("z")

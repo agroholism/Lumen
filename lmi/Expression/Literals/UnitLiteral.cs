@@ -21,7 +21,7 @@ namespace Lumen.Lmi {
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-            yield return new GeneratorTerminalResult(Const.UNIT);
+            yield return new GeneratorExpressionTerminalResult(Const.UNIT);
         }
 
 		public override String ToString() {

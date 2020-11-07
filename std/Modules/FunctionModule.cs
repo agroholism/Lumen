@@ -10,30 +10,14 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Functor);
 			this.AppendImplementation(Prelude.Applicative);
 
-			LambdaFun RCombine = new LambdaFun((e, args) => {
-				Fun m = Converter.ToFunction(e["m"], e);
-				Fun f = Converter.ToFunction(e["f"], e);
-
-				return new LambdaFun((scope, arguments) => m.Run(new Scope(scope), f.Run(new Scope(scope), arguments))) {
-					Arguments = f.Arguments
-				};
-			}) {
-				Arguments = new List<IPattern> {
-					new NamePattern("m"),
-					new NamePattern("f"),
-				}
-			};
-
-			LambdaFun LCombine = new LambdaFun((e, args) => {
+			LambdaFun CombainToLeft = new LambdaFun((e, args) => {
 				Fun m = Converter.ToFunction(e["fc"], e);
 				Fun f = Converter.ToFunction(e["fn"], e);
 
-				return new LambdaFun((scope, arguments) =>
-				f.Run(new Scope(scope), m.Run(new Scope(scope), arguments))) {
-					Arguments = m.Arguments
-				};
+				return new LambdaFun((scope, arguments) => 
+					f.Call(new Scope(scope), m.Call(new Scope(scope), arguments))) { Parameters = m.Parameters };
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
 					new NamePattern("fc"),
 				}
@@ -44,13 +28,13 @@ namespace Lumen.Lang {
 				Fun f = Converter.ToFunction(e["fn"], e);
 
 				return new LambdaFun((scope, arguments) => {
-					m.Run(new Scope(scope), arguments);
-					return f.Run(new Scope(scope), arguments);
+					m.Call(new Scope(scope), arguments);
+					return f.Call(new Scope(scope), arguments);
 				}) {
-					Arguments = m.Arguments
+					Parameters = m.Parameters
 				};
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
 					new NamePattern("fc"),
 				}
@@ -61,25 +45,25 @@ namespace Lumen.Lang {
 				Int32 f = e["n"].ToInt(e);
 
 				return new LambdaFun((scope, arguments) => {
-					Value result = m.Run(scope, arguments);
+					Value result = m.Call(scope, arguments);
 
 					for (Int32 i = 1; i < f; i++) {
-						result = m.Run(scope, result);
+						result = m.Call(scope, result);
 					}
 
 					return result;
 				}) {
-					Arguments = m.Arguments
+					Parameters = m.Parameters
 				};
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
 					new NamePattern("n"),
 				}
 			});
 
 			// let fmap f m = fmap (m >> f)
-			this.SetMember("fmap", LCombine);
+			this.SetMember("fmap", CombainToLeft);
 
 			// Applicative
 			this.SetMember("liftA", new LambdaFun((scope, args) => {
@@ -89,16 +73,16 @@ namespace Lumen.Lang {
 				return new LambdaFun((e, a) => {
 					Value al = e["x'"];
 
-					Fun z = obj2.Run(new Scope(), al).ToFunction(e);
+					Fun z = obj2.Call(new Scope(), al).ToFunction(e);
 
-					return z.Run(new Scope(), obj.Run(new Scope(), al));
+					return z.Call(new Scope(), obj.Call(new Scope(), al));
 				}) {
-					Arguments = new List<IPattern> {
+					Parameters = new List<IPattern> {
 					new NamePattern("x'")
 				}
 				};
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("f"),
 					new NamePattern("m"),
 				}

@@ -26,11 +26,11 @@ namespace Lumen.Lmi {
         public MatchResult Match(Value value, Scope scope) {
             MatchResult result = this.pattern.Match(value, scope);
 
-            if (result.Success) {
-                return new MatchResult { Success = false };
+            if (result.IsSuccess) {
+                return new MatchResult(MatchResultKind.Fail);
             }
 
-            return MatchResult.True;
+            return MatchResult.Success;
         }
 
         public IEnumerable<Value> EvalWithYield(Scope scope) {

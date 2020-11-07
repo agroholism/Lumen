@@ -20,7 +20,7 @@ namespace Lumen.Lang {
 
 				return new Text(self.ToString());
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -31,7 +31,7 @@ namespace Lumen.Lang {
 
 				return new Logical(second.IsParentOf(first));
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 				}
@@ -43,7 +43,7 @@ namespace Lumen.Lang {
 
 				return new Logical(first.Equals(second));
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 				}
@@ -55,7 +55,7 @@ namespace Lumen.Lang {
 
 				return new Logical(!first.Equals(second));
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 				}
@@ -70,7 +70,7 @@ namespace Lumen.Lang {
 			this.SetMember("toText", new LambdaFun((e, args) => {
 				return new Text(e["this"].ToString());
 			}) {
-				Arguments = new System.Collections.Generic.List<IPattern> {
+				Parameters = new System.Collections.Generic.List<IPattern> {
 					new NamePattern("this")
 				}
 			});

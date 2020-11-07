@@ -54,12 +54,12 @@ namespace Lumen.Lang {
 		}
 
 		public static Dictionary<Value, Value> ToDictionary(this Value value, Scope scope) {
-			return value is Map map ? map.InternalValue :
-				throw Helper.CreateConvertError(value.Type, Prelude.Map).ToException();
+			return value is MutableMap map ? map.InternalValue :
+				throw Helper.CreateConvertError(value.Type, Prelude.MutableMap).ToException();
 		}
 
 		public static List<Value> ToList(this Value value, Scope scope) {
-			return value is Array array ? array.InternalValue :
+			return value is MutableArray array ? array.InternalValue :
 				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException();
 		}
 
@@ -77,7 +77,7 @@ namespace Lumen.Lang {
 			if (value.Type.HasImplementation(Prelude.Collection)
 				&& value.Type.TryGetMember("toStream", out Value converterPrototype)
 				&& converterPrototype.TryConvertToFunction(out Fun converter)) {
-				result = converter.Run(new Scope(scope), value).ToStream(scope);
+				result = converter.Call(new Scope(scope), value).ToStream(scope);
 				return true;
 			}
 
@@ -130,7 +130,7 @@ namespace Lumen.Lang {
 
 			if (value.Type.TryGetMember("toNumber", out Value converterPrototype)
 					&& converterPrototype.TryConvertToFunction(out Fun converter)) {
-				return ToNum(converter.Run(new Scope(scope), value), scope);
+				return ToNum(converter.Call(new Scope(scope), value), scope);
 			}
 
 			throw Helper.CreateConvertError(value.Type, Prelude.Number).ToException();

@@ -18,31 +18,31 @@ namespace Lumen.Lang {
 
 			String message = null;
 
-			if(this.Arguments.Count == 0) {
+			if(this.Parameters.Count == 0) {
 				message = "exception raised";
 			}
 			else if (this.TryGetMember("getMessage", out Value messageGenerator)
 				&& messageGenerator.TryConvertToFunction(out Fun reallyMessageGenerator)) {
-				message = reallyMessageGenerator.Run(new Scope(), instance).ToString();
+				message = reallyMessageGenerator.Call(new Scope(), instance).ToString();
 			}
 
 			LumenException result = new LumenException(this, message);
 
 			if (this.TryGetMember("getNote", out Value noteGenerator)
 				&& noteGenerator.TryConvertToFunction(out Fun reallyNoteGenerator)) {
-				result.Note = reallyNoteGenerator.Run(new Scope(), result).ToString();
+				result.Note = reallyNoteGenerator.Call(new Scope(), result).ToString();
 			}
 
 			if (this.TryGetMember("getHelpLink", out Value helpLinkGenerator)
 				&& helpLinkGenerator.TryConvertToFunction(out Fun reallyHelpLinkGenerator)) {
-				result.HelpLink = reallyHelpLinkGenerator.Run(new Scope(), result).ToString();
+				result.HelpLink = reallyHelpLinkGenerator.Call(new Scope(), result).ToString();
 			}
 
 			return result;
 		}
 
-		public override Value Run(Scope e, params Value[] arguments) {
-			if (this.Arguments.Count > arguments.Length) {
+		public override Value Call(Scope e, params Value[] arguments) {
+			if (this.Parameters.Count > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
 			}
 

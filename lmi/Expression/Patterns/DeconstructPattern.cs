@@ -28,7 +28,7 @@ namespace Lumen.Lmi {
 		public List<String> GetDeclaredVariables() {
 			List<String> result = new List<String>();
 
-			if(this.constructor is IdExpression idExpression && idExpression.id.StartsWith("'")) {
+			if (this.constructor is IdExpression idExpression && idExpression.id.StartsWith("'")) {
 				result.Add(idExpression.id);
 			}
 
@@ -45,65 +45,66 @@ namespace Lumen.Lmi {
 
 			if (this.constructor is IdExpression idExpression && idExpression.id.StartsWith("'")) {
 				typeParameter = idExpression.id;
-			} else {
+			}
+			else {
 				requiredType = this.constructor.Eval(scope);
 			}
 
-			if(typeParameter != null) {
+			if (typeParameter != null) {
 				Instance ins = value as Instance;
 				scope[typeParameter] = ins.Type;
 				for (Int32 i = 0; i < this.subpatterns.Count; i++) {
 					MatchResult res = this.subpatterns[i].Match(ins.Items[i], scope);
-					if (!res.Success) {
+					if (!res.IsSuccess) {
 						return res;
 					}
 				}
 
-				return MatchResult.True;
+				return MatchResult.Success;
 			}
 
-			if (requiredType is ExceptionConstructor exceptionConstructor 
+			if (requiredType is ExceptionConstructor exceptionConstructor
 				&& value is LumenException exceptionValue) {
 				if (exceptionConstructor.IsParentOf(value)) {
 					for (Int32 i = 0; i < exceptionConstructor.Fields.Count; i++) {
 						MatchResult res = this.subpatterns[i].Match(exceptionValue.items[i], scope);
-						if (!res.Success) {
+						if (!res.IsSuccess) {
 							return res;
 						}
 					}
 
-					return MatchResult.True;
+					return MatchResult.Success;
 				}
 
-				return new MatchResult {
-					Success = false,
-					Note = $"can not deconstruct a value of type {exceptionValue.Type}"
-				};
+				return new MatchResult(
+					MatchResultKind.Fail,
+					$"can not deconstruct a value of type {exceptionValue.Type}"
+				);
 			}
 
 			if (requiredType is Constructor ctor && value is Instance instance) {
 				if (ctor.IsParentOf(value)) {
 					for (Int32 i = 0; i < ctor.Fields.Count; i++) {
 						MatchResult res = this.subpatterns[i].Match(instance.Items[i], scope);
-						if (!res.Success) {
+						if (!res.IsSuccess) {
 							return res;
 						}
 					}
 
-					return MatchResult.True;
+					return MatchResult.Success;
 				}
 
-				return new MatchResult {
-					Success = false,
-					Note = $"can not deconstruct a value of type {instance.Type}"
-				};
+				return new MatchResult(
+					MatchResultKind.Fail,
+					$"can not deconstruct a value of type {instance.Type}"
+				);
 			}
 
 			if (requiredType is SingletonConstructor) {
-				return new MatchResult { Success = requiredType == value };
+				return new MatchResult(requiredType == value);
 			}
 
-			return new MatchResult { Success = false };
+			return new MatchResult(false); // ??
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

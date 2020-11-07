@@ -21,7 +21,7 @@ namespace Lumen.Lang {
 				return Const.UNIT;
 			}) {
 				Name = "format",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("fstr")
 				}

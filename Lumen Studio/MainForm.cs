@@ -306,7 +306,7 @@ namespace Lumen.Studio {
 						this.Review(_scope.parent, "");
 						return Lang.Const.UNIT;
 					}) {
-						Arguments = new List<Lang.Expressions.IPattern> {
+						Parameters = new List<Lang.Expressions.IPattern> {
 							new Lang.Expressions.NamePattern("line")
 						}
 					});

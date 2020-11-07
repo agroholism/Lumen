@@ -6,7 +6,7 @@
 			this.SetMember("message", new LambdaFun((scope, args) => {
 				return new Text($"exception raised");
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("cause", new LambdaFun((scope, args) => {
@@ -14,7 +14,7 @@
 
 				return exception.Cause == null ? Prelude.None : (Value)Helper.CreateSome(exception.Cause);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}

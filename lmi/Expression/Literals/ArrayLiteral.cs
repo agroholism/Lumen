@@ -29,7 +29,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			return new Array(ToStream(this.elements).ToList());
+			return new MutableArray(ToStream(this.elements).ToList());
         }
 
 		public override System.String ToString() {
@@ -41,7 +41,7 @@ namespace Lumen.Lmi {
 
 			foreach(Expression i in this.elements) {
 				foreach(Value j in i.EvalWithYield(scope)) {
-					if(j is GeneratorTerminalResult cgv) {
+					if(j is GeneratorExpressionTerminalResult cgv) {
 						result.Add(cgv.Value);
 					} else {
 						yield return j;
@@ -49,7 +49,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			yield return new GeneratorTerminalResult(new Array(result));
+			yield return new GeneratorExpressionTerminalResult(new MutableArray(result));
 		}
 	}
 }

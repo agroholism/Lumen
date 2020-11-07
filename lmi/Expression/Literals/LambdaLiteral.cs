@@ -37,7 +37,7 @@ namespace Lumen.Lmi {
 				return new LambdaFun((s, a) => {
 					return new Stream(new LumenGenerator( x, s));
 				}) {
-					Arguments = arguments
+					Parameters = arguments
 				};
 			}
 
@@ -46,7 +46,7 @@ namespace Lumen.Lmi {
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			yield return new GeneratorTerminalResult(this.Eval(scope));
+			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 
 		/*public override String ToString() {

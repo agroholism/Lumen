@@ -9,7 +9,8 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lang {
 	public sealed class Prelude : Module {
 		#region Fields
-		public static Module Cloneable { get; } = new Cloneable();
+		public static Module Default { get; } = new Default();
+		public static Module Clone { get; } = new Clone();
 		public static Module Exception { get; } = new ExceptionClass();
 		public static Module Functor { get; } = new Functor();
 		public static Module Applicative { get; } = new Applicative();
@@ -34,11 +35,12 @@ namespace Lumen.Lang {
 		public static Module Iterator { get; } = new IteratorModule();
 		public static Module Ref { get; } = new RefModule();
 		public static Module Stream { get; } = new StreamModule();
-		public static Module Array { get; } = new ArrayModule();
+		public static Module Range { get; } = new RangeModule();
+		public static Module MutableArray { get; } = new MutableArrayModule();
 		public static Module Function { get; } = new FunctionModule();
 		public static Module Number { get; } = new NumberModule();
-		public static Module Map { get; } = new MapModule();
-		public static Module Pair { get; } = new MapModule.PairModule();
+		public static Module MutableMap { get; } = new MutableMapModule();
+		public static Module Pair { get; } = new MutableMapModule.PairModule();
 		public static Module Text { get; } = new TextModule();
 		public static Module List { get; } = new ListModule();
 
@@ -66,7 +68,8 @@ namespace Lumen.Lang {
 			this.SetMember("Functor", Functor);
 			this.SetMember("Applicative", Applicative);
 			this.SetMember("Context", Context);
-			this.SetMember("Cloneable", Cloneable);
+			this.SetMember("Clone", Clone);
+			this.SetMember("Default", Default);
 			this.SetMember("Exception", Exception);
 
 			this.SetMember("IndexOutOfRange", IndexOutOfRange);
@@ -78,7 +81,7 @@ namespace Lumen.Lang {
 			this.SetMember("ConvertError", ConvertError);
 			this.SetMember("Error", Error);
 
-			this.SetMember("Pair", MapModule.PairModule.ctor);
+			this.SetMember("Pair", MutableMapModule.PairModule.ctor);
 
 			this.SetMember("Unit", Unit);
 
@@ -90,19 +93,20 @@ namespace Lumen.Lang {
 			this.SetMember("Success", Success);
 			this.SetMember("Failed", Failed);
 
+			this.SetMember("Range", Range);
 			this.SetMember("Iterator", Iterator);
 			this.SetMember("Ref", Ref);
 			this.SetMember("ref", Ref);
 			this.SetMember("List", List);
 			this.SetMember("Stream", Stream);
-			this.SetMember("Array", Array);
+			this.SetMember("MutableArray", MutableArray);
 			this.SetMember("Number", Number);
 			this.SetMember("Logical", Logical);
 			this.SetMember("Text", Text);
 			this.SetMember("Function", Function);
 			this.SetMember("Collection", Collection);
 
-			this.SetMember("Map", Map);
+			this.SetMember("MutableMap", MutableMap);
 
 			this.SetMember("true", Const.TRUE);
 			this.SetMember("false", Const.FALSE);
@@ -120,12 +124,12 @@ namespace Lumen.Lang {
 
 				Stopwatch sw = new Stopwatch();
 				sw.Start();
-				fun.Run(new Scope(scope));
+				fun.Call(new Scope(scope));
 				sw.Stop();
 
 				return new Number(sw.ElapsedMilliseconds);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fun")
 				}
 			});
@@ -142,7 +146,7 @@ namespace Lumen.Lang {
 					return Prelude.None;
 				}
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("text"),
 					new NamePattern("fileName")
 				}
@@ -162,7 +166,7 @@ namespace Lumen.Lang {
 
 				return Prelude.None;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fileName")
 				}
 			});
@@ -181,7 +185,7 @@ namespace Lumen.Lang {
 
 				return new List(LinkedList.Empty);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fileName")
 				}
 			});
@@ -191,16 +195,16 @@ namespace Lumen.Lang {
 
 				if (File.Exists(fileName)) {
 					try {
-						return new Array(File.ReadAllLines(fileName).Select(i => new Text(i) as Value).ToList());
+						return new MutableArray(File.ReadAllLines(fileName).Select(i => new Text(i) as Value).ToList());
 					}
 					catch {
-						return new Array();
+						return new MutableArray();
 					}
 				}
 
-				return new Array();
+				return new MutableArray();
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fileName")
 				}
 			});
@@ -215,7 +219,7 @@ namespace Lumen.Lang {
 					return Prelude.None;
 				}
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fileName")
 				}
 			});
@@ -228,7 +232,7 @@ namespace Lumen.Lang {
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});
@@ -240,7 +244,7 @@ namespace Lumen.Lang {
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});
@@ -253,7 +257,7 @@ namespace Lumen.Lang {
 				Console.Write(scope["prompt"]);
 				return new Text(Console.ReadLine());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 				new NamePattern("prompt")
 			}
 			});
@@ -263,7 +267,7 @@ namespace Lumen.Lang {
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("condition")
 				}
 			});
@@ -272,7 +276,7 @@ namespace Lumen.Lang {
 				FunctionIsNotImplementedForType(scope["fName"].ToString(), scope["t"], scope);
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fName"),
 					new NamePattern("t")
 				}
@@ -287,7 +291,7 @@ namespace Lumen.Lang {
 
 				return Prelude.None;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("inputStr")
 				}
 			});

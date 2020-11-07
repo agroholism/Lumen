@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Lumen.Lang {
-	public sealed class Array : BaseValueImpl {
+	public sealed class MutableArray : BaseValueImpl {
 		internal List<Value> InternalValue { get; private set; }
 
-		public override IType Type => Prelude.Array;
+		public override IType Type => Prelude.MutableArray;
 
-		public Array(List<Value> value) {
+		public MutableArray(List<Value> value) {
 			this.InternalValue = value;
 		}
 
-		public Array(IEnumerable<Value> value) {
+		public MutableArray(IEnumerable<Value> value) {
 			this.InternalValue = value.ToList();
 		}
 
-		public Array(params Value[] args) {
+		public MutableArray(params Value[] args) {
 			this.InternalValue = args.ToList();
 		}
 
@@ -25,7 +25,7 @@ namespace Lumen.Lang {
 		}
 
 		public override Boolean Equals(Object obj) {
-			if (obj is Array array) {
+			if (obj is MutableArray array) {
 				List<Value> list1 = this.InternalValue;
 				List<Value> list2 = array.InternalValue;
 

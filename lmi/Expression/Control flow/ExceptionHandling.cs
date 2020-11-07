@@ -53,7 +53,7 @@ RETRY:
 
 				try {
 					foreach (KeyValuePair<IPattern, Expression> i in this.exceptBodies) {
-						if (i.Key.Match(raisedException, scope).Success) {
+						if (i.Key.Match(raisedException, scope).IsSuccess) {
 							return i.Value.Eval(scope);
 						}
 					}
@@ -77,7 +77,7 @@ RETRY:
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			IEnumerator<Value> enumerator = this.tryBody.EvalWithYield(scope).GetEnumerator();
 
-			GeneratorTerminalResult terminalResult = null;
+			GeneratorExpressionTerminalResult terminalResult = null;
 
 			Exception exception = null;
 			Boolean canNext = true;
@@ -98,7 +98,7 @@ RETRY:
 					break;
 				}
 
-				if (val is GeneratorTerminalResult gtr) {
+				if (val is GeneratorExpressionTerminalResult gtr) {
 					terminalResult = gtr;
 				}
 				else {
@@ -110,9 +110,9 @@ RETRY:
 				Value raisedException = exception as LumenException ?? new LumenException(exception.Message);
 
 				foreach (KeyValuePair<IPattern, Expression> i in this.exceptBodies) {
-					if (i.Key.Match(raisedException, scope).Success) {
+					if (i.Key.Match(raisedException, scope).IsSuccess) {
 						foreach (Value x in i.Value.EvalWithYield(scope)) {
-							if (x is GeneratorTerminalResult gtr) {
+							if (x is GeneratorExpressionTerminalResult gtr) {
 								terminalResult = gtr;
 							}
 							else {

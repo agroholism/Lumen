@@ -37,13 +37,13 @@ namespace Lumen.Lmi {
 
 			// If it's true - this is generator
 			if (manager.HasYield) {
-				if (manager.HasTailRecursion) {
+				/*if (manager.HasTailRecursion) {
 					throw new LumenException("function can not have tail recursion and yield at the same time");
 				}
-
+				*/
 				result = new LambdaFun((scope1, args) => 
 					new Stream(new LumenGenerator(closuredBody, scope1))) {
-					Arguments = closuredPatterns,
+					Parameters = closuredPatterns,
 					Name = this.name
 				};
 			}
@@ -58,7 +58,7 @@ namespace Lumen.Lmi {
 
 				if (value is DispatcherFunction dispatcher) {
 					// Dispatcher is already exists
-					dispatcher.Append(result);
+					dispatcher.AppendTargetFunction(result);
 
 				}
 				else if (value is Fun f) {
@@ -81,7 +81,7 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			yield return new GeneratorTerminalResult(this.Eval(scope));
+			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 
 		public Expression Closure(ClosureManager manager) {

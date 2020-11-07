@@ -20,27 +20,27 @@ namespace Lumen.Lmi {
 				List list = value as List;
 
                 if(LinkedList.Count(list.Value) != this.subpatterns.Count) {
-                    return new MatchResult {
-						Success = false,
-						Note = $"function wait a list with length {this.subpatterns.Count}"
-					};
+                    return new MatchResult(
+						MatchResultKind.Fail,
+						$"function wait a list with length {this.subpatterns.Count}"
+					);
                 }
 
                 Int32 index = 0;
                 foreach(Value i in list.Value) {
 					MatchResult result = this.subpatterns[index].Match(i, scope);
-					if (!result.Success) {
+					if (!result.IsSuccess) {
                         return result;
                     }
                     index++;
                 }
-                return MatchResult.True;
+                return MatchResult.Success;
             }
 
-            return new MatchResult {
-				Success = false,
-				Note = $"function wait a list with length {this.subpatterns.Count}"
-			};
+            return new MatchResult(
+				MatchResultKind.Fail,
+				$"function wait a list with length {this.subpatterns.Count}"
+			);
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

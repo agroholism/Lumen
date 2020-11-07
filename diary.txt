@@ -100,6 +100,10 @@ Lumen 0.8
 
 + bug #1 fix "\((1 + 1) + 2)"
 
+06.11.2020
++ (start..end, 2), start.., ..end, ..
++ Array -> MutableArray, Map -> MutableMap
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)
@@ -117,6 +121,73 @@ NON STRICT FOREACH
 9. match operator for strings and regex
 6. map literal ?
 14. Result ?
+
+let reduce.<T: Default> [] _ =
+    T.default ()
+
+let reduce.<T: Default from x> x::xs operation: Function =
+    rec.<T> xs operation |> operation x
+
+unittest average
+    setup
+        let a = [1, 2, 3]
+    
+    exit
+        println "Exit"
+    
+    for i in 0..10:
+        subtest 
+
+
+    Collection.average a
+        not equal 3
+    
+    Collection.average a
+        equal 2
+    
+    Collection.average a
+        less 2
+
+    Collection.average a
+        greater 2
+
+   Collection.average a
+        contains 2
+
+   Collection.average a
+        not contains 2
+
+   Collection.average a
+        match _: Number
+
+   Collection.average a
+        is None
+
+   
+
+    let result = Collection.average a
+        assert result = 2
+    
+    Collection.average []
+        raises CollectionIsEmpty
+
+assertWarns(warn, fun, *args, **kwds) Ч fun(*args, **kwds) порождает предупреждение
+
+assertWarnsRegex(warn, r, fun, *args, **kwds) Ч fun(*args, **kwds) порождает предупреждение и сообщение соответствует регул€рному выражению r
+
+assertGreater(a, b) Ч a > b
+
+assertGreaterEqual(a, b) Ч a >= b
+
+assertLess(a, b) Ч a < b
+
+assertLessEqual(a, b) Ч a <= b
+
+assertRegex(s, r) Ч r.search(s)
+
+assertNotRegex(s, r) Ч not r.search(s)
+
+assertCountEqual(a, b)  Ч a и b содержат те же элементы в одинаковых количествах, но пор€док не важен
 
 			if (ActiveBottomControl == control) {
 				return;

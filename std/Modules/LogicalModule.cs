@@ -1,4 +1,7 @@
-﻿namespace Lumen.Lang {
+﻿using System.Collections.Generic;
+using Lumen.Lang.Expressions;
+
+namespace Lumen.Lang {
 	internal sealed class LogicalModule : Module {
 		internal LogicalModule() {
 			this.Name = "Logical";
@@ -10,27 +13,34 @@
 
 				return (Number)scope["self"].CompareTo(other);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			#endregion
 
 			this.SetMember("toText", new LambdaFun((e, args) => new Text(e["self"].ToString())) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("toNumber", new LambdaFun((e, args) => (Number)(Converter.ToBoolean(e["self"]) ? 1 : 0)) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("clone", new LambdaFun((scope, args) => {
 				return scope["self"];
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return Const.FALSE;
+			}) {
+				Parameters = new List<IPattern>()
+			});
+
+			this.AppendImplementation(Prelude.Default);
 			this.AppendImplementation(Prelude.Ord);
-			this.AppendImplementation(Prelude.Cloneable);
+			this.AppendImplementation(Prelude.Clone);
 		}
 	}
 }

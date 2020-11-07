@@ -16,13 +16,13 @@ namespace Lumen.Lmi {
 
         public MatchResult Match(Value value, Scope scope) {
             if (value is List list && LinkedList.IsEmpty(list.Value)) {
-                return MatchResult.True;
+                return MatchResult.Success;
             }
 
-            return new MatchResult {
-				Success = false,
-				Note = "function wait an empty list"
-			};
+            return new MatchResult (
+				MatchResultKind.Fail,
+				"function wait an empty list"
+			);
         }
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			this.Eval(scope);

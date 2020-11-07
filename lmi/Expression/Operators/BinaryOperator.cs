@@ -78,27 +78,27 @@ namespace Lumen.Lmi {
 			if (this.expressionOne is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.expressionTwo == null) {
-						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), null, this.operation, this.line, this.fileName)));
+						yield return new GeneratorExpressionTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), null, this.operation, this.line, this.fileName)));
 					}
 
 					if (this.expressionTwo is IdExpression ide2 && ide2.id == "_") {
-						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x"), new NamePattern("y") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), new IdExpression("y", ide2.file, ide2.line), this.operation, this.line, this.fileName)));
+						yield return new GeneratorExpressionTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x"), new NamePattern("y") }, new BinaryOperator(new IdExpression("x", ide.file, ide.line), new IdExpression("y", ide2.file, ide2.line), this.operation, this.line, this.fileName)));
 					}
 					else {
-						yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") },
+						yield return new GeneratorExpressionTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") },
 							new BinaryOperator(new IdExpression("x", ide.file, ide.line), new ValueLiteral(this.expressionTwo.Eval(e)), this.operation, this.line, this.fileName)));
 					}
 				}
 			}
 			else if (this.expressionTwo is IdExpression _ide && _ide.id == "_") {
-				yield return new GeneratorTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.file, _ide.line), this.operation, this.line, this.fileName)));
+				yield return new GeneratorExpressionTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.file, _ide.line), this.operation, this.line, this.fileName)));
 			}
 
 			IEnumerable<Value> ops = this.expressionOne.EvalWithYield(e);
 			Value operandOne = Const.UNIT;
 
 			foreach (Value i in ops) {
-				if (i is GeneratorTerminalResult cgv1) {
+				if (i is GeneratorExpressionTerminalResult cgv1) {
 					operandOne = cgv1.Value;
 				}
 				else {
@@ -111,7 +111,7 @@ namespace Lumen.Lmi {
 			if (this.expressionTwo != null) {
 				IEnumerable<Value> ops2 = this.expressionTwo.EvalWithYield(e);
 				foreach (Value i in ops2) {
-					if (i is GeneratorTerminalResult cgv2) {
+					if (i is GeneratorExpressionTerminalResult cgv2) {
 						operandTwo = cgv2.Value;
 					}
 					else {
@@ -121,19 +121,19 @@ namespace Lumen.Lmi {
 			}
 
 			if (this.operation == "and") {
-				yield return new GeneratorTerminalResult(!Converter.ToBoolean(operandOne) ? new Logical(false) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e))));
+				yield return new GeneratorExpressionTerminalResult(!Converter.ToBoolean(operandOne) ? new Logical(false) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e))));
 			}
 
 			if (this.operation == "or") {
-				yield return new GeneratorTerminalResult(Converter.ToBoolean(operandOne) ? new Logical(true) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e))));
+				yield return new GeneratorExpressionTerminalResult(Converter.ToBoolean(operandOne) ? new Logical(true) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e))));
 			}
 
 			if (this.operation == "xor") {
-				yield return new GeneratorTerminalResult(new Logical(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e))));
+				yield return new GeneratorExpressionTerminalResult(new Logical(Converter.ToBoolean(operandOne) ^ Converter.ToBoolean(this.expressionTwo.Eval(e))));
 			}
 
 			if (this.operation == "@not") {
-				yield return new GeneratorTerminalResult(new Logical(!Converter.ToBoolean(operandOne)));
+				yield return new GeneratorExpressionTerminalResult(new Logical(!Converter.ToBoolean(operandOne)));
 			}
 
 			List<Expression> exps = new List<Expression> { new ValueLiteral(operandOne) };
@@ -147,7 +147,7 @@ namespace Lumen.Lmi {
 			Scope s = new Scope(e);
 			IType type = operandOne is SingletonConstructor sc ? sc : operandOne.Type;
 
-			yield return new GeneratorTerminalResult(new Applicate(new DotOperator(new ValueLiteral(type), this.operation, this.fileName, this.line), exps, this.line, this.fileName).Eval(s));
+			yield return new GeneratorExpressionTerminalResult(new Applicate(new DotOperator(new ValueLiteral(type), this.operation, this.fileName, this.line), exps, this.line, this.fileName).Eval(s));
 		}
 
 		public Expression Closure(ClosureManager manager) {

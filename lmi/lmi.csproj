@@ -104,7 +104,7 @@
     <Compile Include="Expression\Generators\ListGenerator.cs" />
     <Compile Include="Expression\Patterns\NotPattern.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="Expression\Application\TailRecursion.cs" />
+    <Compile Include="Expression\Application\Tailrec.cs" />
     <Compile Include="Expression\Control flow\Raise.cs" />
     <Compile Include="Expression\Patterns\RangePattern.cs" />
     <Compile Include="RangeOperator.cs" />

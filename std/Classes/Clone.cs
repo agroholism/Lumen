@@ -2,15 +2,15 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class Cloneable : Module {
-		internal Cloneable() {
-			this.Name = "Cloneable";
+	internal class Clone : Module {
+		internal Clone() {
+			this.Name = "Clone";
 
 			this.SetMember("clone", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Cloneable.clone", scope["self"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Clone.clone", scope["self"].Type, scope);
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});

@@ -24,11 +24,11 @@ namespace Lumen.Studio {
 
 		internal virtual List<AutocompleteItem> GetAutocompleteItems(TextBoxManager manager) {
 			if (this.Fn != null && this.Fn.TryGetMember("get_autocomplete_items", out Value fn)) {
-				Value res = (fn as Fun).Run(new Scope());
+				Value res = (fn as Fun).Call(new Scope());
 				List<AutocompleteItem> result = new List<AutocompleteItem>();
 
 				foreach (Value i in res.ToList(null)) {
-					if (i is Lang.Array) {
+					if (i is Lang.MutableArray) {
 						List<Value> lst = i.ToList(null);
 						AutocompleteItem aci = new AutocompleteItem {
 							Text = lst[0].ToString(),

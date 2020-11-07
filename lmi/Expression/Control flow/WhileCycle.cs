@@ -74,7 +74,7 @@ REDO:
 
 				if (y != null) {
 					foreach (Value it in y) {
-						if (it is GeneratorTerminalResult) {
+						if (it is GeneratorExpressionTerminalResult) {
 							continue;
 						}
 						yield return it;

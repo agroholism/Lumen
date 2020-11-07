@@ -16,7 +16,7 @@ namespace Lumen.Lang {
 				return scope["x"];
 			}) {
 				Name = "onEnter",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});
@@ -26,7 +26,7 @@ namespace Lumen.Lang {
 				return Const.UNIT;
 			}) {
 				Name = "onExit",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});

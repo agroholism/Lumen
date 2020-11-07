@@ -4,19 +4,19 @@ using System.Linq;
 using System.Text;
 
 namespace Lumen.Lang {
-	public class Map : Value {
+	public class MutableMap : Value {
 		internal Dictionary<Value, Value> InternalValue { get; private set; }
 
-		public Map() {
+		public MutableMap() {
 			this.InternalValue = new Dictionary<Value, Value>();
 		}
 
-		public Map(Dictionary<Value, Value> value) {
+		public MutableMap(Dictionary<Value, Value> value) {
 			this.InternalValue = value;
 		}
 
 		public override Boolean Equals(Object obj) {
-			if (obj is Map map) {
+			if (obj is MutableMap map) {
 				if (ReferenceEquals(this, map)) {
 					return true;
 				}
@@ -38,7 +38,7 @@ namespace Lumen.Lang {
 			throw new NotImplementedException();
 		}
 
-		public IType Type => Prelude.Map;
+		public IType Type => Prelude.MutableMap;
 
 		public override String ToString() {
 			if (this.InternalValue.Count == 0) {

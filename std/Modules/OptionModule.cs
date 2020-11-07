@@ -12,12 +12,19 @@ namespace Lumen.Lang {
 
 			this.AppendImplementation(Prelude.Functor);
 			this.AppendImplementation(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Default);
 
 			this.Some = Helper.CreateConstructor("Option.Some", this, new List<String> { "x" }) as Constructor;
 			this.None = Helper.CreateConstructor("Option.None", this, new List<String>());
 
 			this.SetMember("Some", this.Some);
 			this.SetMember("None", this.None);
+
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return this.None;
+			}) {
+				Parameters = new List<IPattern> { }
+			});
 
 			LambdaFun fmap = new LambdaFun((scope, args) => {
 				Value functor = scope["fc"];
@@ -27,12 +34,12 @@ namespace Lumen.Lang {
 				}
 				else if (this.Some.IsParentOf(functor)) {
 					Fun mapper = scope["fn"].ToFunction(scope);
-					return Helper.CreateSome(mapper.Run(new Scope(scope), Prelude.DeconstructSome(functor)));
+					return Helper.CreateSome(mapper.Call(new Scope(scope), Prelude.DeconstructSome(functor)));
 				}
 
 				throw new LumenException(Exceptions.TYPE_ERROR.F(this, functor.Type));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
 					new NamePattern("fc"),
 				}
@@ -53,7 +60,7 @@ namespace Lumen.Lang {
 
 				throw new LumenException("liftA option");
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("m"),
 					new NamePattern("f"),
 				}
@@ -67,12 +74,12 @@ namespace Lumen.Lang {
 				}
 				else if (this.Some.IsParentOf(obj)) {
 					Fun f = scope["f"] as Fun;
-					return f.Run(new Scope(scope), Prelude.DeconstructSome(obj));
+					return f.Call(new Scope(scope), Prelude.DeconstructSome(obj));
 				}
 
 				throw new LumenException("fmap option");
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("m"),
 					new NamePattern("f"),
 				}
@@ -88,7 +95,7 @@ namespace Lumen.Lang {
 				}
 
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("this")
 				}
 			});
@@ -112,6 +119,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("Success", this.Success);
 			this.SetMember("Failed", this.Failed);
+
 
 			/*LambdaFun fmap = new LambdaFun((scope, args) => {
 				Value functor = scope["fc"];
@@ -183,7 +191,7 @@ namespace Lumen.Lang {
 				}
 
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("this")
 				}
 			});

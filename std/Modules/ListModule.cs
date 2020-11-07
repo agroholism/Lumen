@@ -8,10 +8,10 @@ namespace Lumen.Lang {
 		public ListModule() {
 			this.Name = "List";
 
-			this.SetMember("init", new LambdaFun((scope, args) => {
+			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				return new List(new LinkedList(scope["head"], scope["tail"].ToLinkedList(scope)));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("head"),
 					new NamePattern("tail")
 				}
@@ -31,7 +31,7 @@ namespace Lumen.Lang {
 
 				return new List(values.Concat(valuesx));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("values"),
 					new NamePattern("values'")
 				}
@@ -42,7 +42,7 @@ namespace Lumen.Lang {
 
 				return v.Head == Const.UNIT ? Prelude.None : (Value)Helper.CreateSome(v.Head);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("l")
 				}
 			});
@@ -51,7 +51,7 @@ namespace Lumen.Lang {
 
 				return LinkedList.IsEmpty(v) ? Prelude.None : (Value)Helper.CreateSome(new List(v.Tail));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("l")
 				}
 			});
@@ -60,9 +60,9 @@ namespace Lumen.Lang {
 				Fun mapper = scope["pred"].ToFunction(scope);
 				IEnumerable<Value> values = scope["list"].ToStream(scope);
 
-				return new List(values.Where(i => mapper.Run(new Scope(scope), i).ToBoolean()));
+				return new List(values.Where(i => mapper.Call(new Scope(scope), i).ToBoolean()));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("pred"),
 					new NamePattern("list"),
 				}
@@ -86,7 +86,7 @@ namespace Lumen.Lang {
 
 				return new List(result);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("size"),
 					new NamePattern("list")
 				}
@@ -98,7 +98,7 @@ namespace Lumen.Lang {
 
 				LinkedList result = new LinkedList();
 
-				foreach (LinkedList i in firstList.Select(i => fn.Run(new Scope(scope), i).ToLinkedList(scope)).Reverse()) {
+				foreach (LinkedList i in firstList.Select(i => fn.Call(new Scope(scope), i).ToLinkedList(scope)).Reverse()) {
 					foreach (Value j in i.Reverse()) {
 						result = new LinkedList(j, result);
 					}
@@ -106,7 +106,7 @@ namespace Lumen.Lang {
 
 				return new List(result);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("list"),
 					new NamePattern("fn")
 				}
@@ -115,21 +115,21 @@ namespace Lumen.Lang {
 			this.SetMember("toText", new LambdaFun((e, args) => {
 				return new Text(e["this"].ToString());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("this")
 				}
 			});
 			this.SetMember("toStream", new LambdaFun((e, args) => {
 				return new Stream(e["this"].ToLinkedList(e));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("this")
 				}
 			});
 			this.SetMember("toArray", new LambdaFun((e, args) => {
-				return new Array(e["l"].ToLinkedList(e).ToList());
+				return new MutableArray(e["l"].ToLinkedList(e).ToList());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("l")
 				}
 			});
@@ -138,7 +138,7 @@ namespace Lumen.Lang {
 				return new List(scope["x"].ToStream(scope));
 			}) {
 				Name = "fromStream",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});
@@ -146,10 +146,17 @@ namespace Lumen.Lang {
 			this.SetMember("clone", new LambdaFun((scope, args) => {
 				return scope["self"];
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
-			this.AppendImplementation(Prelude.Cloneable);
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return new List();
+			}) {
+				Parameters = new List<IPattern>()
+			});
+
+			this.AppendImplementation(Prelude.Default);
+			this.AppendImplementation(Prelude.Clone);
 			this.AppendImplementation(Prelude.Collection);
 		}
 	}

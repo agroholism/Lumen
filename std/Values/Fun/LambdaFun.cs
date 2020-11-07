@@ -9,7 +9,7 @@ namespace Lumen.Lang {
 
 		public String Name { get; set; }
 
-		public List<IPattern> Arguments { get; set; } = new List<IPattern>();
+		public List<IPattern> Parameters { get; set; } = new List<IPattern>();
 
 		public IType Type { get => Prelude.Function; }
 
@@ -17,21 +17,21 @@ namespace Lumen.Lang {
 			this._lambda = lambda;
 		}
 
-		public Value Run(Scope e, params Value[] arguments) {
+		public Value Call(Scope e, params Value[] arguments) {
 			// Too less given args - partial application
-			if (this.Arguments.Count > arguments.Length) {
+			if (this.Parameters?.Count > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
 			}
 
 			Int32 counter = 0;
 
 			// Check function guards
-			while (counter < this.Arguments.Count) {
-				MatchResult match = this.Arguments[counter].Match(arguments[counter], e);
-				if (!match.Success) {
+			while (counter < this.Parameters.Count) {
+				MatchResult match = this.Parameters[counter].Match(arguments[counter], e);
+				if (match.Kind != MatchResultKind.Success) {
 					LumenException exception = Helper.InvalidArgument(
-							this.Arguments[counter].ToString(),
-							Exceptions.FUNCTION_CAN_NOT_BE_APPLIED.F(String.Join(" ", this.Arguments)));
+							this.Parameters[counter].ToString(),
+							Exceptions.FUNCTION_CAN_NOT_BE_APPLIED.F(String.Join(" ", this.Parameters)));
 					exception.Note = $"Details: {match.Note}";
 					throw exception;
 				}
@@ -46,17 +46,17 @@ namespace Lumen.Lang {
 				result = rt.Result;
 			}
 
-			Int32 delta = arguments.Length - this.Arguments.Count;
+			Int32 delta = arguments.Length - this.Parameters.Count;
 			// If given too many arguments - try to apply to result
 			if (delta > 0) {
-				if (this.Arguments.Count == 0 && arguments[0] == Const.UNIT) {
+				if (this.Parameters.Count == 0 && arguments[0] == Const.UNIT) {
 					return result;
 				}
 
-				Int32 position = this.Arguments.Count;
+				Int32 position = this.Parameters.Count;
 				while (position < arguments.Length) {
 					Fun func = result.ToFunction(e);
-					result = func.Run(e, arguments[position]);
+					result = func.Call(e, arguments[position]);
 					position++;
 				}
 			}
@@ -74,7 +74,7 @@ namespace Lumen.Lang {
 
 		public Value Clone() {
 			return new LambdaFun(this._lambda) {
-				Arguments = this.Arguments,
+				Parameters = this.Parameters,
 				Name = this.Name
 			};
 		}
@@ -90,7 +90,7 @@ namespace Lumen.Lang {
 		public Int32 restArgs;
 
 		public String Name { get; set; }
-		public List<IPattern> Arguments { get; set; }
+		public List<IPattern> Parameters { get; set; }
 		public IType Parent { get; set; }
 		public IType Type => Prelude.Function;
 
@@ -102,7 +102,7 @@ namespace Lumen.Lang {
 			throw new NotImplementedException();
 		}
 
-		public Value Run(Scope e, params Value[] args) {
+		public Value Call(Scope e, params Value[] args) {
 			if (this.restArgs > args.Length) {
 				return new PartialFun {
 					InnerFunction = this,
@@ -118,7 +118,7 @@ namespace Lumen.Lang {
 				vals.Insert(i, this.Args[i]);
 			}
 
-			return this.InnerFunction.Run(e, vals.ToArray());
+			return this.InnerFunction.Call(e, vals.ToArray());
 		}
 
 		public void SetField(String name, Value value, Scope scope) {

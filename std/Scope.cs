@@ -69,6 +69,16 @@ namespace Lumen.Lang {
 			return this.variables.ContainsKey(name);
 		}
 
+		public Boolean TryGetFromThisScope(String name, out Value result) {
+			if (this.variables.TryGetValue(name, out Value value)) {
+				result = value;
+				return true;
+			}
+
+			result = null;
+			return false;
+		}
+
 		public Boolean TryGet(String name, out Value result) {
 			if (this.variables.TryGetValue(name, out Value value)) {
 				result = value;

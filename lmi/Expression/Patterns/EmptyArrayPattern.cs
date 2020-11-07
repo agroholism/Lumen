@@ -16,14 +16,14 @@ namespace Lumen.Lmi {
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
-			if (value is Lang.Array list && list.ToList(scope).Count == 0) {
-				return MatchResult.True;
+			if (value is Lang.MutableArray list && list.ToList(scope).Count == 0) {
+				return MatchResult.Success;
 			}
 
-			return new MatchResult {
-				Success = false,
-				Note = "function wait an empty array"
-			};
+			return new MatchResult(
+				MatchResultKind.Fail,
+				"function wait an empty array"
+			);
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

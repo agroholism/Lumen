@@ -6,14 +6,21 @@ namespace Lumen.Lang {
 		public RefModule() {
 			this.Name = "Ref";
 
-			this.Mixins.Add(Prelude.Format);
-			this.Mixins.Add(Prelude.Functor);
-			this.Mixins.Add(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Format);
+			this.AppendImplementation(Prelude.Functor);
+			this.AppendImplementation(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Default);
+
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return new Ref(Const.UNIT);
+			}) {
+				Parameters = new List<IPattern> { }
+			});
 
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				return new Ref(scope["state"]);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("state")
 				}
 			});
@@ -22,9 +29,9 @@ namespace Lumen.Lang {
 				Ref functor = scope["fc"] as Ref;
 				Fun mapper = scope["fn"].ToFunction(scope);
 
-				return new Ref(mapper.Run(new Scope(scope), functor.Value));
+				return new Ref(mapper.Call(new Scope(scope), functor.Value));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
 					new NamePattern("fc"),
 				}
@@ -35,7 +42,7 @@ namespace Lumen.Lang {
 				Value m = scope["m"];
 				return m.CallMethodFlip("fmap", scope, functor.Value);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("m"),
 					new NamePattern("f"),
 				}
@@ -44,7 +51,7 @@ namespace Lumen.Lang {
 			this.SetMember("!", new LambdaFun((scope, args) => {
 				return (scope["state"] as Ref).Value;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("state"),
 					new NamePattern("unit")
 				}
@@ -54,7 +61,7 @@ namespace Lumen.Lang {
 				Ref state = scope["state"] as Ref;
 				return state.Value = scope["value"];
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("state"),
 					new NamePattern("value"),
 				}
@@ -68,7 +75,7 @@ namespace Lumen.Lang {
 				state2.Value = temp;
 				return state;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("state"),
 					new NamePattern("state'")
 				}
@@ -79,7 +86,7 @@ namespace Lumen.Lang {
 				state.Value = new Number(state.Value.ToDouble(scope) + 1);
 				return state;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("state")
 				}
 			});
@@ -89,7 +96,7 @@ namespace Lumen.Lang {
 				state.Value = new Number(state.Value.ToDouble(scope) - 1);
 				return state;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("state")
 				}
 			});
@@ -104,7 +111,7 @@ namespace Lumen.Lang {
 					return new Text(inc.ToString());
 				}
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 						new NamePattern("state"),
 						new NamePattern("fstr")
 					}

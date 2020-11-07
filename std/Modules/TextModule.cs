@@ -16,7 +16,7 @@ namespace Lumen.Lang {
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				return new Text(scope["self"].ToString() + scope["other"].ToString());
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember(Constants.STAR, new LambdaFun((scope, args) => {
@@ -37,7 +37,7 @@ namespace Lumen.Lang {
 
 				return new Text(buffer.ToString());
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("compare", new LambdaFun((scope, args) => {
@@ -46,7 +46,7 @@ namespace Lumen.Lang {
 
 				return new Number(String.CompareOrdinal(self, other));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember(Constants.MOD, new LambdaFun((scope, args) => {
@@ -55,7 +55,7 @@ namespace Lumen.Lang {
 
 				return new Text(String.Format(self, other.ToStream(scope).ToArray()));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember(Constants.SLASH, new LambdaFun((scope, args) => {
@@ -66,7 +66,7 @@ namespace Lumen.Lang {
 					String[] parts =
 						self.Split(new[] { other.ToString() }, StringSplitOptions.RemoveEmptyEntries);
 
-					return new Array(parts.Select(x => (Value)new Text(x)).ToList());
+					return new MutableArray(parts.Select(x => (Value)new Text(x)).ToList());
 				}
 				else if (other is Number num) {
 					Int32 maxLength = num.ToInt(scope);
@@ -83,12 +83,12 @@ namespace Lumen.Lang {
 						result.Add(new Text(buffer.ToString()));
 					}
 
-					return new Array(result);
+					return new MutableArray(result);
 				}
 
 				throw new LumenException("expect Text or Number");
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
@@ -102,7 +102,7 @@ namespace Lumen.Lang {
 					if (index is Fun fun) {
 						return new Stream(from ch in self
 										  select new Text(ch.ToString()) into value
-										  where fun.Run(new Scope(scope), value).ToBoolean()
+										  where fun.Call(new Scope(scope), value).ToBoolean()
 										  select value);
 					}
 
@@ -144,17 +144,23 @@ namespace Lumen.Lang {
 
 				throw new LumenException("function Text.getIndex supports only one ot two arguments");
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("indices"),
 					new NamePattern("self")
 				}
 			});
 			#endregion
 
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return new Text("");
+			}) {
+				Parameters = new List<IPattern> { }
+			});
+
 			this.SetMember("clone", new LambdaFun((scope, args) => {
 				return new Text(scope["self"].ToString());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -169,7 +175,7 @@ namespace Lumen.Lang {
 			this.SetMember("concat", new LambdaFun((scope, args) => {
 				return new Text(String.Concat(scope["values"].ToStream(scope)));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("values")
 				}
 			});
@@ -180,7 +186,7 @@ namespace Lumen.Lang {
 			this.SetMember("upperCase", new LambdaFun((scope, args) => {
 				return new Text(scope["self"].ToString().ToUpper());
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			// Text -> Text
@@ -189,7 +195,7 @@ namespace Lumen.Lang {
 			this.SetMember("lowerCase", new LambdaFun((scope, args) => {
 				return new Text(scope["self"].ToString().ToLower());
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			// Text -> Text
@@ -198,7 +204,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString().ToLower();
 				return new Text(Char.ToUpper(self[0]) + self.Substring(1));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			// Text -> Text
@@ -209,7 +215,7 @@ namespace Lumen.Lang {
 
 				return new Text(textInfo.ToTitleCase(self));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			// Text -> Text
@@ -224,7 +230,7 @@ namespace Lumen.Lang {
 
 				return new Text(result.ToString());
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			// Text -> Text -> Boolean
@@ -233,7 +239,7 @@ namespace Lumen.Lang {
 			this.SetMember("contains", new LambdaFun((scope, args) => {
 				return new Logical(scope["self"].ToString().Contains(scope["substring"].ToString()));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("substring"),
 					new NamePattern("self")
 				}
@@ -245,7 +251,7 @@ namespace Lumen.Lang {
 
 				return new Logical("" == self);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("isWhiteSpace", new LambdaFun((scope, args) => {
@@ -253,7 +259,7 @@ namespace Lumen.Lang {
 
 				return new Logical(String.IsNullOrWhiteSpace(self));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			// Text -> Text -> Boolean
@@ -262,7 +268,7 @@ namespace Lumen.Lang {
 			this.SetMember("isStartsWith", new LambdaFun((scope, args) => {
 				return new Logical(scope["self"].ToString().StartsWith(scope["prefix"].ToString()));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("prefix"),
 					new NamePattern("self")
 				}
@@ -274,7 +280,7 @@ namespace Lumen.Lang {
 			this.SetMember("isEndsWith", new LambdaFun((scope, args) => {
 				return new Logical(scope["self"].ToString().EndsWith(scope["suffix"].ToString()));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("suffix"),
 					new NamePattern("self")
 				}
@@ -287,13 +293,13 @@ namespace Lumen.Lang {
 
 				return new Stream(self.Select<Char, Value>(x => new Number(x)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("indexOf", new LambdaFun((scope, args) => {
 				return new Number(scope["self"].ToString().IndexOf(scope["subtext"].ToString()));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("subtext"),
 					new NamePattern("self")
 				}
@@ -302,7 +308,7 @@ namespace Lumen.Lang {
 			this.SetMember("lastIndexOf", new LambdaFun((scope, args) => {
 				return new Number(scope["self"].ToString().LastIndexOf(scope["subtext"].ToString()));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("subtext"),
 					new NamePattern("self")
 				}
@@ -314,7 +320,7 @@ namespace Lumen.Lang {
 
 				return new Number(self.Length);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("translate", new LambdaFun((scope, args) => {
@@ -370,7 +376,7 @@ namespace Lumen.Lang {
 				}
 				return new Text(buff.ToString());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("src"),
 					new NamePattern("res"),
 					new NamePattern("text")
@@ -385,7 +391,7 @@ namespace Lumen.Lang {
 
 				return new Text(self.Replace(what, with));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("what"),
 					new NamePattern("with"),
 					Const.Self[0]
@@ -396,7 +402,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.Replace(scope["subtext"].ToString(), ""));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("subtext"),
 					new NamePattern("self")
 				}
@@ -407,7 +413,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.Trim());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -416,7 +422,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.TrimEnd());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -425,7 +431,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.TrimStart());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -467,7 +473,7 @@ namespace Lumen.Lang {
 
 				return new Text(Pad(self, totalLenght));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("length"),
 					new NamePattern("self")
 				}
@@ -477,7 +483,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.PadLeft(scope["lenght"].ToInt(scope)));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("lenght"),
 					new NamePattern("self")
 				}
@@ -487,7 +493,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.PadRight(scope["lenght"].ToInt(scope)));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("lenght"),
 					new NamePattern("self")
 				}
@@ -500,7 +506,7 @@ namespace Lumen.Lang {
 
 				return new Text(Pad(self, totalLenght, with));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 						new NamePattern("with"),
 					new NamePattern("length"),
 					new NamePattern("self")
@@ -511,7 +517,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.PadLeft(scope["lenght"].ToInt(scope), scope["with"].ToString()[0]));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("with"),
 					new NamePattern("lenght"),
 					new NamePattern("self")
@@ -522,7 +528,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				return new Text(self.PadRight(scope["lenght"].ToInt(scope), scope["with"].ToString()[0]));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("with"),
 					new NamePattern("lenght"),
 					new NamePattern("self")
@@ -535,7 +541,7 @@ namespace Lumen.Lang {
 				System.Array.Reverse(chars);
 				return new Text(new String(chars));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -545,7 +551,7 @@ namespace Lumen.Lang {
 
 				return new Number(String.Compare(self, scope["other"].ToString(), true));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self"),
 					new NamePattern("other")
 				}
@@ -558,12 +564,12 @@ namespace Lumen.Lang {
 					StringSplitOptions.None);
 
 				foreach (String i in self) {
-					action.Run(new Scope(scope), new Text(i));
+					action.Call(new Scope(scope), new Text(i));
 				}
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("action"),
 					new NamePattern("self")
 				}
@@ -575,7 +581,7 @@ namespace Lumen.Lang {
 
 				return new Stream(this.GlobalizationEach(self));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -584,7 +590,7 @@ namespace Lumen.Lang {
 				IEnumerable<Value> stream = scope["stream"].ToStream(scope);
 				return new Text(String.Concat(stream));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("stream")
 				}
 			});
@@ -592,13 +598,14 @@ namespace Lumen.Lang {
 			this.SetMember("toText", new LambdaFun((scope, args) => {
 				return scope["self"];
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 
 			this.AppendImplementation(Prelude.Ord);
 			this.AppendImplementation(Prelude.Collection);
-			this.AppendImplementation(Prelude.Cloneable);
+			this.AppendImplementation(Prelude.Clone);
+			this.AppendImplementation(Prelude.Default);
 		}
 
 		public IEnumerable<Value> GlobalizationEach(String str) {

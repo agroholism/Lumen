@@ -34,7 +34,7 @@ namespace Lumen.Lmi {
             Value value = this.matchedExpression.Eval(e);
  
             foreach(KeyValuePair<IPattern, Expression> i in this.patterns) {
-                if(i.Key.Match(value, e).Success) {
+                if(i.Key.Match(value, e).IsSuccess) {
                     return i.Value.Eval(e);
                 }
             }
@@ -46,7 +46,7 @@ namespace Lumen.Lmi {
 			Value value = this.matchedExpression.Eval(scope);
 
 			foreach (KeyValuePair<IPattern, Expression> i in this.patterns) {
-				if (i.Key.Match(value, scope).Success) {
+				if (i.Key.Match(value, scope).IsSuccess) {
 					IEnumerable<Value> result = i.Value.EvalWithYield(scope);
 
 					if (result != null) {

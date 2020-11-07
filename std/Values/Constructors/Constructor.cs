@@ -10,14 +10,14 @@ namespace Lumen.Lang {
 		public List<String> Fields { get; private set; }
 		public override IType Type => Prelude.Function;
 
-		public List<IPattern> Arguments { get; set; }
+		public List<IPattern> Parameters { get; set; }
 		public Module Parent { get; set; }
 
 		public Constructor(String name, Module parent, List<String> fields) {
 			this.Parent = parent;
 			this.Name = name;
 			this.Fields = fields;
-			this.Arguments = fields.Select(i => new NamePattern(i) as IPattern).ToList();
+			this.Parameters = fields.Select(i => new NamePattern(i) as IPattern).ToList();
 		}
 
 		public Value MakeInstance(params Value[] values) {
@@ -60,8 +60,8 @@ namespace Lumen.Lang {
 			throw new LumenException($"fne {name} {this.Name}");
 		}
 
-		public virtual Value Run(Scope e, params Value[] arguments) {
-			if (this.Arguments.Count > arguments.Length) {
+		public virtual Value Call(Scope e, params Value[] arguments) {
+			if (this.Parameters.Count > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
 			}
 

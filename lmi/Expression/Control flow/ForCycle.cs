@@ -38,7 +38,7 @@ namespace Lumen.Lmi {
 			foreach (Value i in container.ToStream(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
-				if (!matchResult.Success) {
+				if (!matchResult.IsSuccess) {
 					throw new LumenException(matchResult.Note);
 				}
 
@@ -79,7 +79,7 @@ REDO:
 			foreach (Value i in container.ToStream(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
-				if (!matchResult.Success) {
+				if (!matchResult.IsSuccess) {
 					throw new LumenException(matchResult.Note);
 				}
 
@@ -111,7 +111,7 @@ REDO:
 
 				if (y != null) {
 					foreach (Value it in y) {
-						if (it is GeneratorTerminalResult) {
+						if (it is GeneratorExpressionTerminalResult) {
 							break;
 						}
 						yield return it;

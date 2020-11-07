@@ -42,6 +42,7 @@ namespace Lumen.Lmi {
 			[")"] = new Token(TokenType.PAREN_CLOSE),
 
 			["="] = new Token(TokenType.EQUALS, Constants.EQUALS),
+			[".<"] = new Token(TokenType.DOT_LESS, ".<"),
 			["<"] = new Token(TokenType.LESS, Constants.LT),
 			[">"] = new Token(TokenType.GREATER, Constants.GT),
 			["<>"] = new Token(TokenType.NOT_EQUALS, Constants.NOT_EQUALS),
@@ -501,7 +502,6 @@ namespace Lumen.Lmi {
 				&& last != TokenType.EQUALS
 				&& last != TokenType.FOR
 				&& last != TokenType.FORWARD_PIPE
-				&& last != TokenType.GREATER
 				&& last != TokenType.GREATER_EQUALS
 				&& last != TokenType.IF
 				&& last != TokenType.IN

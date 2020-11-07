@@ -27,7 +27,7 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				return this.MakeExceptionInstance(e["message"]);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("message")
 				}
 			});
@@ -37,7 +37,7 @@ namespace Lumen.Lang {
 
 				return self.GetField("message");
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}
@@ -51,7 +51,7 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				return this.MakeExceptionInstance(e["message"]);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("message")
 				}
 			});
@@ -61,7 +61,7 @@ namespace Lumen.Lang {
 
 				return self.GetField("message");
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}
@@ -75,13 +75,13 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				return this.MakeExceptionInstance();
 			}) {
-				Arguments = new List<IPattern>()
+				Parameters = new List<IPattern>()
 			});
 
 			this.SetMember("getMessage", new LambdaFun((e, args) => {
 				return new Text("required not empty collection");
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}
@@ -99,7 +99,7 @@ namespace Lumen.Lang {
 			this.SetMember("getMessage", new LambdaFun((e, args) => {
 				return new Text(Exceptions.ASSERT_IS_BROKEN);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}
@@ -113,7 +113,7 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				return this.MakeExceptionInstance(e["fromType"], e["targetType"]);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fromType"),
 					new NamePattern("targetType")
 				}
@@ -125,7 +125,7 @@ namespace Lumen.Lang {
 				return new Text(
 					Exceptions.CONVERT_ERROR.F(self.GetField("fromType"), self.GetField("targetType")));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}
@@ -139,7 +139,7 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				return this.MakeExceptionInstance(scope["name"], scope["message"]);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("name"),
 					new NamePattern("message")
 				}
@@ -150,7 +150,7 @@ namespace Lumen.Lang {
 
 				return new Text($"[{self.GetField("name")}] {self.GetField("message")}");
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}
@@ -165,7 +165,7 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				return this.MakeExceptionInstance(e["typeObject"], e["functionName"]);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("typeObject"),
 					new NamePattern("functionName")
 				}
@@ -176,7 +176,7 @@ namespace Lumen.Lang {
 
 				return new Text(Exceptions.FUNCTION_IS_NOT_IMPLEMENTED_FOR_TYPE.F(self.GetField("functionName"), self.GetField("typeObject")));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}
@@ -190,7 +190,7 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				return this.MakeExceptionInstance();
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 
 				}
 			});
@@ -198,7 +198,7 @@ namespace Lumen.Lang {
 			this.SetMember("getMessage", new LambdaFun((scope, args) => {
 				return new Text(Exceptions.INDEX_OUT_OF_RANGE);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 		}
 	}

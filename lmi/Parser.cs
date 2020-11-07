@@ -58,7 +58,7 @@ namespace Lumen.Lmi {
 
 					Expression from = this.Match(TokenType.FROM) ? this.Expression() : null;
 
-					Expression raise = new Raise(inraise, from, file, line);
+					Expression raise = new Raise(inraise, from, this.file, line);
 
 					if (this.Match(TokenType.WHEN)) {
 						return new Condition(this.Expression(), raise, UnitLiteral.Instance);
@@ -151,7 +151,7 @@ namespace Lumen.Lmi {
 			this.Match(TokenType.EOC);
 
 			if (name == "intern") {
-				Expression innerExpression = Expression();
+				Expression innerExpression = this.Expression();
 
 				return new InternWithBindingDeclaration(innerExpression);
 			}
@@ -161,7 +161,7 @@ namespace Lumen.Lmi {
 
 		private Expression ParseTry() {
 			this.Match(TokenType.COLON);
-			Expression tryBody = Expression();
+			Expression tryBody = this.Expression();
 			this.Match(TokenType.EOC);
 			Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
 			Expression finallyBody = null;
@@ -183,7 +183,7 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.ENSURE)) {
 				this.Match(TokenType.COLON);
 
-				finallyBody = Expression();
+				finallyBody = this.Expression();
 			}
 
 			return new ExceptionHandling(tryBody, patterns, finallyBody);
@@ -352,13 +352,13 @@ namespace Lumen.Lmi {
 
 		private Boolean IsValidRangeToken() {
 			return this.IsValidToken()
-				|| LookMatch(0, TokenType.MINUS)
-				|| LookMatch(0, TokenType.PLUS)
-				|| LookMatch(0, TokenType.STAR)
-				|| LookMatch(0, TokenType.NOT)
-				|| LookMatch(0, TokenType.TILDE)
-				|| LookMatch(0, TokenType.POWER)
-				|| LookMatch(0, TokenType.AMP);
+				|| this.LookMatch(0, TokenType.MINUS)
+				|| this.LookMatch(0, TokenType.PLUS)
+				|| this.LookMatch(0, TokenType.STAR)
+				|| this.LookMatch(0, TokenType.NOT)
+				|| this.LookMatch(0, TokenType.TILDE)
+				|| this.LookMatch(0, TokenType.POWER)
+				|| this.LookMatch(0, TokenType.AMP);
 		}
 
 		private IPattern ParsePattern() {
@@ -603,6 +603,22 @@ namespace Lumen.Lmi {
 			String name = pattern?.ToString() ?? this.Consume(this.GetToken(0).Type).Text;
 
 			List<IPattern> arguments = new List<IPattern>();
+
+			if (this.Match(TokenType.DOT_LESS)) {
+				while(!this.Match(TokenType.GREATER)) {
+					ContextPattern typeArgName = new ContextPattern(this.Consume(TokenType.WORD).Text);
+
+					if(this.Match(TokenType.IMPLEMENTS)) {
+						do {
+							typeArgName.AddImplements(Bitwise());
+						} while (this.Match(TokenType.SPLIT));
+					}
+
+					arguments.Add(typeArgName);
+					this.Match(TokenType.SPLIT);
+				}
+			}
+
 			while (!this.LookMatch(0, TokenType.EQUALS) && !this.LookMatch(0, TokenType.EOC) && !this.LookMatch(0, TokenType.BLOCK_END)) {
 				arguments.Add(this.ParsePattern());
 			}
@@ -980,8 +996,16 @@ namespace Lumen.Lmi {
 		private Expression Application() {
 			Expression result = this.Dot();
 
-			if (this.IsValidToken()) {
-				List<Expression> args = new List<Expression>();
+			List<Expression> typeParams = new List<Expression>();
+			if (this.Match(TokenType.DOT_LESS)) {
+				while (!this.Match(TokenType.GREATER)) {
+					typeParams.Add(this.Bitwise());
+					this.Match(TokenType.SPLIT);
+				}
+			}
+
+			if (this.IsValidToken() || typeParams.Count != 0) {
+				List<Expression> args = typeParams;
 
 				while (this.IsValidToken()) {
 					args.Add(this.Dot());
@@ -1109,7 +1133,7 @@ namespace Lumen.Lmi {
 					args.Add(this.Dot());
 				}
 
-				Expression res = new TailRecursion(args, this.file, this.line);
+				Expression res = new Tailrec(args, this.file, this.line);
 				return res;
 			}
 
@@ -1177,7 +1201,7 @@ namespace Lumen.Lmi {
 
 				if(this.LookMatch(0, TokenType.SPLIT) && result is RangeOperator rangeOperator) {
 					this.Match(TokenType.SPLIT);
-					rangeOperator.AddStep(Expression());
+					rangeOperator.AddStep(this.Expression());
 				}
 
 				this.Match(TokenType.PAREN_CLOSE);

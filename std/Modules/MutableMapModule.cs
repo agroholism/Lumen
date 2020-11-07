@@ -4,9 +4,9 @@ using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class MapModule : Module {
-		internal MapModule() {
-			this.Name = "Map";
+	internal class MutableMapModule : Module {
+		internal MutableMapModule() {
+			this.Name = "MutableMap";
 
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
 				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
@@ -25,7 +25,7 @@ namespace Lumen.Lang {
 
 				throw new LumenException("function Map.getIndex supports only one argument");
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("indices"),
 					new NamePattern("self")
 				}
@@ -40,7 +40,7 @@ namespace Lumen.Lang {
 
 				return Prelude.None;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("key"),
 					new NamePattern("self")
 				}
@@ -57,7 +57,7 @@ namespace Lumen.Lang {
 
 				throw new LumenException("function Map.setIndex supports only one argument");
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("indices"),
 					new NamePattern("value"),
 					new NamePattern("self"),
@@ -66,7 +66,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				Value value = e["initValue"];
-				Map result = new Map();
+				MutableMap result = new MutableMap();
 
 				if (value == Const.UNIT) {
 					return result;
@@ -79,25 +79,25 @@ namespace Lumen.Lang {
 
 				return result;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("initValue")
 				}
 			});
 
 			this.SetMember("getValues", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e.Get("m")).InternalValue;
-				return new Array(dict.Values.ToList());
+				IDictionary<Value, Value> dict = ((MutableMap)e.Get("m")).InternalValue;
+				return new MutableArray(dict.Values.ToList());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("m")
 				}
 			});
 
 			this.SetMember("getKeys", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((Map)e.Get("m")).InternalValue;
-				return new Array(dict.Keys.ToList());
+				IDictionary<Value, Value> dict = ((MutableMap)e.Get("m")).InternalValue;
+				return new MutableArray(dict.Keys.ToList());
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("m")
 				}
 			});
@@ -108,7 +108,7 @@ namespace Lumen.Lang {
 
 				return new Logical(self.ContainsKey(key));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("key"),
 					new NamePattern("self"),
 				}
@@ -126,7 +126,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("fromStream", new LambdaFun((e, args) => {
 				Value value = e["stream"];
-				Map result = new Map();
+				MutableMap result = new MutableMap();
 
 				foreach (Value i in value.ToStream(e)) {
 					LinkedList stream = i.ToLinkedList(e);
@@ -135,16 +135,16 @@ namespace Lumen.Lang {
 
 				return result;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("stream")
 				}
 			});
 
 			this.SetMember("toStream", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> self = ((Map)e["self"]).InternalValue;
+				IDictionary<Value, Value> self = ((MutableMap)e["self"]).InternalValue;
 				return new Stream(self.Select(Helper.CreatePair));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
@@ -154,6 +154,13 @@ namespace Lumen.Lang {
                 return new String("[" + String.Join(", ", dict) + "]");
             }));*/
 
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return new MutableMap();
+			}) {
+				Parameters = new List<IPattern> { }
+			});
+
+			this.AppendImplementation(Prelude.Default);
 			this.AppendImplementation(Prelude.Collection);
 		}
 
@@ -168,7 +175,7 @@ namespace Lumen.Lang {
 				this.SetMember("init", new LambdaFun((scope, args) => {
 					return Helper.CreatePair(scope["fst"], scope["snd"]);
 				}) {
-					Arguments = new List<IPattern> {
+					Parameters = new List<IPattern> {
 						new NamePattern("fst"),
 						new NamePattern("snd")
 					}

@@ -4,7 +4,7 @@ namespace Lumen.Lang {
 	public class SingletonConstructor : BaseValueImpl, IConstructor {
 		public String Name { get; set; }
 
-		public override IType Type => this.Parent;
+		public override IType Type => this.Parent; 
 
 		public Module Parent { get; set; }
 

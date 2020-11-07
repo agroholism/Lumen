@@ -38,12 +38,12 @@ namespace Lumen.Lang {
 			this.callStack.Add(new CallStackRecord(functionName, fileName, line));
 		}
 
-		public Boolean SetLastCallDataIfAbsent(String functionName, String fileName, Int32 line) {
+		public Boolean SetLastCallDataIfAbsent(String functionName = null, String fileName = null, Int32 lineNumber = -1) {
 			CallStackRecord lastCall =
 				this.callStack[this.callStack.Count - 1];
 
 			lastCall.FileName ??= fileName;
-			lastCall.LineNumber = lastCall.LineNumber == -1 ? line : lastCall.LineNumber;
+			lastCall.LineNumber = lastCall.LineNumber == -1 ? lineNumber : lastCall.LineNumber;
 
 			if (lastCall.FunctionName == null) {
 				lastCall.FunctionName = functionName;
@@ -69,10 +69,18 @@ namespace Lumen.Lang {
 
 				result
 				.Append(Environment.NewLine)
-				.Append($"\tat \"{call.FileName}\" on {call.LineNumber}");
+				.Append("\t");
+
+				if (call.FileName != null) {
+					result.Append($"at \"{call.FileName}\" ");
+				}
+
+				if (call.LineNumber >= 0) {
+					result.Append($"on {call.LineNumber} ");
+				}
 
 				if (call.FunctionName != null) {
-					result.Append($" in {call.FunctionName}");
+					result.Append($"in {call.FunctionName}");
 				}
 			}
 
@@ -147,7 +155,7 @@ namespace Lumen.Lang {
 			if (obj is Value value) {
 				if (this.Type.HasImplementation(Prelude.Ord)
 					&& this.Type.GetMember("compare", null).TryConvertToFunction(out Fun comparator)) {
-					return comparator.Run(new Scope(), this, value).ToInt(null);
+					return comparator.Call(new Scope(), this, value).ToInt(null);
 				}
 			}
 
@@ -157,7 +165,7 @@ namespace Lumen.Lang {
 		public virtual String ToString(String format, IFormatProvider formatProvider) {
 			if (this.Type.HasImplementation(Prelude.Format) &&
 				this.Type.GetMember("format", null).TryConvertToFunction(out Fun function)) {
-				function.Run(new Scope(), this, new Text(format ?? "")).ToString();
+				function.Call(new Scope(), this, new Text(format ?? "")).ToString();
 			}
 
 			return this.ToString();

@@ -18,7 +18,7 @@ namespace Lumen.Lang {
 
 				return new LumenIterator(stream.GetEnumerator(), scope);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("stream")
 				}
 			});
@@ -32,7 +32,7 @@ namespace Lumen.Lang {
 
 				return iter;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("iter")
 				}
 			});
@@ -46,7 +46,7 @@ namespace Lumen.Lang {
 
 				return iter;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("iter"),
 					new NamePattern("_")
 				}
@@ -61,7 +61,7 @@ namespace Lumen.Lang {
 
 				return x;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("iter"),
 					new NamePattern("value")
 				}
@@ -76,7 +76,7 @@ namespace Lumen.Lang {
 
 				return x;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("iter"),
 					new NamePattern("value")
 				}
@@ -85,7 +85,7 @@ namespace Lumen.Lang {
 			this.SetMember("toStream", new LambdaFun((e, args) => {
 				return new Stream(e["this"].ToList(e));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("this")
 				}
 			});
@@ -101,7 +101,7 @@ namespace Lumen.Lang {
 
 				return new LumenIterator(stream.GetEnumerator(), scope);
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});

@@ -22,7 +22,7 @@ namespace Lumen.Lmi {
             Value assignableValue = this.assignableExpression.Eval(scope);
 
 			MatchResult matchResult = this.pattern.Match(assignableValue, scope);
-			if (!matchResult.Success) {
+			if (!matchResult.IsSuccess) {
 				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: this.lineName, fileName: this.fileName) {
 					Note = matchResult.Note
 				};
@@ -37,7 +37,7 @@ namespace Lumen.Lmi {
 
 			Value assignableValue = Const.UNIT;
 			foreach (Value result in assignableExpressionEvaluationResults) {
-				if (result is GeneratorTerminalResult cgv) {
+				if (result is GeneratorExpressionTerminalResult cgv) {
 					assignableValue = cgv.Value;
 					break;
 				}
@@ -46,13 +46,13 @@ namespace Lumen.Lmi {
 			}
 
 			MatchResult matchResult = this.pattern.Match(assignableValue, scope);
-			if (!matchResult.Success) {
+			if (!matchResult.IsSuccess) {
 				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: this.lineName, fileName: this.fileName) {
 					Note = matchResult.Note
 				};
 			}
 
-			yield return new GeneratorTerminalResult(assignableValue);
+			yield return new GeneratorExpressionTerminalResult(assignableValue);
 		}
 
 		public Expression Closure(ClosureManager manager) {

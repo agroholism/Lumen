@@ -20,69 +20,69 @@ namespace Lumen.Lmi {
 			Value rightValue = (this.right as ValuePattern)?.value;
 
 			if (leftValue == null && rightValue == null) {
-				return MatchResult.True;
+				return MatchResult.Success;
 			}
 
 			if (leftValue == null) {
 				Fun _comparator = rightValue.Type.GetMember("compare", scope).ToFunction(scope);
 
 				try {
-					Double rightResult = _comparator.Run(scope, value, rightValue).ToDouble(scope);
+					Double rightResult = _comparator.Call(scope, value, rightValue).ToDouble(scope);
 
 					Boolean result = this.isInclusive ? rightResult <= 0 : rightResult < 0;
 
 					if (result) {
-						return MatchResult.True;
+						return MatchResult.Success;
 					}
 				}
 				catch {
 
 				}
 
-				return new MatchResult {
-					Success = false,
-					Note = $"expect value in range {leftValue}{(this.isInclusive ? "..." : "..")}{rightValue}"
-				};
+				return new MatchResult (
+					MatchResultKind.Fail,
+					$"expect value in range {leftValue}{(this.isInclusive ? "..." : "..")}{rightValue}"
+				);
 			}
 
 			Fun comparator = leftValue.Type.GetMember("compare", scope).ToFunction(scope);
 
 			if (rightValue == null) {
 				try {
-					Boolean result = comparator.Run(new Scope(scope), leftValue, value).ToDouble(scope) <= 0;
+					Boolean result = comparator.Call(new Scope(scope), leftValue, value).ToDouble(scope) <= 0;
 
 					if (result) {
-						return MatchResult.True;
+						return MatchResult.Success;
 					}
 				}
 				catch {
 
 				}
 
-				return new MatchResult {
-					Success = false,
-					Note = $"expect value in range {leftValue}{(this.isInclusive ? "..." : "..")}{rightValue}"
-				};
+				return new MatchResult(
+					MatchResultKind.Fail,
+					$"expect value in range {leftValue}{(this.isInclusive ? "..." : "..")}{rightValue}"
+				);
 			}
 
 			try {
-				Double leftResult = comparator.Run(new Scope(scope), leftValue, value).ToDouble(scope);
-				Double rightResult = comparator.Run(scope, value, rightValue).ToDouble(scope);
+				Double leftResult = comparator.Call(new Scope(scope), leftValue, value).ToDouble(scope);
+				Double rightResult = comparator.Call(scope, value, rightValue).ToDouble(scope);
 
 				Boolean result = leftResult <= 0 && (this.isInclusive ? rightResult <= 0 : rightResult < 0);
 
 				if (result) {
-					return MatchResult.True;
+					return MatchResult.Success;
 				}
 			}
 			catch {
 
 			}
 
-			return new MatchResult {
-				Success = false,
-				Note = $"expect value in range {leftValue}{(this.isInclusive ? "..." : "..")}{rightValue}"
-			};
+			return new MatchResult (
+				MatchResultKind.Fail,
+				$"expect value in range {leftValue}{(this.isInclusive ? "..." : "..")}{rightValue}"
+			);
 		}
 
 

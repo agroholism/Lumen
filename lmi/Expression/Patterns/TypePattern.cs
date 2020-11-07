@@ -58,6 +58,11 @@ namespace Lumen.Lmi {
 
 				Value requiredType = requirement.Eval(scope);
 
+				if(requiredType is GenericLater) {
+					scope[(requirement as IdExpression).id] = value.Type;
+					continue;
+				}
+
 				if (requiredType is Constructor ctor) {
 					requiredType = this.GetModule(ctor);
 				}
@@ -66,14 +71,21 @@ namespace Lumen.Lmi {
 					continue;
 				}
 
-				if (requiredType is Module typeClass && this.GetModule(value.Type).HasImplementation(typeClass)) {
-					continue;
-				}
+				if (requiredType is Module typeClass) {
+					if (!this.GetModule(value.Type).HasImplementation(typeClass)) {
+						return new MatchResult(
+							MatchResultKind.Fail,
+							$"value of type {value.Type} should implement class {requiredType}"
+						);
+					}
 
-				return new MatchResult {
-					Success = false,
-					Note = $"wait value of type {requiredType} given {value.Type}"
-				};
+					continue;
+				} 
+
+				return new MatchResult(
+					MatchResultKind.Fail,
+					$"wait value of type {requiredType} given {value.Type}"
+				);
 			}
 
 			return this.subpattern.Match(value, scope);

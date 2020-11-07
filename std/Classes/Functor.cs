@@ -18,7 +18,7 @@ namespace Lumen.Lang {
 				return Const.UNIT;
 			}) {
 				Name = "fmap",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
 					new NamePattern("fc")
 				}
@@ -26,10 +26,10 @@ namespace Lumen.Lang {
 
 			this.SetMember(">>-", new LambdaFun((scope, args) => {
 				Value fc = scope["fc"];
-				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Run(scope, scope["fn"], fc);
+				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Call(scope, scope["fn"], fc);
 			}) {
 				Name = ">>-",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fc"),
 					new NamePattern("fn")
 				}
@@ -37,10 +37,10 @@ namespace Lumen.Lang {
 
 			this.SetMember("-<<", new LambdaFun((scope, args) => {
 				Value fc = scope["fc"];
-				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Run(scope, scope["fn"], fc);
+				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Call(scope, scope["fn"], fc);
 			}) {
 				Name = "-<<",
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
 					new NamePattern("fc")
 				}

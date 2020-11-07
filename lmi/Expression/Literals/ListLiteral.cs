@@ -36,7 +36,7 @@ namespace Lumen.Lmi {
 
 			foreach (Expression i in this.elements) {
 				foreach (Value j in i.EvalWithYield(scope)) {
-					if (j is GeneratorTerminalResult cgv) {
+					if (j is GeneratorExpressionTerminalResult cgv) {
 						result.Add(cgv.Value);
 					}
 					else {
@@ -45,7 +45,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			yield return new GeneratorTerminalResult(new List(result));
+			yield return new GeneratorExpressionTerminalResult(new List(result));
 		}
 
 		public override System.String ToString() {

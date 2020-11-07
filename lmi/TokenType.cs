@@ -98,6 +98,7 @@
 		WHEN,
 		REDO,
 		RETRY,
-		ANNOTATION
+		ANNOTATION,
+		DOT_LESS
 	}
 }

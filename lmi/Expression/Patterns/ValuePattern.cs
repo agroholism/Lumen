@@ -30,7 +30,7 @@ namespace Lumen.Lmi {
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
-			return new MatchResult { Success = this.value.Equals(value) };
+			return new MatchResult(this.value.Equals(value));
         }
 
         public override String ToString() {

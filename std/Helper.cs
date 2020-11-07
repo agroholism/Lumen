@@ -24,15 +24,15 @@ namespace Lumen.Lang {
 		}
 
 		public static Value CallMethod(this Value self, String name, Scope scope) {
-			return self.Type.GetMember(name, scope).ToFunction(scope).Run(new Scope(scope), self);
+			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), self);
 		}
 
 		public static Value CallMethod(this Value self, String name, Scope scope, Value arg) {
-			return self.Type.GetMember(name, scope).ToFunction(scope).Run(new Scope(scope), self, arg);
+			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), self, arg);
 		}
 
 		public static Value CallMethodFlip(this Value self, String name, Scope scope, Value arg) {
-			return self.Type.GetMember(name, scope).ToFunction(scope).Run(new Scope(scope), arg, self);
+			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), arg, self);
 		}
 
 		public static IConstructor CreateConstructor(String name, Module baseType, List<String> fields) {
@@ -76,7 +76,7 @@ namespace Lumen.Lang {
 		}
 
 		public static Instance CreatePair(Value key, Value value) {
-			Instance result = new Instance(MapModule.PairModule.ctor as Constructor);
+			Instance result = new Instance(MutableMapModule.PairModule.ctor as Constructor);
 
 			result.Items[0] = key;
 			result.Items[1] = value;
@@ -93,22 +93,22 @@ namespace Lumen.Lang {
 				return new List(LinkedList.Create(values));
 			}
 
-			if (type == Prelude.Array) {
-				return new Array(values.ToList());
+			if (type == Prelude.MutableArray) {
+				return new MutableArray(values.ToList());
 			}
 
 			if (type == Prelude.Stream) {
 				return new Stream(values);
 			}
 
-			return (type.GetMember("fromStream", scope) as Fun).Run(new Scope(scope), new Stream(values));
+			return (type.GetMember("fromStream", scope) as Fun).Call(new Scope(scope), new Stream(values));
 		}
 
 		public static Value MakePartial(Fun function, Value[] vals) {
 			return new PartialFun {
 				InnerFunction = function,
 				Args = vals,
-				restArgs = function.Arguments.Count - vals.Length
+				restArgs = function.Parameters.Count - vals.Length
 			};
 		}
 

@@ -116,7 +116,7 @@ namespace Lumen.Lang {
 	
 				return new NumberRange(selfDouble, otherDouble, true);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// self..other
@@ -129,7 +129,7 @@ namespace Lumen.Lang {
 
 				return new NumberRange(selfDouble, otherDouble, false);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// self + other
@@ -143,7 +143,7 @@ namespace Lumen.Lang {
 
 				return new Number(scope["self"].ToDouble(scope) + other.ToDouble(scope));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// self - other
@@ -157,7 +157,7 @@ namespace Lumen.Lang {
 
 				return new Number(scope["self"].ToDouble(scope) - other.ToDouble(scope));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// self / other
@@ -167,7 +167,7 @@ namespace Lumen.Lang {
 
 				return new Number(scope["self"].ToDouble(scope) / other.ToDouble(scope));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// self * other
@@ -177,7 +177,7 @@ namespace Lumen.Lang {
 
 				return new Number(scope["self"].ToDouble(scope) * other.ToDouble(scope));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// self ^ other
@@ -187,7 +187,7 @@ namespace Lumen.Lang {
 
 				return new Number(Math.Pow(scope["self"].ToDouble(scope), other.ToDouble(scope)));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember(Constants.MOD, new LambdaFun((scope, args) => {
@@ -195,7 +195,7 @@ namespace Lumen.Lang {
 
 				return new Number(scope["self"].ToDouble(scope) % other.ToDouble(scope));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			#endregion
@@ -205,7 +205,7 @@ namespace Lumen.Lang {
 			this.SetMember("compare", new LambdaFun((scope, args) => {
 				return new Number(scope["x"].CompareTo(scope["y"]));
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y")
 				}
@@ -217,7 +217,7 @@ namespace Lumen.Lang {
 
 				return (Number)Math.Truncate(scope["self"].ToDouble(scope) / other.ToDouble(scope));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// Number -> Number -> Number
@@ -226,7 +226,7 @@ namespace Lumen.Lang {
 
 				return new Number(scope["self"].ToDouble(scope) % other.ToDouble(scope));
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			// Number -> Number -> Number
@@ -238,7 +238,7 @@ namespace Lumen.Lang {
 
 				return new Number((numOne % numTwo + numTwo) % numTwo);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("binaryNot", new LambdaFun((scope, args) => {
@@ -246,7 +246,7 @@ namespace Lumen.Lang {
 
 				return new Number(~value);
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("binaryAnd", new LambdaFun((scope, args) => {
@@ -257,7 +257,7 @@ namespace Lumen.Lang {
 
 				return new Number(numOne & numTwo);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 			this.SetMember("binaryOr", new LambdaFun((scope, args) => {
 				Value other = scope["other"];
@@ -267,7 +267,7 @@ namespace Lumen.Lang {
 
 				return new Number(numOne | numTwo);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("binaryXor", new LambdaFun((scope, args) => {
@@ -278,7 +278,7 @@ namespace Lumen.Lang {
 
 				return new Number(numOne ^ numTwo);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("binaryLsh", new LambdaFun((scope, args) => {
@@ -289,7 +289,7 @@ namespace Lumen.Lang {
 
 				return new Number(numOne << numTwo);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("binaryRsh", new LambdaFun((scope, args) => {
@@ -300,7 +300,7 @@ namespace Lumen.Lang {
 
 				return new Number(numOne >> numTwo);
 			}) {
-				Arguments = Const.SelfOther
+				Parameters = Const.SelfOther
 			});
 
 			this.SetMember("times", new LambdaFun((scope, args) => {
@@ -308,14 +308,14 @@ namespace Lumen.Lang {
 				Fun action = scope["action"] as Fun;
 
 				for (Double x = 0; x < n; x += 1) {
-					action.Run(new Scope(scope) {
+					action.Call(new Scope(scope) {
 						["self"] = action
 					}, new Number(x));
 				}
 
 				return Const.UNIT;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					Const.Self[0],
 					new NamePattern("action")
 				}
@@ -333,7 +333,7 @@ namespace Lumen.Lang {
 					_ => new Number(Math.Round(num)),
 				};
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					Const.Self[0],
 					new NamePattern("to")
 				}
@@ -341,80 +341,80 @@ namespace Lumen.Lang {
 			this.SetMember("abs", new LambdaFun((scope, args) => {
 				return new Number(Math.Abs(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("sqrt", new LambdaFun((scope, args) => {
 				return new Number(Math.Sqrt(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("acos", new LambdaFun((scope, args) => {
 				return new Number(Math.Acos(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("asin", new LambdaFun((scope, args) => {
 				return new Number(Math.Asin(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("atan", new LambdaFun((scope, args) => {
 				return new Number(Math.Atan(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("cos", new LambdaFun((scope, args) => {
 				return new Number(Math.Cos(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("cosh", new LambdaFun((scope, args) => {
 				return new Number(Math.Cosh(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("exp", new LambdaFun((scope, args) => {
 				return new Number(Math.Exp(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("log", new LambdaFun((scope, args) => {
 				return new Number(Math.Log(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("log10", new LambdaFun((scope, args) => {
 				return new Number(Math.Log10(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("sin", new LambdaFun((scope, args) => {
 				return new Number(Math.Sin(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 			this.SetMember("sinh", new LambdaFun((scope, args) => {
 				return new Number(Math.Sinh(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("tan", new LambdaFun((scope, args) => {
 				return new Number(Math.Tan(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("tanh", new LambdaFun((scope, args) => {
 				return new Number(Math.Tanh(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			this.SetMember("isnan", new LambdaFun((scope, args) => {
 				return new Logical(Double.IsNaN(scope["self"].ToDouble(scope)));
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			/*this.SetMember("withBase", new LambdaFun((scope, args) => {
@@ -442,7 +442,7 @@ namespace Lumen.Lang {
 
 				return Prelude.None;
 			}) {
-				Arguments = new List<IPattern> {
+				Parameters = new List<IPattern> {
 					Const.Self[0]
 				}
 			});
@@ -453,7 +453,7 @@ namespace Lumen.Lang {
 				Value num = scope["self"];
 				return new Text(num.ToString());
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
 			});
 
 			#endregion
@@ -461,11 +461,18 @@ namespace Lumen.Lang {
 			this.SetMember("clone", new LambdaFun((scope, args) => {
 				return scope["self"];
 			}) {
-				Arguments = Const.Self
+				Parameters = Const.Self
+			});
+
+			this.SetMember("default", new LambdaFun((scope, args) => {
+				return new Number(0);
+			}) {
+				Parameters = new List<IPattern> { }
 			});
 
 			this.AppendImplementation(Prelude.Ord);
-			this.AppendImplementation(Prelude.Cloneable);
+			this.AppendImplementation(Prelude.Clone);
+			this.AppendImplementation(Prelude.Default);
 			this.NameIt();
 		}
 

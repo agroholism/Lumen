@@ -25,7 +25,7 @@ namespace Lumen.Lmi {
 
 			if (this.bindingDeclaration is BindingDeclaration bindingDeclaration) {
 				MatchResult matchResult = bindingDeclaration.pattern.Match(this.evaluationResult, scope);
-				if (!matchResult.Success) {
+				if (!matchResult.IsSuccess) {
 					throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: bindingDeclaration.lineName, fileName: bindingDeclaration.fileName) {
 						Note = matchResult.Note
 					};
@@ -39,7 +39,7 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			yield return new GeneratorTerminalResult(this.Eval(scope));
+			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 	}
 }

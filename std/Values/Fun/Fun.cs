@@ -15,9 +15,9 @@ namespace Lumen.Lang {
 		String Name { get; set; }
 
 		/// <summary> Arguments of function </summary>
-		List<IPattern> Arguments { get; set; }
+		List<IPattern> Parameters { get; set; }
 
 		/// <summary> This method runs a function </summary>
-		Value Run(Scope e, params Value[] args);
+		Value Call(Scope e, params Value[] args);
 	}
 }

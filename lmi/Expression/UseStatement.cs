@@ -25,10 +25,10 @@ namespace Lumen.Lmi {
 			Fun onEnter = context.Type.GetMember("onEnter", scope).ToFunction(scope);
 			Fun onExit = context.Type.GetMember("onExit", scope).ToFunction(scope);
 
-			Value value = onEnter.Run(new Scope(scope), context);
+			Value value = onEnter.Call(new Scope(scope), context);
 
 			MatchResult matchResult = this.pattern.Match(value, scope);
-			if (!matchResult.Success) {
+			if (!matchResult.IsSuccess) {
 				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line, file) {
 					Note = matchResult.Note
 				};
@@ -54,7 +54,7 @@ namespace Lumen.Lmi {
 					raisedException
 				};
 
-				useEvaluationResult = onExit.Run(new Scope(scope), context, new List(arguments));
+				useEvaluationResult = onExit.Call(new Scope(scope), context, new List(arguments));
 			}
 
 			return useEvaluationResult;
@@ -65,10 +65,10 @@ namespace Lumen.Lmi {
 			Fun onEnter = context.Type.GetMember("onEnter", scope).ToFunction(scope);
 			Fun onExit = context.Type.GetMember("onExit", scope).ToFunction(scope);
 
-			Value value = onEnter.Run(new Scope(scope), context);
+			Value value = onEnter.Call(new Scope(scope), context);
 
 			MatchResult matchResult = this.pattern.Match(value, scope);
-			if (!matchResult.Success) {
+			if (!matchResult.IsSuccess) {
 				throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line, file) {
 					Note = matchResult.Note
 				};
@@ -79,7 +79,7 @@ namespace Lumen.Lmi {
 				yield return i;
 			}
 
-			onExit.Run(new Scope(scope), context, value);
+			onExit.Call(new Scope(scope), context, value);
 		}
 
 		public Expression Closure(ClosureManager manager) {

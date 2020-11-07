@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
@@ -22,92 +21,48 @@ namespace Lumen.Lmi {
 		public Value Eval(Scope scope) {
 			Value callableValue = this.callableExpression.Eval(scope);
 
-			if (callableValue is SingletonConstructor) {
-				return callableValue;
+			if (!callableValue.TryConvertToFunction(out Fun function)) {
+				LumenException invalidOperation =
+					Helper.InvalidOperation($"can not call value of type {callableValue.Type}");
+				invalidOperation.SetLastCallDataIfAbsent(fileName: this.fileName, lineNumber: this.lineNumber);
+				throw invalidOperation;
 			}
 
-			try {
-				return this.CallFunction(callableValue.ToFunction(scope), scope);
-			}
-			catch (LumenException lex) {
-				String currentFunctionName = null;
-
-				if (scope.ExistsInThisScope("rec") && scope["rec"].TryConvertToFunction(out Fun currentFunction)) {
-					currentFunctionName = currentFunction.Name;
-				}
-
-				lex.SetLastCallDataIfAbsent(currentFunctionName, this.fileName, this.lineNumber);
-
-				throw;
-			}
-		}
-
-		private Value CallFunction(Fun function, Scope scope) {
+			// Partial application
 			if (this.argumentsExpression.Any(i => i is IdExpression id && id.id == "_")) {
-				return this.MakePartial(function, scope);
+				return this.MakePartialFunction(function, scope);
 			}
 
-			Scope innerScope = new Scope(scope) {
-				["rec"] = function
-			};
+			Value[] parameters = this.argumentsExpression.Select(i => i.Eval(scope)).ToArray();
 
-			Value result;
-			Value[] arguments = this.argumentsExpression.Select(i => i.Eval(scope)).ToArray();
-
-TAIL_REC:
+tail_recursion_entry:
 			try {
-				result = function.Run(innerScope, arguments);
-			}
-			catch (LumenException lex) {
-				lex.AddToCallStack(null, this.fileName, this.lineNumber);
-				throw;
-			}
+				Value functionCallResult = 
+					function.Call(new Scope(scope) { ["rec"] = function }, parameters);
 
-			if (result is TailRecursion.Tailrec tr) {
-				arguments = tr.newArguments;
-				goto TAIL_REC;
-			}
-
-			return result;
-		}
-
-		private Value ProcessCall(Scope scope, Fun function, Value[] args) {
-			try {
-				return function.Run(scope, args);
-			}
-			catch (LumenException lex) {
-				lex.AddToCallStack(null, this.fileName, this.lineNumber);
-				throw;
-			}
-		}
-
-		private Value MakePartial(Fun function, Scope parent) {
-			List<IPattern> arguments = new List<IPattern>();
-
-			List<Expression> expressions = new List<Expression>();
-			Int32 x = 0;
-			foreach (Expression exp in this.argumentsExpression) {
-				if (!(exp is IdExpression ide) || ide.id != "_") {
-					expressions.Add(new ValueLiteral(exp.Eval(parent)));
-					continue;
+				// Returning TailRecursion means tailrec call
+				if (functionCallResult is TailRecursion tailRecursion) {
+					parameters = tailRecursion.newArguments;
+					goto tail_recursion_entry;
 				}
 
-				String parameterName = $"<apply-part-arg-{x}>";
-				arguments.Add(new NamePattern(parameterName));
-				expressions.Add(new IdExpression(parameterName, ide.file, ide.line));
-				x++;
+				return functionCallResult;
 			}
-
-			return new UserFun(arguments, new Applicate(new ValueLiteral(function), expressions, this.lineNumber, this.fileName)) {
-				Name = $"<apply-part-from-{function.Name ?? "<anonym-func>"}>"
-			};
+			catch (LumenException lumenException) {
+				// This exception handling only needed to add information to call stack.
+				lumenException.SetLastCallDataIfAbsent(function.Name, null, -1);
+				lumenException.AddToCallStack(null, this.fileName, this.lineNumber);
+				throw;
+			}
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			Value callableValue = Const.UNIT;
+
 			foreach (Value result in this.callableExpression.EvalWithYield(scope)) {
-				if (result is GeneratorTerminalResult cgv) {
-					callableValue = cgv.Value;
+				if (result is GeneratorExpressionTerminalResult generatorExpressionTerminalResult) {
+					callableValue = generatorExpressionTerminalResult.Value;
+					break;
 				}
 				else {
 					yield return result;
@@ -115,56 +70,90 @@ TAIL_REC:
 			}
 
 			if (callableValue is SingletonConstructor) {
-				yield return new GeneratorTerminalResult(callableValue);
+				yield return new GeneratorExpressionTerminalResult(callableValue);
 				yield break;
 			}
 
-			IEnumerable<Value> results;
+			IEnumerable<Value> functionCallResults;
 
 			try {
-				results = this.CallFunctionWithYield(callableValue.ToFunction(scope), scope);
+				functionCallResults = this.CallFunctionInGenerator(callableValue.ToFunction(scope), scope);
 			}
-			catch (LumenException lex) {
+			catch (LumenException lumenException) {
 				String currentFunctionName = null;
 
-				if (scope.ExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
+				if (scope.TryGetFromThisScope("rec", out Value rec) && rec.TryConvertToFunction(out Fun currentFunction)) {
 					currentFunctionName = currentFunction.Name;
 				}
 
-				lex.AddToCallStack(currentFunctionName, this.fileName, this.lineNumber);
+				lumenException.SetLastCallDataIfAbsent(currentFunctionName, this.fileName, this.lineNumber);
 
 				throw;
 			}
 
-			foreach (Value result in results) {
+			foreach (Value result in functionCallResults) {
 				yield return result;
 			}
 		}
 
-		private IEnumerable<Value> CallFunctionWithYield(Fun function, Scope e) {
+		private IEnumerable<Value> CallFunctionInGenerator(Fun function, Scope scope) {
+			// Partial application
 			if (this.argumentsExpression.Any(i => i is IdExpression id && id.id == "_")) {
-				yield return new GeneratorTerminalResult(this.MakePartial(function, e));
+				yield return new GeneratorExpressionTerminalResult(this.MakePartialFunction(function, scope));
 			}
 
-			Scope innerScope = new Scope(e);
+			Scope functionScope = new Scope(scope) {
+				["rec"] = function
+			};
 
-			List<Value> args = new List<Value>();
-			foreach (Expression i in this.argumentsExpression) {
-				foreach (Value j in i.EvalWithYield(e)) {
-					switch (j) {
-						case GeneratorTerminalResult cgv:
-							args.Add(cgv.Value);
-							break;
-						default:
-							yield return j;
-							break;
+			List<Value> arguments = new List<Value>();
+			foreach (Expression argumentExpression in this.argumentsExpression) {
+				foreach (Value argumentEvaluationResult in argumentExpression.EvalWithYield(scope)) {
+					if (argumentEvaluationResult is GeneratorExpressionTerminalResult terminalResult) {
+						arguments.Add(terminalResult.Value);
+						break;
+					}
+					else {
+						yield return argumentEvaluationResult;
 					}
 				}
 			}
 
-			innerScope["rec"] = function;
+			Value[] argumentsArray = arguments.ToArray();
 
-			yield return new GeneratorTerminalResult(this.ProcessCall(innerScope, function, args.ToArray()));
+			Value functionCallResult = null;
+
+			try {
+				functionCallResult = function.Call(functionScope, argumentsArray);
+			}
+			catch (LumenException lex) {
+				lex.AddToCallStack(null, this.fileName, this.lineNumber);
+				throw;
+			}
+
+			yield return new GeneratorExpressionTerminalResult(functionCallResult);
+		}
+
+		private Value MakePartialFunction(Fun targetFunction, Scope parent) {
+			List<IPattern> arguments = new List<IPattern>();
+
+			List<Expression> newParameters = new List<Expression>();
+			Int32 x = 0;
+			foreach (Expression exp in this.argumentsExpression) {
+				if (!(exp is IdExpression ide) || ide.id != "_") {
+					newParameters.Add(new ValueLiteral(exp.Eval(parent)));
+					continue;
+				}
+
+				String parameterName = $"<apply-part-arg-{x}>";
+				arguments.Add(new NamePattern(parameterName));
+				newParameters.Add(new IdExpression(parameterName, ide.file, ide.line));
+				x++;
+			}
+
+			return new UserFun(arguments, new Applicate(new ValueLiteral(targetFunction), newParameters, this.lineNumber, this.fileName)) {
+				Name = $"<apply-part-from-{targetFunction.Name ?? "<anonym-func>"}>"
+			};
 		}
 
 		public Expression Closure(ClosureManager manager) {

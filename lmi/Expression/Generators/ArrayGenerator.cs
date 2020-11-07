@@ -15,7 +15,7 @@ namespace Lumen.Lmi {
 		}
 
 		public Value Eval(Scope e) {
-			return new Array(this.sequenceGenerator.Generator(e));
+			return new MutableArray(this.sequenceGenerator.Generator(e));
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

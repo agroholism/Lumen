@@ -134,11 +134,11 @@ namespace Lumen.Studio {
 			String RestoreFunctionHeader(String name, Lang.Fun fun) {
 				String header = "\0let \0" + name;
 
-				if (fun.Arguments.Count == 0) {
+				if (fun.Parameters.Count == 0) {
 					header += "()";
 				}
 				else {
-					foreach (var i in fun.Arguments) {
+					foreach (var i in fun.Parameters) {
 						header += " " + i.ToString();
 					}
 				}
@@ -151,7 +151,7 @@ namespace Lumen.Studio {
 			String RestoreConstructorHeader(String name, Lang.Constructor fun) {
 				String header = name;
 
-				foreach (var i in fun.Arguments) {
+				foreach (var i in fun.Parameters) {
 					header += " " + i.ToString();
 				}
 

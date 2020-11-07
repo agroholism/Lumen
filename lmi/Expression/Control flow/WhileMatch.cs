@@ -20,7 +20,7 @@ namespace Lumen.Lmi {
 		public Value Eval(Scope scope) {
 			Value value = this.assinableExpression.Eval(scope);
 
-			while (this.pattern.Match(value, scope).Success) {
+			while (this.pattern.Match(value, scope).IsSuccess) {
 				REDO:
 				try {
 					this.body.Eval(scope);
@@ -51,7 +51,7 @@ namespace Lumen.Lmi {
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			Value value = this.assinableExpression.Eval(scope);
 	
-			while (this.pattern.Match(value, scope).Success) {
+			while (this.pattern.Match(value, scope).IsSuccess) {
 				IEnumerable<Value> yieldedValues;
 REDO:
 				try {
@@ -78,7 +78,7 @@ REDO:
 
 				if (yieldedValues != null) {
 					foreach (Value yieldedValue in yieldedValues) {
-						if (yieldedValue is GeneratorTerminalResult) {
+						if (yieldedValue is GeneratorExpressionTerminalResult) {
 							continue;
 						}
 
