@@ -5,10 +5,10 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class ConditionMatch : Expression {
-		private IPattern pattern;
-		private Expression assinableExpression;
-		private Expression trueExpression;
-		private Expression falseExpression;
+		private readonly IPattern pattern;
+		private readonly Expression assinableExpression;
+		private readonly Expression trueExpression;
+		private readonly Expression falseExpression;
 
 		public ConditionMatch(IPattern pattern, Expression assinableExpression, Expression trueBody, Expression falseBody) {
 			this.pattern = pattern;
@@ -18,12 +18,21 @@ namespace Lumen.Lmi {
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			return new ConditionMatch(
-				this.pattern.Closure(manager) as IPattern,
-				this.assinableExpression.Closure(manager),
-				this.trueExpression.Closure(manager),
-				this.falseExpression.Closure(manager)
-				);
+			// Right expression - first
+			Expression closuredAssignableExpression = this.assinableExpression?.Closure(manager);
+			IPattern closuredPattern = this.pattern.Closure(manager) as IPattern;
+
+			// Because trueExpression and falseExpression can influence on each other without isolated managers
+			ClosureManager trueExpressionManager = manager.Clone();
+			Expression closuredTrueExpression = this.trueExpression.Closure(trueExpressionManager);
+
+			// But there are we use old manager so we can aviod additional manager
+			Expression closuredFalseExpression = this.falseExpression.Closure(manager);
+
+			ConditionMatch result = new ConditionMatch(closuredPattern, closuredAssignableExpression, closuredTrueExpression, closuredFalseExpression);
+			// And just move results in base manager
+			manager.Assimilate(trueExpressionManager);
+			return result;
 		}
 
 		public Value Eval(Scope scope) {

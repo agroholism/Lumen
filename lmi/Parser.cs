@@ -798,12 +798,12 @@ namespace Lumen.Lmi {
 				}
 
 				if (this.Match(TokenType.FORWARD_PIPE)) {
-					expr = new Applicate(this.Range(), new List<Expression> { expr }, this.line, this.file);
+					expr = new Applicate(this.Range(), new List<Expression> { expr }, this.file, this.line);
 					continue;
 				}
 
 				if (this.Match(TokenType.BACKWARD_PIPE)) {
-					expr = new Applicate(expr, new List<Expression> { this.Range() }, this.line, this.file);
+					expr = new Applicate(expr, new List<Expression> { this.Range() }, this.file, this.line);
 					continue;
 				}
 
@@ -1011,7 +1011,7 @@ namespace Lumen.Lmi {
 					args.Add(this.Dot());
 				}
 
-				result = new Applicate(result, args, this.line, this.file);
+				result = new Applicate(result, args, this.file, this.line);
 				// this.Match(TokenType.EOC);
 			}
 
@@ -1184,6 +1184,21 @@ namespace Lumen.Lmi {
 				}
 
 				List<IPattern> patterns = new List<IPattern>();
+
+				if (this.Match(TokenType.DOT_LESS)) {
+					while (!this.Match(TokenType.GREATER)) {
+						ContextPattern typeArgName = new ContextPattern(this.Consume(TokenType.WORD).Text);
+
+						if (this.Match(TokenType.IMPLEMENTS)) {
+							do {
+								typeArgName.AddImplements(Bitwise());
+							} while (this.Match(TokenType.SPLIT));
+						}
+
+						patterns.Add(typeArgName);
+						this.Match(TokenType.SPLIT);
+					}
+				}
 
 				while (!this.Match(TokenType.LAMBDA)) {
 					patterns.Add(this.ParsePattern());

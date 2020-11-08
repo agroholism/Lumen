@@ -54,11 +54,11 @@
     <Compile Include="Expression\Declarations\ClassDeclaration.cs" />
     <Compile Include="Expression\Declarations\ExceptionDeclaration.cs" />
     <Compile Include="Expression\Control flow\ExceptionHandling.cs" />
-    <Compile Include="Expression\Application\Applicate.cs" />
+    <Compile Include="Expression\Applicate.cs" />
     <Compile Include="Expression\BlockE.cs" />
     <Compile Include="Expression\Declarations\FunctionDeclaration.cs" />
     <Compile Include="Expression\Declarations\ModuleDeclaration.cs" />
-    <Compile Include="Expression\Declarations\TypeDeclaration.cs" />
+    <Compile Include="Expression\Declarations\VariantDeclaration.cs" />
     <Compile Include="Expression\Declarations\BindingDeclaration.cs" />
     <Compile Include="Expression\Generators\YieldFrom.cs" />
     <Compile Include="Expression\Operators\DotExpression.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="Expression\Generators\ListGenerator.cs" />
     <Compile Include="Expression\Patterns\NotPattern.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="Expression\Application\Tailrec.cs" />
+    <Compile Include="Expression\Control flow\Tailrec.cs" />
     <Compile Include="Expression\Control flow\Raise.cs" />
     <Compile Include="Expression\Patterns\RangePattern.cs" />
     <Compile Include="RangeOperator.cs" />

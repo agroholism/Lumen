@@ -57,7 +57,7 @@ namespace Lumen.Lmi {
 
 			IType type = rightOperand is SingletonConstructor sc ? sc : rightOperand.Type;
 
-			return new Applicate(new DotOperator(new ValueLiteral(type), "::", this.fileName, this.lineNumber), new List<Expression> { new ValueLiteral(leftOperand), new ValueLiteral(rightOperand) }, this.lineNumber, this.fileName).Eval(e);
+			return new Applicate(new DotOperator(new ValueLiteral(type), "::", this.fileName, this.lineNumber), new List<Expression> { new ValueLiteral(leftOperand), new ValueLiteral(rightOperand) }, this.fileName, this.lineNumber).Eval(e);
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope e) {
@@ -121,7 +121,7 @@ namespace Lumen.Lmi {
 
 			IType type = rightOperand is SingletonConstructor sc ? sc : rightOperand.Type;
 
-			yield return new GeneratorExpressionTerminalResult(new Applicate(new DotOperator(new ValueLiteral(type), "::", this.fileName, this.lineNumber), new List<Expression> { new ValueLiteral(leftOperand), new ValueLiteral(rightOperand) }, this.lineNumber, this.fileName).Eval(e));
+			yield return new GeneratorExpressionTerminalResult(new Applicate(new DotOperator(new ValueLiteral(type), "::", this.fileName, this.lineNumber), new List<Expression> { new ValueLiteral(leftOperand), new ValueLiteral(rightOperand) }, this.fileName, this.lineNumber).Eval(e));
 		}
 
 		public Expression Closure(ClosureManager manager) {

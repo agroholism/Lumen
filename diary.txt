@@ -104,6 +104,13 @@ Lumen 0.8
 + (start..end, 2), start.., ..end, ..
 + Array -> MutableArray, Map -> MutableMap
 
+07.11.2020
++ Functions with contexts
+
+08.11.2020
++ bug #2 fix Condition.Closure was wrong
++ bug #3 fix ConditionMatch.Closure was wrong
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)

@@ -9,8 +9,6 @@ namespace Lumen.Lang.Expressions {
 		public Boolean HasYield { get; set; }
 		public Boolean HasTailRecursion { get; set; }
 
-		public Boolean AllowToCapture { get; set; }
-
 		public IEnumerable<String> Declarations {
 			get => this.declared;
 		}
@@ -30,6 +28,15 @@ namespace Lumen.Lang.Expressions {
 			foreach (String name in names) {
 				this.Declare(name);
 			}
+		}
+
+		public void Assimilate(ClosureManager another) {
+			foreach (String declaration in another.Declarations) {
+				this.Declare(declaration);
+			}
+
+			this.HasTailRecursion |= another.HasTailRecursion;
+			this.HasYield |= another.HasYield;
 		}
 
 		public Boolean IsDeclared(String name) {

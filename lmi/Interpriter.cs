@@ -8,6 +8,8 @@ using Lumen.Lang;
 
 using String = System.String;
 using System.Linq;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Lumen.Lmi {
 	public static class Interpriter {
@@ -55,10 +57,10 @@ namespace Lumen.Lmi {
 			catch (LumenException uex) {
 				WriteException(uex.ToString());
 
-				if (uex.Line != -1) {
+				if (uex.Line != -1 && uex.File != null && File.Exists(uex.File)) {
 					WriteException("");
 
-					String[] lines = source.Split(new String[] { Environment.NewLine }, StringSplitOptions.None);
+					String[] lines = File.ReadAllText(uex.File).Split(new String[] { Environment.NewLine }, StringSplitOptions.None);
 					WriteException($"{uex.Line}| {lines[uex.Line - 1]}");
 				}
 

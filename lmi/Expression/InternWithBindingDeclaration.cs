@@ -26,7 +26,7 @@ namespace Lumen.Lmi {
 			if (this.bindingDeclaration is BindingDeclaration bindingDeclaration) {
 				MatchResult matchResult = bindingDeclaration.pattern.Match(this.evaluationResult, scope);
 				if (!matchResult.IsSuccess) {
-					throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: bindingDeclaration.lineName, fileName: bindingDeclaration.fileName) {
+					throw new LumenException(Exceptions.NAME_CAN_NOT_BE_DEFINED, line: bindingDeclaration.lineNumber, fileName: bindingDeclaration.fileName) {
 						Note = matchResult.Note
 					};
 				}

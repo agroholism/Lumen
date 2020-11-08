@@ -48,7 +48,7 @@ namespace Lumen.Lang {
 			return String.Format(val, vals);
 		}
 
-		public static String ArgumentsToString(IEnumerable<Expressions.Expression> exps) {
+		public static String ArgumentsToString(IEnumerable<Expression> exps) {
 			return String.Join(" ", exps);
 		}
 

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class Condition : Expression {
-        public Expression conditionExpression;
-        public Expression falseExpression;
-        public Expression trueExpression;
+        private readonly Expression conditionExpression;
+        private readonly Expression falseExpression;
+        private readonly Expression trueExpression;
 
         public Condition(Expression condition, Expression trueExpression, Expression falseExpression) {
             this.conditionExpression = condition;
@@ -26,32 +25,43 @@ namespace Lumen.Lmi {
 			IEnumerable<Value> conditionEvaluationResult = this.conditionExpression.EvalWithYield(scope);
 
 			Value condition = Const.UNIT;
-			foreach (Value result in conditionEvaluationResult) {
-				if (result is GeneratorExpressionTerminalResult cgv) {
-					condition = cgv.Value;
+			foreach (Value evaluationResult in conditionEvaluationResult) {
+				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
+					condition = terminalResult.Value;
 					break;
 				}
 
-				yield return result;
+				yield return evaluationResult;
 			}
 
 			IEnumerable<Value> expressionResults = condition.ToBoolean() ? this.trueExpression.EvalWithYield(scope) : this.falseExpression.EvalWithYield(scope);
 
-			foreach (Value result in expressionResults) {
-				yield return result;
+			foreach (Value expressionResult in expressionResults) {
+				yield return expressionResult;
 			}
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			// Here problem
-            return new Condition(this.conditionExpression.Closure(manager), this.trueExpression.Closure(manager), this.falseExpression.Closure(manager));
+			Expression closuredConditionExpression = this.conditionExpression.Closure(manager);
+
+            // Because trueExpression and falseExpression can influence on each other without isolated managers
+            ClosureManager trueExpressionManager = manager.Clone();
+            Expression closuredTrueExpression = this.trueExpression.Closure(trueExpressionManager);
+
+            // But there are we use old manager so we can aviod additional manager
+            Expression closuredFalseExpression = this.falseExpression.Closure(manager);
+
+			Condition result =  new Condition(closuredConditionExpression, closuredTrueExpression, closuredFalseExpression);
+            // And just move results in base manager
+            manager.Assimilate(trueExpressionManager);
+            return result;
         }
 
         public override String ToString() {
-            String result = "if " + this.conditionExpression.ToString() + ": " + Environment.NewLine + "\t" + this.trueExpression.ToString();
+            String result = $"if {this.conditionExpression}{Environment.NewLine}\t{this.trueExpression}";
 
-            if (this.falseExpression != null && !(this.falseExpression is UnitLiteral)) {
-                result += Environment.NewLine + "else: " + Environment.NewLine + "\t" + this.falseExpression.ToString();
+            if (this.falseExpression != null && this.falseExpression is not UnitLiteral) {
+                result += $"{Environment.NewLine}else{Environment.NewLine}\t{this.falseExpression}";
             }
 
             return result;

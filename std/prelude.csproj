@@ -51,6 +51,7 @@
     <Compile Include="Expression\NativeExpression.cs" />
     <Compile Include="Modules\ConvertError.cs" />
     <Compile Include="Modules\TailRecursion.cs" />
+    <Compile Include="Modules\UnitModule.cs" />
     <Compile Include="Values\Constructors\ExceptionConstructor.cs" />
     <Compile Include="Values\Constructors\IConstructor.cs" />
     <Compile Include="Values\Generators\LumenGenerator.cs" />

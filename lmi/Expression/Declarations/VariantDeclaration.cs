@@ -7,27 +7,27 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class VariantDeclaration : Expression {
-		private readonly String name;
+		private readonly String typeName;
 		private readonly List<Expression> members;
 		private readonly List<ConstructorMetadata> constructors;
-		private readonly List<Expression> derivings;
+		private readonly List<Expression> implementsExpressions;
 
-		public VariantDeclaration(String name, List<ConstructorMetadata> constructors,  List<Expression> members, List<Expression> derivings) {
-			this.name = name;
+		public VariantDeclaration(String typeName, List<ConstructorMetadata> constructors,  List<Expression> members, List<Expression> implementsExpressions) {
+			this.typeName = typeName;
 			this.constructors = constructors;
 			this.members = members;
-			this.derivings = derivings;
+			this.implementsExpressions = implementsExpressions;
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			manager.Declare(this.name);
+			manager.Declare(this.typeName);
 			manager.Declare(this.constructors.Select(i => i.Name));
 
-			return new VariantDeclaration(this.name, this.constructors, this.members.Select(i => i.Closure(manager)).ToList(), this.derivings.Select(i => i.Closure(manager)).ToList());
+			return new VariantDeclaration(this.typeName, this.constructors, this.members.Select(i => i.Closure(manager)).ToList(), this.implementsExpressions.Select(i => i.Closure(manager)).ToList());
 		}
 
 		public Value Eval(Scope scope) {
-			Module createdType = new Module(this.name);
+			Module createdType = new Module(this.typeName);
 
 			foreach (ConstructorMetadata i in this.constructors) {
 				IType constructor = Helper.CreateConstructor(i.Name, createdType, i.Parameters);
@@ -36,8 +36,8 @@ namespace Lumen.Lmi {
 				scope.Bind(i.Name, constructor);
 			}
 
-			if (this.constructors.Count > 1 || !this.constructors.Any(i => i.Name == this.name)) {
-				scope.Bind(this.name, createdType);
+			if (this.constructors.Count > 1 || !this.constructors.Any(i => i.Name == this.typeName)) {
+				scope.Bind(this.typeName, createdType);
 			}
 
 			Scope helperScope = new Scope(scope);
@@ -50,7 +50,7 @@ namespace Lumen.Lmi {
 				createdType.SetMember(i.Key, i.Value);
 			}
 
-			foreach (Expression deriving in this.derivings) {
+			foreach (Expression deriving in this.implementsExpressions) {
 				Module typeClass = deriving.Eval(scope) as Module;
 				createdType.AppendImplementation(typeClass);
 			}
@@ -63,16 +63,16 @@ namespace Lumen.Lmi {
 		}
 
 		public override String ToString() {
-			String result = $"type {this.name} = {String.Join(" | ", this.constructors)}";
+			String result = $"type {this.typeName} = {String.Join(" | ", this.constructors)}";
 
-			if (this.derivings.Count != 0 || this.members.Count != 0) {
+			if (this.implementsExpressions.Count != 0 || this.members.Count != 0) {
 				result += Environment.NewLine;
 
-				foreach (Expression i in this.derivings) {
+				foreach (Expression i in this.implementsExpressions) {
 					result += "\tinclude " + i + Environment.NewLine;
 				}
 
-				if (this.derivings.Count > 0) {
+				if (this.implementsExpressions.Count > 0) {
 					result += "\t" + Environment.NewLine;
 				}
 

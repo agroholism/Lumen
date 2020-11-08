@@ -50,13 +50,13 @@ namespace Lumen.Lmi {
 				Value result =
 						new Applicate(new DotOperator(
 						new ValueLiteral(endValue.Type), this.isInclusive ? Constants.RANGE_INCLUSIVE : Constants.RANGE_EXCLUSIVE,
-						this.file, this.line), new List<Expression> { new ValueLiteral(startValue), new ValueLiteral(endValue) }, this.line, this.file).Eval(scope);
+						this.file, this.line), new List<Expression> { new ValueLiteral(startValue), new ValueLiteral(endValue) }, this.file, this.line).Eval(scope);
 
 				if (stepValue != null) {
 					result =
 					   new Applicate(new DotOperator(
 					   new ValueLiteral(result.Type), Constants.SLASH,
-					   this.file, this.line), new List<Expression> { new ValueLiteral(result), new ValueLiteral(stepValue) }, this.line, this.file).Eval(scope);
+					   this.file, this.line), new List<Expression> { new ValueLiteral(result), new ValueLiteral(stepValue) }, this.file, this.line).Eval(scope);
 				}
 
 				return result;
@@ -65,13 +65,13 @@ namespace Lumen.Lmi {
 			Value _result = new Applicate(new DotOperator(
 				new ValueLiteral(startValue.Type), this.isInclusive ? Constants.RANGE_INCLUSIVE : Constants.RANGE_EXCLUSIVE,
 				this.file, this.line), new List<Expression> { new ValueLiteral(startValue), new ValueLiteral(endValue)
-				}, this.line, this.file).Eval(scope);
+				}, this.file, this.line).Eval(scope);
 
 			if (stepValue != null) {
 				_result =
 				   new Applicate(new DotOperator(
 				   new ValueLiteral(_result.Type), Constants.SLASH,
-				   this.file, this.line), new List<Expression> { new ValueLiteral(_result), new ValueLiteral(stepValue) }, this.line, this.file).Eval(scope);
+				   this.file, this.line), new List<Expression> { new ValueLiteral(_result), new ValueLiteral(stepValue) }, this.file, this.line).Eval(scope);
 			}
 
 			return _result;
