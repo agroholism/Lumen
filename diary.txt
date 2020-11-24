@@ -111,6 +111,10 @@ Lumen 0.8
 + bug #2 fix Condition.Closure was wrong
 + bug #3 fix ConditionMatch.Closure was wrong
 
+24.11.2020
++ typeof
++ method call syntax
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)

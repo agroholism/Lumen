@@ -224,6 +224,36 @@ namespace Lumen.Lang {
 				}
 			});
 
+			Module GetModule(IType obj) {
+				if (obj is Module m) {
+					return m;
+				}
+
+				if (obj is Instance instance) {
+					return (instance.Type as Constructor).Parent as Module;
+				}
+
+				if (obj is Constructor constructor) {
+					return constructor.Parent;
+				}
+
+				if (obj is SingletonConstructor singleton) {
+					return singleton.Parent;
+				}
+
+				return GetModule(obj.Type);
+			}
+
+			this.SetMember("typeof", new LambdaFun((scope, args) => {
+				Value value = scope["value"];
+
+				return GetModule(value.Type);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("value")
+				}
+			});
+
 			// 23/04
 			this.SetMember("println", new LambdaFun((scope, args) => {
 				Value x = scope["x"];

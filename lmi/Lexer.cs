@@ -662,6 +662,11 @@ namespace Lumen.Lmi {
 					return;
 				}
 
+				if (current == '*') {
+					this.MultilineComment();
+					return;
+				}
+
 				current = this.Peek(0);
 			}
 
@@ -727,6 +732,20 @@ namespace Lumen.Lmi {
 
 			while (true) {
 				if ("\r\n\0".IndexOf(current) != -1) {
+					break;
+				}
+				current = this.Next();
+			}
+
+			this.Next();
+		}
+
+		private void MultilineComment() {
+			Char current = this.Peek(0);
+
+			while (true) {
+				if (current == '*' && this.Peek(1) == '/') {
+					this.Next();
 					break;
 				}
 				current = this.Next();
