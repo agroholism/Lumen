@@ -75,8 +75,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("element"),
-					new NamePattern("self")
+						new NamePattern("self"),
+					new NamePattern("element")
 				}
 			});
 
@@ -88,8 +88,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("elements"),
-					new NamePattern("self")
+						new NamePattern("self"),
+					new NamePattern("elements")
 				}
 			});
 
@@ -104,8 +104,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-				new NamePattern("element"),
-					new NamePattern("self")
+				new NamePattern("self") , new NamePattern("element")
 				}
 			});
 
@@ -118,8 +117,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("element") ,
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("element")
 				}
 			});
 
@@ -135,8 +133,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("element"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("element")
 				}
 			});
 
@@ -149,8 +146,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("predicate"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("predicate")
 				}
 			});
 
@@ -185,8 +181,7 @@ Array.refs
 				return new MutableArray(value);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("other"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("other")
 				}
 			});
 
@@ -202,8 +197,7 @@ Array.refs
 				return new MutableArray(value);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("other"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("other")
 				}
 			});
 
@@ -232,8 +226,7 @@ Array.refs
 				return new MutableArray(value);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("other"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("other")
 				}
 			});
 
@@ -249,8 +242,7 @@ Array.refs
 				return new MutableArray(value);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("other"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("other")
 				}
 			});
 
@@ -259,8 +251,7 @@ Array.refs
 				return new Logical(self.Contains(scope["elem"]));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("elem"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("elem")
 				}
 			});
 

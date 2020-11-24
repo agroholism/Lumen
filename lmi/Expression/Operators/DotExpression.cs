@@ -46,6 +46,11 @@ namespace Lumen.Lmi {
 					return result;
 				}
 
+				IType type = value.Type;
+				return new Applicate(
+					new ValueLiteral(type.GetMember(this.memberName, e)), 
+					new List<Expression> { new ValueLiteral(value) }, this.fileName, this.line).Eval(e);
+
 				// internal unification //
 
 				//if(value.Type.TryGetMember("<get>" + this.memberName, out Value property) && property is Fun funp) {

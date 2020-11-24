@@ -79,8 +79,6 @@ namespace Lumen.Lang.Expressions {
 	public class NamePattern : IPattern {
 		private readonly String identifier;
 
-
-
 		public NamePattern(String identifier) {
 			this.identifier = identifier;
 		}
@@ -105,6 +103,10 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
+			if(scope.ExistsInThisScope(this.identifier)) {
+				Console.WriteLine($"WARNING: there are rebinding {this.identifier} please don't use rebindings");
+			}
+
 			scope[this.identifier] = value;
 			return MatchResult.Success;
 		}

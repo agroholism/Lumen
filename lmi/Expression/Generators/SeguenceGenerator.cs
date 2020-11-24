@@ -31,10 +31,11 @@ namespace Lumen.Lmi {
 			Value current;
 
 			foreach (Value i in this.container.Eval(scope).ToStream(scope)) {
-				this.names.Match(i, scope);
+				var inner = new Scope(scope);
+				this.names.Match(i, inner);
 
 				try {
-					current = this.body.Eval(scope);
+					current = this.body.Eval(inner);
 				}
 				catch (Break breakException) {
 					if (breakException.IsMatch(this.cycleName)) {

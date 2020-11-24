@@ -26,7 +26,7 @@ namespace Lumen.Lang {
 
 			this.SetMember(">>-", new LambdaFun((scope, args) => {
 				Value fc = scope["fc"];
-				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Call(scope, scope["fn"], fc);
+				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Call(new Scope(scope), scope["fn"], fc);
 			}) {
 				Name = ">>-",
 				Parameters = new List<IPattern> {
@@ -37,7 +37,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("-<<", new LambdaFun((scope, args) => {
 				Value fc = scope["fc"];
-				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Call(scope, scope["fn"], fc);
+				return fc.Type.GetMember("fmap", scope).ToFunction(scope).Call(new Scope(scope), scope["fn"], fc);
 			}) {
 				Name = "-<<",
 				Parameters = new List<IPattern> {

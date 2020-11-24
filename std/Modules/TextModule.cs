@@ -240,8 +240,8 @@ namespace Lumen.Lang {
 				return new Logical(scope["self"].ToString().Contains(scope["substring"].ToString()));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("substring"),
-					new NamePattern("self")
+					new NamePattern("self"),
+					new NamePattern("substring")
 				}
 			});
 
@@ -269,8 +269,7 @@ namespace Lumen.Lang {
 				return new Logical(scope["self"].ToString().StartsWith(scope["prefix"].ToString()));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("prefix"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("prefix")
 				}
 			});
 
@@ -281,8 +280,7 @@ namespace Lumen.Lang {
 				return new Logical(scope["self"].ToString().EndsWith(scope["suffix"].ToString()));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("suffix"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("suffix")
 				}
 			});
 
@@ -300,8 +298,7 @@ namespace Lumen.Lang {
 				return new Number(scope["self"].ToString().IndexOf(scope["subtext"].ToString()));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("subtext"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("subtext")
 				}
 			});
 
@@ -309,8 +306,7 @@ namespace Lumen.Lang {
 				return new Number(scope["self"].ToString().LastIndexOf(scope["subtext"].ToString()));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("subtext"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("subtext")
 				}
 			});
 
@@ -377,9 +373,9 @@ namespace Lumen.Lang {
 				return new Text(buff.ToString());
 			}) {
 				Parameters = new List<IPattern> {
+					new NamePattern("text"),
 					new NamePattern("src"),
-					new NamePattern("res"),
-					new NamePattern("text")
+					new NamePattern("res")
 				}
 			});
 
@@ -403,8 +399,7 @@ namespace Lumen.Lang {
 				return new Text(self.Replace(scope["subtext"].ToString(), ""));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("subtext"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("subtext")
 				}
 			});
 
@@ -474,8 +469,7 @@ namespace Lumen.Lang {
 				return new Text(Pad(self, totalLenght));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("length"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("length")
 				}
 			});
 
@@ -484,8 +478,7 @@ namespace Lumen.Lang {
 				return new Text(self.PadLeft(scope["lenght"].ToInt(scope)));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("lenght"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("lenght")
 				}
 			});
 
@@ -494,8 +487,7 @@ namespace Lumen.Lang {
 				return new Text(self.PadRight(scope["lenght"].ToInt(scope)));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("lenght"),
-					new NamePattern("self")
+					new NamePattern("self") , new NamePattern("lenght")
 				}
 			});
 
@@ -507,9 +499,9 @@ namespace Lumen.Lang {
 				return new Text(Pad(self, totalLenght, with));
 			}) {
 				Parameters = new List<IPattern> {
+						new NamePattern("self"),
 						new NamePattern("with"),
-					new NamePattern("length"),
-					new NamePattern("self")
+					new NamePattern("length")
 				}
 			});
 
@@ -518,9 +510,9 @@ namespace Lumen.Lang {
 				return new Text(self.PadLeft(scope["lenght"].ToInt(scope), scope["with"].ToString()[0]));
 			}) {
 				Parameters = new List<IPattern> {
+						new NamePattern("self"),
 					new NamePattern("with"),
-					new NamePattern("lenght"),
-					new NamePattern("self")
+					new NamePattern("lenght")
 				}
 			});
 
@@ -529,9 +521,9 @@ namespace Lumen.Lang {
 				return new Text(self.PadRight(scope["lenght"].ToInt(scope), scope["with"].ToString()[0]));
 			}) {
 				Parameters = new List<IPattern> {
+						new NamePattern("self"),
 					new NamePattern("with"),
-					new NamePattern("lenght"),
-					new NamePattern("self")
+					new NamePattern("lenght")
 				}
 			});
 
@@ -570,8 +562,8 @@ namespace Lumen.Lang {
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("action"),
-					new NamePattern("self")
+						new NamePattern("self"),
+					new NamePattern("action")
 				}
 			});
 
