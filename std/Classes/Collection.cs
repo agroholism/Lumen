@@ -536,7 +536,7 @@ namespace Lumen.Lang {
 				return Helper.FromStream(typeParameter, values.Where(i => predicate.Call(new Scope(scope), i).ToBoolean()), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("predicate")
+					new TypePattern("self", this), new NamePattern("predicate")
 				}
 			});
 
@@ -550,8 +550,8 @@ namespace Lumen.Lang {
 					values.Select(i => mapper.Call(new Scope(scope), i)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("fn"),
 					new TypePattern("fc", this),
+					new NamePattern("fn"),
 				}
 			};
 

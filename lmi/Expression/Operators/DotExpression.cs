@@ -37,7 +37,7 @@ namespace Lumen.Lmi {
 					return module.GetMember(this.memberName, e);
 				}
 
-				if (value is IType itype) {
+				if (value is not SingletonConstructor && value is IType itype) {
 					return itype.GetMember(this.memberName, e);
 				}
 

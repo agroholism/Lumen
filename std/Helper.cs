@@ -40,7 +40,22 @@ namespace Lumen.Lang {
 				return new SingletonConstructor(name, baseType);
 			}
 
-			Constructor result = new Constructor(name, baseType, fields.ToList());
+			Dictionary<String, List<IType>> dict = new();
+			foreach(var i in fields) {
+				dict.Add(i, new List<IType>());
+			}
+
+			Constructor result = new Constructor(name, baseType, dict);
+
+			return result;
+		}
+
+		public static IConstructor CreateConstructor(String name, Module baseType, Dictionary<String, List<IType>> fields) {
+			if (fields.Count == 0) {
+				return new SingletonConstructor(name, baseType);
+			}
+
+			Constructor result = new Constructor(name, baseType, fields);
 
 			return result;
 		}
@@ -50,7 +65,14 @@ namespace Lumen.Lang {
 				return new SingletonConstructor(name, baseType);
 			}
 
-			Constructor result = new Constructor(name, baseType, fields.ToList());
+
+			Dictionary<String, List<IType>> dict = new();
+			foreach (var i in fields) {
+				dict.Add(i, new List<IType>());
+			}
+
+
+			Constructor result = new Constructor(name, baseType, dict);
 
 			return result;
 		}

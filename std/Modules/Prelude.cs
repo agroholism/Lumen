@@ -63,6 +63,8 @@ namespace Lumen.Lang {
 		private Prelude() {
 			this.SetMember("Prelude", this);
 
+			this.SetMember("Any", Any);
+
 			this.SetMember("Ord", Ord);
 			this.SetMember("Format", Format);
 			this.SetMember("Functor", Functor);

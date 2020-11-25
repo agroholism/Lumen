@@ -162,4 +162,51 @@ namespace Lumen.Lang.Expressions {
 			return $"({this.subpattern}: {this.requirement})";
 		}
 	}
+
+	internal class TypesPattern : IPattern {
+		private IPattern subpattern;
+		private List<IType> requirements;
+
+		public TypesPattern(String subpattern, List<IType> requirements) {
+			this.subpattern = new NamePattern(subpattern);
+			this.requirements = requirements;
+		}
+
+		public TypesPattern(IPattern subpattern, List<IType> requirements) {
+			this.subpattern = subpattern;
+			this.requirements = requirements;
+		}
+
+		public Expression Closure(ClosureManager manager) {
+			return new TypesPattern(this.subpattern.Closure(manager) as IPattern, this.requirements);
+		}
+
+		public Value Eval(Scope e) {
+			throw new NotImplementedException();
+		}
+
+		public List<String> GetDeclaredVariables() {
+			return new List<String>();
+		}
+
+		public MatchResult Match(Value value, Scope scope) {
+			if(this.requirements.All(i => i.IsParentOf(value))) {
+				return this.subpattern.Match(value, scope);
+			}
+
+			return new MatchResult(
+				MatchResultKind.Fail,
+				$"wait value of type {String.Join(", ", this.requirements)} given {value.Type}"
+			);
+		}
+
+		public IEnumerable<Value> EvalWithYield(Scope scope) {
+			this.Eval(scope);
+			yield break;
+		}
+
+		public override String ToString() {
+			return $"({this.subpattern}: {String.Join(", ", this.requirements)})";
+		}
+	}
 }

@@ -30,7 +30,13 @@ namespace Lumen.Lmi {
 			Module createdType = new Module(this.typeName);
 
 			foreach (ConstructorMetadata i in this.constructors) {
-				IType constructor = Helper.CreateConstructor(i.Name, createdType, i.Parameters);
+				Dictionary<String, List<IType>> dict = new();
+
+				foreach (var item in i.Parameters) {
+					dict.Add(item.Key, item.Value.Select(i => i.Eval(scope) as IType).ToList());
+				}
+
+				IType constructor = Helper.CreateConstructor(i.Name, createdType, dict);
 
 				createdType.SetMember(i.Name, constructor);
 				scope.Bind(i.Name, constructor);

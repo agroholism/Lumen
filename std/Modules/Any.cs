@@ -5,7 +5,7 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lang {
 	internal class AnyModule : Module {
 		internal AnyModule() {
-			this.Name = "_";
+			this.Name = "Any";
 
 			this.SetMember("toText", new LambdaFun((e, args) => {
 				Value self = e["self"];

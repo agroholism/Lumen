@@ -63,8 +63,8 @@ namespace Lumen.Lang {
 				return new List(values.Where(i => mapper.Call(new Scope(scope), i).ToBoolean()));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("pred"),
 					new NamePattern("list"),
+					new NamePattern("pred"),
 				}
 			});
 
@@ -87,8 +87,8 @@ namespace Lumen.Lang {
 				return new List(result);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("size"),
-					new NamePattern("list")
+					new NamePattern("list"),
+					new NamePattern("size")
 				}
 			});
 

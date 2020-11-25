@@ -96,6 +96,10 @@ namespace Lumen.Lang {
 		public Boolean IsParentOf(Value value) {
 			Value parent = value.Type;
 
+			if(this == Prelude.Any) {
+				return true;
+			}
+
 			if (parent == this) {
 				return true;
 			}

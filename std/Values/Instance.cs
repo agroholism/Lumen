@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Lumen.Lang {
 	public class Instance : BaseValueImpl {
@@ -11,7 +12,7 @@ namespace Lumen.Lang {
 		}
 
 		public Boolean TryGetField(String name, out Value result) {
-			Int32 index = (this.Type as Constructor).Fields.IndexOf(name);
+			Int32 index = (this.Type as Constructor).Fields.Select(i => i.Key).ToList().IndexOf(name);
 
 			if (index != -1) {
 				result = this.Items[index];

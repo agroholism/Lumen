@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.Remoting.Services;
 using System.Text;
 
 using Lumen.Lang;
@@ -42,7 +39,7 @@ namespace Lumen.Lmi {
 				case TokenType.RETURN: // kk
 					this.Match(TokenType.RETURN);
 
-					Expression ret = 
+					Expression ret =
 						new Return(!this.IsValidToken() ? UnitLiteral.Instance : this.Expression());
 
 					if (this.Match(TokenType.WHEN)) {
@@ -247,7 +244,7 @@ namespace Lumen.Lmi {
 			}
 
 			if (defaultConstructors.Count == 0) {
-				defaultConstructors.Add(new ConstructorMetadata(typeName, new List<String>()));
+				defaultConstructors.Add(new ConstructorMetadata(typeName, new()));
 			}
 
 			List<Expression> derivings = new List<Expression>();
@@ -269,17 +266,22 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseVariantDeclaration(String typeName) {
+			Boolean expectBlockEnd = this.Match(TokenType.BLOCK_START);
+
 			List<ConstructorMetadata> defaultConstructors = new List<ConstructorMetadata>();
-			while (!this.LookMatch(0, TokenType.BLOCK_START)
-				&& !this.Match(TokenType.EOC)
-				&& !this.Match(TokenType.EOF)) {
+
+			if (!expectBlockEnd) {
+				this.ParseDefaultConstructor(defaultConstructors);
+			}
+
+			while (this.Match(TokenType.BAR)) {
 				this.ParseDefaultConstructor(defaultConstructors);
 			}
 
 			List<Expression> derivings = new List<Expression>();
 			List<Expression> members = new List<Expression>();
 
-			if (this.Match(TokenType.BLOCK_START)) {
+			if (this.Match(TokenType.BLOCK_START) || expectBlockEnd) {
 				while (!this.Match(TokenType.BLOCK_END) && !this.Match(TokenType.EOF)) {
 					if (this.Match(TokenType.IMPLEMENTS)) {
 						derivings.Add(this.Expression());
@@ -318,11 +320,26 @@ namespace Lumen.Lmi {
 		}
 
 		private void ParseDefaultConstructor(List<ConstructorMetadata> defaultConstructors) {
-			List<String> paramters = new List<String>();
+			Dictionary<String, List<Expression>> paramters = new Dictionary<String, List<Expression>>();
 			String constructorName = this.Consume(TokenType.WORD).Text;
 
-			while (this.LookMatch(0, TokenType.WORD)) {
-				paramters.Add(this.Consume(TokenType.WORD).Text);
+			while (this.LookMatch(0, TokenType.WORD) || this.LookMatch(0, TokenType.PAREN_OPEN)) {
+				Boolean hasParens = this.Match(TokenType.PAREN_OPEN);
+
+				String parameterName = this.Consume(TokenType.WORD).Text;
+				List<Expression> types = new List<Expression>();
+
+				if (this.Match(TokenType.COLON)) {
+					do {
+						types.Add(this.Primary());
+					} while (this.Match(TokenType.SPLIT));
+				}
+
+				paramters.Add(parameterName, types);
+
+				if(hasParens) {
+					this.Consume(TokenType.PAREN_CLOSE);
+				}
 			}
 
 			defaultConstructors.Add(new ConstructorMetadata(constructorName, paramters));
@@ -605,10 +622,10 @@ namespace Lumen.Lmi {
 			List<IPattern> arguments = new List<IPattern>();
 
 			if (this.Match(TokenType.DOT_LESS)) {
-				while(!this.Match(TokenType.GREATER)) {
+				while (!this.Match(TokenType.GREATER)) {
 					ContextPattern typeArgName = new ContextPattern(this.Consume(TokenType.WORD).Text);
 
-					if(this.Match(TokenType.IMPLEMENTS)) {
+					if (this.Match(TokenType.IMPLEMENTS)) {
 						do {
 							typeArgName.AddImplements(Bitwise());
 						} while (this.Match(TokenType.SPLIT));
@@ -817,7 +834,7 @@ namespace Lumen.Lmi {
 			Expression result = this.Equality();
 
 			if (this.Match(TokenType.DOT2)) {
-				if(!this.IsValidRangeToken()) {
+				if (!this.IsValidRangeToken()) {
 					return new RangeOperator(result, null, false, this.line, this.file);
 				}
 
@@ -1214,7 +1231,7 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.PAREN_OPEN)) {
 				Expression result = this.Expression();
 
-				if(this.LookMatch(0, TokenType.SPLIT) && result is RangeOperator rangeOperator) {
+				if (this.LookMatch(0, TokenType.SPLIT) && result is RangeOperator rangeOperator) {
 					this.Match(TokenType.SPLIT);
 					rangeOperator.AddStep(this.Expression());
 				}

@@ -30,6 +30,11 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
+			if (this.Type.TryGetMember("toText", out Value value)
+				&& value.TryConvertToFunction(out Fun converter)) {
+				return converter.Call(new Scope(), this).ToString();
+			}
+
 			return this.Name;
 		}
 

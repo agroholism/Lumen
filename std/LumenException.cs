@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
@@ -114,7 +115,7 @@ namespace Lumen.Lang {
 		}
 
 		public Boolean TryGetField(String name, out Value result) {
-			Int32 index = (this.Type as ExceptionConstructor).Fields.IndexOf(name);
+			Int32 index = (this.Type as ExceptionConstructor).Fields.Select(i => i.Key).ToList().IndexOf(name);
 
 			if (index != -1) {
 				result = this.items[index];

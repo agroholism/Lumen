@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	internal class ConstructorMetadata {
 		public String Name { get; private set; }
-		public List<String> Parameters { get; private set; }
+		public Dictionary<String, List<Expression>> Parameters { get; private set; }
 
-		public ConstructorMetadata(String name, List<String> parameters) {
+		public ConstructorMetadata(String name, Dictionary<String, List<Expression>> parameters) {
 			this.Name = name;
 			this.Parameters = parameters;
 		}

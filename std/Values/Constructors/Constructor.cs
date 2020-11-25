@@ -7,24 +7,42 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lang {
 	public class Constructor : BaseValueImpl, IConstructor, Fun {
 		public String Name { get; set; }
-		public List<String> Fields { get; private set; }
+		public Dictionary<String, List<IType>> Fields { get; private set; }
 		public override IType Type => Prelude.Function;
 
 		public List<IPattern> Parameters { get; set; }
 		public Module Parent { get; set; }
 
-		public Constructor(String name, Module parent, List<String> fields) {
+		public Constructor(String name, Module parent, Dictionary<String, List<IType>> fields) {
 			this.Parent = parent;
 			this.Name = name;
 			this.Fields = fields;
-			this.Parameters = fields.Select(i => new NamePattern(i) as IPattern).ToList();
+			this.Parameters = fields.Select(i => (IPattern)new TypesPattern(i.Key, i.Value)).ToList();
+		}
+
+		public Constructor(String name, Module parent, params String[] fields) {
+			this.Parent = parent;
+			this.Name = name;
+			Dictionary<String, List<IType>> dict = new();
+			foreach (var i in fields) {
+				dict.Add(i, new List<IType>());
+			}
+
+			this.Fields = dict;
+			this.Parameters = dict.Select(i => (IPattern)new TypesPattern(i.Key, i.Value)).ToList();
 		}
 
 		public Value MakeInstance(params Value[] values) {
 			Instance result = new Instance(this);
 
-			for (Int32 i = 0; i < values.Length; i++) {
-				result.Items[i] = values[i];
+			Int32 current = 0;
+			foreach(var i in this.Fields) {
+				if(!i.Value.All(j => j.IsParentOf(values[current]))) {
+					throw new Exception($"wait value of type {String.Join(", ", i.Value)} given {values[current].Type}");
+				}
+
+				result.Items[current] = values[current];
+				current++;
 			}
 
 			return result;
