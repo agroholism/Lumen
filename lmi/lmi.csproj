@@ -51,6 +51,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assert.cs" />
     <Compile Include="Expression\Declarations\ClassDeclaration.cs" />
     <Compile Include="Expression\Declarations\ExceptionDeclaration.cs" />
     <Compile Include="Expression\Control flow\ExceptionHandling.cs" />

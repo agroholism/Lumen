@@ -3,11 +3,6 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	/// module Prelude where
-	///		...
-	///		module Context where
-	///			let format (x: 'T) (fstr: Text) =
-	///				functionIsNotImplementedForType "Format.format" 'T
 	internal class Context : Module {
 		internal Context() {
 			this.Name = "Context";
@@ -22,7 +17,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("onExit", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Context.onExit", scope["x"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Context.onExit", scope["x"].Type);
 				return Const.UNIT;
 			}) {
 				Name = "onExit",

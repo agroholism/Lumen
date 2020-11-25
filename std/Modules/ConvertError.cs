@@ -90,14 +90,16 @@ namespace Lumen.Lang {
 		internal AssertError() : base() {
 			this.Name = "AssertError";
 
-			this.constructor = new ExceptionConstructor("AssertError", this);
+			this.constructor = new ExceptionConstructor("AssertError", this, "message");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				return this.MakeExceptionInstance();
 			}));
 
 			this.SetMember("getMessage", new LambdaFun((e, args) => {
-				return new Text(Exceptions.ASSERT_IS_BROKEN);
+				Instance self = e["self"] as Instance;
+
+				return self.GetField("message");
 			}) {
 				Parameters = Const.Self
 			});

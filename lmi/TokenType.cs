@@ -99,6 +99,7 @@
 		REDO,
 		RETRY,
 		ANNOTATION,
-		DOT_LESS
+		DOT_LESS,
+		ASSERT
 	}
 }

@@ -7,7 +7,7 @@ namespace Lumen.Lang {
 			this.Name = "Clone";
 
 			this.SetMember("clone", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Clone.clone", scope["self"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Clone.clone", scope["self"].Type);
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {

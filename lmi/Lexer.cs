@@ -645,6 +645,9 @@ namespace Lumen.Lmi {
 				case "retry":
 					this.AddToken(TokenType.RETRY);
 					break;
+				case "assert":
+					this.AddToken(TokenType.ASSERT);
+					break;
 				default:
 					this.AddToken(TokenType.WORD, word);
 					break;

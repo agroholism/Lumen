@@ -17,7 +17,7 @@ namespace Lumen.Lang {
 			this.Name = "Format";
 
 			this.SetMember("format", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Format.format", scope["x"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Format.format", scope["x"].Type);
 				return Const.UNIT;
 			}) {
 				Name = "format",

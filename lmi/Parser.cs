@@ -138,6 +138,10 @@ namespace Lumen.Lmi {
 				case TokenType.FOR:
 					this.Match(TokenType.FOR);
 					return this.ParseFor();
+				case TokenType.ASSERT:
+					this.Match(TokenType.ASSERT);
+					Int32 currentLine = this.line;
+					return new Assert(this.Expression(), this.file, currentLine);
 				default:
 					return this.LogikOr();
 			}

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
@@ -83,8 +81,6 @@ namespace Lumen.Lang {
 			this.SetMember("ConvertError", ConvertError);
 			this.SetMember("Error", Error);
 
-			this.SetMember("Pair", MutableMapModule.PairModule.ctor);
-
 			this.SetMember("Unit", Unit);
 
 			this.SetMember("Option", Option);
@@ -120,21 +116,6 @@ namespace Lumen.Lang {
 
 			this.SetMember("pi", (Number)Math.PI);
 			this.SetMember("e", (Number)Math.E);
-
-			this.SetMember("time", new LambdaFun((scope, args) => {
-				Fun fun = scope["fun"].ToFunction(scope);
-
-				Stopwatch sw = new Stopwatch();
-				sw.Start();
-				fun.Call(new Scope(scope));
-				sw.Stop();
-
-				return new Number(sw.ElapsedMilliseconds);
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("fun")
-				}
-			});
 
 			this.SetMember("writeFile", new LambdaFun((scope, args) => {
 				String fileName = scope["fileName"].ToString();
@@ -226,7 +207,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			Module GetModule(IType obj) {
+			static Module GetModule(IType obj) {
 				if (obj is Module m) {
 					return m;
 				}
@@ -294,18 +275,8 @@ namespace Lumen.Lang {
 			}
 			});
 
-			this.SetMember("assert", new LambdaFun((scope, args) => {
-				Assert(scope["condition"].ToBoolean(), scope);
-
-				return Const.UNIT;
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("condition")
-				}
-			});
-
 			this.SetMember("functionIsNotImplementedForType", new LambdaFun((scope, args) => {
-				FunctionIsNotImplementedForType(scope["fName"].ToString(), scope["t"], scope);
+				FunctionIsNotImplementedForType(scope["fName"].ToString(), scope["t"]);
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
@@ -344,7 +315,7 @@ namespace Lumen.Lang {
 			}
 		}
 
-		public static void FunctionIsNotImplementedForType(String functionName, Value typeName, Scope scope) {
+		public static void FunctionIsNotImplementedForType(String functionName, Value typeName) {
 			throw FunctionIsNotImplemented.constructor.MakeInstance(typeName, new Text(functionName)).ToException();
 
 		}

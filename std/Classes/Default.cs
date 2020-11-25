@@ -7,7 +7,7 @@ namespace Lumen.Lang {
 			this.Name = "Default";
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Default.default", scope["self"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Default.default", scope["self"].Type);
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {

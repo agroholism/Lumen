@@ -8,7 +8,7 @@ namespace Lumen.Lang {
 			this.Name = "Applicative";
 
 			this.SetMember("liftA", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Applicative.liftA", scope["x"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Applicative.liftA", scope["x"].Type);
 				return Const.UNIT;
 			}) {
 				Name = "liftA",

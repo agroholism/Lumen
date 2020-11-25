@@ -14,7 +14,7 @@ namespace Lumen.Lang {
 			this.Name = "Functor";
 
 			this.SetMember("fmap", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Functor.fmap", scope["x"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Functor.fmap", scope["x"].Type);
 				return Const.UNIT;
 			}) {
 				Name = "fmap",

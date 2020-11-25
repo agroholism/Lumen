@@ -13,7 +13,7 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Applicative);
 
 			this.SetMember("toStream", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Collection.toStream", scope["self"].Type, scope);
+				Prelude.FunctionIsNotImplementedForType("Collection.toStream", scope["self"].Type);
 				return Const.UNIT;
 			}) {
 				Name = "toStream",

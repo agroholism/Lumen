@@ -447,16 +447,12 @@ namespace Lumen.Lang {
 				}
 			});
 
-			#region StandartConverters
-
 			this.SetMember("toText", new LambdaFun((scope, args) => {
 				Value num = scope["self"];
 				return new Text(num.ToString());
 			}) {
 				Parameters = Const.Self
 			});
-
-			#endregion
 
 			this.SetMember("clone", new LambdaFun((scope, args) => {
 				return scope["self"];
