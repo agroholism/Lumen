@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using Lumen.Lang.Expressions;
 
+using System.Threading.Tasks;
+
 namespace Lumen.Lang {
 	public sealed class Prelude : Module {
 		#region Fields
@@ -41,6 +43,7 @@ namespace Lumen.Lang {
 		public static Module Pair { get; } = new MutableMapModule.PairModule();
 		public static Module Text { get; } = new TextModule();
 		public static Module List { get; } = new ListModule();
+		public static Module Future { get; } = new FutureModule();
 
 		public static Module Logical { get; } = new LogicalModule();
 
@@ -104,6 +107,8 @@ namespace Lumen.Lang {
 			this.SetMember("Function", Function);
 			this.SetMember("Collection", Collection);
 
+			this.SetMember("Future", Future);
+
 			this.SetMember("MutableMap", MutableMap);
 
 			this.SetMember("true", Const.TRUE);
@@ -148,6 +153,20 @@ namespace Lumen.Lang {
 				}
 
 				return Prelude.None;
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("fileName")
+				}
+			});
+
+			this.SetMember("readFileAsync", new LambdaFun((scope, args) => {
+				String fileName = scope["fileName"].ToString();
+
+				StreamReader stream = File.OpenText(fileName);
+				return new Future(stream.ReadToEndAsync().ContinueWith(task => {
+					stream.Dispose();
+					return (Value)new Text(task.Result);
+				}));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("fileName")

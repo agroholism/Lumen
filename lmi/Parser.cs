@@ -818,12 +818,12 @@ namespace Lumen.Lmi {
 					continue;
 				}
 
-				if (this.Match(TokenType.FORWARD_PIPE)) {
+				if (expr is not BlockE && this.Match(TokenType.FORWARD_PIPE)) {
 					expr = new Applicate(this.Range(), new List<Expression> { expr }, this.file, this.line);
 					continue;
 				}
 
-				if (this.Match(TokenType.BACKWARD_PIPE)) {
+				if (expr is not BlockE &&  this.Match(TokenType.BACKWARD_PIPE)) {
 					expr = new Applicate(expr, new List<Expression> { this.Range() }, this.file, this.line);
 					continue;
 				}
@@ -1289,22 +1289,8 @@ namespace Lumen.Lmi {
 
 			Int32 line = this.line;
 			while (!this.Match(TokenType.BLOCK_END)) {
-				if (this.Match(TokenType.EOF)) {
-					throw new LumenException("пропущена закрывающая фигурная скобка", line, this.file);
-				}
-
 				block.Add(this.Expression());
 				this.Match(TokenType.EOC);
-			}
-
-			// Optimization
-			if (block.expressions.Count == 1) {
-				if (block.expressions[0] is BindingDeclaration vd) {
-					return vd.assignableExpression;
-				}
-				else {
-					return block.expressions[0];
-				}
 			}
 
 			return block;

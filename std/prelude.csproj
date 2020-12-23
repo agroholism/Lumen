@@ -50,6 +50,7 @@
     <Compile Include="CallStackRecord.cs" />
     <Compile Include="Expression\NativeExpression.cs" />
     <Compile Include="Modules\ConvertError.cs" />
+    <Compile Include="Modules\FutureModule.cs" />
     <Compile Include="Modules\TailRecursion.cs" />
     <Compile Include="Modules\UnitModule.cs" />
     <Compile Include="Values\Constructors\ExceptionConstructor.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Modules\RefModule.cs" />
     <Compile Include="Modules\IteratorModule.cs" />
     <Compile Include="Values\Generators\StopGenerator.cs" />
+    <Compile Include="Values\Future.cs" />
     <Compile Include="Values\Unit.cs" />
     <Compile Include="Values\Constructors\Constructor.cs" />
     <Compile Include="Expression\ClosureManager.cs" />
