@@ -115,6 +115,14 @@ Lumen 0.8
 + typeof
 + method call syntax
 
+25.12.2020
++ Stream -> Seq
++ MutableArray -> MutArray
++ MutableMap -> MutMap
++ Array literal @[]
++ Seq literal #[]
++ seqOf, mutArrayOf, mutMapOf, listOf
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)

@@ -54,17 +54,17 @@ namespace Lumen.Lang {
 		}
 
 		public static Dictionary<Value, Value> ToDictionary(this Value value, Scope scope) {
-			return value is MutableMap map ? map.InternalValue :
-				throw Helper.CreateConvertError(value.Type, Prelude.MutableMap).ToException();
+			return value is MutMap map ? map.InternalValue :
+				throw Helper.CreateConvertError(value.Type, Prelude.MutMap).ToException();
 		}
 
 		public static List<Value> ToList(this Value value, Scope scope) {
-			return value is MutableArray array ? array.InternalValue :
+			return value is MutArray array ? array.InternalValue :
 				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException();
 		}
 
-		public static Boolean TryConvertToStream(this Value value, Scope scope, out IEnumerable<Value> result) {
-			if (value is Stream stream) {
+		public static Boolean TryConvertToSeq(this Value value, Scope scope, out IEnumerable<Value> result) {
+			if (value is Seq stream) {
 				result = stream.InternalValue;
 				return true;
 			}
@@ -75,9 +75,9 @@ namespace Lumen.Lang {
 			}
 
 			if (value.Type.HasImplementation(Prelude.Collection)
-				&& value.Type.TryGetMember("toStream", out Value converterPrototype)
+				&& value.Type.TryGetMember("toSeq", out Value converterPrototype)
 				&& converterPrototype.TryConvertToFunction(out Fun converter)) {
-				result = converter.Call(new Scope(scope), value).ToStream(scope);
+				result = converter.Call(new Scope(scope), value).ToSeq(scope);
 				return true;
 			}
 
@@ -85,12 +85,12 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public static IEnumerable<Value> ToStream(this Value value, Scope scope) {
-			if(value.TryConvertToStream(scope, out var result)) {
+		public static IEnumerable<Value> ToSeq(this Value value, Scope scope) {
+			if(value.TryConvertToSeq(scope, out var result)) {
 				return result;
 			}
 
-			throw Helper.CreateConvertError(value.Type, Prelude.Stream).ToException();
+			throw Helper.CreateConvertError(value.Type, Prelude.Seq).ToException();
 		}
 
 		public static Boolean TryConvertToException(this Value value, out LumenException result) {

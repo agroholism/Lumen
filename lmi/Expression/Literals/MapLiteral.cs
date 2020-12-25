@@ -21,7 +21,7 @@ namespace Lumen.Lmi {
                 res.Add(i.Key.Eval(e), i.Value.Eval(e));
             }
 
-            return new MutableMap(res);
+            return new MutMap(res);
         }
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

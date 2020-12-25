@@ -341,7 +341,7 @@ namespace Lumen.Lmi {
 
 				paramters.Add(parameterName, types);
 
-				if(hasParens) {
+				if (hasParens) {
 					this.Consume(TokenType.PAREN_CLOSE);
 				}
 			}
@@ -426,13 +426,13 @@ namespace Lumen.Lmi {
 				}
 			}
 			else if (this.Match(TokenType.LIST_OPEN)) {
-				if (this.Match(TokenType.LIST_CLOSE)) {
+				if (this.Match(TokenType.COLLECTION_CLOSE)) {
 					result = EmptyListPattern.Instance;
 				}
 				else {
 					List<IPattern> subpatterns = new List<IPattern>();
 
-					while (!this.Match(TokenType.LIST_CLOSE)) {
+					while (!this.Match(TokenType.COLLECTION_CLOSE)) {
 						subpatterns.Add(this.ParsePattern());
 						this.Match(TokenType.SPLIT);
 					}
@@ -471,7 +471,7 @@ namespace Lumen.Lmi {
 
 						List<IPattern> subpatterns = new List<IPattern>();
 						while (!this.LookMatch(0, TokenType.PAREN_CLOSE)
-							&& !this.LookMatch(0, TokenType.LIST_CLOSE)
+							&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE)
 							&& !this.LookMatch(0, TokenType.LAMBDA)
 							&& !this.LookMatch(0, TokenType.EQUALS)) {
 							subpatterns.Add(this.ParsePattern());
@@ -491,7 +491,7 @@ namespace Lumen.Lmi {
 
 					List<IPattern> subpatterns = new List<IPattern>();
 
-					while (!this.LookMatch(0, TokenType.EQUALS) && !this.LookMatch(0, TokenType.LIST_CLOSE) && !this.LookMatch(0, TokenType.PAREN_CLOSE) && !this.LookMatch(0, TokenType.LAMBDA) && !this.LookMatch(0, TokenType.BAR)) {
+					while (!this.LookMatch(0, TokenType.EQUALS) && !this.LookMatch(0, TokenType.COLLECTION_CLOSE) && !this.LookMatch(0, TokenType.PAREN_CLOSE) && !this.LookMatch(0, TokenType.LAMBDA) && !this.LookMatch(0, TokenType.BAR)) {
 						subpatterns.Add(this.ParsePattern());
 					}
 
@@ -807,23 +807,22 @@ namespace Lumen.Lmi {
 		private Expression FunctionalOperators() {
 			Expression expr = this.Range();
 
-			while (true) {
+			while (expr is not BlockE) {
 				Token current = this.GetToken(0);
 
 				if (current.Type == TokenType.MIDDLE_PRIORITY_RIGTH) {
 					this.Match(current.Type);
 
 					expr = new BinaryOperator(expr, this.Range(), current.Text, this.line, this.file);
-					current = this.GetToken(0);
 					continue;
 				}
 
-				if (expr is not BlockE && this.Match(TokenType.FORWARD_PIPE)) {
+				if (this.Match(TokenType.FORWARD_PIPE)) {
 					expr = new Applicate(this.Range(), new List<Expression> { expr }, this.file, this.line);
 					continue;
 				}
 
-				if (expr is not BlockE &&  this.Match(TokenType.BACKWARD_PIPE)) {
+				if (this.Match(TokenType.BACKWARD_PIPE)) {
 					expr = new Applicate(expr, new List<Expression> { this.Range() }, this.file, this.line);
 					continue;
 				}
@@ -1006,6 +1005,7 @@ namespace Lumen.Lmi {
 				|| this.LookMatch(0, TokenType.BANG)
 				|| this.LookMatch(0, TokenType.LIST_OPEN)
 				|| this.LookMatch(0, TokenType.ARRAY_OPEN)
+				|| this.LookMatch(0, TokenType.SEQ_OPEN)
 				|| this.LookMatch(0, TokenType.NUMBER)
 				|| this.LookMatch(0, TokenType.TEXT)
 				|| this.LookMatch(0, TokenType.VOID)
@@ -1066,7 +1066,7 @@ namespace Lumen.Lmi {
 			while (this.Match(TokenType.LIST_OPEN)) {
 				List<Expression> indices = new List<Expression>();
 
-				while (!this.Match(TokenType.LIST_CLOSE)) {
+				while (!this.Match(TokenType.COLLECTION_CLOSE)) {
 					indices.Add(this.Expression());
 					this.Match(TokenType.SPLIT);
 				}
@@ -1096,7 +1096,7 @@ namespace Lumen.Lmi {
 
 				ForCycle result = this.ParseFor();
 
-				this.Match(TokenType.LIST_CLOSE);
+				this.Match(TokenType.COLLECTION_CLOSE);
 
 				return new ListGenerator(new SequenceGenerator(result.cycleName, result.pattern, result.expression, result.body));
 			}
@@ -1107,9 +1107,21 @@ namespace Lumen.Lmi {
 
 				ForCycle result = this.ParseFor();
 
-				this.Match(TokenType.ARRAY_CLOSE);
+				this.Match(TokenType.COLLECTION_CLOSE);
 
 				return new ArrayGenerator(new SequenceGenerator(result.cycleName, result.pattern, result.expression, result.body));
+			}
+
+			// Sequence generators
+			if (this.LookMatch(0, TokenType.SEQ_OPEN) && this.LookMatch(1, TokenType.FOR)) {
+				this.Match(TokenType.SEQ_OPEN);
+				this.Match(TokenType.FOR);
+
+				ForCycle result = this.ParseFor();
+
+				this.Match(TokenType.COLLECTION_CLOSE);
+
+				return new SequenceGenerator(result.cycleName, result.pattern, result.expression, result.body);
 			}
 
 			// Lists
@@ -1118,7 +1130,7 @@ namespace Lumen.Lmi {
 
 				Boolean shouldExpectEndToken = this.Match(TokenType.BLOCK_START);
 
-				while (!this.Match(TokenType.LIST_CLOSE)) {
+				while (!this.Match(TokenType.COLLECTION_CLOSE)) {
 					if (this.Match(TokenType.EOF)) {
 						throw new LumenException(Exceptions.UNCLOSED_LIST_LITERAL, line: Current.Line, fileName: this.file);
 					}
@@ -1126,7 +1138,7 @@ namespace Lumen.Lmi {
 					elements.Add(this.Expression());
 					this.MatchAny(TokenType.SPLIT, TokenType.EOC);
 
-					if (shouldExpectEndToken && this.LookMatch(0, TokenType.BLOCK_END) && this.LookMatch(1, TokenType.LIST_CLOSE)) {
+					if (shouldExpectEndToken && this.LookMatch(0, TokenType.BLOCK_END) && this.LookMatch(1, TokenType.COLLECTION_CLOSE)) {
 						this.Match(TokenType.BLOCK_END);
 					}
 				}
@@ -1134,16 +1146,48 @@ namespace Lumen.Lmi {
 				return new ListE(elements);
 			}
 
-			if (this.Match(TokenType.YIELD)) {
-				if (this.Match(TokenType.FROM)) {
-					return new YieldFrom(this.Expression());
+			// Arrays
+			if (this.Match(TokenType.ARRAY_OPEN)) {
+				List<Expression> elements = new List<Expression>();
+
+				Boolean shouldExpectEndToken = this.Match(TokenType.BLOCK_START);
+
+				while (!this.Match(TokenType.COLLECTION_CLOSE)) {
+					if (this.Match(TokenType.EOF)) {
+						throw new LumenException(Exceptions.UNCLOSED_ARRAY_LITERAL, line: Current.Line, fileName: this.file);
+					}
+
+					elements.Add(this.Expression());
+					this.MatchAny(TokenType.SPLIT, TokenType.EOC);
+
+					if (shouldExpectEndToken && this.LookMatch(0, TokenType.BLOCK_END) && this.LookMatch(1, TokenType.COLLECTION_CLOSE)) {
+						this.Match(TokenType.BLOCK_END);
+					}
 				}
 
-				if (this.LookMatch(0, TokenType.BLOCK_END) || this.LookMatch(0, TokenType.PAREN_CLOSE) || this.Match(TokenType.EOC) || this.Match(TokenType.EOF)) {
-					return new Yield(UnitLiteral.Instance);
+				return new ArrayLiteral(elements);
+			}
+
+			// Sequences
+			if (this.Match(TokenType.SEQ_OPEN)) {
+				List<Expression> elements = new List<Expression>();
+
+				Boolean shouldExpectEndToken = this.Match(TokenType.BLOCK_START);
+
+				while (!this.Match(TokenType.COLLECTION_CLOSE)) {
+					if (this.Match(TokenType.EOF)) {
+						throw new LumenException(Exceptions.UNCLOSED_ARRAY_LITERAL, line: Current.Line, fileName: this.file);
+					}
+
+					elements.Add(this.Expression());
+					this.MatchAny(TokenType.SPLIT, TokenType.EOC);
+
+					if (shouldExpectEndToken && this.LookMatch(0, TokenType.BLOCK_END) && this.LookMatch(1, TokenType.COLLECTION_CLOSE)) {
+						this.Match(TokenType.BLOCK_END);
+					}
 				}
 
-				return new Yield(this.Expression());
+				return new SeqLiteral(elements);
 			}
 
 			// Tail recursion
@@ -1158,43 +1202,21 @@ namespace Lumen.Lmi {
 				return res;
 			}
 
-			// Arrays
-			if (this.Match(TokenType.ARRAY_OPEN)) {
-				List<Expression> elements = new List<Expression>();
-
-				Boolean shouldExpectEndToken = this.Match(TokenType.BLOCK_START);
-
-				while (!this.Match(TokenType.ARRAY_CLOSE)) {
-					if (this.Match(TokenType.EOF)) {
-						throw new LumenException(Exceptions.UNCLOSED_ARRAY_LITERAL, line: Current.Line, fileName: this.file);
-					}
-
-					elements.Add(this.Expression());
-					this.MatchAny(TokenType.SPLIT, TokenType.EOC);
-
-					if (shouldExpectEndToken && this.LookMatch(0, TokenType.BLOCK_END) && this.LookMatch(1, TokenType.ARRAY_CLOSE)) {
-						this.Match(TokenType.BLOCK_END);
-					}
+			if (this.Match(TokenType.YIELD)) {
+				if (this.Match(TokenType.FROM)) {
+					return new YieldFrom(this.Expression());
 				}
 
-				return new ArrayLiteral(elements);
+				if (this.LookMatch(0, TokenType.BLOCK_END) || this.LookMatch(0, TokenType.PAREN_CLOSE) || this.Match(TokenType.EOC) || this.Match(TokenType.EOF)) {
+					return new Yield(UnitLiteral.Instance);
+				}
+
+				return new Yield(this.Expression());
 			}
 
 			// Number literals
 			if (this.Match(TokenType.NUMBER)) {
 				return new ValueLiteral(Double.Parse(Current.Text, System.Globalization.NumberFormatInfo.InvariantInfo));
-			}
-
-			// Sequence generators
-			if (this.LookMatch(0, TokenType.PAREN_OPEN) && this.LookMatch(1, TokenType.FOR)) {
-				this.Match(TokenType.PAREN_OPEN);
-				this.Match(TokenType.FOR);
-
-				ForCycle result = this.ParseFor();
-
-				this.Match(TokenType.PAREN_CLOSE);
-
-				return new SequenceGenerator(result.cycleName, result.pattern, result.expression, result.body);
 			}
 
 			if (this.Match(TokenType.FUN)) {
@@ -1234,13 +1256,7 @@ namespace Lumen.Lmi {
 
 			if (this.Match(TokenType.PAREN_OPEN)) {
 				Expression result = this.Expression();
-
-				if (this.LookMatch(0, TokenType.SPLIT) && result is RangeOperator rangeOperator) {
-					this.Match(TokenType.SPLIT);
-					rangeOperator.AddStep(this.Expression());
-				}
-
-				this.Match(TokenType.PAREN_CLOSE);
+				this.Consume(TokenType.PAREN_CLOSE);
 				return result;
 			}
 
@@ -1287,7 +1303,6 @@ namespace Lumen.Lmi {
 			BlockE block = new BlockE();
 			this.Match(TokenType.BLOCK_START);
 
-			Int32 line = this.line;
 			while (!this.Match(TokenType.BLOCK_END)) {
 				block.Add(this.Expression());
 				this.Match(TokenType.EOC);
@@ -1347,4 +1362,4 @@ namespace Lumen.Lmi {
 		}
 	}
 }
-// 1229 -> 1143 -> 961
+// 1229 -> 1143 -> 961 -> 1348 (122520)

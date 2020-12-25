@@ -98,7 +98,7 @@ namespace Lumen.Lang {
 		}
 
 		public static Instance CreatePair(Value key, Value value) {
-			Instance result = new Instance(MutableMapModule.PairModule.ctor as Constructor);
+			Instance result = new Instance(MutMapModule.PairModule.ctor as Constructor);
 
 			result.Items[0] = key;
 			result.Items[1] = value;
@@ -110,20 +110,20 @@ namespace Lumen.Lang {
 			return new List(pair.Key, pair.Value);
 		}
 
-		internal static Value FromStream(IType type, IEnumerable<Value> values, Scope scope) {
+		internal static Value FromSeq(IType type, IEnumerable<Value> values, Scope scope) {
 			if (type == Prelude.List) {
 				return new List(LinkedList.Create(values));
 			}
 
-			if (type == Prelude.MutableArray) {
-				return new MutableArray(values.ToList());
+			if (type == Prelude.MutArray) {
+				return new MutArray(values.ToList());
 			}
 
-			if (type == Prelude.Stream) {
-				return new Stream(values);
+			if (type == Prelude.Seq) {
+				return new Seq(values);
 			}
 
-			return (type.GetMember("fromStream", scope) as Fun).Call(new Scope(scope), new Stream(values));
+			return (type.GetMember("fromSeq", scope) as Fun).Call(new Scope(scope), new Seq(values));
 		}
 
 		public static Value MakePartial(Fun function, Value[] vals) {

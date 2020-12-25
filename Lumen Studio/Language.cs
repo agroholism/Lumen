@@ -28,7 +28,7 @@ namespace Lumen.Studio {
 				List<AutocompleteItem> result = new List<AutocompleteItem>();
 
 				foreach (Value i in res.ToList(null)) {
-					if (i is Lang.MutableArray) {
+					if (i is Lang.MutArray) {
 						List<Value> lst = i.ToList(null);
 						AutocompleteItem aci = new AutocompleteItem {
 							Text = lst[0].ToString(),

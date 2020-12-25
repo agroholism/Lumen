@@ -17,6 +17,11 @@ namespace Lumen.Lang {
 			this._lambda = lambda;
 		}
 
+		public LambdaFun(LumenFunc lambda, List<IPattern> parameters) {
+			this._lambda = lambda;
+			this.Parameters = parameters;
+		}
+
 		public Value Call(Scope e, params Value[] arguments) {
 			// Too less given args - partial application
 			if (this.Parameters?.Count > arguments.Length) {

@@ -5,17 +5,17 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
 	public class UserFun : Fun {
-		public Expression Body;
+		private Expression body;
 		public List<IPattern> Parameters { get; set; } = new List<IPattern>();
 		public String Name { get; set; }
 		public IType Type => Prelude.Function;
 
-		public UserFun(List<IPattern> arguments, Expression Body) {
+		public UserFun(List<IPattern> arguments, Expression body) {
 			this.Parameters = arguments;
-			this.Body = Body;
+			this.body = body;
 		}
 
-		public UserFun(List<IPattern> arguments, Expression Body, String name) : this(arguments, Body) {
+		public UserFun(List<IPattern> arguments, Expression body, String name) : this(arguments, body) {
 			this.Name = name;
 		}
 
@@ -76,7 +76,7 @@ namespace Lumen.Lang {
 
 			Value result;
 			try {
-				result = this.Body.Eval(e);
+				result = this.body.Eval(e);
 			}
 			catch (Return rt) {
 				result = rt.Result;

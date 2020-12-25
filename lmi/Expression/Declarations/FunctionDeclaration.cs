@@ -27,7 +27,6 @@ namespace Lumen.Lmi {
 			ClosureManager manager = new ClosureManager(scope);
 
 			// Make closure of arguments patterns
-			// Because here can be (x: Number), (Pair x y), etc. 
 			List<IPattern> closuredPatterns =
 				this.arguments.Select(argument => argument.Closure(manager) as IPattern).ToList();
 
@@ -37,12 +36,12 @@ namespace Lumen.Lmi {
 
 			// If it's true - this is generator
 			if (manager.HasYield) {
-				/*if (manager.HasTailRecursion) {
+				if (manager.HasTailRecursion) {
 					throw new LumenException("function can not have tail recursion and yield at the same time");
 				}
-				*/
+				
 				result = new LambdaFun((scope1, args) => 
-					new Stream(new LumenGenerator(closuredBody, scope1))) {
+					new Seq(new LumenGenerator(closuredBody, scope1))) {
 					Parameters = closuredPatterns,
 					Name = this.name
 				};

@@ -109,6 +109,7 @@
     <Compile Include="Expression\Control flow\Raise.cs" />
     <Compile Include="Expression\Patterns\RangePattern.cs" />
     <Compile Include="RangeOperator.cs" />
+    <Compile Include="Expression\Literals\SeqLiteral.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenType.cs" />
     <Compile Include="Expression\Patterns\WherePattern.cs" />

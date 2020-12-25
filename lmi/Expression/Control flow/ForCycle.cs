@@ -35,7 +35,7 @@ namespace Lumen.Lmi {
 			Value container = this.expression.Eval(scope);
 
 			List<String> declared = this.pattern.GetDeclaredVariables();
-			foreach (Value i in container.ToStream(scope)) {
+			foreach (Value i in container.ToSeq(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.IsSuccess) {
@@ -76,7 +76,7 @@ REDO:
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			Value container = this.expression.Eval(scope);
 
-			foreach (Value i in container.ToStream(scope)) {
+			foreach (Value i in container.ToSeq(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.IsSuccess) {

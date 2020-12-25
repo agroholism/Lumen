@@ -40,10 +40,7 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public Boolean IsDeclared(String name) {
-			if (name == "rec" || name == "_") {
-				return true;
-			}
-			return this.declared.Contains(name);
+			return name == "rec" || name == "_" || this.declared.Contains(name);
 		}
 
 		public ClosureManager Clone() {

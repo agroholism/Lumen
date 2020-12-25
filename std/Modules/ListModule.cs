@@ -26,8 +26,8 @@ namespace Lumen.Lang {
 
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				IType typeParameter = scope["values"].Type;
-				IEnumerable<Value> values = scope["values"].ToStream(scope);
-				IEnumerable<Value> valuesx = scope["values'"].ToStream(scope);
+				IEnumerable<Value> values = scope["values"].ToSeq(scope);
+				IEnumerable<Value> valuesx = scope["values'"].ToSeq(scope);
 
 				return new List(values.Concat(valuesx));
 			}) {
@@ -58,7 +58,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("filter", new LambdaFun((scope, args) => {
 				Fun mapper = scope["pred"].ToFunction(scope);
-				IEnumerable<Value> values = scope["list"].ToStream(scope);
+				IEnumerable<Value> values = scope["list"].ToSeq(scope);
 
 				return new List(values.Where(i => mapper.Call(new Scope(scope), i).ToBoolean()));
 			}) {
@@ -119,25 +119,25 @@ namespace Lumen.Lang {
 					new NamePattern("this")
 				}
 			});
-			this.SetMember("toStream", new LambdaFun((e, args) => {
-				return new Stream(e["this"].ToLinkedList(e));
+			this.SetMember("toSeq", new LambdaFun((e, args) => {
+				return new Seq(e["this"].ToLinkedList(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("this")
 				}
 			});
 			this.SetMember("toArray", new LambdaFun((e, args) => {
-				return new MutableArray(e["l"].ToLinkedList(e).ToList());
+				return new MutArray(e["l"].ToLinkedList(e).ToList());
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("l")
 				}
 			});
 
-			this.SetMember("fromStream", new LambdaFun((scope, args) => {
-				return new List(scope["x"].ToStream(scope));
+			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
+				return new List(scope["x"].ToSeq(scope));
 			}) {
-				Name = "fromStream",
+				Name = "fromSeq",
 				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}

@@ -53,7 +53,7 @@
         BLOCK_END,
 
         LIST_OPEN,
-        LIST_CLOSE,
+        COLLECTION_CLOSE,
 
         ARRAY_OPEN,
         ARRAY_CLOSE,
@@ -100,6 +100,7 @@
 		RETRY,
 		ANNOTATION,
 		DOT_LESS,
-		ASSERT
+		ASSERT,
+		SEQ_OPEN
 	}
 }

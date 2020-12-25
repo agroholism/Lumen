@@ -20,7 +20,7 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			foreach(Value i in this.expression.Eval(scope).ToStream(scope)) {
+			foreach(Value i in this.expression.Eval(scope).ToSeq(scope)) {
 				yield return i;
 			}
 		}

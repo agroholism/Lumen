@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class MutableArrayModule : Module {
-		public MutableArrayModule() {
-			this.Name = "MutableArray";
+	internal class MutArrayModule : Module {
+		public MutArrayModule() {
+			this.Name = "MutArray";
 
 			/*
 Array.add+2404
@@ -51,7 +51,7 @@ Array.refs
 			#endregion
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
-				return new MutableArray();
+				return new MutArray();
 			}) {
 				Parameters = new List<IPattern> { }
 			});
@@ -62,7 +62,7 @@ Array.refs
 				List<Value> clone = new List<Value>();
 				clone.AddRange(array);
 
-				return new MutableArray(clone);
+				return new MutArray(clone);
 			}) {
 				Parameters = Const.Self
 			});
@@ -83,7 +83,7 @@ Array.refs
 			this.SetMember("addAll", new LambdaFun((scope, args) => {
 				List<Value> array = scope["self"].ToList(scope);
 
-				array.AddRange(scope["elements"].ToStream(scope));
+				array.AddRange(scope["elements"].ToSeq(scope));
 
 				return Const.UNIT;
 			}) {
@@ -162,7 +162,7 @@ Array.refs
 
 				value.Sort();
 
-				return new MutableArray(value);
+				return new MutArray(value);
 			}) {
 				Parameters = Const.Self
 			});
@@ -178,7 +178,7 @@ Array.refs
 					return first.CompareTo(second);
 				});
 
-				return new MutableArray(value);
+				return new MutArray(value);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self") , new NamePattern("other")
@@ -194,7 +194,7 @@ Array.refs
 					return (Int32)Converter.ToDouble(comparator.Call(new Scope(scope), i, j), scope);
 				});
 
-				return new MutableArray(value);
+				return new MutArray(value);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self") , new NamePattern("other")
@@ -207,7 +207,7 @@ Array.refs
 
 				value.Sort((i, j) => j.CompareTo(i));
 
-				return new MutableArray(value);
+				return new MutArray(value);
 			}) {
 				Parameters = Const.Self
 			});
@@ -223,7 +223,7 @@ Array.refs
 					return second.CompareTo(first);
 				});
 
-				return new MutableArray(value);
+				return new MutArray(value);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self") , new NamePattern("other")
@@ -239,7 +239,7 @@ Array.refs
 					return -(Int32)Converter.ToDouble(comparator.Call(new Scope(scope), i, j), scope);
 				});
 
-				return new MutableArray(value);
+				return new MutArray(value);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self") , new NamePattern("other")
@@ -329,17 +329,17 @@ Array.refs
 				Parameters = Const.Self
 			});
 
-			this.SetMember("fromStream", new LambdaFun((scope, args) => {
-				return new MutableArray(scope["x"].ToStream(scope));
+			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
+				return new MutArray(scope["x"].ToSeq(scope));
 			}) {
-				Name = "fromStream",
+				Name = "fromSeq",
 				Parameters = new List<IPattern> {
 					new NamePattern("x")
 				}
 			});
 
-			this.SetMember("toStream", new LambdaFun((e, args) => {
-				return new Stream(e["array"].ToList(e));
+			this.SetMember("toSeq", new LambdaFun((e, args) => {
+				return new Seq(e["array"].ToList(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("array")

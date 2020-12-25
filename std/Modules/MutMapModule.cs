@@ -4,9 +4,9 @@ using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class MutableMapModule : Module {
-		internal MutableMapModule() {
-			this.Name = "MutableMap";
+	internal class MutMapModule : Module {
+		internal MutMapModule() {
+			this.Name = "MutMap";
 
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
 				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
@@ -66,13 +66,13 @@ namespace Lumen.Lang {
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				Value value = e["initValue"];
-				MutableMap result = new MutableMap();
+				MutMap result = new MutMap();
 
 				if (value == Const.UNIT) {
 					return result;
 				}
 
-				foreach (Value i in value.ToStream(e)) {
+				foreach (Value i in value.ToSeq(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
@@ -85,8 +85,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("getValues", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((MutableMap)e.Get("m")).InternalValue;
-				return new MutableArray(dict.Values.ToList());
+				IDictionary<Value, Value> dict = ((MutMap)e.Get("m")).InternalValue;
+				return new MutArray(dict.Values.ToList());
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("m")
@@ -94,8 +94,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("getKeys", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((MutableMap)e.Get("m")).InternalValue;
-				return new MutableArray(dict.Keys.ToList());
+				IDictionary<Value, Value> dict = ((MutMap)e.Get("m")).InternalValue;
+				return new MutArray(dict.Keys.ToList());
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("m")
@@ -124,11 +124,11 @@ namespace Lumen.Lang {
 			 });
 			 */
 
-			this.SetMember("fromStream", new LambdaFun((e, args) => {
+			this.SetMember("fromSeq", new LambdaFun((e, args) => {
 				Value value = e["stream"];
-				MutableMap result = new MutableMap();
+				MutMap result = new MutMap();
 
-				foreach (Value i in value.ToStream(e)) {
+				foreach (Value i in value.ToSeq(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
@@ -140,9 +140,9 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("toStream", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> self = ((MutableMap)e["self"]).InternalValue;
-				return new Stream(self.Select(Helper.CreatePair));
+			this.SetMember("toSeq", new LambdaFun((e, args) => {
+				IDictionary<Value, Value> self = ((MutMap)e["self"]).InternalValue;
+				return new Seq(self.Select(Helper.CreatePair));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")
@@ -155,7 +155,7 @@ namespace Lumen.Lang {
             }));*/
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
-				return new MutableMap();
+				return new MutMap();
 			}) {
 				Parameters = new List<IPattern> { }
 			});

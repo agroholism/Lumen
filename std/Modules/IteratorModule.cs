@@ -10,11 +10,11 @@ namespace Lumen.Lang {
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				Value x = scope["stream"];
 
-				if (x is Stream s && s.InternalValue is LumenGenerator lgn) {
+				if (x is Seq s && s.InternalValue is LumenGenerator lgn) {
 					return lgn.GetEnumerator() as Value;
 				}
 
-				IEnumerable<Value> stream = x.ToStream(scope);
+				IEnumerable<Value> stream = x.ToSeq(scope);
 
 				return new LumenIterator(stream.GetEnumerator(), scope);
 			}) {
@@ -82,22 +82,14 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("toStream", new LambdaFun((e, args) => {
-				return new Stream(e["this"].ToList(e));
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("this")
-				}
-			});
-
-			this.SetMember("fromStream", new LambdaFun((scope, args) => {
+			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
 				Value x = scope["stream"];
 
-				if (x is Stream s && s.InternalValue is LumenGenerator lgn) {
+				if (x is Seq s && s.InternalValue is LumenGenerator lgn) {
 					return lgn.GetEnumerator() as Value;
 				}
 
-				IEnumerable<Value> stream = x.ToStream(scope);
+				IEnumerable<Value> stream = x.ToSeq(scope);
 
 				return new LumenIterator(stream.GetEnumerator(), scope);
 			}) {
@@ -105,8 +97,6 @@ namespace Lumen.Lang {
 					new NamePattern("x")
 				}
 			});
-
-			this.AppendImplementation(Prelude.Collection);
 		}
 	}
 }

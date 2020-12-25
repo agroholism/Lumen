@@ -15,7 +15,7 @@ namespace Lumen.Lmi {
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
-			if (value is Lang.MutableArray array) {
+			if (value is Lang.MutArray array) {
 				List<Value> castedArray = array.ToList(scope);
 
 				if (castedArray.Count != this.subpatterns.Count) {

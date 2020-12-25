@@ -4,18 +4,18 @@ using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class StreamModule : Module {
-		public StreamModule() {
-			this.Name = "Stream";
+	internal class SeqModule : Module {
+		public SeqModule() {
+			this.Name = "Seq";
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
-				return new Stream(Enumerable.Empty<Value>());
+				return new Seq(Enumerable.Empty<Value>());
 			}) {
 				Parameters = new List<IPattern> { }
 			});
 
-			this.SetMember("toStream", new LambdaFun((e, args) => {
-				return new Stream(e["this"].ToList(e));
+			this.SetMember("toSeq", new LambdaFun((e, args) => {
+				return new Seq(e["this"].ToList(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("this")
@@ -91,8 +91,8 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("toStream", new LambdaFun((e, args) => {
-				return new Stream(e["self"].ToStream(e));
+			this.SetMember("toSeq", new LambdaFun((e, args) => {
+				return new Seq(e["self"].ToSeq(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")

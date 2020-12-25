@@ -6,55 +6,49 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
 namespace Lumen.Lmi {
-    public class LambdaLiteral : Expression {
-        public List<IPattern> arguments;
-        public Expression body;
+	public class LambdaLiteral : Expression {
+		private List<IPattern> parameters;
+		private Expression body;
 
-		public Boolean isIntern = false;
+		public LambdaLiteral(List<IPattern> parameters, Expression body) {
+			this.parameters = parameters;
+			this.body = body;
+		}
 
-		public LambdaLiteral(List<IPattern> arguments, Expression body) {
-            this.arguments = arguments;
-            this.body = body;
-        }
+		public Value Eval(Scope scope) {
+			ClosureManager manager = new ClosureManager(scope);
 
-        public Expression Closure(ClosureManager manager) {
-			ClosureManager newManager = manager.Clone();
-			return new LambdaLiteral(this.arguments.Select(i => i.Closure(newManager) as IPattern).ToList(), this.body.Closure(newManager));
-        }
+			List<IPattern> closuredParameters =
+				this.parameters.Select(parameter => parameter.Closure(manager) as IPattern).ToList();
 
-        public Value Eval(Scope e) {
-			ClosureManager manager = new ClosureManager(e);
-
-			manager.Declare(new List<String>() { "self", "_" });
-
-			foreach (IPattern i in this.arguments) {
-				manager.Declare(i.GetDeclaredVariables());
-			}
-
-			Expression x = this.body.Closure(manager);
+			Expression closuredBody = this.body.Closure(manager);
 
 			if (manager.HasYield) {
-				return new LambdaFun((s, a) => {
-					return new Stream(new LumenGenerator( x, s));
-				}) {
-					Parameters = arguments
-				};
+				return new LambdaFun((generatorScope, _) =>
+					new Seq(new LumenGenerator(closuredBody, generatorScope)), closuredParameters
+				);
 			}
 
-			// todo
-			return new UserFun(this.arguments, x, "[lambda]");
-        }
+			return new UserFun(closuredParameters, closuredBody, "[AnonymousFunction]");
+		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 
-		/*public override String ToString() {
-			if(this.arguments.Count == 1) {
-				return "() -> " + Utils.Bodify(this.body);
+		public Expression Closure(ClosureManager manager) {
+			ClosureManager innerManager = manager.Clone();
+			return new LambdaLiteral(
+				this.parameters.Select(i => i.Closure(innerManager) as IPattern).ToList(), 
+				this.body.Closure(innerManager));
+		}
+
+		public override String ToString() {
+			if (this.parameters.Count == 1) {
+				return "fun -> " + Utils.Bodify(this.body);
 			}
 
-            return $"({String.Join(" ", this.arguments)}) -> " + Utils.Bodify(this.body);
-        }*/
+			return $"fun {String.Join(" ", this.parameters)} -> " + Utils.Bodify(this.body);
+		}
 	}
 }

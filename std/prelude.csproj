@@ -65,7 +65,7 @@
     <Compile Include="Values\Constructors\Constructor.cs" />
     <Compile Include="Expression\ClosureManager.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="Modules\StreamModule.cs" />
+    <Compile Include="Modules\SeqModule.cs" />
     <Compile Include="Modules\OptionModule.cs" />
     <Compile Include="Classes\Format.cs" />
     <Compile Include="Classes\Ord.cs" />
@@ -83,16 +83,16 @@
     <Compile Include="Modules\Any.cs" />
     <Compile Include="Expression\Break.cs" />
     <Compile Include="Modules\FunctionModule.cs" />
-    <Compile Include="Modules\MutableMapModule.cs" />
+    <Compile Include="Modules\MutMapModule.cs" />
     <Compile Include="Modules\LogicalModule.cs" />
     <Compile Include="Classes\Collection.cs" />
     <Compile Include="Modules\TextModule.cs" />
-    <Compile Include="Values\Collections\Stream.cs" />
+    <Compile Include="Values\Collections\Seq.cs" />
     <Compile Include="Values\Instance.cs" />
     <Compile Include="Values\Fun\LambdaFun.cs" />
     <Compile Include="Values\Fun\UserFun.cs" />
     <Compile Include="Values\IType.cs" />
-    <Compile Include="Values\Collections\MutableMap.cs" />
+    <Compile Include="Values\Collections\MutMap.cs" />
     <Compile Include="Modules\NumberModule.cs" />
     <Compile Include="Converter.cs" />
     <Compile Include="LumenException.cs" />
@@ -101,7 +101,7 @@
     <Compile Include="Const.cs" />
     <Compile Include="Values\Logical.cs" />
     <Compile Include="Values\Fun\Fun.cs" />
-    <Compile Include="Values\Collections\MutableArray.cs" />
+    <Compile Include="Values\Collections\MutArray.cs" />
     <Compile Include="Modules\Prelude.cs" />
     <Compile Include="Expression\Expression.cs" />
     <Compile Include="Values\Number.cs" />
@@ -110,7 +110,7 @@
     <Compile Include="Values\Text.cs" />
     <Compile Include="Values\Value.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Modules\MutableArrayModule.cs" />
+    <Compile Include="Modules\MutArrayModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

@@ -34,13 +34,13 @@ namespace Lumen.Lang {
 
 		public static Module Iterator { get; } = new IteratorModule();
 		public static Module Ref { get; } = new RefModule();
-		public static Module Stream { get; } = new StreamModule();
+		public static Module Seq { get; } = new SeqModule();
 		public static Module Range { get; } = new RangeModule();
-		public static Module MutableArray { get; } = new MutableArrayModule();
+		public static Module MutArray { get; } = new MutArrayModule();
 		public static Module Function { get; } = new FunctionModule();
 		public static Module Number { get; } = new NumberModule();
-		public static Module MutableMap { get; } = new MutableMapModule();
-		public static Module Pair { get; } = new MutableMapModule.PairModule();
+		public static Module MutMap { get; } = new MutMapModule();
+		public static Module Pair { get; } = new MutMapModule.PairModule();
 		public static Module Text { get; } = new TextModule();
 		public static Module List { get; } = new ListModule();
 		public static Module Future { get; } = new FutureModule();
@@ -99,8 +99,8 @@ namespace Lumen.Lang {
 			this.SetMember("Ref", Ref);
 			this.SetMember("ref", Ref);
 			this.SetMember("List", List);
-			this.SetMember("Stream", Stream);
-			this.SetMember("MutableArray", MutableArray);
+			this.SetMember("Seq", Seq);
+			this.SetMember("MutArray", MutArray);
 			this.SetMember("Number", Number);
 			this.SetMember("Logical", Logical);
 			this.SetMember("Text", Text);
@@ -109,7 +109,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("Future", Future);
 
-			this.SetMember("MutableMap", MutableMap);
+			this.SetMember("MutMap", MutMap);
 
 			this.SetMember("true", Const.TRUE);
 			this.SetMember("false", Const.FALSE);
@@ -173,38 +173,19 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("readLines", new LambdaFun((scope, args) => {
+			this.SetMember("readFileLines", new LambdaFun((scope, args) => {
 				String fileName = scope["fileName"].ToString();
 
 				if (File.Exists(fileName)) {
 					try {
-						return new List(LinkedList.Create(File.ReadAllLines(fileName).Select(i => new Text(i))));
+						return new Seq(File.ReadLines(fileName).Select(i => new Text(i)));
 					}
 					catch {
-						return new List(LinkedList.Empty);
+						return Lang.Seq.Empty;
 					}
 				}
 
-				return new List(LinkedList.Empty);
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("fileName")
-				}
-			});
-
-			this.SetMember("readArray", new LambdaFun((scope, args) => {
-				String fileName = scope["fileName"].ToString();
-
-				if (File.Exists(fileName)) {
-					try {
-						return new MutableArray(File.ReadAllLines(fileName).Select(i => new Text(i) as Value).ToList());
-					}
-					catch {
-						return new MutableArray();
-					}
-				}
-
-				return new MutableArray();
+				return Lang.Seq.Empty;
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("fileName")
@@ -315,6 +296,70 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("inputStr")
+				}
+			});
+
+			//122520
+
+			this.SetMember("listOf", new LambdaFun((scope, args) => {
+				Value init = scope["init"];
+
+				if(init == Const.UNIT) {
+					return new List();
+				}
+
+				return new List(init.ToSeq(scope));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init")
+				}
+			});
+
+			this.SetMember("seqOf", new LambdaFun((scope, args) => {
+				Value init = scope["init"];
+
+				if (init == Const.UNIT) {
+					return new Seq(Enumerable.Empty<Value>());
+				}
+
+				return new Seq(init.ToSeq(scope));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init")
+				}
+			});
+
+			this.SetMember("mutArrayOf", new LambdaFun((scope, args) => {
+				Value init = scope["init"];
+
+				if (init == Const.UNIT) {
+					return new MutArray();
+				}
+
+				return new MutArray(init.ToSeq(scope));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init")
+				}
+			});
+
+			this.SetMember("mutMapOf", new LambdaFun((e, args) => {
+				Value value = e["init"];
+				MutMap result = new MutMap();
+
+				if (value == Const.UNIT) {
+					return result;
+				}
+
+				foreach (Value i in value.ToSeq(e)) {
+					List<Value> stream = i.ToSeq(e).Take(2).ToList();
+					result.InternalValue[stream[0]] = stream[1];
+				}
+
+				return result;
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init")
 				}
 			});
 		}

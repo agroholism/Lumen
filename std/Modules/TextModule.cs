@@ -53,7 +53,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				Value other = scope["other"];
 
-				return new Text(String.Format(self, other.ToStream(scope).ToArray()));
+				return new Text(String.Format(self, other.ToSeq(scope).ToArray()));
 			}) {
 				Parameters = Const.SelfOther
 			});
@@ -66,7 +66,7 @@ namespace Lumen.Lang {
 					String[] parts =
 						self.Split(new[] { other.ToString() }, StringSplitOptions.RemoveEmptyEntries);
 
-					return new MutableArray(parts.Select(x => (Value)new Text(x)).ToList());
+					return new MutArray(parts.Select(x => (Value)new Text(x)).ToList());
 				}
 				else if (other is Number num) {
 					Int32 maxLength = num.ToInt(scope);
@@ -83,7 +83,7 @@ namespace Lumen.Lang {
 						result.Add(new Text(buffer.ToString()));
 					}
 
-					return new MutableArray(result);
+					return new MutArray(result);
 				}
 
 				throw new LumenException("expect Text or Number");
@@ -100,7 +100,7 @@ namespace Lumen.Lang {
 					Value index = indices[0];
 
 					if (index is Fun fun) {
-						return new Stream(from ch in self
+						return new Seq(from ch in self
 										  select new Text(ch.ToString()) into value
 										  where fun.Call(new Scope(scope), value).ToBoolean()
 										  select value);
@@ -118,7 +118,7 @@ namespace Lumen.Lang {
 
 					StringBuilder buffer = new StringBuilder();
 
-					foreach (Value i in index.ToStream(scope)) {
+					foreach (Value i in index.ToSeq(scope)) {
 						if (i is Number) {
 							Int32 newIndex = Helper.Index(i.ToInt(scope), self.Length);
 
@@ -173,7 +173,7 @@ namespace Lumen.Lang {
 			// Исключения: 
 			//	ConvertException: невозможно преобразовать объект к типу Stream
 			this.SetMember("concat", new LambdaFun((scope, args) => {
-				return new Text(String.Concat(scope["values"].ToStream(scope)));
+				return new Text(String.Concat(scope["values"].ToSeq(scope)));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("values")
@@ -289,7 +289,7 @@ namespace Lumen.Lang {
 			this.SetMember("getChars", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				return new Stream(self.Select<Char, Value>(x => new Number(x)));
+				return new Seq(self.Select<Char, Value>(x => new Number(x)));
 			}) {
 				Parameters = Const.Self
 			});
@@ -568,18 +568,18 @@ namespace Lumen.Lang {
 			});
 
 
-			this.SetMember("toStream", new LambdaFun((scope, args) => {
+			this.SetMember("toSeq", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				return new Stream(this.GlobalizationEach(self));
+				return new Seq(this.GlobalizationEach(self));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
 
-			this.SetMember("fromStream", new LambdaFun((scope, args) => {
-				IEnumerable<Value> stream = scope["stream"].ToStream(scope);
+			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
+				IEnumerable<Value> stream = scope["stream"].ToSeq(scope);
 				return new Text(String.Concat(stream));
 			}) {
 				Parameters = new List<IPattern> {

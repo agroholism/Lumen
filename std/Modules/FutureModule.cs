@@ -9,6 +9,8 @@ namespace Lumen.Lang {
 		internal FutureModule() {
 			this.Name = "Future";
 
+			this.AppendImplementation(Prelude.Functor);
+
 			// 23.12.2020
 			this.SetMember("run", new LambdaFun((scope, args) => {
 				Fun action = scope["action"].ToFunction(scope);
@@ -35,8 +37,28 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("isFaulted", new LambdaFun((scope, args) => {
+				Future future = scope["future"] as Future;
+
+				return new Logical(future.Task.IsFaulted);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("future"),
+				}
+			});
+
+			this.SetMember("isSuccess", new LambdaFun((scope, args) => {
+				Future future = scope["future"] as Future;
+
+				return new Logical(future.Task.Status == TaskStatus.RanToCompletion);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("future"),
+				}
+			});
+
 			this.SetMember("all", new LambdaFun((scope, args) => {
-				IEnumerable<Value> futures = scope["futures"].ToStream(scope);
+				IEnumerable<Value> futures = scope["futures"].ToSeq(scope);
 
 				IEnumerable<Task<Value>> tasks =
 					futures.Select(i => (i as Future).Task); // unsafe!
@@ -52,7 +74,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("any", new LambdaFun((scope, args) => {
-				IEnumerable<Value> futures = scope["futures"].ToStream(scope);
+				IEnumerable<Value> futures = scope["futures"].ToSeq(scope);
 
 				IEnumerable<Task<Value>> tasks =
 					futures.Select(i => (i as Future).Task); // unsafe!
@@ -82,7 +104,7 @@ namespace Lumen.Lang {
 				}
 
 				IEnumerable<System.Threading.Tasks.Task<Value>> tasks =
-					task.ToStream(scope).Select(i => (i as Future).Task); // unsafe!
+					task.ToSeq(scope).Select(i => (i as Future).Task); // unsafe!
 				Task.WaitAll(tasks.ToArray());
 
 				List results = new List(tasks.Select(i => {
@@ -125,7 +147,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("catch", new LambdaFun((scope, args) => {
+			LambdaFun fmap = new LambdaFun((scope, args) => {
 				Future future = scope["future"] as Future;
 				Fun then = scope["thenFunction"].ToFunction(scope);
 
@@ -133,17 +155,36 @@ namespace Lumen.Lang {
 					future.Task.ContinueWith(
 						task => {
 							if (task.IsFaulted) {
-								Exception e = task.Exception.GetBaseException();
-								return then.Call(new Scope(), e as LumenException);
+								throw task.Exception.GetBaseException();
 							}
 
-							return task.Result;
+							return then.Call(new Scope(), task.Result);
 						}
 					)
 				);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("thenFunction"),
+					new NamePattern("future"),
+				}
+			};
+
+			this.SetMember("fmap", fmap);
+
+			this.SetMember("catch", new LambdaFun((scope, args) => {
+				Future future = scope["future"] as Future;
+				Fun catchFunction = scope["catchFunction"].ToFunction(scope);
+
+				return new Future(
+					future.Task.ContinueWith(
+						task => task.IsFaulted 
+							? catchFunction.Call(new Scope(), task.Exception.GetBaseException() as LumenException)
+							: task.Result
+					)
+				);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("catchFunction"),
 					new NamePattern("future"),
 				}
 			});

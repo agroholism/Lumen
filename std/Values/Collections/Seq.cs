@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
-	public sealed class Stream : Value {
+	public sealed class Seq : Value {
 		internal IEnumerable<Value> InternalValue { get; private set; }
 
-		public Stream(IEnumerable<Value> innerValue) {
+		public static Seq Empty => new Seq(Enumerable.Empty<Value>());
+
+		public Seq(IEnumerable<Value> innerValue) {
 			this.InternalValue = innerValue;
 		}
 
@@ -17,7 +20,7 @@ namespace Lumen.Lang {
 			throw new LumenException($"can not compare value of type 'Kernel.Enumerator' with value of type '{obj.GetType()}'");
 		}
 
-		public IType Type => Prelude.Stream;
+		public IType Type => Prelude.Seq;
 
 		public override String ToString() {
 			return $"[Stream #{this.GetHashCode()}]";

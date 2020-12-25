@@ -19,7 +19,7 @@ namespace Lumen.Lmi {
 			IEnumerable<Value> ToStream(List<Expression> exps) {
 				foreach (Expression exp in exps) {
 					if (exp is From from) {
-						foreach (Value i in from.Eval(e).ToStream(e)) {
+						foreach (Value i in from.Eval(e).ToSeq(e)) {
 							yield return i;
 						}
 					}
@@ -29,11 +29,11 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			return new MutableArray(ToStream(this.elements).ToList());
+			return new MutArray(ToStream(this.elements).ToList());
         }
 
 		public override System.String ToString() {
-			return $"[|{System.String.Join(", ", this.elements)}|]";
+			return $"@[{System.String.Join(", ", this.elements)}]";
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
@@ -49,7 +49,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			yield return new GeneratorExpressionTerminalResult(new MutableArray(result));
+			yield return new GeneratorExpressionTerminalResult(new MutArray(result));
 		}
 	}
 }

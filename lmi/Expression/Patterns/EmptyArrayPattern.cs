@@ -16,7 +16,7 @@ namespace Lumen.Lmi {
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
-			if (value is Lang.MutableArray list && list.ToList(scope).Count == 0) {
+			if (value is Lang.MutArray list && list.ToList(scope).Count == 0) {
 				return MatchResult.Success;
 			}
 

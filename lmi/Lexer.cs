@@ -7,11 +7,12 @@ using Lumen.Lang;
 
 namespace Lumen.Lmi {
 	internal sealed class Lexer {
-		private const String operatorsString = "+-\\*/%(){}=<>!$&|;:?,[]^.~$@";
+		private const String operatorsString = "+-\\*/%(){}=<>!$&|;:?,[]^.~$@#";
 		private static readonly IDictionary<String, Token> operatorsDictionary = new Dictionary<String, Token>() {
 			["()"] = new Token(TokenType.VOID, "()"),
 
 			["@"] = new Token(TokenType.ANNOTATION, "@"),
+			["#"] = new Token(TokenType.ANNOTATION, "#"),
 
 			["?"] = new Token(TokenType.QUESTION, "?"),
 			["~"] = new Token(TokenType.TILDE, Constants.BNOT),
@@ -27,8 +28,8 @@ namespace Lumen.Lmi {
 			["&"] = new Token(TokenType.AMP, Constants.BAND),
 			["|"] = new Token(TokenType.BAR, Constants.BOR),
 
-			["<<"] = new Token(TokenType.SHIFT_LEFT, Constants.LSH),
-			[">>"] = new Token(TokenType.SHIFT_RIGTH, Constants.RSH),
+			["<<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<<"),
+			[">>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, ">>"),
 
 			["<<="] = new Token(TokenType.SHIFT_LEFT, "<<="),
 			[">>-"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, ">>-"),
@@ -67,10 +68,10 @@ namespace Lumen.Lmi {
 			["..."] = new Token(TokenType.DOT3, Constants.RANGE_INCLUSIVE),
 
 			["["] = new Token(TokenType.LIST_OPEN, "["),
-			["]"] = new Token(TokenType.LIST_CLOSE, "]"),
+			["]"] = new Token(TokenType.COLLECTION_CLOSE, "]"),
 
-			["[|"] = new Token(TokenType.ARRAY_OPEN, "[|"),
-			["|]"] = new Token(TokenType.ARRAY_CLOSE, "|]"),
+			["@["] = new Token(TokenType.ARRAY_OPEN, "@["),
+			["#["] = new Token(TokenType.SEQ_OPEN, "#["),
 
 			["|>"] = new Token(TokenType.FORWARD_PIPE, "|>"),
 			["<|"] = new Token(TokenType.BACKWARD_PIPE, "<|")
@@ -423,7 +424,7 @@ namespace Lumen.Lmi {
 				foreach (Token i in zzz) {
 					this.AddToken(i);
 				}
-				this.AddToken(TokenType.LIST_CLOSE);
+				this.AddToken(TokenType.COLLECTION_CLOSE);
 				this.AddToken(TokenType.PAREN_CLOSE);
 			}
 		}
@@ -462,8 +463,7 @@ namespace Lumen.Lmi {
 					this.AddToken(TokenType.BLOCK_END);
 				}
 			}
-
-			if (newLevel > this.level) {
+			else if (newLevel > this.level) {
 				for (Int32 i = 0; i < newLevel - this.level; i += 4) {
 					this.AddToken(TokenType.BLOCK_START);
 				}
@@ -471,12 +471,8 @@ namespace Lumen.Lmi {
 
 			this.level = newLevel;
 
-			if (this.tokens.Count > 0) {
-				TokenType typeOfLast = this.tokens[this.tokens.Count - 1].Type;
-
-				if (this.CanInsert()) {
-					this.AddToken(TokenType.EOC);
-				}
+			if (this.tokens.Count > 0 && this.CanInsert()) {
+				this.AddToken(TokenType.EOC);
 			}
 		}
 
@@ -486,12 +482,10 @@ namespace Lumen.Lmi {
 				&& last != TokenType.FUN
 				&& last != TokenType.AND
 				&& last != TokenType.BAR
-				&& last != TokenType.SHIFT_LEFT
 				&& last != TokenType.ARRAY_OPEN
 				&& last != TokenType.AS
 				&& last != TokenType.ASSIGN
 				&& last != TokenType.BACKWARD_PIPE
-				&& last != TokenType.SHIFT_RIGTH
 				&& last != TokenType.POWER
 				&& last != TokenType.DOT
 				&& last != TokenType.DOT2
@@ -679,24 +673,24 @@ namespace Lumen.Lmi {
 				buffer.Append(current);
 				current = this.Next();
 				if (!operatorsDictionary.ContainsKey(buffer.ToString() + current)) {
-					Token t = operatorsDictionary[buffer.ToString()];
+					Token currentOperator = operatorsDictionary[buffer.ToString()];
 
 					if (this.tokens.Count > 0) {
 						TokenType last = this.tokens[this.tokens.Count - 1].Type;
 
-						if (t.Type != TokenType.PAREN_OPEN
+						if (currentOperator.Type != TokenType.PAREN_OPEN
 							&& last == TokenType.EOC) {
 							this.tokens.RemoveAt(this.tokens.Count - 1);
 						}
 
 						if (last == TokenType.BLOCK_START
-							&& !this.IsStartlineToken(t.Type)) {
+							&& !this.IsStartlineToken(currentOperator.Type)) {
 							this.tokens.RemoveAt(this.tokens.Count - 1);
 							this.level -= 4;
 						}
 					}
 
-					this.AddToken(t);
+					this.AddToken(currentOperator);
 					return;
 				}
 			}
