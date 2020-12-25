@@ -135,5 +135,13 @@ namespace Lumen.Lang {
 
 			throw Helper.CreateConvertError(value.Type, Prelude.Number).ToException();
 		}
+
+		public static Future ToFuture(this Value value, Scope scope) {
+			if(value is Future future) {
+				return future;
+			} 
+
+			throw Helper.CreateConvertError(value.Type, Prelude.Future).ToException();
+		}
 	}
 }

@@ -114,16 +114,6 @@ namespace Lumen.Lang {
 				}
 			});
 
-			/* LambdaFun to_l = new LambdaFun((e, args) => {
-				 Expando obj = e.Get("this") as Expando;
-				 List<Value> result = new List<Value> {
-					 obj.Get("key", AccessModifiers.PUBLIC, e),
-					 obj.Get("value", AccessModifiers.PUBLIC, e)
-				 };
-				 return new Array(result);
-			 });
-			 */
-
 			this.SetMember("fromSeq", new LambdaFun((e, args) => {
 				Value value = e["stream"];
 				MutMap result = new MutMap();
@@ -148,11 +138,6 @@ namespace Lumen.Lang {
 					new NamePattern("self")
 				}
 			});
-
-			/*this.Set("to_s", new LambdaFun((e, args) => {
-                IDictionary<Value, Value> dict = Converter.ToMap(e.Get("this"), e);
-                return new String("[" + String.Join(", ", dict) + "]");
-            }));*/
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
 				return new MutMap();

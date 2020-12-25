@@ -10,40 +10,63 @@ namespace Lumen.Lang {
 			this.Name = "Future";
 
 			this.AppendImplementation(Prelude.Functor);
+			this.AppendImplementation(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Monad);
 
-			// 23.12.2020
 			this.SetMember("run", new LambdaFun((scope, args) => {
 				Fun action = scope["action"].ToFunction(scope);
 
-				Task<Value> task = new(() => action.Call(new Scope(), Const.UNIT));
-
-				task.Start();
-
-				return new Future(task);
+				return new Future(Task.Factory.StartNew(() => action.Call(new Scope(), Const.UNIT)));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("action")
+					new TypePattern("action", Prelude.Function)
+				}
+			});
+
+			this.SetMember("pure", new LambdaFun((scope, args) => {
+				Value result = scope["result"];
+
+				return new Future(Task.FromResult(result));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("result")
 				}
 			});
 
 			this.SetMember("delay", new LambdaFun((scope, args) => {
-				Task<Value> task = Task.Delay(scope["time"].ToInt(scope))
-					.ContinueWith(_ => Const.UNIT);
+				Int32 time = scope["time"].ToInt(scope);
 
-				return new Future(task);
+				return new Future(Task.Delay(time).ContinueWith(_ => Const.UNIT));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("time")
 				}
 			});
 
-			this.SetMember("isFaulted", new LambdaFun((scope, args) => {
+			this.SetMember("delayed", new LambdaFun((scope, args) => {
+				Int32 time = scope["time"].ToInt(scope);
+				Fun continuation = scope["continuation"].ToFunction(scope);
+
+				return new Future(
+					Task.Delay(time).ContinueWith(
+						_ => continuation.Call(new Scope(), Const.UNIT)
+					)
+				);
+			}) {
+				Parameters = new List<IPattern> {
+					new TypePattern("time", Prelude.Number),
+					new TypePattern("continuation", Prelude.Function)
+				}
+			});
+
+
+			this.SetMember("isFailed", new LambdaFun((scope, args) => {
 				Future future = scope["future"] as Future;
 
 				return new Logical(future.Task.IsFaulted);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("future"),
+					new TypePattern("future", this),
 				}
 			});
 
@@ -53,15 +76,96 @@ namespace Lumen.Lang {
 				return new Logical(future.Task.Status == TaskStatus.RanToCompletion);
 			}) {
 				Parameters = new List<IPattern> {
+					new TypePattern("future", this),
+				}
+			});
+
+
+			this.SetMember("wait", new LambdaFun((scope, args) => {
+				Future future = scope["future"].ToFuture(scope);
+
+				try {
+					future.Task.Wait();
+				} catch (AggregateException) {
+
+				}
+
+				return future;
+			}) {
+				Parameters = new List<IPattern> {
+					new TypePattern("future", this),
+				}
+			});
+
+			this.SetMember("waitFor", new LambdaFun((scope, args) => {
+				Int32 time = scope["time"].ToInt(scope);
+				Future future = scope["future"].ToFuture(scope);
+
+				try {
+					return new Logical(future.Task.Wait(time));
+				}
+				catch (AggregateException) {
+					return new Logical(true);
+				}
+			}) {
+				Parameters = new List<IPattern> {
+					new TypePattern("time", Prelude.Number),
+					new TypePattern("future", this),
+				}
+			});
+
+			this.SetMember("waitResult", new LambdaFun((scope, args) => {
+				Future future = scope["future"].ToFuture(scope);
+
+				try {
+					future.Task.Wait();
+				} catch (AggregateException e) {
+					return Helper.Failed(e.GetBaseException() as LumenException);
+				}
+
+				return Helper.Success(future.Task.Result);
+			}) { 
+				Parameters = new List<IPattern> {
+					new TypePattern("future", this)
+				}
+			});
+
+			this.SetMember("await", new LambdaFun((scope, args) => {
+				Value futureOrFutures = scope["future"];
+
+				if (futureOrFutures is Future future) {
+					try {
+						future.Task.Wait();
+					}
+					catch (AggregateException e) {
+						throw e.GetBaseException();
+					}
+
+					return future.Task.Result;
+				}
+
+				Task<Value>[] futures =
+					futureOrFutures.ToSeq(scope)
+					.Select(i => i.ToFuture(scope).Task)
+					.ToArray();
+
+				Task.WaitAll(futures);
+
+				return new List(futures.Select(i =>
+					!i.IsFaulted ? i.Result : throw i.Exception.GetBaseException()
+				));
+			}) {
+				Parameters = new List<IPattern> {
 					new NamePattern("future"),
 				}
 			});
 
-			this.SetMember("all", new LambdaFun((scope, args) => {
+
+			this.SetMember("whenAll", new LambdaFun((scope, args) => {
 				IEnumerable<Value> futures = scope["futures"].ToSeq(scope);
 
 				IEnumerable<Task<Value>> tasks =
-					futures.Select(i => (i as Future).Task); // unsafe!
+					futures.Select(i => i.ToFuture(scope).Task);
 
 				return new Future(
 					Task.WhenAll(tasks)
@@ -73,7 +177,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("any", new LambdaFun((scope, args) => {
+			this.SetMember("whenAny", new LambdaFun((scope, args) => {
 				IEnumerable<Value> futures = scope["futures"].ToSeq(scope);
 
 				IEnumerable<Task<Value>> tasks =
@@ -89,103 +193,104 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("wait", new LambdaFun((scope, args) => {
-				Value task = scope["task"];
 
-				if (task is Future t) {
-					try {
-						t.Task.Wait();
-					}
-					catch (AggregateException e) {
-						throw e.GetBaseException();
-					}
-
-					return t.Task.Result;
+			static Value Then(Task<Value> task, Fun continuation) {
+				if (task.IsFaulted) {
+					throw task.Exception.GetBaseException();
 				}
 
-				IEnumerable<System.Threading.Tasks.Task<Value>> tasks =
-					task.ToSeq(scope).Select(i => (i as Future).Task); // unsafe!
-				Task.WaitAll(tasks.ToArray());
+				return continuation.Call(new Scope(), task.Result);
+			}
 
-				List results = new List(tasks.Select(i => {
-					try {
-						i.Wait();
-					}
-					catch (AggregateException e) {
-						throw e.GetBaseException();
-					}
-
-					return i.Result;
-				}));
-
-				return results;
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("task")
-				}
-			});
-
-			this.SetMember("then", new LambdaFun((scope, args) => {
-				Future future = scope["future"] as Future;
-				Fun then = scope["thenFunction"].ToFunction(scope);
+			LambdaFun map = new LambdaFun((scope, args) => {
+				Future future = scope["future"].ToFuture(scope);
+				Fun continuation = scope["continuation"].ToFunction(scope);
 
 				return new Future(
 					future.Task.ContinueWith(
-						task => {
-							if (task.IsFaulted) {
-								throw task.Exception.GetBaseException();
-							}
-
-							return then.Call(new Scope(), task.Result);
-						}
+						task => Then(task, continuation)
 					)
 				);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("thenFunction"),
-					new NamePattern("future"),
-				}
-			});
-
-			LambdaFun fmap = new LambdaFun((scope, args) => {
-				Future future = scope["future"] as Future;
-				Fun then = scope["thenFunction"].ToFunction(scope);
-
-				return new Future(
-					future.Task.ContinueWith(
-						task => {
-							if (task.IsFaulted) {
-								throw task.Exception.GetBaseException();
-							}
-
-							return then.Call(new Scope(), task.Result);
-						}
-					)
-				);
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("thenFunction"),
+					new NamePattern("continuation"),
 					new NamePattern("future"),
 				}
 			};
 
-			this.SetMember("fmap", fmap);
+			this.SetMember("then", map);
+			this.SetMember("fmap", map);
 
 			this.SetMember("catch", new LambdaFun((scope, args) => {
-				Future future = scope["future"] as Future;
-				Fun catchFunction = scope["catchFunction"].ToFunction(scope);
+				Future future = scope["future"].ToFuture(scope);
+				Fun continuation = scope["continuation"].ToFunction(scope);
 
 				return new Future(
 					future.Task.ContinueWith(
-						task => task.IsFaulted 
-							? catchFunction.Call(new Scope(), task.Exception.GetBaseException() as LumenException)
+						task => task.IsFaulted
+							? continuation.Call(new Scope(), task.Exception.GetBaseException() as LumenException)
 							: task.Result
 					)
 				);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("catchFunction"),
+					new NamePattern("continuation"),
 					new NamePattern("future"),
+				}
+			});
+
+			this.SetMember("liftA", new LambdaFun((scope, args) => {
+				Future future = scope["future"].ToFuture(scope);
+				Future continuationFuture = scope["continuation"].ToFuture(scope);
+
+				return new Future(
+					continuationFuture.Task.ContinueWith(continuation => { 
+						if (continuation.IsFaulted) {
+							throw continuation.Exception.GetBaseException();
+						}
+
+						return future.Task.ContinueWith(
+							task => Then(task, continuation.Result.ToFunction(scope))
+						);
+					}).Unwrap()
+				);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("future"),
+					new NamePattern("continuation"),
+				}
+			});
+
+			this.SetMember("bind", new LambdaFun((scope, args) => {
+				Future future = scope["future"].ToFuture(scope);
+				Fun continuation = scope["continuation"].ToFunction(scope);
+
+				return new Future(
+					future.Task.ContinueWith(
+						task => task.IsFaulted
+								? throw task.Exception.GetBaseException()
+								: continuation.Call(new Scope(), task.Result).ToFuture(scope).Task
+
+					).Unwrap()
+				);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("continuation"),
+					new NamePattern("future"),
+				}
+			});
+
+			this.SetMember("unwrap", new LambdaFun((scope, args) => {
+				Future future = scope["future"] as Future;
+
+				return new Future(
+					future.Task.ContinueWith(
+						task => task.Result.ToFuture(scope).Task
+					).Unwrap()
+				);
+			}) {
+				Parameters = new List<IPattern> {
+					new TypePattern("future", this),
 				}
 			});
 		}

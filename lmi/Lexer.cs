@@ -33,6 +33,7 @@ namespace Lumen.Lmi {
 
 			["<<="] = new Token(TokenType.SHIFT_LEFT, "<<="),
 			[">>-"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, ">>-"),
+			[">>="] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, ">>="),
 			["-<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "-<"),
 			["-<<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "-<<"),
 			["<*"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<*"),

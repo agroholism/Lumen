@@ -14,6 +14,7 @@ namespace Lumen.Lang {
 		public static Module Exception { get; } = new ExceptionClass();
 		public static Module Functor { get; } = new Functor();
 		public static Module Applicative { get; } = new Applicative();
+		public static Module Monad { get; } = new Monad();
 		public static Module Collection { get; } = new Collection();
 		public static Module Ord { get; } = new OrdModule();
 		public static Module Format { get; } = new Format();
@@ -70,6 +71,7 @@ namespace Lumen.Lang {
 			this.SetMember("Format", Format);
 			this.SetMember("Functor", Functor);
 			this.SetMember("Applicative", Applicative);
+			this.SetMember("Monad", Monad);
 			this.SetMember("Context", Context);
 			this.SetMember("Clone", Clone);
 			this.SetMember("Default", Default);

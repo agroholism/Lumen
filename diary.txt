@@ -115,6 +115,9 @@ Lumen 0.8
 + typeof
 + method call syntax
 
+24.12.2020
++ Future
+
 25.12.2020
 + Stream -> Seq
 + MutableArray -> MutArray
@@ -123,14 +126,16 @@ Lumen 0.8
 + Seq literal #[]
 + seqOf, mutArrayOf, mutMapOf, listOf
 
++ Future.wait, Future.waitFor, Future.pure, Future.delayed, Future.waitResult
++ class Monad
++ Monad implementation for Future
++ Applicative.<*> -> Applicative.-<<
++ Applicative.>>-
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)
 - module - it is required?
-
-tests (D)
-
-MODULE unsafe - macro, that changes a parent scope
 
 Lumen 0.9
 NON STRICT FOREACH
@@ -139,56 +144,12 @@ NON STRICT FOREACH
 10. operator in pattern matching?
 9. match operator for strings and regex
 6. map literal ?
-14. Result ?
 
 let reduce.<T: Default> [] _ =
     T.default ()
 
 let reduce.<T: Default from x> x::xs operation: Function =
     rec.<T> xs operation |> operation x
-
-unittest average
-    setup
-        let a = [1, 2, 3]
-    
-    exit
-        println "Exit"
-    
-    for i in 0..10:
-        subtest 
-
-
-    Collection.average a
-        not equal 3
-    
-    Collection.average a
-        equal 2
-    
-    Collection.average a
-        less 2
-
-    Collection.average a
-        greater 2
-
-   Collection.average a
-        contains 2
-
-   Collection.average a
-        not contains 2
-
-   Collection.average a
-        match _: Number
-
-   Collection.average a
-        is None
-
-   
-
-    let result = Collection.average a
-        assert result = 2
-    
-    Collection.average []
-        raises CollectionIsEmpty
 
 assertWarns(warn, fun, *args, **kwds) Ч fun(*args, **kwds) порождает предупреждение
 
@@ -241,27 +202,4 @@ assertCountEqual(a, b)  Ч a и b содержат те же элементы в одинаковых количествах
 				}
 			};
 
-			    
-buildPage [
-    ["16.07.2019", 
-    [
-    [Removed, "Removed <code>mut</code> modifier"],
-    [Added, "<code>Ref</code> type in prelude"],
-    [Added, "<code>from ... import ...</code> syntax"]
-    ]
-    ],
-    ["17.07.2019", 
-    [
-    [Fixed, "Function application bug fixes"],
-    [Fixed, "Parser bug fixes"],
-    [Fixed, "Fixed <code>Ord</code> class"],
-    [Added, "<code>extend</code> operator"],
-    [Added, "Chained equality and comphrasion"]
-    ]
-    ],
-    ["18.07.2019", 
-    [
-    [Added, "Equality operators for <code>Array</code>, <code>List</code> and <code>Map</code>"]
-    ]
-    ]
-]
+	
