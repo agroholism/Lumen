@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
@@ -7,95 +8,148 @@ namespace Lumen.Lang {
 		internal FunctionModule() {
 			this.Name = "Function";
 
-			this.AppendImplementation(Prelude.Functor);
-			this.AppendImplementation(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Monoid);
+			this.AppendImplementation(Prelude.Monad);
 
-			LambdaFun CombainToLeft = new LambdaFun((e, args) => {
-				Fun m = Converter.ToFunction(e["fc"], e);
-				Fun f = Converter.ToFunction(e["fn"], e);
+			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
+				Fun m = scope["fc"].ToFunction(scope);
+				Fun f = scope["fn"].ToFunction(scope);
 
-				return new LambdaFun((scope, arguments) => 
-					f.Call(new Scope(scope), m.Call(new Scope(scope), arguments))) { Parameters = m.Parameters };
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("fn"),
-					new NamePattern("fc"),
-				}
-			};
+				return new LambdaFun((inScope, inArgs) => {
+					Value x = inScope["x"];
 
-			this.SetMember(Constants.PLUS, new LambdaFun((e, args) => {
-				Fun m = Converter.ToFunction(e["fc"], e);
-				Fun f = Converter.ToFunction(e["fn"], e);
+					Value mx = m.Call(new Scope(), x);
+					Value fx = f.Call(new Scope(), x);
 
-				return new LambdaFun((scope, arguments) => {
-					m.Call(new Scope(scope), arguments);
-					return f.Call(new Scope(scope), arguments);
-				}) {
-					Parameters = m.Parameters
-				};
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("fn"),
-					new NamePattern("fc"),
-				}
-			});
-
-			this.SetMember(Constants.STAR, new LambdaFun((e, args) => {
-				Fun m = Converter.ToFunction(e["fn"], e);
-				Int32 f = e["n"].ToInt(e);
-
-				return new LambdaFun((scope, arguments) => {
-					Value result = m.Call(scope, arguments);
-
-					for (Int32 i = 1; i < f; i++) {
-						result = m.Call(scope, result);
-					}
-
-					return result;
-				}) {
-					Parameters = m.Parameters
-				};
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("fn"),
-					new NamePattern("n"),
-				}
-			});
-
-			// let fmap f m = fmap (m >> f)
-			this.SetMember("fmap", CombainToLeft);
-
-			// Applicative
-			this.SetMember("liftA", new LambdaFun((scope, args) => {
-				Fun obj = scope["f"].ToFunction(scope);
-				Fun obj2 = scope["m"].ToFunction(scope);
-
-				return new LambdaFun((e, a) => {
-					Value al = e["x'"];
-
-					Fun z = obj2.Call(new Scope(), al).ToFunction(e);
-
-					return z.Call(new Scope(), obj.Call(new Scope(), al));
+					return mx.Type.GetMember("+", inScope).ToFunction(inScope)
+						.Call(new Scope(), mx, fx);
 				}) {
 					Parameters = new List<IPattern> {
-					new NamePattern("x'")
-				}
+						new NamePattern("x")
+					}
 				};
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("f"),
-					new NamePattern("m"),
+					new NamePattern("fc"),
+					new NamePattern("fn"),
 				}
 			});
 
-			// add >>
-			// add <<
-			// add +=
-			// add -=
-			// add +
-			// add -
-			// add .curry
-			// add .combine
+			LambdaFun emptyFunction = new LambdaFun((inScope, inArgs) => {
+				return inScope["x"].Type
+							.GetMember("empty", inScope)
+							.ToFunction(inScope)
+							.Call(new Scope(), Const.UNIT);
+			}) {
+				Parameters = new List<IPattern> { new NamePattern("x") }
+			};
+
+			this.SetMember("empty", new LambdaFun((scope, args) => emptyFunction) {
+				Parameters = new List<IPattern> {
+					new NamePattern("_"),
+				}
+			});
+
+			this.SetMember("pure", new LambdaFun((scope, args) => {
+				Value x = scope["x"];
+
+				return new LambdaFun((inScope, inArgs) => x) {
+					Parameters = new List<IPattern> {
+						new NamePattern("_")
+					}
+				};
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("x"),
+				}
+			});
+
+			this.SetMember("map", new LambdaFun((scope, args) => {
+				Fun functor = scope["functor"].ToFunction(scope);
+				Fun function = scope["function"].ToFunction(scope);
+
+				return new LambdaFun((inScope, inArgs) =>
+					function.Call(new Scope(inScope), functor.Call(new Scope(inScope), inArgs))) {
+					Parameters = functor.Parameters
+				};
+			}) {
+				Parameters = new List<IPattern> {
+					new TypePattern("function", this),
+					new TypePattern("functor", this),
+				}
+			});
+
+			this.SetMember("lift", new LambdaFun((scope, args) => {
+				Fun func = scope["func"].ToFunction(scope);
+				Fun appl = scope["appl"].ToFunction(scope);
+
+				return new LambdaFun((e, a) => {
+					Value arg = e["x"];
+
+					return appl.Call(new Scope(), arg).ToFunction(e)
+						.Call(new Scope(), func.Call(new Scope(), arg));
+				}) {
+					Parameters = new List<IPattern> {
+						new NamePattern("x")
+					}
+				};
+			}) {
+				Parameters = new List<IPattern> {
+					new TypePattern("func", this),
+					new TypePattern("appl", this),
+				}
+			});
+			
+			this.SetMember("bind", new LambdaFun((scope, args) => {
+				Fun func = scope["func"].ToFunction(scope);
+				Fun monad = scope["monad"].ToFunction(scope);
+
+				return new LambdaFun((inScope, inArgs) => {
+					Value arg = inScope["x"];
+
+					Value hres = monad.Call(new Scope(), arg);
+					Fun fres = func.Call(new Scope(), hres).ToFunction(inScope);
+
+					return fres.Call(new Scope(), arg);
+				}) {
+					Parameters = new List<IPattern> {
+						new NamePattern("x")
+					}
+				};
+			}) {
+				Parameters = new List<IPattern> {
+					new TypePattern("func", this),
+					new TypePattern("monad", this),
+				}
+			});
+
+			Fun ConcatWith(Fun m, Fun f, Fun with) {
+				return new LambdaFun((inScope, inArgs) => {
+					Value x = inScope["x"];
+
+					Value mx = m.Call(new Scope(), x);
+					Value fx = f.Call(new Scope(), x);
+
+					return with.Call(new Scope(), mx, fx);
+				}) {
+					Parameters = new List<IPattern> {
+						new NamePattern("x")
+					}
+				};
+			}
+
+			this.SetMember("concatWith", new LambdaFun((scope, args) => {
+				IEnumerable<Value> functions = scope["functions"].ToSeq(scope);
+				Fun with = scope["with"].ToFunction(scope);
+
+				return functions.Select(i => i.ToFunction(scope))
+					.Aggregate((x, y) => ConcatWith(x, y, with));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("functions"),
+					new NamePattern("with"),
+				}
+			});
 		}
 	}
 }

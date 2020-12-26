@@ -173,5 +173,9 @@ namespace Lumen.Lang {
 		internal static LumenException InvalidArgument(String name, String message) {
 			return Prelude.InvalidArgument.MakeExceptionInstance(new Text(name), new Text(message));
 		}
+
+		public static Boolean IsEmpty(Value alt) {
+			return alt.CallMethod("isEmpty", new Scope()).ToBoolean();
+		}
 	}
 }

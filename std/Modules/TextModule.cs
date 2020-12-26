@@ -165,6 +165,14 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("empty", new LambdaFun((scope, args) => {
+				return new Text("");
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("x")
+				}
+			});
+
 			// Collection -> Text
 			// let concat values = ...
 			// Сцепляет Collection объектов в единую строку

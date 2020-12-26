@@ -93,6 +93,12 @@ namespace Lumen.Lang {
 			this.Members[name] = value;
 		}
 
+		public void SetMemberIfAbsent(String name, Value value) {
+			if (!this.Members.ContainsKey(name)) {
+				this.Members[name] = value;
+			}
+		}
+
 		public Boolean IsParentOf(Value value) {
 			Value parent = value.Type;
 
@@ -111,7 +117,8 @@ namespace Lumen.Lang {
 			return value.Type.HasImplementation(this);
 		}
 
-		public void AppendImplementation(Module classModule) {
+		public void AppendImplementation(Class classModule) {
+			classModule.OnImplement(this);
 			this.Mixins.Add(classModule);
 		}
 

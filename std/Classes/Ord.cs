@@ -1,16 +1,7 @@
 ﻿using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	/// <summary>
-	/// That's Ord mixin. Used for sorting, compharsion etc
-	/// </summary>
-	/// module prelude where
-	///		...
-	///		/// Require let compare x y 
-	///		@mixin module Ord
-	///			@requirement let compare x y
-	///			...
-	internal class OrdModule : Module {
+	internal class OrdModule : SystemClass {
 		internal OrdModule() {
 			this.Name = "Ord";
 

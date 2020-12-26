@@ -36,6 +36,31 @@ namespace Lumen.Lang {
 					new NamePattern("values'")
 				}
 			});
+		
+			this.SetMember("empty", new LambdaFun((scope, args) => {
+				return new List();
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("x")
+				}
+			});
+			
+			this.SetMember("pure", new LambdaFun((scope, args) => {
+				return new List(scope["x"]);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("x")
+				}
+			});
+
+			this.SetMember("replicate", new LambdaFun((scope, args) => {
+				return new List(Enumerable.Repeat(scope["init"], scope["len"].ToInt(scope)));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init"),
+					new NamePattern("len")
+				}
+			});
 
 			this.SetMember("head", new LambdaFun((e, args) => {
 				LinkedList v = e["l"].ToLinkedList(e);
@@ -157,7 +182,7 @@ namespace Lumen.Lang {
 
 			this.AppendImplementation(Prelude.Default);
 			this.AppendImplementation(Prelude.Clone);
-			this.AppendImplementation(Prelude.Collection);
+			this.AppendImplementation(Prelude.Container);
 		}
 	}
 }

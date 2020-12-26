@@ -58,6 +58,10 @@ namespace Lumen.Lmi {
 				return new Logical(!Converter.ToBoolean(operandOne));
 			}
 
+			if (this.operation == "<|>") {
+				return !Helper.IsEmpty(operandOne) ? operandOne : this.expressionTwo.Eval(e);
+			}
+
 			Value operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.UNIT;
 
 			List<Expression> exps = new List<Expression> { new ValueLiteral(operandOne) };

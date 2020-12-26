@@ -5,27 +5,15 @@ using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class Collection : Module {
+	internal class Collection : SystemClass {
 		internal Collection() {
 			this.Name = "Collection";
-
-			this.AppendImplementation(Prelude.Functor);
-			this.AppendImplementation(Prelude.Applicative);
 
 			this.SetMember("toSeq", new LambdaFun((scope, args) => {
 				Prelude.FunctionIsNotImplementedForType("Collection.toSeq", scope["self"].Type);
 				return Const.UNIT;
 			}) {
 				Name = "toSeq",
-				Parameters = new List<IPattern> {
-					new NamePattern("self")
-				}
-			});
-
-			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
-				return scope["self"];
-			}) {
-				Name = "fromSeq",
 				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
@@ -279,7 +267,6 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
-				IType typeParameter = scope["values"].Type;
 				IEnumerable<Value> values = scope["values"].ToSeq(scope);
 				IEnumerable<Value> valuesx = scope["values'"].ToSeq(scope);
 
@@ -528,19 +515,18 @@ namespace Lumen.Lang {
 
 
 			this.SetMember("filter", new LambdaFun((scope, args) => {
-				Value self = scope["self"];
 				Fun predicate = scope["predicate"].ToFunction(scope);
-				IEnumerable<Value> values = self.ToSeq(scope);
-				IType typeParameter = self.Type;
+				IEnumerable<Value> values = scope["self"].ToSeq(scope);
 
-				return Helper.FromSeq(typeParameter, values.Where(i => predicate.Call(new Scope(scope), i).ToBoolean()), scope);
+				return new Seq(values.Where(i => predicate.Call(new Scope(scope), i).ToBoolean()));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this), new NamePattern("predicate")
+					new NamePattern("predicate"),
+					new TypePattern("self", this),
 				}
 			});
-
-			LambdaFun map = new LambdaFun((scope, args) => {
+			
+			this.SetMember("map", new LambdaFun((scope, args) => {
 				Value fc = scope["fc"];
 				IType typeParameter = fc.Type;
 				Fun mapper = scope["fn"].ToFunction(scope);
@@ -550,15 +536,11 @@ namespace Lumen.Lang {
 					values.Select(i => mapper.Call(new Scope(scope), i)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("fc", this),
 					new NamePattern("fn"),
+					new TypePattern("fc", this),
 				}
-			};
-
-			this.SetMember("fmap", map);
-
-			this.SetMember("map", map);
-
+			});
+			
 			this.SetMember("mapi", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
 				Fun mapper = scope["mapper"].ToFunction(scope);
@@ -580,8 +562,8 @@ namespace Lumen.Lang {
 					}
 				}
 			}
-
-			this.SetMember("liftA", new LambdaFun((scope, args) => {
+			
+			this.SetMember("lift", new LambdaFun((scope, args) => {
 				IEnumerable<Value> obj = scope["other"].ToSeq(scope);
 				Value self = scope["self"];
 				IEnumerable<Value> selfStream = self.ToSeq(scope);
@@ -599,6 +581,20 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("bind", new LambdaFun((scope, args) => {
+				IEnumerable<Value> monad = scope["monad"].ToSeq(scope);
+				Fun fn = scope["fn"].ToFunction(scope);
+
+				return Helper.FromSeq(
+					scope["monad"].Type,
+					Flatten2(monad.Select(i => fn.Call(new Scope(), i).ToSeq(scope)), scope),
+					scope);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("fn"),
+					new NamePattern("monad"),
+				}
+			});
 
 			this.SetMember("iter", new LambdaFun((scope, args) => {
 				Fun action = scope["action"].ToFunction(scope);

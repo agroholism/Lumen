@@ -2,12 +2,14 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class Clone : Module {
+	internal class Clone : SystemClass {
 		internal Clone() {
 			this.Name = "Clone";
+		}
 
-			this.SetMember("clone", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Clone.clone", scope["self"].Type);
+		public override void OnImplement(Module target) {
+			target.SetMemberIfAbsent("clone", new LambdaFun((scope, args) => {
+				Prelude.FunctionIsNotImplementedForType("Clone.clone", target);
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {

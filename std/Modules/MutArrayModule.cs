@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
@@ -50,6 +50,24 @@ Array.refs
 			});
 			#endregion
 
+			this.SetMember("empty", new LambdaFun((scope, args) => {
+				return new MutArray();
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("x")
+				}
+			});
+
+
+			this.SetMember("replicate", new LambdaFun((scope, args) => {
+				return new MutArray(Enumerable.Repeat(scope["init"], scope["len"].ToInt(scope)));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init"),
+					new NamePattern("len")
+				}
+			});
+
 			this.SetMember("default", new LambdaFun((scope, args) => {
 				return new MutArray();
 			}) {
@@ -65,6 +83,18 @@ Array.refs
 				return new MutArray(clone);
 			}) {
 				Parameters = Const.Self
+			});
+
+			this.SetMember("filter", new LambdaFun((scope, args) => {
+				Fun predicate = scope["predicate"].ToFunction(scope);
+				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+
+				return new MutArray(values.Where(i => predicate.Call(new Scope(scope), i).ToBoolean()));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("predicate"),
+					new TypePattern("self", this),
+				}
 			});
 
 			this.SetMember("add", new LambdaFun((scope, args) => {

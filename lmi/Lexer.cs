@@ -38,7 +38,8 @@ namespace Lumen.Lmi {
 			["-<<"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "-<<"),
 			["<*"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<*"),
 			["<*>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<*>"),
-			["<$>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<$>"),
+			["<+>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<+>"),
+			["<+"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<+"),
 
 			["("] = new Token(TokenType.PAREN_OPEN),
 			[")"] = new Token(TokenType.PAREN_CLOSE),
@@ -74,6 +75,7 @@ namespace Lumen.Lmi {
 			["@["] = new Token(TokenType.ARRAY_OPEN, "@["),
 			["#["] = new Token(TokenType.SEQ_OPEN, "#["),
 
+			["<|>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<|>"),
 			["|>"] = new Token(TokenType.FORWARD_PIPE, "|>"),
 			["<|"] = new Token(TokenType.BACKWARD_PIPE, "<|")
 		};

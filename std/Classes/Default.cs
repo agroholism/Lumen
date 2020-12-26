@@ -2,7 +2,7 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class Default : Module {
+	internal class Default : SystemClass {
 		internal Default() {
 			this.Name = "Default";
 

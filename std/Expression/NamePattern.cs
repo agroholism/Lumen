@@ -107,7 +107,7 @@ namespace Lumen.Lang.Expressions {
 				Console.WriteLine($"WARNING: there are rebinding {this.identifier} please don't use rebindings");
 			}
 
-			scope[this.identifier] = value;
+			scope.Bind(this.identifier, value);
 			return MatchResult.Success;
 		}
 

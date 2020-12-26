@@ -53,7 +53,7 @@ namespace Lumen.Lmi {
 			}
 
 			foreach (Expression deriving in this.derivings) {
-				Module typeClass = deriving.Eval(scope) as Module;
+				Class typeClass = deriving.Eval(scope) as Class;
 				createdType.AppendImplementation(typeClass);
 			}
 

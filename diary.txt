@@ -132,6 +132,13 @@ Lumen 0.8
 + Applicative.<*> -> Applicative.-<<
 + Applicative.>>-
 
+26.12.2020
++ class Monoid
++ class Alternative
++ Monad implementation for Function
++ Monoid implementation for Function, Number
++ Alternative implementation for Collection
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)

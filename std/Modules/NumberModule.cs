@@ -200,6 +200,14 @@ namespace Lumen.Lang {
 
 			#endregion
 
+			this.SetMember("empty", new LambdaFun((scope, args) => {
+				return new Number(0);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("_")
+				}
+			});
+
 			// Number -> Number -> Number
 			// Ord class implementation
 			this.SetMember("compare", new LambdaFun((scope, args) => {
@@ -469,6 +477,7 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Ord);
 			this.AppendImplementation(Prelude.Clone);
 			this.AppendImplementation(Prelude.Default);
+			this.AppendImplementation(Prelude.Monoid);
 			this.NameIt();
 		}
 

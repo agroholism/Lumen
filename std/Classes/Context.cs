@@ -3,7 +3,7 @@
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	internal class Context : Module {
+	internal class Context : SystemClass {
 		internal Context() {
 			this.Name = "Context";
 

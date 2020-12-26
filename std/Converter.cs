@@ -115,7 +115,7 @@ namespace Lumen.Lang {
 
 		public static LumenException ToException(this Value value) {
 			return value.TryConvertToException(out LumenException result) ? result 
-				: Helper.CreateConvertError(value.Type, Prelude.Collection).ToException();
+				: Helper.CreateConvertError(value.Type, Prelude.Exception).ToException();
 		}
 
 		internal static LinkedList ToLinkedList(this Value value, Scope scope) {

@@ -12,7 +12,7 @@ namespace Lumen.Lang {
 	///		module Format where
 	///			let format (x: 'T) (fstr: Text) =
 	///				functionIsNotImplementedForType "Format.format" 'T
-	internal class Format : Module {
+	internal class Format : SystemClass {
 		internal Format() {
 			this.Name = "Format";
 

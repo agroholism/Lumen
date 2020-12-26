@@ -8,6 +8,31 @@ namespace Lumen.Lang {
 		public SeqModule() {
 			this.Name = "Seq";
 
+			this.SetMember("empty", new LambdaFun((scope, args) => {
+				return new Seq(Enumerable.Empty<Value>());
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("x")
+				}
+			});
+
+			this.SetMember("pure", new LambdaFun((scope, args) => {
+				return new Seq(Enumerable.Repeat(scope["init"], 1));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init")
+				}
+			});
+
+			this.SetMember("replicate", new LambdaFun((scope, args) => {
+				return new Seq(Enumerable.Repeat(scope["init"], scope["len"].ToInt(scope)));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("init"),
+					new NamePattern("len")
+				}
+			});
+
 			this.SetMember("default", new LambdaFun((scope, args) => {
 				return new Seq(Enumerable.Empty<Value>());
 			}) {
@@ -22,8 +47,17 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
+				return scope["self"];
+			}) {
+				Name = "fromSeq",
+				Parameters = new List<IPattern> {
+					new NamePattern("self")
+				}
+			});
+
 			this.AppendImplementation(Prelude.Default);
-			this.AppendImplementation(Prelude.Collection);
+			this.AppendImplementation(Prelude.Container);
 		}
 	}
 

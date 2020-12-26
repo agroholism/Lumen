@@ -4,21 +4,21 @@ using System.IO;
 using System.Linq;
 using Lumen.Lang.Expressions;
 
-using System.Threading.Tasks;
-
 namespace Lumen.Lang {
 	public sealed class Prelude : Module {
 		#region Fields
-		public static Module Default { get; } = new Default();
-		public static Module Clone { get; } = new Clone();
-		public static Module Exception { get; } = new ExceptionClass();
-		public static Module Functor { get; } = new Functor();
-		public static Module Applicative { get; } = new Applicative();
-		public static Module Monad { get; } = new Monad();
-		public static Module Collection { get; } = new Collection();
-		public static Module Ord { get; } = new OrdModule();
-		public static Module Format { get; } = new Format();
-		public static Module Context { get; } = new Context();
+		public static Class Default { get; } = new Default();
+		public static Class Clone { get; } = new Clone();
+		public static Class Exception { get; } = new ExceptionClass();
+		public static Class Monoid { get; } = new Monoid();
+		public static Class Functor { get; } = new Functor();
+		public static Class Applicative { get; } = new Applicative();
+		public static Class Monad { get; } = new Monad();
+		public static Class Collection { get; } = new Collection();
+		public static Class Container { get; } = new Container();
+		public static Class Ord { get; } = new OrdModule();
+		public static Class Format { get; } = new Format();
+		public static Class Context { get; } = new Context();
 
 		public static ErrorModule IndexOutOfRange { get; } = new IndexOutOfRange();
 		public static ErrorModule FunctionIsNotImplemented { get; } = new FunctionIsNotImplemented();
@@ -69,6 +69,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("Ord", Ord);
 			this.SetMember("Format", Format);
+			this.SetMember("Monoid", Monoid);
 			this.SetMember("Functor", Functor);
 			this.SetMember("Applicative", Applicative);
 			this.SetMember("Monad", Monad);
@@ -345,16 +346,16 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("mutMapOf", new LambdaFun((e, args) => {
-				Value value = e["init"];
+			this.SetMember("mutMapOf", new LambdaFun((scope, args) => {
+				Value value = scope["init"];
 				MutMap result = new MutMap();
 
 				if (value == Const.UNIT) {
 					return result;
 				}
 
-				foreach (Value i in value.ToSeq(e)) {
-					List<Value> stream = i.ToSeq(e).Take(2).ToList();
+				foreach (Value i in value.ToSeq(scope)) {
+					List<Value> stream = i.ToSeq(scope).Take(2).ToList();
 					result.InternalValue[stream[0]] = stream[1];
 				}
 
@@ -382,7 +383,7 @@ namespace Lumen.Lang {
 		}
 
 		public static void FunctionIsNotImplementedForType(String functionName, Value typeName) {
-			throw FunctionIsNotImplemented.constructor.MakeInstance(typeName, new Text(functionName)).ToException();
+			throw FunctionIsNotImplemented.constructor.MakeExceptionInstance(typeName, new Text(functionName)).ToException();
 
 		}
 	}

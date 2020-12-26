@@ -8,38 +8,37 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lmi {
 	internal class ClassDeclaration : Expression {
 		private String className;
+		private String typeParam;
 		private List<Expression> membersExpressions;
 		private List<Expression> derivingExpressions;
 
-		public ClassDeclaration(String className, List<Expression> members, List<Expression> derivings) {
+		public ClassDeclaration(String className, String typeParam, List<Expression> members, List<Expression> derivings) {
 			this.className = className;
+			this.typeParam = typeParam;
 			this.membersExpressions = members;
 			this.derivingExpressions = derivings;
 		}
 
 		public Value Eval(Scope scope) {
-			Module moduleValue = new Module(this.className);
+			Class moduleValue = new Class(this.className, this.typeParam ?? "_");
 
 			Scope moduleScope = new Scope(scope) {
 				[this.className] = moduleValue
 			};
 
-			foreach (Expression memberExpression in this.membersExpressions) {
-				memberExpression.Eval(moduleScope);
-			}
-
-			foreach (KeyValuePair<String, Value> member in moduleScope.variables) {
-				// There are class in this scope, so to avoid recursion we check
-				if (member.Value != moduleValue) {
-					moduleValue.SetMember(member.Key, member.Value);
-				}
+			foreach(Expression i in this.membersExpressions) {
+				ClosureManager cm = new (moduleScope);
+				cm.Declare(this.typeParam);
+				moduleValue.Declarations.Add(i.Closure(cm));
 			}
 
 			foreach (Expression derivingExpression in this.derivingExpressions) {
-				Module typeClass = derivingExpression.Eval(scope) as Module;
+				Class typeClass = derivingExpression.Eval(scope) as Class;
+
 				if (typeClass == moduleValue) {
 					throw new LumenException("implementing itself");
 				}
+
 				moduleValue.AppendImplementation(typeClass);
 			}
 
@@ -57,7 +56,7 @@ namespace Lumen.Lmi {
 			ClosureManager newManager = manager.Clone();
 			newManager.Declare(this.className);
 
-			ClassDeclaration result = new ClassDeclaration(this.className, this.membersExpressions.Select(i => i.Closure(newManager)).ToList(), this.derivingExpressions.Select(i => i.Closure(manager)).ToList());
+			ClassDeclaration result = new ClassDeclaration(this.className, this.typeParam, this.membersExpressions.Select(i => i.Closure(newManager)).ToList(), this.derivingExpressions.Select(i => i.Closure(manager)).ToList());
 			manager.Declare(this.className);
 			return result;
 		}

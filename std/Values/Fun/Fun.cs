@@ -6,7 +6,6 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lang {
 	/// <summary> Delegate for Lumen function </summary>
 	/// <param name="scope"> Scope for execution </param>
-	/// <param name="args"> Arguments that apply </param>
 	public delegate Value LumenFunc(Scope scope, params Value[] args);
 
 	/// <summary> Interface for any Lumen function value </summary>

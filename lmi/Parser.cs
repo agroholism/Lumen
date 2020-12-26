@@ -308,6 +308,12 @@ namespace Lumen.Lmi {
 			List<Expression> members = new List<Expression>();
 			List<Expression> derivings = new List<Expression>();
 
+			String typeParam = null;
+
+			if(this.LookMatch(0, TokenType.WORD)) {
+				typeParam = this.Consume(TokenType.WORD).Text;
+			}
+
 			if (this.Match(TokenType.BLOCK_START)) {
 				while (!this.Match(TokenType.BLOCK_END) && !this.Match(TokenType.EOF)) {
 					if (this.Match(TokenType.IMPLEMENTS)) {
@@ -320,7 +326,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			return new ClassDeclaration(typeName, members, derivings);
+			return new ClassDeclaration(typeName, typeParam, members, derivings);
 		}
 
 		private void ParseDefaultConstructor(List<ConstructorMetadata> defaultConstructors) {

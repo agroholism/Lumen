@@ -43,18 +43,21 @@
   <ItemGroup>
     <Compile Include="Classes\Applicative.cs" />
     <Compile Include="Classes\Clone.cs" />
+    <Compile Include="Classes\Container.cs" />
     <Compile Include="Classes\Context.cs" />
     <Compile Include="Classes\Default.cs" />
     <Compile Include="Classes\ExceptionClass.cs" />
     <Compile Include="Classes\Functor.cs" />
     <Compile Include="CallStackRecord.cs" />
     <Compile Include="Classes\Monad.cs" />
+    <Compile Include="Classes\Monoid.cs" />
     <Compile Include="Expression\NativeExpression.cs" />
     <Compile Include="Modules\ConvertError.cs" />
     <Compile Include="Modules\FutureModule.cs" />
     <Compile Include="Modules\ResultModule.cs" />
     <Compile Include="Modules\TailRecursion.cs" />
     <Compile Include="Modules\UnitModule.cs" />
+    <Compile Include="Values\Class.cs" />
     <Compile Include="Values\Constructors\ExceptionConstructor.cs" />
     <Compile Include="Values\Constructors\IConstructor.cs" />
     <Compile Include="Values\Generators\LumenGenerator.cs" />

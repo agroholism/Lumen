@@ -1,5 +1,5 @@
 ﻿namespace Lumen.Lang {
-	internal class ExceptionClass : Module {
+	internal class ExceptionClass : SystemClass {
 		internal ExceptionClass() {
 			this.Name = "Exception";
 
