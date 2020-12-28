@@ -83,8 +83,8 @@ namespace Lumen.Lmi {
 					}
 
 					return nextExpression;
-				case TokenType.BREAK:
-					this.Match(TokenType.BREAK);
+				case TokenType.EXIT:
+					this.Match(TokenType.EXIT);
 
 					Expression breakExpression =
 						new Break(this.LookMatch(0, TokenType.WORD) ?
@@ -129,8 +129,8 @@ namespace Lumen.Lmi {
 				case TokenType.MODULE:
 					this.Match(TokenType.MODULE);
 					return this.ParseModule();
-				case TokenType.WHILE:
-					this.Match(TokenType.WHILE);
+				case TokenType.LOOP:
+					this.Match(TokenType.LOOP);
 					return this.ParseWhile();
 				case TokenType.LET:
 					this.Match(TokenType.LET);
@@ -310,7 +310,7 @@ namespace Lumen.Lmi {
 
 			String typeParam = null;
 
-			if(this.LookMatch(0, TokenType.WORD)) {
+			if (this.LookMatch(0, TokenType.WORD)) {
 				typeParam = this.Consume(TokenType.WORD).Text;
 			}
 
@@ -724,25 +724,22 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseWhile() {
-			if (this.Match(TokenType.MATCH)) {
-				IPattern pattern = this.ParsePattern();
-				this.Match(TokenType.EQUALS);
-				Expression assinableExpression = this.Expression();
+			String cycleName = this.Match(TokenType.AS) ? this.Consume(TokenType.WORD).Text : null;
+			this.Match(TokenType.EOC);
+			if (this.LookMatch(0, TokenType.BAR)) {
+				List<(Expression, Expression)> guardAndBodies = new List<(Expression, Expression)>();
+				while (this.Match(TokenType.BAR)) {
+					Expression guard = this.Expression();
+					this.Match(TokenType.LAMBDA);
+					Expression body = this.Expression();
+					guardAndBodies.Add((guard, body));
+				}
 
-				String cycleName = this.Match(TokenType.AS) ? this.Consume(TokenType.WORD).Text : null;
-
-				this.Match(TokenType.COLON);
-				Expression body = this.Expression();
-
-				return new WhileMatch(cycleName, pattern, assinableExpression, body);
+				return new DijkstraLoop(cycleName, guardAndBodies);
 			}
-			else {
-				Expression condition = this.Expression();
-				String cycleName = this.Match(TokenType.AS) ? this.Consume(TokenType.WORD).Text : null;
-				this.Match(TokenType.COLON);
-				Expression body = this.Expression();
-				return new WhileCycle(cycleName, condition, body);
-			}
+
+			this.Match(TokenType.COLON);
+			return new Loop(cycleName, this.Expression());
 		}
 
 		private Expression LogikOr() {

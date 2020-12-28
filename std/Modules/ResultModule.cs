@@ -10,9 +10,6 @@ namespace Lumen.Lang {
 		public ResultModule() {
 			this.Name = "Result";
 
-			this.AppendImplementation(Prelude.Functor);
-			this.AppendImplementation(Prelude.Applicative);
-
 			this.Success = Helper.CreateConstructor("Result.Success", this,
 				new List<String> { "value" }) as Constructor;
 			this.Failed = Helper.CreateConstructor("Result.Failed", this,

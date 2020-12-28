@@ -20,6 +20,8 @@ namespace Lumen.Lang {
 			this.SetMember("Some", this.Some);
 			this.SetMember("None", this.None);
 
+			this.SetMember("pure", this.Some);
+
 			this.SetMember("default", new LambdaFun((scope, args) => {
 				return this.None;
 			}) {
@@ -45,17 +47,17 @@ namespace Lumen.Lang {
 				}
 			};
 
-			this.SetMember("fmap", fmap);
+			this.SetMember("map", fmap);
 
 			// Applicative
-			this.SetMember("liftA", new LambdaFun((scope, args) => {
+			this.SetMember("lift", new LambdaFun((scope, args) => {
 				Value obj = scope["f"];
 
 				if (obj == this.None) {
 					return this.None;
 				}
 				else if (this.Some.IsParentOf(obj)) {
-					return scope["m"].CallMethodFlip("fmap", scope, Prelude.DeconstructSome(obj));
+					return scope["m"].CallMethodFlip("map", scope, Prelude.DeconstructSome(obj));
 				}
 
 				throw new LumenException("liftA option");
@@ -66,7 +68,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("liftB", new LambdaFun((scope, args) => {
+			this.SetMember("bind", new LambdaFun((scope, args) => {
 				IType obj = scope["m"] as IType;
 
 				if (obj == this.None) {

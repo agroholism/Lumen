@@ -1,22 +1,20 @@
-﻿using Lumen.Lang.Expressions;
-using Lumen.Lang;
-using String = System.String;
+﻿using System;
 using System.Collections.Generic;
+using Lumen.Lang;
+using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
-	internal class WhileCycle : Expression {
+	internal class Loop : Expression {
 		internal String cycleName;
-		internal Expression condition;
 		internal Expression body;
 
-		internal WhileCycle(String cycleName, Expression condition, Expression body) {
+		internal Loop(String cycleName, Expression body) {
 			this.cycleName = cycleName;
-			this.condition = condition;
 			this.body = body;
 		}
 
 		public Value Eval(Scope scope) {
-			while (this.condition.Eval(scope).ToBoolean()) {
+			while (true) {
 REDO:
 				try {
 					this.body.Eval(scope);
@@ -44,13 +42,13 @@ REDO:
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			return new WhileCycle(this.cycleName, this.condition.Closure(manager), this.body.Closure(manager));
+			return new Loop(this.cycleName, this.body.Closure(manager));
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			while (this.condition.Eval(scope).ToBoolean()) {
+			while (true) {
 REDO:
-				IEnumerable<Value> y = null;
+				IEnumerable<Value> y;
 				try {
 					y = this.body.EvalWithYield(scope);
 				}

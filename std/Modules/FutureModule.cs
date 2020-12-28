@@ -9,8 +9,6 @@ namespace Lumen.Lang {
 		internal FutureModule() {
 			this.Name = "Future";
 
-			this.AppendImplementation(Prelude.Functor);
-			this.AppendImplementation(Prelude.Applicative);
 			this.AppendImplementation(Prelude.Monad);
 
 			this.SetMember("run", new LambdaFun((scope, args) => {
@@ -219,7 +217,7 @@ namespace Lumen.Lang {
 			};
 
 			this.SetMember("then", map);
-			this.SetMember("fmap", map);
+			this.SetMember("map", map);
 
 			this.SetMember("catch", new LambdaFun((scope, args) => {
 				Future future = scope["future"].ToFuture(scope);
@@ -239,7 +237,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("liftA", new LambdaFun((scope, args) => {
+			this.SetMember("lift", new LambdaFun((scope, args) => {
 				Future future = scope["future"].ToFuture(scope);
 				Future continuationFuture = scope["continuation"].ToFuture(scope);
 

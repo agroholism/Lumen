@@ -603,8 +603,8 @@ namespace Lumen.Lmi {
 				case "else":
 					this.AddToken(TokenType.ELSE);
 					break;
-				case "while":
-					this.AddToken(TokenType.WHILE);
+				case "loop":
+					this.AddToken(TokenType.LOOP);
 					break;
 				case "let":
 					this.AddToken(TokenType.LET);
@@ -627,8 +627,8 @@ namespace Lumen.Lmi {
 				case "not":
 					this.AddToken(TokenType.NOT);
 					break;
-				case "break":
-					this.AddToken(TokenType.BREAK);
+				case "exit":
+					this.AddToken(TokenType.EXIT);
 					break;
 				case "next":
 					this.AddToken(TokenType.NEXT);

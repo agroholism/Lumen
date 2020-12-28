@@ -193,8 +193,8 @@ namespace Lumen.Lang {
 				throw Helper.InvalidArgument("indices", "indexation support only one index");
 			}) {
 				Parameters = new List<IPattern> {
+					new NamePattern("indices"),
 					new TypePattern("self", this),
-					new NamePattern("indices")
 				}
 			});
 

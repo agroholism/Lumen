@@ -105,8 +105,8 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-						new NamePattern("self"),
-					new NamePattern("element")
+					new NamePattern("element"),
+					new NamePattern("self"),
 				}
 			});
 
@@ -147,7 +147,7 @@ Array.refs
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("self") , new NamePattern("element")
+					new NamePattern("self"), new NamePattern("element")
 				}
 			});
 
@@ -177,6 +177,21 @@ Array.refs
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self") , new NamePattern("predicate")
+				}
+			});
+
+			this.SetMember("removeAt", new LambdaFun((scope, args) => {
+				List<Value> array = scope["self"].ToList(scope);
+
+				Int32 predicate = scope["at"].ToInt(scope);
+				var atval = array[predicate];
+				array.RemoveAt(predicate);
+
+				return atval;
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("at"),
+					new NamePattern("self")
 				}
 			});
 
