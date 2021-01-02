@@ -4,6 +4,7 @@ using System.Linq;
 
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lmi {
 	public class LambdaLiteral : Expression {

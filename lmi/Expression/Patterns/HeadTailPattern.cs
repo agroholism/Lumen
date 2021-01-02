@@ -2,39 +2,15 @@
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 using System;
-using System.Linq;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	internal class HeadTailPattern : IPattern {
 		private IPattern xName;
 		private IPattern xsName;
 
-		public Boolean IsNotEval => false;
-
 		public HeadTailPattern(IPattern xName, IPattern xsName) {
 			this.xName = xName;
 			this.xsName = xsName;
-		}
-
-		public Expression Closure(ClosureManager manager) {
-			manager.Declare(this.GetDeclaredVariables());
-
-			return this;
-		}
-
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
-		}
-
-		public List<String> GetDeclaredVariables() {
-			List<String> result = this.xName.GetDeclaredVariables();
-			result.AddRange(this.xsName.GetDeclaredVariables());
-			return result;
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
@@ -56,6 +32,18 @@ namespace Lumen.Lmi {
 
 				return this.xsName.Match(new List(list.Value.Tail), scope);
 			}
+		}
+
+		public List<String> GetDeclaredVariables() {
+			List<String> result = this.xName.GetDeclaredVariables();
+			result.AddRange(this.xsName.GetDeclaredVariables());
+			return result;
+		}
+
+		public IPattern Closure(ClosureManager manager) {
+			manager.Declare(this.GetDeclaredVariables());
+
+			return this;
 		}
 
 		public Module GetModule(IType obj) {

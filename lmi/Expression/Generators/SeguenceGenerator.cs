@@ -2,6 +2,7 @@
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 using System;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lmi {
 	internal class SequenceGenerator : Expression {

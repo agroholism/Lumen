@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lumen.Lang.Expressions {
+namespace Lumen.Lang {
 	public class ClosureManager {
 		private readonly List<String> declared;
 		public Scope Scope { get; private set; }

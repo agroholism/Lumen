@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lumen.Lang.Expressions;
-using Lumen.Lang;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
     internal class AsPattern : IPattern {
         private readonly IPattern innerPattern;
         private readonly String identifier;
@@ -13,13 +11,9 @@ namespace Lumen.Lmi {
             this.identifier = identifier;
         }
 
-        public Expression Closure(ClosureManager manager) {
+        public IPattern Closure(ClosureManager manager) {
 			manager.Declare(this.identifier);
-            return new AsPattern(this.innerPattern.Closure(manager) as IPattern, this.identifier);
-        }
-
-        public Value Eval(Scope e) {
-            throw new NotImplementedException();
+            return new AsPattern(this.innerPattern.Closure(manager), this.identifier);
         }
 
         public List<String> GetDeclaredVariables() {
@@ -39,13 +33,8 @@ namespace Lumen.Lmi {
             return result;
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
-		}
-
 		public override String ToString() {
-            return $"{this.innerPattern.ToString()} as {this.identifier}";
+            return $"{this.innerPattern} as {this.identifier}";
         }
     }
 }

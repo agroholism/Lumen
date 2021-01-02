@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	internal class NotPattern : IPattern {
 		private IPattern pattern;
 
@@ -11,16 +11,12 @@ namespace Lumen.Lmi {
 			this.pattern = pattern;
 		}
 
-        public Expression Closure(ClosureManager manager) {
-            return new NotPattern(this.pattern.Closure(manager) as IPattern);
-        }
-
-        public Value Eval(Scope e) {
-            throw new NotImplementedException();
+        public IPattern Closure(ClosureManager manager) {
+            return new NotPattern(this.pattern.Closure(manager));
         }
 
         public List<String> GetDeclaredVariables() {
-            return new List<String>();
+            return pattern.GetDeclaredVariables();
         }
 
         public MatchResult Match(Value value, Scope scope) {
@@ -31,10 +27,6 @@ namespace Lumen.Lmi {
             }
 
             return MatchResult.Success;
-        }
-
-        public IEnumerable<Value> EvalWithYield(Scope scope) {
-            throw new NotImplementedException();
         }
 
         public override String ToString() {

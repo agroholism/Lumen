@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	public class InfinityRange : BaseValueImpl {

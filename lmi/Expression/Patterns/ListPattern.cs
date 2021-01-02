@@ -5,7 +5,7 @@ using System.Linq;
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	/// <summary> Pattern [..., ...] </summary>
 	internal class ListPattern : IPattern {
         private List<IPattern> subpatterns;
@@ -43,10 +43,6 @@ namespace Lumen.Lmi {
 			);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
-		}
 
 		public List<String> GetDeclaredVariables() {
 			List<String> result = new List<String>();
@@ -58,12 +54,8 @@ namespace Lumen.Lmi {
 			return result;
 		}
 
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public Expression Closure(ClosureManager manager) {
-			return new ListPattern(this.subpatterns.Select(i => i.Closure(manager) as IPattern).ToList());
+		public IPattern Closure(ClosureManager manager) {
+			return new ListPattern(this.subpatterns.Select(i => i.Closure(manager)).ToList());
 		}
 
 		public override String ToString() {

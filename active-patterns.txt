@@ -15,6 +15,7 @@ Proposed to version 0.8
 	однако, он был изменён вследствие излишней сложности
 
 	  [? patternName arguments] deconstruction
+	  <? patternName arguments ?> deconstruction
 match x 
 | parseRegex? ("(\\d+) (\\w+)") fst snd =
 | [? parseRegex "(\\d+) (\\w+)"] fst snd =

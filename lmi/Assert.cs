@@ -42,7 +42,7 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Lumen.Lang.Patterns;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 
-namespace Lumen.Lang.Expressions {
-	public interface IPattern : Expression {
+namespace Lumen.Lang.Patterns {
+	public interface IPattern {
 		MatchResult Match(Value value, Scope scope);
 
 		List<String> GetDeclaredVariables();
+
+		IPattern Closure(ClosureManager manager);
 	}
 
 	public enum MatchResultKind {

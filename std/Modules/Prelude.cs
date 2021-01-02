@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	public sealed class Prelude : Module {
@@ -34,7 +34,7 @@ namespace Lumen.Lang {
 		public static Module Unit { get; } = new UnitModule();
 
 		public static Module Iterator { get; } = new IteratorModule();
-		public static Module Ref { get; } = new RefModule();
+		public static Module Mut { get; } = new MutModule();
 		public static Module Seq { get; } = new SeqModule();
 		public static Module Range { get; } = new RangeModule();
 		public static Module MutArray { get; } = new MutArrayModule();
@@ -99,8 +99,8 @@ namespace Lumen.Lang {
 
 			this.SetMember("Range", Range);
 			this.SetMember("Iterator", Iterator);
-			this.SetMember("Ref", Ref);
-			this.SetMember("ref", Ref);
+			this.SetMember("Mut", Mut);
+			this.SetMember("mut", Mut);
 			this.SetMember("List", List);
 			this.SetMember("Seq", Seq);
 			this.SetMember("MutArray", MutArray);

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Container : SystemClass {

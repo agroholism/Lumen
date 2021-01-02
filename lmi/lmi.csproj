@@ -71,7 +71,6 @@
     <Compile Include="Expression\Operators\InOperator.cs" />
     <Compile Include="Expression\Patterns\ArrayPattern.cs" />
     <Compile Include="Expression\Patterns\EmptyArrayPattern.cs" />
-    <Compile Include="Expression\Patterns\ValuePattern.cs" />
     <Compile Include="Expression\Generators\SeguenceGenerator.cs" />
     <Compile Include="Expression\Literals\LambdaLiteral.cs" />
     <Compile Include="Expression\Literals\ListLiteral.cs" />
@@ -84,7 +83,7 @@
     <Compile Include="Expression\Operators\BinaryOperator.cs" />
     <Compile Include="Expression\Operators\Indexation.cs" />
     <Compile Include="Expression\Patterns\AsPattern.cs" />
-    <Compile Include="Expression\Patterns\DiscordPattern.cs" />
+    <Compile Include="Expression\Patterns\DiscardPattern.cs" />
     <Compile Include="Expression\Patterns\EmptyListPattern.cs" />
     <Compile Include="Expression\Patterns\HeadTailPattern.cs" />
     <Compile Include="Expression\Patterns\ListPattern.cs" />
@@ -112,7 +111,7 @@
     <Compile Include="Expression\Literals\SeqLiteral.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenType.cs" />
-    <Compile Include="Expression\Patterns\WherePattern.cs" />
+    <Compile Include="Expression\Patterns\WhenPattern.cs" />
     <Compile Include="Expression\Patterns\TypePattern.cs" />
     <Compile Include="Expression\UseStatement.cs" />
     <Compile Include="Expression\Generators\Yield.cs" />

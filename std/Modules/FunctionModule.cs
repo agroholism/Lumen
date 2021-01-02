@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal sealed class FunctionModule : Module {
@@ -74,8 +74,8 @@ namespace Lumen.Lang {
 				};
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("function", this),
-					new TypePattern("functor", this),
+					new ExactTypePattern("function", this),
+					new ExactTypePattern("functor", this),
 				}
 			});
 
@@ -95,8 +95,8 @@ namespace Lumen.Lang {
 				};
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("func", this),
-					new TypePattern("appl", this),
+					new ExactTypePattern("func", this),
+					new ExactTypePattern("appl", this),
 				}
 			});
 			
@@ -118,8 +118,8 @@ namespace Lumen.Lang {
 				};
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("func", this),
-					new TypePattern("monad", this),
+					new ExactTypePattern("func", this),
+					new ExactTypePattern("monad", this),
 				}
 			});
 

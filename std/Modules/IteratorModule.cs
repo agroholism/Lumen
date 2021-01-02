@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class IteratorModule : Module {

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal sealed class LogicalModule : Module {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	/// <summary> Delegate for Lumen function </summary>

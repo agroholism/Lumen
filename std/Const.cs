@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	/// <summary> Contains more important Kernel constants. </summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lmi {
 	internal class ForCycle : Expression {

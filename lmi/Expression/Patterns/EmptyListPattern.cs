@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	/// <summary> Pattern [] </summary>
 	internal class EmptyListPattern : IPattern {
 		public static EmptyListPattern Instance { get; } = new EmptyListPattern();
-		public Boolean IsNotEval { get; } = false;
 
 		private EmptyListPattern() {
 
@@ -24,20 +23,12 @@ namespace Lumen.Lmi {
 				"function wait an empty list"
 			);
         }
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
-		}
 
 		public List<String> GetDeclaredVariables() {
 			return new List<String>();
 		}
 
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public Expression Closure(ClosureManager manager) {
+		public IPattern Closure(ClosureManager manager) {
 			return this;
 		}
 

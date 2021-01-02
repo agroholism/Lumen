@@ -139,24 +139,44 @@ Lumen 0.8
 + Monoid implementation for Function, Number
 + Alternative implementation for Collection
 
+28
+
+29
+
+03.01.2021
++ 1h refactoring stage 1
+
 TODO:
 - fix import
 - let Left v | Right v = i  YES (make pattern parsing rules)
 - module - it is required?
+<-> Mut
 
 Lumen 0.9
 NON STRICT FOREACH
 3. let callSecond () = callFirst()
    and callFirst () = callSecond()
 10. operator in pattern matching?
-9. match operator for strings and regex
-6. map literal ?
 
 let reduce.<T: Default> [] _ =
     T.default ()
 
-let reduce.<T: Default from x> x::xs operation: Function =
-    rec.<T> xs operation |> operation x
+type Logger = aspect
+	before Number.* =
+		println "Called"
+
+type Point = Point Number Number
+	invariant shouldBePositive (Point x y) =
+		x > 0 and y > 0
+
+	let getX (Point x _) = !x
+	let getY (Point _ y) = !y
+	
+	mut let setX val (Point x _) =
+		x <- val
+
+	mut let setY val (Point _ y) =
+		y <- val
 
 assertWarns(warn, fun, *args, **kwds) Ч fun(*args, **kwds) порождает предупреждение
 

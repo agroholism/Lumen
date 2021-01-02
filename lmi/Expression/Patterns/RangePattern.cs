@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	internal class RangePattern : IPattern {
 		private IPattern left;
 		private IPattern right;
@@ -86,20 +86,12 @@ namespace Lumen.Lmi {
 		}
 
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			throw new NotImplementedException();
-		}
-
 		public List<String> GetDeclaredVariables() {
 			return new List<String>();
 		}
 
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public Expression Closure(ClosureManager manager) {
-			return new RangePattern(this.left?.Closure(manager) as IPattern, this.right?.Closure(manager) as IPattern, this.isInclusive);
+		public IPattern Closure(ClosureManager manager) {
+			return new RangePattern(this.left?.Closure(manager), this.right?.Closure(manager), this.isInclusive);
 		}
 
 		public override String ToString() {

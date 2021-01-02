@@ -4,12 +4,10 @@ using System;
 using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	/// <summary> Pattern () </summary>
 	internal class UnitPattern : IPattern {
 		public static UnitPattern Instance = new UnitPattern();
-
-		public Boolean IsNotEval => false;
 
 		private UnitPattern() {
 
@@ -23,16 +21,7 @@ namespace Lumen.Lmi {
 			return new List<String>();
 		}
 
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
-		}
-
-		public Expression Closure(ClosureManager manager) {
+		public IPattern Closure(ClosureManager manager) {
 			return this;
 		}
 

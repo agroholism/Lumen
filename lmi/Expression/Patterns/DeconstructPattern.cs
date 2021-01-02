@@ -2,41 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Lumen.Lmi;
 using Lumen.Lang.Expressions;
-using Lumen.Lang;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	internal class DeconstructPattern : IPattern {
 		private Expression constructor;
 		private List<IPattern> subpatterns;
-
-		public Boolean IsNotEval { get; set; } = false;
 
 		public DeconstructPattern(Expression constructor, List<IPattern> subPatterns) {
 			this.constructor = constructor;
 			this.subpatterns = subPatterns;
 		}
 
-		public Expression Closure(ClosureManager manager) {
-			return new DeconstructPattern(this.constructor.Closure(manager), this.subpatterns.Select(i => i.Closure(manager) as IPattern).ToList());
-		}
-
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public List<String> GetDeclaredVariables() {
-			List<String> result = new List<String>();
-
-			if (this.constructor is IdExpression idExpression && idExpression.id.StartsWith("'")) {
-				result.Add(idExpression.id);
-			}
-
-			foreach (IPattern i in this.subpatterns) {
-				result.AddRange(i.GetDeclaredVariables());
-			}
-
-			return result;
+		public IPattern Closure(ClosureManager manager) {
+			return new DeconstructPattern(this.constructor.Closure(manager), this.subpatterns.Select(i => i.Closure(manager)).ToList());
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
@@ -107,9 +87,18 @@ namespace Lumen.Lmi {
 			return new MatchResult(false); // ??
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
+		public List<String> GetDeclaredVariables() {
+			List<String> result = new List<String>();
+
+			if (this.constructor is IdExpression idExpression && idExpression.id.StartsWith("'")) {
+				result.Add(idExpression.id);
+			}
+
+			foreach (IPattern i in this.subpatterns) {
+				result.AddRange(i.GetDeclaredVariables());
+			}
+
+			return result;
 		}
 
 		public override String ToString() {

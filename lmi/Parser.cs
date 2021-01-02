@@ -5,6 +5,7 @@ using System.Text;
 
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lmi {
 	internal sealed class Parser {
@@ -391,6 +392,23 @@ namespace Lumen.Lmi {
 		private IPattern ParsePattern() {
 			IPattern result = null;
 
+			if(this.Match(TokenType.ACTIVE_PATTERN_OPEN)) {
+				Expression activePattern = Expression();
+				this.Consume(TokenType.ACTIVE_PATTERN_CLOSE);
+
+				List<IPattern> subpatterns = new List<IPattern>();
+
+				while (!this.LookMatch(0, TokenType.EQUALS) 
+					&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE) 
+					&& !this.LookMatch(0, TokenType.PAREN_CLOSE) 
+					&& !this.LookMatch(0, TokenType.LAMBDA) 
+					&& !this.LookMatch(0, TokenType.BAR)) {
+					subpatterns.Add(this.ParsePattern());
+				}
+
+				return new ActivePattern(activePattern, subpatterns);
+			}
+
 			if (this.Match(TokenType.DOT2)) {
 				if (!this.IsValidRangeToken()) {
 					result = new RangePattern(result, null, false);
@@ -456,7 +474,7 @@ namespace Lumen.Lmi {
 				String name = this.Consume(TokenType.WORD).Text;
 
 				if (name == "_") {
-					result = DiscordPattern.Instance;
+					result = DiscardPattern.Instance;
 				}
 				else if (name == "true") {
 					result = new ValuePattern(Const.TRUE);
@@ -465,28 +483,7 @@ namespace Lumen.Lmi {
 					result = new ValuePattern(Const.FALSE);
 				}
 				else if (Char.IsLower(name[0]) && !this.LookMatch(0, TokenType.DOT)) {
-					if (this.Match(TokenType.QUESTION)) {
-						List<Expression> arguments = new List<Expression>();
-
-						if (this.Match(TokenType.PAREN_OPEN)) {
-							while (!this.Match(TokenType.PAREN_CLOSE)) {
-								arguments.Add(this.Expression());
-								this.Match(TokenType.SPLIT);
-							}
-						}
-
-						List<IPattern> subpatterns = new List<IPattern>();
-						while (!this.LookMatch(0, TokenType.PAREN_CLOSE)
-							&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE)
-							&& !this.LookMatch(0, TokenType.LAMBDA)
-							&& !this.LookMatch(0, TokenType.EQUALS)) {
-							subpatterns.Add(this.ParsePattern());
-						}
-						return new ActivePattern(new IdExpression(name, this.file, this.line), arguments, subpatterns);
-					}
-					else {
-						result = new NamePattern(name);
-					}
+					result = new NamePattern(name);
 				}
 				else {
 					Expression constructor = new IdExpression(name, this.file, this.line);
@@ -555,7 +552,7 @@ namespace Lumen.Lmi {
 
 			if (this.Match(TokenType.WHEN)) {
 				Expression exp = this.Expression();
-				result = new WherePattern(result, exp);
+				result = new WhenPattern(result, exp);
 			}
 
 			while (this.Match(TokenType.BAR)) {

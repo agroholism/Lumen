@@ -2,31 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Lumen.Lmi;
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
 
-namespace Lumen.Lmi {
+namespace Lumen.Lang.Patterns {
 	internal class TypePattern : IPattern {
 		private IPattern subpattern;
 		private List<Expression> requirements;
-
-		public Boolean IsNotEval => false;
 
 		public TypePattern(IPattern innerExpression, List<Expression> requirements) {
 			this.subpattern = innerExpression;
 			this.requirements = requirements;
 		}
 
-		public Expression Closure(ClosureManager manager) {
+		public IPattern Closure(ClosureManager manager) {
 			String typeParameter = this.FindTypeParameter();
 			if (typeParameter != null) {
 				manager.Declare(typeParameter);
 			}
-			return new TypePattern(this.subpattern.Closure(manager) as IPattern, this.requirements.Select(i => i.Closure(manager)).ToList());
-		}
-
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
+			return new TypePattern(this.subpattern.Closure(manager), this.requirements.Select(i => i.Closure(manager)).ToList());
 		}
 
 		public String FindTypeParameter() {
@@ -89,11 +84,6 @@ namespace Lumen.Lmi {
 			}
 
 			return this.subpattern.Match(value, scope);
-		}
-
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Eval(scope);
-			yield break;
 		}
 
 		public Module GetModule(IType obj) {

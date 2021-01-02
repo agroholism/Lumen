@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal sealed class FutureModule : Module {
@@ -17,7 +17,7 @@ namespace Lumen.Lang {
 				return new Future(Task.Factory.StartNew(() => action.Call(new Scope(), Const.UNIT)));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("action", Prelude.Function)
+					new ExactTypePattern("action", Prelude.Function)
 				}
 			});
 
@@ -52,8 +52,8 @@ namespace Lumen.Lang {
 				);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("time", Prelude.Number),
-					new TypePattern("continuation", Prelude.Function)
+					new ExactTypePattern("time", Prelude.Number),
+					new ExactTypePattern("continuation", Prelude.Function)
 				}
 			});
 
@@ -64,7 +64,7 @@ namespace Lumen.Lang {
 				return new Logical(future.Task.IsFaulted);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("future", this),
+					new ExactTypePattern("future", this),
 				}
 			});
 
@@ -74,7 +74,7 @@ namespace Lumen.Lang {
 				return new Logical(future.Task.Status == TaskStatus.RanToCompletion);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("future", this),
+					new ExactTypePattern("future", this),
 				}
 			});
 
@@ -91,7 +91,7 @@ namespace Lumen.Lang {
 				return future;
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("future", this),
+					new ExactTypePattern("future", this),
 				}
 			});
 
@@ -107,8 +107,8 @@ namespace Lumen.Lang {
 				}
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("time", Prelude.Number),
-					new TypePattern("future", this),
+					new ExactTypePattern("time", Prelude.Number),
+					new ExactTypePattern("future", this),
 				}
 			});
 
@@ -124,7 +124,7 @@ namespace Lumen.Lang {
 				return Helper.Success(future.Task.Result);
 			}) { 
 				Parameters = new List<IPattern> {
-					new TypePattern("future", this)
+					new ExactTypePattern("future", this)
 				}
 			});
 
@@ -288,7 +288,7 @@ namespace Lumen.Lang {
 				);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("future", this),
+					new ExactTypePattern("future", this),
 				}
 			});
 		}

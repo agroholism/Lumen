@@ -28,7 +28,7 @@ namespace Lumen.Studio {
 				List<AutocompleteItem> result = new List<AutocompleteItem>();
 
 				foreach (Value i in res.ToList(null)) {
-					if (i is Lang.MutArray) {
+					if (i is MutArray) {
 						List<Value> lst = i.ToList(null);
 						AutocompleteItem aci = new AutocompleteItem {
 							Text = lst[0].ToString(),
@@ -48,7 +48,7 @@ namespace Lumen.Studio {
 			return null;
 		}
 
-		internal virtual void OnTextChanged(TextBoxManager manager, FastColoredTextBoxNS.Range rng) {
+		internal virtual void OnTextChanged(TextBoxManager manager, Range rng) {
 			FastColoredTextBox textBox = manager.TextBox;
 
 			textBox.Range.ClearFoldingMarkers();

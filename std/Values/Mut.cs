@@ -1,12 +1,12 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public class Ref : BaseValueImpl {
+	public class Mut : BaseValueImpl {
 		public Value Value { get; set; }
 
-		public override IType Type => Prelude.Ref;
+		public override IType Type => Prelude.Mut;
 
-		public Ref(Value value) {
+		public Mut(Value value) {
 			this.Value = value;
 		}
 

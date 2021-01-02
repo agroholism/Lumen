@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Collection : SystemClass {
@@ -194,7 +194,7 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("indices"),
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 				}
 			});
 
@@ -332,7 +332,7 @@ namespace Lumen.Lang {
 			}) {
 				Name = "Collection.average",
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 
@@ -347,7 +347,7 @@ namespace Lumen.Lang {
 				}
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 
@@ -362,7 +362,7 @@ namespace Lumen.Lang {
 				}
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 
@@ -379,7 +379,7 @@ namespace Lumen.Lang {
 				}
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("folder")
 				}
 			});
@@ -393,7 +393,7 @@ namespace Lumen.Lang {
 				return values.Aggregate(init, (x, y) => folder.Call(new Scope(scope), x, y));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("init"),
 					new NamePattern("folder")
 				}
@@ -411,7 +411,7 @@ namespace Lumen.Lang {
 				}
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("folder")
+					new ExactTypePattern("self", this) , new NamePattern("folder")
 				}
 			});
 
@@ -424,7 +424,7 @@ namespace Lumen.Lang {
 				return values.Reverse().Aggregate(init, (x, y) => folder.Call(new Scope(scope), x, y));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("init"),
 					new NamePattern("folder")
 				}
@@ -439,7 +439,7 @@ namespace Lumen.Lang {
 				return (result == null) ? Prelude.None : (Value)Helper.CreateSome(result);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 
@@ -451,7 +451,7 @@ namespace Lumen.Lang {
 				return (result == null) ? Prelude.None : (Value)Helper.CreateSome(result);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 
@@ -462,7 +462,7 @@ namespace Lumen.Lang {
 				return new Number(self.Count());
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 
@@ -473,7 +473,7 @@ namespace Lumen.Lang {
 				return new Number(self.Count(i => elem.Equals(i)));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , 
+					new ExactTypePattern("self", this) , 
 					new NamePattern("elem")
 				}
 			});
@@ -486,7 +486,7 @@ namespace Lumen.Lang {
 				return new Number(stream.Count(i => fun.Call(new Scope(scope), i).ToBoolean()));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("pred")
+					new ExactTypePattern("self", this) , new NamePattern("pred")
 				}
 			});
 
@@ -498,7 +498,7 @@ namespace Lumen.Lang {
 				return new Logical(self.All(x => predicate.Call(new Scope(scope), x).ToBoolean()));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("predicate")
+					new ExactTypePattern("self", this) , new NamePattern("predicate")
 				}
 			});
 
@@ -509,7 +509,7 @@ namespace Lumen.Lang {
 				return new Logical(self.Any(x => predicate.Call(new Scope(scope), x).ToBoolean()));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("predicate")
+					new ExactTypePattern("self", this) , new NamePattern("predicate")
 				}
 			});
 
@@ -522,7 +522,7 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("predicate"),
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 				}
 			});
 			
@@ -537,7 +537,7 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("fn"),
-					new TypePattern("fc", this),
+					new ExactTypePattern("fc", this),
 				}
 			});
 			
@@ -550,7 +550,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(typeParameter, values.Select((i, index) => mapper.Call(new Scope(scope), new Number(index), i)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("mapper")
+					new ExactTypePattern("self", this) , new NamePattern("mapper")
 				}
 			});
 
@@ -576,7 +576,7 @@ namespace Lumen.Lang {
 					scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("other"),
 				}
 			});
@@ -607,7 +607,7 @@ namespace Lumen.Lang {
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("action")
 				}
 			});
@@ -625,7 +625,7 @@ namespace Lumen.Lang {
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("action")
 				}
 			});
@@ -644,7 +644,7 @@ namespace Lumen.Lang {
 				return Prelude.None;
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("predicate")
+					new ExactTypePattern("self", this) , new NamePattern("predicate")
 				}
 			});
 
@@ -662,7 +662,7 @@ namespace Lumen.Lang {
 				return new MutArray(result);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("predicate")
+					new ExactTypePattern("self", this) , new NamePattern("predicate")
 				}
 			});
 
@@ -684,7 +684,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.OrderBy(i => mutator.Call(new Scope(scope), i)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("other")
+					new ExactTypePattern("self", this) , new NamePattern("other")
 				}
 			});
 
@@ -696,7 +696,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.OrderBy(i => i, new CompareUtil(comparator, scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("other")
+					new ExactTypePattern("self", this) , new NamePattern("other")
 				}
 			});
 
@@ -717,7 +717,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.OrderByDescending(i => mutator.Call(new Scope(scope), i)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("other")
+					new ExactTypePattern("self", this) , new NamePattern("other")
 				}
 			});
 
@@ -729,7 +729,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.OrderByDescending(i => i, new CompareUtil(comparator, scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("other")
+					new ExactTypePattern("self", this) , new NamePattern("other")
 				}
 			});
 
@@ -742,7 +742,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.Take(count), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("count")
+					new ExactTypePattern("self", this) , new NamePattern("count")
 				}
 			});
 
@@ -755,7 +755,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.TakeWhile(i => predicate.Call(new Scope(scope), i).ToBoolean()), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("predicate")
+					new ExactTypePattern("self", this) , new NamePattern("predicate")
 				}
 			});
 
@@ -768,7 +768,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.Skip(count), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("count")
+					new ExactTypePattern("self", this) , new NamePattern("count")
 				}
 			});
 
@@ -781,7 +781,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, value.SkipWhile(i => predicate.Call(new Scope(scope), i).ToBoolean()), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("predicate")
+					new ExactTypePattern("self", this) , new NamePattern("predicate")
 				}
 			});
 
@@ -792,7 +792,7 @@ namespace Lumen.Lang {
 				return Helper.FromSeq(self.Type, self.ToSeq(scope).Distinct(), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 				}
 			});
 
@@ -803,7 +803,7 @@ namespace Lumen.Lang {
 					self.ToSeq(scope).Except(scope["other"].ToSeq(scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this) , new NamePattern("other")
+					new ExactTypePattern("self", this) , new NamePattern("other")
 				}
 			});
 
@@ -814,8 +814,8 @@ namespace Lumen.Lang {
 					self.ToSeq(scope).Intersect(scope["other"].ToSeq(scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
-						new TypePattern("other", this),
+					new ExactTypePattern("self", this),
+						new ExactTypePattern("other", this),
 				}
 			});
 
@@ -826,7 +826,7 @@ namespace Lumen.Lang {
 					self.ToSeq(scope).Union(scope["other"].ToSeq(scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("other"),
 				}
 			});
@@ -850,7 +850,7 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("delim"),
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 				}
 			});
 
@@ -860,7 +860,7 @@ namespace Lumen.Lang {
 				return new Seq(Step(v, e["count"].ToInt(e)));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 					new NamePattern("count")
 				}
 			});
@@ -871,7 +871,7 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("elem"),
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 
@@ -890,7 +890,7 @@ namespace Lumen.Lang {
 				return new List(LinkedList.Create(self));
 			}) {
 				Parameters = new List<IPattern> {
-					new TypePattern("self", this)
+					new ExactTypePattern("self", this)
 				}
 			});
 

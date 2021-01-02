@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Lumen.Lang;
-using Lumen.Lang.Expressions;
 
-namespace Lumen.Lmi {
-	/// <summary> Pattern [..., ...] </summary>
+namespace Lumen.Lang.Patterns {
+	/// <summary> Pattern @[..., ...] </summary>
 	internal class ArrayPattern : IPattern {
 		private List<IPattern> subpatterns;
 
@@ -15,7 +14,7 @@ namespace Lumen.Lmi {
 		}
 
 		public MatchResult Match(Value value, Scope scope) {
-			if (value is Lang.MutArray array) {
+			if (value is MutArray array) {
 				List<Value> castedArray = array.ToList(scope);
 
 				if (castedArray.Count != this.subpatterns.Count) {
@@ -42,11 +41,6 @@ namespace Lumen.Lmi {
 			);
 		}
 
-
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			throw new NotImplementedException();
-		}
-
 		public List<String> GetDeclaredVariables() {
 			List<String> result = new List<String>();
 
@@ -57,16 +51,12 @@ namespace Lumen.Lmi {
 			return result;
 		}
 
-		public Value Eval(Scope e) {
-			throw new NotImplementedException();
-		}
-
-		public Expression Closure(ClosureManager manager) {
-			return new ListPattern(this.subpatterns.Select(i => i.Closure(manager) as IPattern).ToList());
+		public IPattern Closure(ClosureManager manager) {
+			return new ArrayPattern(this.subpatterns.Select(i => i.Closure(manager)).ToList());
 		}
 
 		public override String ToString() {
-			return $"[|{String.Join(", ", this.subpatterns)}|]";
+			return $"@[{String.Join(", ", this.subpatterns)}]";
 		}
 	}
 }

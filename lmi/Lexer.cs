@@ -12,7 +12,7 @@ namespace Lumen.Lmi {
 			["()"] = new Token(TokenType.VOID, "()"),
 
 			["@"] = new Token(TokenType.ANNOTATION, "@"),
-			["#"] = new Token(TokenType.ANNOTATION, "#"),
+			/*["#"] = new Token(TokenType.ANNOTATION, "#"),*/
 
 			["?"] = new Token(TokenType.QUESTION, "?"),
 			["~"] = new Token(TokenType.TILDE, Constants.BNOT),
@@ -77,7 +77,10 @@ namespace Lumen.Lmi {
 
 			["<|>"] = new Token(TokenType.MIDDLE_PRIORITY_RIGTH, "<|>"),
 			["|>"] = new Token(TokenType.FORWARD_PIPE, "|>"),
-			["<|"] = new Token(TokenType.BACKWARD_PIPE, "<|")
+			["<|"] = new Token(TokenType.BACKWARD_PIPE, "<|"),
+
+			[":>"] = new Token(TokenType.ACTIVE_PATTERN_CLOSE, ":>"),
+			["<:"] = new Token(TokenType.ACTIVE_PATTERN_OPEN, "<:")
 		};
 		private readonly String source;
 		private readonly Int32 length;

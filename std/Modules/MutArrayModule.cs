@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lumen.Lang.Expressions;
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class MutArrayModule : Module {
@@ -93,7 +93,7 @@ Array.refs
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("predicate"),
-					new TypePattern("self", this),
+					new ExactTypePattern("self", this),
 				}
 			});
 
