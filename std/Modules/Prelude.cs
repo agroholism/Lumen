@@ -133,6 +133,12 @@ namespace Lumen.Lang {
 					File.WriteAllText(fileName, text);
 					return Helper.CreateSome(new Text(fileName));
 				}
+				catch(ArgumentException aex) {
+					throw Helper.InvalidArgument("fileName", aex.Message);
+				}
+				catch (PathTooLongException ptl) {
+					throw Helper.InvalidArgument("fileName", ptl.Message);
+				}
 				catch {
 					return Prelude.None;
 				}
@@ -265,11 +271,11 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("read", new LambdaFun((scope, args) => {
+			this.SetMember("readln", new LambdaFun((scope, args) => {
 				return new Text(Console.ReadLine());
 			}));
 
-			this.SetMember("readWith", new LambdaFun((scope, args) => {
+			this.SetMember("readlnWith", new LambdaFun((scope, args) => {
 				Console.Write(scope["prompt"]);
 				return new Text(Console.ReadLine());
 			}) {
@@ -285,20 +291,6 @@ namespace Lumen.Lang {
 				Parameters = new List<IPattern> {
 					new NamePattern("t"),
 					new NamePattern("fName")
-				}
-			});
-
-			this.SetMember("parsen", new LambdaFun((scope, args) => {
-				String str = scope["inputStr"].ToString();
-
-				if (Double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result)) {
-					return Helper.CreateSome(new Number(result));
-				}
-
-				return Prelude.None;
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("inputStr")
 				}
 			});
 

@@ -98,7 +98,6 @@
     <Compile Include="Expression\Extend.cs" />
     <Compile Include="Expression\Patterns\ActivePattern.cs" />
     <Compile Include="Expression\Generators\ArrayGenerator.cs" />
-    <Compile Include="Expression\Control flow\ConditionMatch.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Expression\Literals\MapLiteral.cs" />
     <Compile Include="Expression\Generators\ListGenerator.cs" />

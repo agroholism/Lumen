@@ -145,6 +145,10 @@ Lumen 0.8
 
 03.01.2021
 + 1h refactoring stage 1
++ Number.parse, Number.tryParse
++ type pattern as constructor pattern
++ not pattern
+- if match
 
 TODO:
 - fix import

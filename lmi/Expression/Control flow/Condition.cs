@@ -6,8 +6,8 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lmi {
 	internal class Condition : Expression {
         private readonly Expression conditionExpression;
-        private readonly Expression falseExpression;
         private readonly Expression trueExpression;
+        private readonly Expression falseExpression;
 
         public Condition(Expression condition, Expression trueExpression, Expression falseExpression) {
             this.conditionExpression = condition;
@@ -34,7 +34,9 @@ namespace Lumen.Lmi {
 				yield return evaluationResult;
 			}
 
-			IEnumerable<Value> expressionResults = condition.ToBoolean() ? this.trueExpression.EvalWithYield(scope) : this.falseExpression.EvalWithYield(scope);
+			IEnumerable<Value> expressionResults = condition.ToBoolean() 
+                ? this.trueExpression.EvalWithYield(scope) 
+                : this.falseExpression.EvalWithYield(scope);
 
 			foreach (Value expressionResult in expressionResults) {
 				yield return expressionResult;
@@ -58,10 +60,10 @@ namespace Lumen.Lmi {
         }
 
         public override String ToString() {
-            String result = $"if {this.conditionExpression}{Environment.NewLine}\t{this.trueExpression}";
+            String result = $"if {this.conditionExpression}:{Environment.NewLine}\t{this.trueExpression}";
 
             if (this.falseExpression != null && this.falseExpression is not UnitLiteral) {
-                result += $"{Environment.NewLine}else{Environment.NewLine}\t{this.falseExpression}";
+                result += $"{Environment.NewLine}else:{Environment.NewLine}\t{this.falseExpression}";
             }
 
             return result;

@@ -15,10 +15,6 @@ namespace Lumen.Lang.Patterns {
 			this.subpatterns = subPatterns;
 		}
 
-		public IPattern Closure(ClosureManager manager) {
-			return new DeconstructPattern(this.constructor.Closure(manager), this.subpatterns.Select(i => i.Closure(manager)).ToList());
-		}
-
 		public MatchResult Match(Value value, Scope scope) {
 			Value requiredType = null;
 			String typeParameter = null;
@@ -84,6 +80,10 @@ namespace Lumen.Lang.Patterns {
 				return new MatchResult(requiredType == value);
 			}
 
+			if (requiredType is Module m) {
+				return new MatchResult(m.IsParentOf(value));
+			}
+
 			return new MatchResult(false); // ??
 		}
 
@@ -99,6 +99,10 @@ namespace Lumen.Lang.Patterns {
 			}
 
 			return result;
+		}
+
+		public IPattern Closure(ClosureManager manager) {
+			return new DeconstructPattern(this.constructor.Closure(manager), this.subpatterns.Select(i => i.Closure(manager)).ToList());
 		}
 
 		public override String ToString() {

@@ -7,29 +7,25 @@ using Lumen.Lang.Expressions;
 namespace Lumen.Lmi {
 	internal class DijkstraLoop : Expression {
 		private String cycleName;
-		List<(Expression, Expression)> guardAndBodies;
+		List<(Expression, Expression)> guardsAndBodies;
 
-		public DijkstraLoop(String cycleName, List<(Expression, Expression)> guardAndBodies) {
+		public DijkstraLoop(String cycleName, List<(Expression, Expression)> guardsAndBodies) {
 			this.cycleName = cycleName;
-			this.guardAndBodies = guardAndBodies;
+			this.guardsAndBodies = guardsAndBodies;
 		}
 
 		public Value Eval(Scope scope) {
 			Boolean atLeastOneGuardIsTrue = true;
 			while (atLeastOneGuardIsTrue) {
-				REDO:
+REDO:
 				try {
 					atLeastOneGuardIsTrue = false;
-					foreach ((Expression guard, Expression body) in this.guardAndBodies) {
-						if(guard.Eval(scope).ToBoolean()) {
+					foreach ((Expression guard, Expression body) in this.guardsAndBodies) {
+						if (guard.Eval(scope).ToBoolean()) {
 							atLeastOneGuardIsTrue = true;
 							body.Eval(scope);
 							break;
 						}
-					}
-
-					if(!atLeastOneGuardIsTrue) {
-						break;
 					}
 				}
 				catch (Break breakException) {
@@ -62,12 +58,16 @@ namespace Lumen.Lmi {
 REDO:
 				try {
 					atLeastOneGuardIsTrue = false;
-					foreach ((Expression guard, Expression body) in this.guardAndBodies) {
+					foreach ((Expression guard, Expression body) in this.guardsAndBodies) {
 						if (guard.Eval(scope).ToBoolean()) {
 							atLeastOneGuardIsTrue = true;
 							yieldedValues = body.EvalWithYield(scope);
 							break;
 						}
+					}
+
+					if (!atLeastOneGuardIsTrue) {
+						break;
 					}
 				}
 				catch (Break breakException) {
@@ -101,8 +101,23 @@ REDO:
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			return new DijkstraLoop(this.cycleName, this.guardAndBodies.Select(i => 
-				(i.Item1.Closure(manager), i.Item2.Closure(manager))).ToList());
+			List<(Expression, Expression)> closured = new List<(Expression, Expression)>();
+			List<ClosureManager> managers = new List<ClosureManager>();
+			foreach ((Expression guard, Expression body) in this.guardsAndBodies) {
+				ClosureManager currentManager = manager.Clone();
+
+				Expression closuredGuard = guard.Closure(currentManager);
+				Expression closuredBody = body.Closure(currentManager);
+				closured.Add((closuredGuard, closuredBody));
+
+				managers.Add(currentManager);
+			}
+
+			foreach(ClosureManager localManager in managers) {
+				manager.Assimilate(localManager);
+			}
+
+			return new DijkstraLoop(this.cycleName, closured);
 		}
 	}
 }

@@ -441,7 +441,7 @@ namespace Lumen.Lang {
 				}
 			});*/
 
-			this.SetMember("parse", new LambdaFun((scope, args) => {
+			this.SetMember("tryParse", new LambdaFun((scope, args) => {
 				String str = scope["self"].ToString();
 
 				if (Double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result)) {
@@ -449,6 +449,20 @@ namespace Lumen.Lang {
 				}
 
 				return Prelude.None;
+			}) {
+				Parameters = new List<IPattern> {
+					Const.Self[0]
+				}
+			});
+
+			this.SetMember("parse", new LambdaFun((scope, args) => {
+				String str = scope["self"].ToString();
+
+				if (Double.TryParse(str, System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out Double result)) {
+					return new Number(result);
+				}
+
+				throw Helper.CreateConvertError(scope["self"].Type, this);
 			}) {
 				Parameters = new List<IPattern> {
 					Const.Self[0]

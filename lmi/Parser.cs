@@ -392,16 +392,20 @@ namespace Lumen.Lmi {
 		private IPattern ParsePattern() {
 			IPattern result = null;
 
-			if(this.Match(TokenType.ACTIVE_PATTERN_OPEN)) {
+			if(this.Match(TokenType.NOT)) {
+				return new NotPattern(this.ParsePattern());
+			}
+
+			if (this.Match(TokenType.ACTIVE_PATTERN_OPEN)) {
 				Expression activePattern = Expression();
 				this.Consume(TokenType.ACTIVE_PATTERN_CLOSE);
 
 				List<IPattern> subpatterns = new List<IPattern>();
 
-				while (!this.LookMatch(0, TokenType.EQUALS) 
-					&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE) 
-					&& !this.LookMatch(0, TokenType.PAREN_CLOSE) 
-					&& !this.LookMatch(0, TokenType.LAMBDA) 
+				while (!this.LookMatch(0, TokenType.EQUALS)
+					&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE)
+					&& !this.LookMatch(0, TokenType.PAREN_CLOSE)
+					&& !this.LookMatch(0, TokenType.LAMBDA)
 					&& !this.LookMatch(0, TokenType.BAR)) {
 					subpatterns.Add(this.ParsePattern());
 				}
@@ -679,45 +683,22 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseIf() {
-			if (this.Match(TokenType.MATCH)) {
-				IPattern pattern = this.ParsePattern();
-				this.Match(TokenType.EQUALS);
-				Expression assinableExpression = this.Expression();
+			Expression condition = this.Expression();
 
+			this.Match(TokenType.COLON);
+
+			Expression trueBody = this.Expression();
+
+			Expression falseBody = UnitLiteral.Instance;
+
+			this.Match(TokenType.EOC);
+
+			if (this.Match(TokenType.ELSE)) {
 				this.Match(TokenType.COLON);
-
-				Expression trueBody = this.Expression();
-
-				Expression falseBody = UnitLiteral.Instance;
-
-				this.Match(TokenType.EOC);
-
-				if (this.Match(TokenType.ELSE)) {
-					this.Match(TokenType.COLON);
-					falseBody = this.Expression();
-				}
-
-				return new ConditionMatch(pattern, assinableExpression, trueBody, falseBody);
+				falseBody = this.Expression();
 			}
-			else {
 
-				Expression condition = this.Expression();
-
-				this.Match(TokenType.COLON);
-
-				Expression trueBody = this.Expression();
-
-				Expression falseBody = UnitLiteral.Instance;
-
-				this.Match(TokenType.EOC);
-
-				if (this.Match(TokenType.ELSE)) {
-					this.Match(TokenType.COLON);
-					falseBody = this.Expression();
-				}
-
-				return new Condition(condition, trueBody, falseBody);
-			}
+			return new Condition(condition, trueBody, falseBody);
 		}
 
 		private Expression ParseWhile() {
