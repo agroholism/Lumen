@@ -7,29 +7,15 @@ using Lumen.Lang.Patterns;
 namespace Lumen.Lmi {
 	internal class ForCycle : Expression {
 		internal String cycleName;
+		internal IPattern pattern;
 		internal Expression expression;
 		internal Expression body;
-		internal IPattern pattern;
 
-		public ForCycle(String cycleName, IPattern pattern, Expression container, Expression body) {
+		public ForCycle(String cycleName, IPattern pattern, Expression expression, Expression body) {
 			this.cycleName = cycleName;
 			this.pattern = pattern;
 			this.body = body;
-			this.expression = container;
-		}
-
-		public Expression Closure(ClosureManager manager) {
-			ClosureManager manager2 = manager.Clone();
-
-			manager2.Declare(this.pattern.GetDeclaredVariables());
-
-			ForCycle res = new ForCycle(this.cycleName, this.pattern, this.expression.Closure(manager), this.body.Closure(manager2));
-
-			if (!manager.HasYield) {
-				manager.HasYield = manager2.HasYield;
-			}
-
-			return res;
+			this.expression = expression;
 		}
 
 		public Value Eval(Scope scope) {
@@ -52,7 +38,6 @@ REDO:
 					}
 
 					throw breakException;
-
 				}
 				catch (Redo redoException) {
 					if (redoException.IsMatch(this.cycleName)) {
@@ -75,7 +60,17 @@ REDO:
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			Value container = this.expression.Eval(scope);
+			IEnumerable<Value> containerEvaluationResult = this.expression.EvalWithYield(scope);
+
+			Value container = Const.UNIT;
+			foreach (Value evaluationResult in containerEvaluationResult) {
+				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
+					container = terminalResult.Value;
+					break;
+				}
+
+				yield return evaluationResult;
+			}
 
 			foreach (Value i in container.ToSeq(scope)) {
 REDO:
@@ -119,6 +114,20 @@ REDO:
 					}
 				}
 			}
+		}
+
+		public Expression Closure(ClosureManager manager) {
+			ClosureManager manager2 = manager.Clone();
+
+			manager2.Declare(this.pattern.GetDeclaredVariables());
+
+			ForCycle res = new ForCycle(this.cycleName, this.pattern, this.expression.Closure(manager), this.body.Closure(manager2));
+
+			if (!manager.HasYield) {
+				manager.HasYield = manager2.HasYield;
+			}
+
+			return res;
 		}
 
 		/*public override String ToString() {
