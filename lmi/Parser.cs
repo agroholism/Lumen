@@ -788,7 +788,7 @@ namespace Lumen.Lmi {
 		private Expression FunctionalOperators() {
 			Expression expr = this.Range();
 
-			while (expr is not BlockE) {
+			while (expr is not Block) {
 				Token current = this.GetToken(0);
 
 				if (current.Type == TokenType.MIDDLE_PRIORITY_RIGTH) {
@@ -1281,7 +1281,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression AloneORBlock() {
-			BlockE block = new BlockE();
+			Block block = new Block();
 			this.Match(TokenType.BLOCK_START);
 
 			while (!this.Match(TokenType.BLOCK_END)) {

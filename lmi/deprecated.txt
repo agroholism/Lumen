@@ -1243,31 +1243,3 @@ namespace Lumen.Lang {
 
     }
 }
-
-type Vector = Vector values where
-    constructor Vector (values: Array) =
-        Vector values
-    
-    let vectorized values (Vector other) operation =
-        Vector (List.toArray (for i in 0..*values: (operation (values.[i]) other.[i])))
-    let vectorized values other operation =
-        Vector (List.toArray (for i in 0..*values: (operation (values.[i]) other)))
-    
-    let - (Vector values) () = Array.map (0-_) values
-    let + (Vector values) other = Vector.vectorized values other (_+_)
-    let - (Vector values) other = Vector.vectorized values other (_-_)
-    let * (Vector values) other = Vector.vectorized values other (_*_)
-    let / (Vector values) other = Vector.vectorized values other (_/_)
-    let ^ (Vector values) other = Vector.vectorized values other (_^_)
-    
-    let len (Vector values) = *values
-
-let vec = Vector
-let len = Vector.len
-
-let sum vector = vector.values / (_+_)
-let mean vector = sum vector / len vector
-let max vector = Stream.max vector.values
-
-let v = vec [|3, 4, 5, 1, 3, 6|]
-print (max v)s

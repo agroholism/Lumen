@@ -21,13 +21,13 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("pure", new LambdaFun((scope, args) => {
-				Value result = scope["result"];
+			this.SetMember("wrap", new LambdaFun((scope, args) => {
+				Value val = scope["val"];
 
-				return new Future(Task.FromResult(result));
+				return new Future(Task.FromResult(val));
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("result")
+					new NamePattern("val")
 				}
 			});
 
@@ -54,6 +54,25 @@ namespace Lumen.Lang {
 				Parameters = new List<IPattern> {
 					new ExactTypePattern("time", Prelude.Number),
 					new ExactTypePattern("continuation", Prelude.Function)
+				}
+			});
+
+
+			this.SetMember("getException", new LambdaFun((scope, args) => {
+				Future future = scope["future"] as Future;
+
+
+				try {
+					future.Task.Wait();
+				}
+				catch (AggregateException e) {
+					return e.GetBaseException() as LumenException;
+				}
+
+				return Const.UNIT;
+			}) {
+				Parameters = new List<IPattern> {
+					new ExactTypePattern("future", this),
 				}
 			});
 
@@ -218,6 +237,22 @@ namespace Lumen.Lang {
 
 			this.SetMember("then", map);
 			this.SetMember("map", map);
+
+			this.SetMember("onCompleted", new LambdaFun((scope, args) => {
+				Future future = scope["future"].ToFuture(scope);
+				Fun continuation = scope["continuation"].ToFunction(scope);
+
+				return new Future(
+					future.Task.ContinueWith(
+						task => continuation.Call(new Scope(), new Future(task))
+					)
+				);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("continuation"),
+					new NamePattern("future"),
+				}
+			});
 
 			this.SetMember("catch", new LambdaFun((scope, args) => {
 				Future future = scope["future"].ToFuture(scope);

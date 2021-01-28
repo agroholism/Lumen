@@ -35,7 +35,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("map", new LambdaFun((scope, args) => {
 				Value appl = scope["appl"];
-				Value function = appl.Type.GetMember("pure", scope).ToFunction(scope)
+				Value function = appl.Type.GetMember("wrap", scope).ToFunction(scope)
 					.Call(new Scope(), scope["func"]);
 
 				return appl.Type.GetMember("lift", scope).ToFunction(scope)
@@ -50,8 +50,8 @@ namespace Lumen.Lang {
 		}
 
 		public override void OnImplement(Module target) {
-			target.SetMemberIfAbsent("pure", new LambdaFun((scope, args) => {
-				Prelude.FunctionIsNotImplementedForType("Applicative.pure", target);
+			target.SetMemberIfAbsent("wrap", new LambdaFun((scope, args) => {
+				Prelude.FunctionIsNotImplementedForType("Applicative.wrap", target);
 				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {

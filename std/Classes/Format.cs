@@ -3,15 +3,6 @@
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	/// <summary>
-	/// That's Format mixin. Used in string interpolation with invariant culture
-	/// </summary>
-	/// module Prelude where
-	///		...
-	///		/// Require let format x (fstr: Text)
-	///		module Format where
-	///			let format (x: 'T) (fstr: Text) =
-	///				functionIsNotImplementedForType "Format.format" 'T
 	internal class Format : SystemClass {
 		internal Format() {
 			this.Name = "Format";

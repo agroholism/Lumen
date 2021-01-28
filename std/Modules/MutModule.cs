@@ -7,8 +7,7 @@ namespace Lumen.Lang {
 			this.Name = "Mut";
 
 			this.AppendImplementation(Prelude.Format);
-			this.AppendImplementation(Prelude.Functor);
-			this.AppendImplementation(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Monad);
 			this.AppendImplementation(Prelude.Default);
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
@@ -25,7 +24,15 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("fmap", new LambdaFun((scope, args) => {
+			this.SetMember("wrap", new LambdaFun((scope, args) => {
+				return new Mut(scope["state"]);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("state")
+				}
+			});
+
+			this.SetMember("map", new LambdaFun((scope, args) => {
 				Mut functor = scope["fc"] as Mut;
 				Fun mapper = scope["fn"].ToFunction(scope);
 
@@ -37,7 +44,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("liftA", new LambdaFun((scope, args) => {
+			this.SetMember("lift", new LambdaFun((scope, args) => {
 				Mut functor = scope["f"] as Mut;
 				Value m = scope["m"];
 				return m.CallMethodFlip("fmap", scope, functor.Value);
@@ -45,6 +52,18 @@ namespace Lumen.Lang {
 				Parameters = new List<IPattern> {
 					new NamePattern("m"),
 					new NamePattern("f"),
+				}
+			});
+
+			this.SetMember("bind", new LambdaFun((scope, args) => {
+				Mut functor = scope["m"] as Mut;
+
+				Fun f = scope["f"] as Fun;
+				return f.Call(new Scope(scope), functor.Value);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("f"),
+					new NamePattern("m"),
 				}
 			});
 

@@ -6,14 +6,14 @@ using Lumen.Lang.Expressions;
 using Lumen.Lang;
 
 namespace Lumen.Lmi {
-	public class BlockE : Expression {
+	public class Block : Expression {
 		public List<Expression> expressions;
 
-		public BlockE() {
+		public Block() {
 			this.expressions = new List<Expression>();
 		}
 
-		public BlockE(List<Expression> Expressions) {
+		public Block(List<Expression> Expressions) {
 			this.expressions = Expressions;
 		}
 
@@ -27,7 +27,7 @@ namespace Lumen.Lmi {
 			for (Int32 i = 0; i < this.expressions.Count - 1; i++) {
 				if (this.expressions[i] is BindingDeclaration binding) {
 					List<String> declared = binding.pattern.GetDeclaredVariables();
-					foreach (var x in declared) {
+					foreach (String x in declared) {
 						if (e.ExistsInThisScope(x)) {
 							savedBindings[x] = e[x];
 							e.Remove(x);
@@ -42,7 +42,7 @@ namespace Lumen.Lmi {
 				return this.expressions[this.expressions.Count - 1].Eval(e);
 			}
 
-			foreach (var item in savedBindings) {
+			foreach (KeyValuePair<String, Value> item in savedBindings) {
 				e[item.Key] = item.Value;
 			}
 
@@ -55,7 +55,7 @@ namespace Lumen.Lmi {
 		}
 
 		public Expression Closure(ClosureManager manager) {
-			return new BlockE(this.expressions.Select(expression => expression.Closure(manager)).ToList());
+			return new Block(this.expressions.Select(expression => expression.Closure(manager)).ToList());
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {

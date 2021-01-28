@@ -16,7 +16,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("pure", new LambdaFun((scope, args) => {
+			this.SetMember("wrap", new LambdaFun((scope, args) => {
 				return new Seq(Enumerable.Repeat(scope["init"], 1));
 			}) {
 				Parameters = new List<IPattern> {

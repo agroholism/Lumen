@@ -236,7 +236,7 @@ namespace Lumen.Lang {
 				return GetModule(obj.Type);
 			}
 
-			this.SetMember("typeof", new LambdaFun((scope, args) => {
+			this.SetMember("typeOf", new LambdaFun((scope, args) => {
 				Value value = scope["value"];
 
 				return GetModule(value.Type);

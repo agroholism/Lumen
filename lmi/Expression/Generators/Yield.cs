@@ -21,21 +21,19 @@ namespace Lumen.Lmi {
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			yield return this.expression.Eval(scope);
-			if (scope.IsExsists(Constants.YIELD_VALUE_SPECIAL_NAME)) {
-				yield return new GeneratorExpressionTerminalResult( scope[Constants.YIELD_VALUE_SPECIAL_NAME]);
+
+			if (scope.IsExsists(Constants.YIELD_EXCEPTION_SPECIAL_NAME)) {
+				var ex = scope[Constants.YIELD_EXCEPTION_SPECIAL_NAME];
+				scope.Remove(Constants.YIELD_EXCEPTION_SPECIAL_NAME);
+				throw ex.ToException();
+			}
+			else if (scope.IsExsists(Constants.YIELD_VALUE_SPECIAL_NAME)) {
+				yield return new GeneratorExpressionTerminalResult(scope[Constants.YIELD_VALUE_SPECIAL_NAME]);
 				scope.Remove(Constants.YIELD_VALUE_SPECIAL_NAME);
-			} else {
+			}
+			else {
 				yield return new GeneratorExpressionTerminalResult(Const.UNIT);
 			}
 		}
-	}
-
-	class GeneratorExpressionTerminalResult : BaseValueImpl {
-		public GeneratorExpressionTerminalResult(Value value) {
-			this.Value = value;
-		}
-
-		public Value Value { get; set; }
-		public override IType Type => throw new System.NotImplementedException();
 	}
 }

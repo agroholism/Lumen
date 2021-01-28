@@ -79,6 +79,26 @@ namespace Lumen.Lang {
 			});
 			*/
 
+			this.SetMember("wrap", new LambdaFun((scope, args) => {
+				Instance obj = scope["this"] as Instance;
+
+				return Helper.Success(obj.Items[0]);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("this")
+				}
+			});
+
+			this.SetMember("unwrap", new LambdaFun((scope, args) => {
+				Instance obj = scope["this"] as Instance;
+
+				return obj.Items[0];
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("this")
+				}
+			});
+
 			this.SetMember("toText", new LambdaFun((scope, args) => {
 				Instance obj = scope["this"] as Instance;
 				if (this.Success.IsParentOf(obj)) {

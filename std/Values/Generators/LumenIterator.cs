@@ -23,6 +23,12 @@ namespace Lumen.Lang {
 			return this.Next();
 		}
 
+		public Value Throw(Value value) {
+			this.scope?.Bind(Constants.YIELD_EXCEPTION_SPECIAL_NAME, value);
+
+			return this.Next();
+		}
+
 		public Value Next() {
 			this.MoveNext();
 			return this.Current;
@@ -36,6 +42,12 @@ namespace Lumen.Lang {
 			return this.internalValue.MoveNext();
 		}
 
+		public Boolean MoveNext(Value value) {
+			this.scope?.Bind(Constants.YIELD_VALUE_SPECIAL_NAME, value);
+
+			return this.internalValue.MoveNext();
+		}
+
 		public void Reset() {
 			this.internalValue.Reset();
 		}
@@ -43,5 +55,14 @@ namespace Lumen.Lang {
 		public override String ToString() {
 			return $"[Iterator #{this.GetHashCode()}]";
 		}
+	}
+
+	public class GeneratorExpressionTerminalResult : BaseValueImpl {
+		public GeneratorExpressionTerminalResult(Value value) {
+			this.Value = value;
+		}
+
+		public Value Value { get; set; }
+		public override IType Type => throw new System.NotImplementedException();
 	}
 }

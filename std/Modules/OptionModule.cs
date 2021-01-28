@@ -10,8 +10,7 @@ namespace Lumen.Lang {
 		public OptionModule() {
 			this.Name = "Option";
 
-			this.AppendImplementation(Prelude.Functor);
-			this.AppendImplementation(Prelude.Applicative);
+			this.AppendImplementation(Prelude.Monad);
 			this.AppendImplementation(Prelude.Default);
 
 			this.Some = Helper.CreateConstructor("Option.Some", this, new List<String> { "x" }) as Constructor;
@@ -20,7 +19,7 @@ namespace Lumen.Lang {
 			this.SetMember("Some", this.Some);
 			this.SetMember("None", this.None);
 
-			this.SetMember("pure", this.Some);
+			this.SetMember("wrap", this.Some);
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
 				return this.None;
@@ -69,7 +68,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("bind", new LambdaFun((scope, args) => {
-				IType obj = scope["m"] as IType;
+				Value obj = scope["m"];
 
 				if (obj == this.None) {
 					return this.None;
@@ -82,8 +81,8 @@ namespace Lumen.Lang {
 				throw new LumenException("fmap option");
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("m"),
 					new NamePattern("f"),
+					new NamePattern("m"),
 				}
 			});
 

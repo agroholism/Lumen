@@ -50,7 +50,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("pure", new LambdaFun((scope, args) => {
+			this.SetMember("wrap", new LambdaFun((scope, args) => {
 				Value x = scope["x"];
 
 				return new LambdaFun((inScope, inArgs) => x) {

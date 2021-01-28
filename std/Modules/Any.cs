@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Lumen.Lang.Patterns;
 
@@ -20,42 +21,30 @@ namespace Lumen.Lang {
 
 				return new Text(self.ToString());
 			}) {
-				Parameters = new System.Collections.Generic.List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("self")
 				}
 			});
 
-			this.SetMember("is", new LambdaFun((e, args) => {
-				Value first = e["x"];
-				IType second = e["y"] as IType;
+			this.SetMember(Constants.EQUALS, new LambdaFun((scope, args) => {
+				Value x = scope["x"];
+				Value y = scope["y"];
 
-				return new Logical(second.IsParentOf(first));
+				return new Logical(x.Equals(y));
 			}) {
-				Parameters = new System.Collections.Generic.List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 				}
 			});
 
-			this.SetMember(Constants.EQUALS, new LambdaFun((e, args) => {
-				Value first = e["x"];
-				Value second = e["y"];
+			this.SetMember(Constants.NOT_EQUALS, new LambdaFun((scope, args) => {
+				Value x = scope["x"];
+				Value y = scope["y"];
 
-				return new Logical(first.Equals(second));
+				return new Logical(!x.Equals(y));
 			}) {
-				Parameters = new System.Collections.Generic.List<IPattern> {
-					new NamePattern("x"),
-					new NamePattern("y"),
-				}
-			});
-
-			this.SetMember(Constants.NOT_EQUALS, new LambdaFun((e, args) => {
-				Value first = e["x"];
-				Value second = e["y"];
-
-				return new Logical(!first.Equals(second));
-			}) {
-				Parameters = new System.Collections.Generic.List<IPattern> {
+				Parameters = new List<IPattern> {
 					new NamePattern("x"),
 					new NamePattern("y"),
 				}

@@ -1,15 +1,17 @@
-﻿using Lumen.Lang.Patterns;
+﻿using System.Collections.Generic;
+
+using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class UnitModule : Module {
 		internal UnitModule() {
 			this.Name = "Unit";
 
-			this.SetMember("toText", new LambdaFun((e, args) => {
-				return new Text(e["this"].ToString());
+			this.SetMember("toText", new LambdaFun((scope, args) => {
+				return new Text(scope["self"].ToString());
 			}) {
-				Parameters = new System.Collections.Generic.List<IPattern> {
-					new NamePattern("this")
+				Parameters = new List<IPattern> {
+					new NamePattern("self")
 				}
 			});
 		}

@@ -3,6 +3,7 @@
 namespace Lumen.Lang {
 	public static class Constants {
 		public const String YIELD_VALUE_SPECIAL_NAME = "[yield-value]";
+		public const String YIELD_EXCEPTION_SPECIAL_NAME = "[yield-exception]";
 		public const String LAST_EXCEPTION_SPECIAL_NAME = "[last-exception]";
 
 		public const String NOT = "not";
