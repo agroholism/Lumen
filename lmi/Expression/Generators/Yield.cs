@@ -23,7 +23,7 @@ namespace Lumen.Lmi {
 			yield return this.expression.Eval(scope);
 
 			if (scope.IsExsists(Constants.YIELD_EXCEPTION_SPECIAL_NAME)) {
-				var ex = scope[Constants.YIELD_EXCEPTION_SPECIAL_NAME];
+				Value ex = scope[Constants.YIELD_EXCEPTION_SPECIAL_NAME];
 				scope.Remove(Constants.YIELD_EXCEPTION_SPECIAL_NAME);
 				throw ex.ToException();
 			}

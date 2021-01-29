@@ -31,7 +31,12 @@ namespace Lumen.Lang {
 				}
 
 				if (exitValue != null) {
-					yield return new GeneratorExpressionTerminalResult(exitValue);
+					yield return exitValue;
+					yield break;
+				}
+
+				if(enumerator.Current is GeneratorExpressionTerminalResult terminalResult) {
+					yield return terminalResult.Value;
 					yield break;
 				}
 

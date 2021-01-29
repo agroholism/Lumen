@@ -1186,6 +1186,9 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.YIELD)) {
 				if (this.Match(TokenType.FROM)) {
 					return new YieldFrom(this.Expression());
+
+					/*return new ForCycle(null, new NamePattern("<>i"), this.Expression(), 
+						new Yield(new IdExpression("<>i", this.file, line)));*/
 				}
 
 				if (this.LookMatch(0, TokenType.BLOCK_END) || this.LookMatch(0, TokenType.PAREN_CLOSE) || this.Match(TokenType.EOC) || this.Match(TokenType.EOF)) {
