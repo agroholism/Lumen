@@ -26,7 +26,17 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			this.Result = this.expression.Eval(scope);
+			IEnumerable<Value> expressionEvaluationResults = this.expression.EvalWithYield(scope);
+			
+			foreach(Value evaluationResult in expressionEvaluationResults) {
+				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
+					this.Result = terminalResult.Value;
+					break;
+				}
+
+				yield return evaluationResult;
+			}
+
 			throw this;
 		}
 
