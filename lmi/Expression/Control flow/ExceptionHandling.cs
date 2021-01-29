@@ -16,24 +16,6 @@ namespace Lumen.Lmi {
 			this.ensureBody = finallyBody;
 		}
 
-		public Expression Closure(ClosureManager manager) {
-			Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
-
-			foreach (KeyValuePair<IPattern, Expression> i in this.exceptBodies) {
-				ClosureManager manager2 = manager.Clone();
-
-				IPattern ip = i.Key.Closure(manager2) as IPattern;
-
-				patterns.Add(ip, i.Value.Closure(manager2));
-
-				if (manager2.HasYield) {
-					manager.HasYield = true;
-				}
-			}
-
-			return new ExceptionHandling(this.tryBody.Closure(manager), patterns, this.ensureBody?.Closure(manager));
-		}
-
 		public Value Eval(Scope scope) {
 			Value expressionResult = null;
 
@@ -42,6 +24,9 @@ RETRY_OUTER:
 
 			try {
 				expressionResult = this.tryBody.Eval(scope);
+			}
+			catch (Exception e) when (e is Return || e is Break || e is Next) {
+				throw;
 			}
 			catch (Exception ex) {
 				Value raisedException = ex as LumenException ?? new LumenException(ex.Message);
@@ -78,12 +63,12 @@ RETRY:
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			IEnumerator<Value> enumerator = this.tryBody.EvalWithYield(scope).GetEnumerator();
 
-			GeneratorExpressionTerminalResult terminalResult = null;
+			GeneratorExpressionTerminalResult tryExceptRescueResult = null;
 
 			Exception exception = null;
 			Boolean canNext = true;
 			while (true) {
-				Value val;
+				Value value;
 
 				try {
 					if (!canNext) {
@@ -91,33 +76,35 @@ RETRY:
 					}
 
 					canNext = enumerator.MoveNext();
-					val = enumerator.Current;
-
+					value = enumerator.Current;
+				}
+				catch (Exception e) when (e is Return || e is Break || e is Next) {
+					throw;
 				}
 				catch (Exception ex) {
 					exception = ex;
 					break;
 				}
 
-				if (val is GeneratorExpressionTerminalResult gtr) {
-					terminalResult = gtr;
+				if (value is GeneratorExpressionTerminalResult terminalResult) {
+					tryExceptRescueResult = terminalResult;
 				}
 				else {
-					yield return val;
+					yield return value;
 				}
 			}
 
 			if (exception != null) {
 				Value raisedException = exception as LumenException ?? new LumenException(exception.Message);
 
-				foreach (KeyValuePair<IPattern, Expression> i in this.exceptBodies) {
-					if (i.Key.Match(raisedException, scope).IsSuccess) {
-						foreach (Value x in i.Value.EvalWithYield(scope)) {
-							if (x is GeneratorExpressionTerminalResult gtr) {
-								terminalResult = gtr;
+				foreach (KeyValuePair<IPattern, Expression> exceptBody in this.exceptBodies) {
+					if (exceptBody.Key.Match(raisedException, scope).IsSuccess) {
+						foreach (Value evaluationResult in exceptBody.Value.EvalWithYield(scope)) {
+							if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
+								tryExceptRescueResult = terminalResult;
 							}
 							else {
-								yield return x;
+								yield return evaluationResult;
 							}
 						}
 						break;
@@ -126,12 +113,30 @@ RETRY:
 			}
 
 			if (this.ensureBody != null) {
-				foreach (Value x in this.ensureBody.EvalWithYield(scope)) {
-					yield return x;
+				foreach (Value evaluationResult in this.ensureBody.EvalWithYield(scope)) {
+					yield return evaluationResult;
 				}
 			}
 
-			yield return terminalResult;
+			yield return tryExceptRescueResult;
+		}
+
+		public Expression Closure(ClosureManager manager) {
+			Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
+
+			foreach (KeyValuePair<IPattern, Expression> i in this.exceptBodies) {
+				ClosureManager manager2 = manager.Clone();
+
+				IPattern ip = i.Key.Closure(manager2) as IPattern;
+
+				patterns.Add(ip, i.Value.Closure(manager2));
+
+				if (manager2.HasYield) {
+					manager.HasYield = true;
+				}
+			}
+
+			return new ExceptionHandling(this.tryBody.Closure(manager), patterns, this.ensureBody?.Closure(manager));
 		}
 	}
 }

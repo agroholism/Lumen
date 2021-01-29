@@ -48,21 +48,6 @@ namespace Lumen.Lmi {
 					}
 
 					return ret;
-				case TokenType.RAISE: // kk
-					this.Match(TokenType.RAISE);
-					Int32 line = this.line;
-
-					Expression inraise = !this.IsValidToken() ? UnitLiteral.Instance : this.Expression();
-
-					Expression from = this.Match(TokenType.FROM) ? this.Expression() : null;
-
-					Expression raise = new Raise(inraise, from, this.file, line);
-
-					if (this.Match(TokenType.WHEN)) {
-						return new Condition(this.Expression(), raise, UnitLiteral.Instance);
-					}
-
-					return raise;
 				case TokenType.MATCH:
 					this.Match(TokenType.MATCH);
 					return this.ParseMatch();
@@ -392,7 +377,7 @@ namespace Lumen.Lmi {
 		private IPattern ParsePattern() {
 			IPattern result = null;
 
-			if(this.Match(TokenType.NOT)) {
+			if (this.Match(TokenType.NOT)) {
 				return new NotPattern(this.ParsePattern());
 			}
 
@@ -1033,7 +1018,8 @@ namespace Lumen.Lmi {
 					}
 					else if (this.LookMatch(0, TokenType.LIST_OPEN)) {
 						res = this.Slice(res);
-					} else if(this.Match(TokenType.TYPE)) {
+					}
+					else if (this.Match(TokenType.TYPE)) {
 						res = new TypeOf(res, this.file, this.line);
 					}
 
@@ -1198,6 +1184,22 @@ namespace Lumen.Lmi {
 				}
 
 				return new Yield(this.Expression());
+			}
+
+			if(this.Match(TokenType.RAISE)) {
+				Int32 line = this.line;
+
+				Expression inraise = !this.IsValidToken() ? UnitLiteral.Instance : this.Expression();
+
+				Expression from = this.Match(TokenType.FROM) ? this.Expression() : null;
+
+				Expression raise = new Raise(inraise, from, this.file, line);
+
+				if (this.Match(TokenType.WHEN)) {
+					return new Condition(this.Expression(), raise, UnitLiteral.Instance);
+				}
+
+				return raise;
 			}
 
 			// Number literals
