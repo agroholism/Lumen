@@ -26,7 +26,8 @@ namespace Lumen.Lang.Expressions {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			yield return new StopGenerator();
+			this.Result = this.expression.Eval(scope);
+			throw this;
 		}
 
 		public Expression Closure(ClosureManager manager) {

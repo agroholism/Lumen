@@ -60,10 +60,10 @@ REDO:
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> containerEvaluationResult = this.expression.EvalWithYield(scope);
+			IEnumerable<Value> containerEvaluationResults = this.expression.EvalWithYield(scope);
 
 			Value container = Const.UNIT;
-			foreach (Value evaluationResult in containerEvaluationResult) {
+			foreach (Value evaluationResult in containerEvaluationResults) {
 				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					container = terminalResult.Value;
 					break;
@@ -72,6 +72,8 @@ REDO:
 				yield return evaluationResult;
 			}
 
+			Value returnResult = null;
+
 			foreach (Value i in container.ToSeq(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
@@ -79,10 +81,10 @@ REDO:
 					throw new LumenException(matchResult.Note);
 				}
 
-				IEnumerable<Value> y = null;
+				IEnumerable<Value> iterationEvaluationResults = null;
 
 				try {
-					y = this.body.EvalWithYield(scope);
+					iterationEvaluationResults = this.body.EvalWithYield(scope);
 				}
 				catch (Break breakException) {
 					if (breakException.IsMatch(this.cycleName)) {
@@ -98,21 +100,23 @@ REDO:
 
 					throw redoException;
 				}
-				catch (Return) {
-					yield break;
-				}
 				catch (Next) {
 					continue;
 				}
 
-				if (y != null) {
-					foreach (Value it in y) {
+				if (iterationEvaluationResults != null) {
+					foreach (Value it in iterationEvaluationResults) {
 						if (it is GeneratorExpressionTerminalResult) {
 							break;
 						}
+
 						yield return it;
 					}
 				}
+			}
+
+			if (returnResult != null) {
+				yield return new GeneratorExpressionTerminalResult(returnResult);
 			}
 		}
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
@@ -13,12 +14,28 @@ namespace Lumen.Lang {
 		}
 
 		private IEnumerable<Value> Run(Scope scope) {
-			foreach (Value i in this.generatorBody.EvalWithYield(scope)) {
-				if (i is StopGenerator) {
+			IEnumerator<Value> enumerator = this.generatorBody.EvalWithYield(scope).GetEnumerator();
+
+			while (true) {
+				Value exitValue = null;
+
+				try {
+					Boolean canMove = enumerator.MoveNext();
+
+					if (!canMove) {
+						yield break;
+					}
+				}
+				catch (Return ret) {
+					exitValue = ret.Result;
+				}
+
+				if (exitValue != null) {
+					yield return new GeneratorExpressionTerminalResult(exitValue);
 					yield break;
 				}
 
-				yield return i;
+				yield return enumerator.Current;
 			}
 		}
 

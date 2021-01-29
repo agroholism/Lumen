@@ -61,10 +61,12 @@ namespace Lumen.Lmi {
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
 			for (Int32 i = 0; i < this.expressions.Count - 1; i++) {
 				IEnumerable<Value> x = this.expressions[i].EvalWithYield(scope);
+
 				foreach (Value it in x) {
 					if (it is GeneratorExpressionTerminalResult) {
 						continue;
 					}
+
 					yield return it;
 				}
 			}

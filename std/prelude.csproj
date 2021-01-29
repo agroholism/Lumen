@@ -69,7 +69,6 @@
     <Compile Include="Values\Generators\LumenIterator.cs" />
     <Compile Include="Modules\MutModule.cs" />
     <Compile Include="Modules\IteratorModule.cs" />
-    <Compile Include="Values\Generators\StopGenerator.cs" />
     <Compile Include="Values\Future.cs" />
     <Compile Include="Values\Unit.cs" />
     <Compile Include="Values\Constructors\Constructor.cs" />

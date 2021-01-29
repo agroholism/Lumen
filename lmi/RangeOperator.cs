@@ -78,7 +78,7 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			throw new NotImplementedException();
+			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 
 		public void AddStep(Expression stepExpression) {
