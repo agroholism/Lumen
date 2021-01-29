@@ -1033,6 +1033,8 @@ namespace Lumen.Lmi {
 					}
 					else if (this.LookMatch(0, TokenType.LIST_OPEN)) {
 						res = this.Slice(res);
+					} else if(this.Match(TokenType.TYPE)) {
+						res = new TypeOf(res, this.file, this.line);
 					}
 
 					continue;
