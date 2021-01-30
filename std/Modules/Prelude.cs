@@ -100,7 +100,6 @@ namespace Lumen.Lang {
 			this.SetMember("Range", Range);
 			this.SetMember("Iterator", Iterator);
 			this.SetMember("Mut", Mut);
-			this.SetMember("mut", Mut);
 			this.SetMember("List", List);
 			this.SetMember("Seq", Seq);
 			this.SetMember("MutArray", MutArray);
@@ -133,7 +132,7 @@ namespace Lumen.Lang {
 					File.WriteAllText(fileName, text);
 					return Helper.CreateSome(new Text(fileName));
 				}
-				catch(ArgumentException aex) {
+				catch (ArgumentException aex) {
 					throw Helper.InvalidArgument("fileName", aex.Message);
 				}
 				catch (PathTooLongException ptl) {
@@ -299,7 +298,7 @@ namespace Lumen.Lang {
 			this.SetMember("listOf", new LambdaFun((scope, args) => {
 				Value init = scope["init"];
 
-				if(init == Const.UNIT) {
+				if (init == Const.UNIT) {
 					return new List();
 				}
 
@@ -355,6 +354,26 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("init")
+				}
+			});
+
+			this.SetMember("then", new LambdaFun((scope, args) => {
+				return scope["f"].ToFunction(scope).Call(new Scope(scope), scope["x"]);
+			}) {
+				Parameters = new List<IPattern> {
+					new ExactTypePattern("f", Function),
+					new NamePattern("x")
+				}
+			});
+
+			this.SetMember("also", new LambdaFun((scope, args) => {
+				Value x = scope["x"];
+				scope["f"].ToFunction(scope).Call(new Scope(scope), x);
+				return x;
+			}) {
+				Parameters = new List<IPattern> {
+					new ExactTypePattern("f", Function),
+					new NamePattern("x")
 				}
 			});
 		}
