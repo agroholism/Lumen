@@ -14,7 +14,7 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Default);
 
 			this.Some = Helper.CreateConstructor("Option.Some", this, new List<String> { "x" }) as Constructor;
-			this.None = Helper.CreateConstructor("Option.None", this, new List<String>());
+			this.None = Helper.CreateConstructor("Option.None", this);
 
 			this.SetMember("Some", this.Some);
 			this.SetMember("None", this.None);
@@ -101,6 +101,16 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("fn")
+				}
+			});
+
+			this.SetMember("contains", new LambdaFun((scope, args) => {
+				Value val = Prelude.DeconstructSome(scope["self"]);
+				return new Logical(val != null && scope["x"].Equals(val));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("x"),
+					new NamePattern("self")
 				}
 			});
 

@@ -378,13 +378,13 @@ namespace Lumen.Lang {
 			});
 		}
 
-		public static Value DeconstructSome(Value some) {
+		public static Value? DeconstructSome(Value some) {
 			if (Some.IsParentOf(some)) {
 				Instance someInstance = some as Instance;
-				return someInstance.GetField("x");
+				return someInstance.Items[0];
 			}
 
-			return some;
+			return null;
 		}
 
 		public static void Assert(Boolean condition, Scope scope) {

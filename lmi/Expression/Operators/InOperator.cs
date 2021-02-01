@@ -46,9 +46,8 @@ namespace Lumen.Lmi {
 			};
 
 			Scope s = new Scope(e);
-			IType type = operandTwo is SingletonConstructor sc ? sc : operandTwo.Type;
 
-			return new Applicate(new DotOperator(new ValueLiteral(type), "contains", this.fileName, this.line), exps, this.fileName, this.line).Eval(s);
+			return new Applicate(new DotOperator(new ValueLiteral(operandTwo.Type), "contains", this.fileName, this.line), exps, this.fileName, this.line).Eval(s);
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope e) {
