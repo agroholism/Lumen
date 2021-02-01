@@ -746,6 +746,11 @@ namespace Lumen.Lmi {
 
 			if (this.Match(TokenType.IS)) {
 				Int32 lineNumber = this.line;
+
+				if(this.Match(TokenType.NOT)) {
+					return new BinaryOperator(new IsOperator(exp, this.FunctionalOperators(), lineNumber, this.file), UnitLiteral.Instance, Constants.NOT, lineNumber, this.file);
+				}
+
 				return new IsOperator(exp, this.FunctionalOperators(), lineNumber, this.file);
 			}
 
