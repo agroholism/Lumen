@@ -104,5 +104,6 @@
 		SEQ_OPEN,
 		ACTIVE_PATTERN_OPEN,
         ACTIVE_PATTERN_CLOSE,
-    }
+		IS,
+	}
 }

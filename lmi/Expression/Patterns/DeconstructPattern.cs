@@ -59,6 +59,10 @@ namespace Lumen.Lang.Patterns {
 			}
 
 			if (requiredType is Constructor ctor && value is Instance instance) {
+				if(this.subpatterns.Count == 0) {
+					return new MatchResult(ctor.IsParentOf(value));
+				}
+
 				if (ctor.IsParentOf(value)) {
 					for (Int32 i = 0; i < ctor.Fields.Count; i++) {
 						MatchResult res = this.subpatterns[i].Match(instance.Items[i], scope);
@@ -84,7 +88,7 @@ namespace Lumen.Lang.Patterns {
 				return new MatchResult(m.IsParentOf(value));
 			}
 
-			return new MatchResult(false); // ??
+			return new MatchResult(value.Equals(requiredType));
 		}
 
 		public List<String> GetDeclaredVariables() {

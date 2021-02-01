@@ -391,7 +391,8 @@ namespace Lumen.Lmi {
 					&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE)
 					&& !this.LookMatch(0, TokenType.PAREN_CLOSE)
 					&& !this.LookMatch(0, TokenType.LAMBDA)
-					&& !this.LookMatch(0, TokenType.BAR)) {
+					&& !this.LookMatch(0, TokenType.BAR)
+					&& !this.LookMatch(0, TokenType.BLOCK_START)) {
 					subpatterns.Add(this.ParsePattern());
 				}
 
@@ -483,7 +484,13 @@ namespace Lumen.Lmi {
 
 					List<IPattern> subpatterns = new List<IPattern>();
 
-					while (!this.LookMatch(0, TokenType.EQUALS) && !this.LookMatch(0, TokenType.COLLECTION_CLOSE) && !this.LookMatch(0, TokenType.PAREN_CLOSE) && !this.LookMatch(0, TokenType.LAMBDA) && !this.LookMatch(0, TokenType.BAR)) {
+					while (!this.LookMatch(0, TokenType.EQUALS) 
+						&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE) 
+						&& !this.LookMatch(0, TokenType.PAREN_CLOSE) 
+						&& !this.LookMatch(0, TokenType.LAMBDA) 
+						&& !this.LookMatch(0, TokenType.BAR)
+						&& !this.LookMatch(0, TokenType.BLOCK_START)
+						&& !this.LookMatch(0, TokenType.COLON)) {
 						subpatterns.Add(this.ParsePattern());
 					}
 
@@ -760,6 +767,11 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.IN)) {
 				Int32 lineNumber = this.line;
 				return new InOperator(exp, this.FunctionalOperators(), lineNumber, this.file);
+			}
+
+			if (this.Match(TokenType.IS)) {
+				Int32 lineNumber = this.line;
+				return new IsOperator(exp, this.ParsePattern(), lineNumber, this.file);
 			}
 
 			if (this.Match(TokenType.ASSIGN)) {

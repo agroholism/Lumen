@@ -113,8 +113,8 @@ namespace Lumen.Lang {
 
 			this.SetMember("MutMap", MutMap);
 
-			this.SetMember("true", Const.TRUE);
-			this.SetMember("false", Const.FALSE);
+			this.SetMember("True", Const.TRUE);
+			this.SetMember("False", Const.FALSE);
 
 			this.SetMember("inf", new Number(Double.PositiveInfinity));
 			this.SetMember("nan", new Number(Double.NaN));

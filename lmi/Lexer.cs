@@ -591,6 +591,9 @@ namespace Lumen.Lmi {
 				case "as":
 					this.AddToken(TokenType.AS);
 					break;
+				case "is":
+					this.AddToken(TokenType.IS);
+					break;
 				case "match":
 					this.AddToken(TokenType.MATCH);
 					break;
