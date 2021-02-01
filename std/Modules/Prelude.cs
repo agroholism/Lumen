@@ -116,13 +116,13 @@ namespace Lumen.Lang {
 			this.SetMember("True", Const.TRUE);
 			this.SetMember("False", Const.FALSE);
 
-			this.SetMember("inf", new Number(Double.PositiveInfinity));
-			this.SetMember("nan", new Number(Double.NaN));
+			this.SetMember("Inf", new Number(Double.PositiveInfinity));
+			this.SetMember("Nan", new Number(Double.NaN));
 
-			this.SetMember("nl", new Text(Environment.NewLine));
+			this.SetMember("Nl", new Text(Environment.NewLine));
 
-			this.SetMember("pi", (Number)Math.PI);
-			this.SetMember("e", (Number)Math.E);
+			this.SetMember("Pi", (Number)Math.PI);
+			this.SetMember("E", (Number)Math.E);
 
 			this.SetMember("writeFile", new LambdaFun((scope, args) => {
 				String fileName = scope["fileName"].ToString();

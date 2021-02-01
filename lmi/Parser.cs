@@ -374,6 +374,16 @@ namespace Lumen.Lmi {
 				|| this.LookMatch(0, TokenType.AMP);
 		}
 
+		private Boolean IsPatternStopToken() {
+			return this.LookMatch(0, TokenType.EQUALS)
+				|| this.LookMatch(0, TokenType.COLLECTION_CLOSE)
+				|| this.LookMatch(0, TokenType.PAREN_CLOSE)
+				|| this.LookMatch(0, TokenType.LAMBDA)
+				|| this.LookMatch(0, TokenType.BAR)
+				|| this.LookMatch(0, TokenType.BLOCK_START)
+				|| this.LookMatch(0, TokenType.COLON);
+		}
+
 		private IPattern ParsePattern() {
 			IPattern result = null;
 
@@ -382,7 +392,7 @@ namespace Lumen.Lmi {
 			}
 
 			if (this.Match(TokenType.ACTIVE_PATTERN_OPEN)) {
-				Expression activePattern = Expression();
+				Expression activePattern = this.Expression();
 				this.Consume(TokenType.ACTIVE_PATTERN_CLOSE);
 
 				List<IPattern> subpatterns = new List<IPattern>();
@@ -399,22 +409,12 @@ namespace Lumen.Lmi {
 				return new ActivePattern(activePattern, subpatterns);
 			}
 
-			if (this.Match(TokenType.DOT2)) {
-				if (!this.IsValidRangeToken()) {
-					result = new RangePattern(result, null, false);
-				}
-				else {
-					result = new RangePattern(result, this.ParsePattern(), false);
-				}
-			}
+			if (this.LookMatch(0, TokenType.DOT2) || this.LookMatch(1, TokenType.DOT3)) {
+				Boolean isInclusive = this.Match(TokenType.DOT3);
 
-			if (this.Match(TokenType.DOT3)) {
-				if (!this.IsValidRangeToken()) {
-					result = new RangePattern(result, null, true);
-				}
-				else {
-					result = new RangePattern(result, this.ParsePattern(), true);
-				}
+				result = !this.IsValidRangeToken()
+					? new RangePattern(result, null, isInclusive)
+					: new RangePattern(result, this.ParsePattern(), isInclusive);
 			}
 
 			if (this.Match(TokenType.PAREN_OPEN)) {
@@ -466,12 +466,6 @@ namespace Lumen.Lmi {
 				if (name == "_") {
 					result = DiscardPattern.Instance;
 				}
-				else if (name == "true") {
-					result = new ValuePattern(Const.TRUE);
-				}
-				else if (name == "false") {
-					result = new ValuePattern(Const.FALSE);
-				}
 				else if (Char.IsLower(name[0]) && !this.LookMatch(0, TokenType.DOT)) {
 					result = new NamePattern(name);
 				}
@@ -484,13 +478,7 @@ namespace Lumen.Lmi {
 
 					List<IPattern> subpatterns = new List<IPattern>();
 
-					while (!this.LookMatch(0, TokenType.EQUALS) 
-						&& !this.LookMatch(0, TokenType.COLLECTION_CLOSE) 
-						&& !this.LookMatch(0, TokenType.PAREN_CLOSE) 
-						&& !this.LookMatch(0, TokenType.LAMBDA) 
-						&& !this.LookMatch(0, TokenType.BAR)
-						&& !this.LookMatch(0, TokenType.BLOCK_START)
-						&& !this.LookMatch(0, TokenType.COLON)) {
+					while (!this.IsPatternStopToken()) {
 						subpatterns.Add(this.ParsePattern());
 					}
 
@@ -499,22 +487,12 @@ namespace Lumen.Lmi {
 			}
 
 			if (result is ValuePattern) {
-				if (this.Match(TokenType.DOT2)) {
-					if (!this.IsValidToken()) {
-						result = new RangePattern(result, null, false);
-					}
-					else {
-						result = new RangePattern(result, this.ParsePattern(), false);
-					}
-				}
+				if (this.LookMatch(0, TokenType.DOT2) || this.LookMatch(1, TokenType.DOT3)) {
+					Boolean isInclusive = this.Match(TokenType.DOT3);
 
-				if (this.Match(TokenType.DOT3)) {
-					if (!this.IsValidToken()) {
-						result = new RangePattern(result, null, true);
-					}
-					else {
-						result = new RangePattern(result, this.ParsePattern(), true);
-					}
+					result = !this.IsValidRangeToken()
+						? new RangePattern(result, null, isInclusive)
+						: new RangePattern(result, this.ParsePattern(), isInclusive);
 				}
 			}
 
@@ -542,18 +520,15 @@ namespace Lumen.Lmi {
 			}
 
 			if (this.Match(TokenType.AS)) {
-				String ide = this.Consume(TokenType.WORD).Text;
-				result = new AsPattern(result, ide);
+				result = new AsPattern(result, this.Consume(TokenType.WORD).Text);
 			}
 
 			if (this.Match(TokenType.WHEN)) {
-				Expression exp = this.Expression();
-				result = new WhenPattern(result, exp);
+				result = new WhenPattern(result, this.Expression());
 			}
 
 			while (this.Match(TokenType.BAR)) {
-				IPattern second = this.ParsePattern();
-				result = new OrPattern(result, second);
+				result = new OrPattern(result, this.ParsePattern());
 			}
 
 			return result;
@@ -630,7 +605,7 @@ namespace Lumen.Lmi {
 
 					if (this.Match(TokenType.IMPLEMENTS)) {
 						do {
-							typeArgName.AddImplements(Bitwise());
+							typeArgName.AddImplements(this.Bitwise());
 						} while (this.Match(TokenType.SPLIT));
 					}
 
@@ -771,7 +746,7 @@ namespace Lumen.Lmi {
 
 			if (this.Match(TokenType.IS)) {
 				Int32 lineNumber = this.line;
-				return new IsOperator(exp, this.ParsePattern(), lineNumber, this.file);
+				return new IsOperator(exp, this.FunctionalOperators(), lineNumber, this.file);
 			}
 
 			if (this.Match(TokenType.ASSIGN)) {
@@ -1198,7 +1173,7 @@ namespace Lumen.Lmi {
 				return new Yield(this.Expression());
 			}
 
-			if(this.Match(TokenType.RAISE)) {
+			if (this.Match(TokenType.RAISE)) {
 				Int32 line = this.line;
 
 				Expression inraise = !this.IsValidToken() ? UnitLiteral.Instance : this.Expression();
@@ -1234,7 +1209,7 @@ namespace Lumen.Lmi {
 
 						if (this.Match(TokenType.IMPLEMENTS)) {
 							do {
-								typeArgName.AddImplements(Bitwise());
+								typeArgName.AddImplements(this.Bitwise());
 							} while (this.Match(TokenType.SPLIT));
 						}
 
