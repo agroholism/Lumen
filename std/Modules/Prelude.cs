@@ -38,7 +38,7 @@ namespace Lumen.Lang {
 		public static Module Seq { get; } = new SeqModule();
 		public static Module Range { get; } = new RangeModule();
 		public static Module MutArray { get; } = new MutArrayModule();
-		public static Module Function { get; } = new FunctionModule();
+		public static IMutableType Function { get; } = new FunctionModule();
 		public static Module Number { get; } = new NumberModule();
 		public static Module MutMap { get; } = new MutMapModule();
 		public static Module Pair { get; } = new MutMapModule.PairModule();

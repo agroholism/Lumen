@@ -4,7 +4,7 @@ using System.Linq;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal sealed class FunctionModule : Module {
+	internal sealed class FunctionModule : Type {
 		internal FunctionModule() {
 			this.Name = "Function";
 

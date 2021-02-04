@@ -1,6 +1,6 @@
 ﻿namespace Lumen.Lang {
 	public interface IConstructor : IType {
-		Module Parent { get; }
+		Type Parent { get; }
 
 		Value MakeInstance(params Value[] values);
 	}

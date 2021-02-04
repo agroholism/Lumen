@@ -4,28 +4,25 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	public class Class : Module {
-		public String TypeParameter { get; protected set; } = "T";
-		public List<Expression> Declarations { get; } = new List<Expression>();
+	public class Class : Module, IMutableType {
+		public Dictionary<String, Expression> Declarations { get; private set; }
+		protected List<Class> Implementations { get; private set; }
 
-		public Class() : base() {
+		public IEnumerable<String> AvailableNames => throw new NotImplementedException();
 
-		}
-
-		public Class(String name, String typeParameter) : this() {
-			this.Name = name;
-			this.TypeParameter = typeParameter;
+		public Class(String name) : base(name) {
+			this.Declarations = new Dictionary<String, Expression>();
+			this.Implementations = new List<Class>();
 		}
 
 		public virtual void OnImplement(Module target) {
 			Scope scope = new Scope {
-				[this.TypeParameter] = target,
 				[this.Name] = this
 			};
 
-			foreach (Expression decl in this.Declarations) {
-				ClosureManager manager = new ClosureManager(scope);
-				decl.Closure(manager).Eval(scope);
+			foreach (KeyValuePair<String, Expression> decl in this.Declarations) {
+				scope[decl.Key] = target;
+				decl.Value.Eval(scope);
 			}
 
 			foreach (KeyValuePair<String, Value> member in scope.variables) {
@@ -34,9 +31,25 @@ namespace Lumen.Lang {
 				}
 			}
 		}
+
+		public Boolean IsParentOf(Value value) {
+			return value.Type.HasImplementation(this);
+		}
+
+		public Boolean HasImplementation(Class typeClass) {
+			throw new NotImplementedException();
+		}
+
+		public void AppendImplementation(Class cls) {
+			throw new NotImplementedException();
+		}
 	}
 
 	public class SystemClass : Class {
+		public SystemClass(String name) : base(name) {
+
+		}
+
 		public override void OnImplement(Module target) {
 			
 		}
