@@ -3,10 +3,14 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang.Expressions {
 	public class Next : Exception, Expression {
-		public static Next Instance { get; } = new Next();
+		private String label;
 
-		private Next() {
+		public Next(String label) : base("unexpected next with label " + label) {
+			this.label = label;
+		}
 
+		public Boolean IsMatch(String otherLabel) {
+			return this.label == otherLabel;
 		}
 
 		public Value Eval(Scope e) {

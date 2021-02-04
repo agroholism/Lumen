@@ -46,8 +46,12 @@ REDO:
 
 					throw redoException;
 				}
-				catch (Next) {
-					continue;
+				catch (Next nextException) {
+					if (nextException.IsMatch(this.cycleName)) {
+						continue;
+					}
+
+					throw nextException;
 				}
 				finally {
 					foreach (String declaration in declared) {
@@ -100,8 +104,12 @@ REDO:
 
 					throw redoException;
 				}
-				catch (Next) {
-					continue;
+				catch (Next nextException) {
+					if (nextException.IsMatch(this.cycleName)) {
+						continue;
+					}
+
+					throw nextException;
 				}
 
 				if (iterationEvaluationResults != null) {

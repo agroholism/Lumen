@@ -33,8 +33,12 @@ REDO:
 
 					throw redoException;
 				}
-				catch (Next) {
-					continue;
+				catch (Next nextException) {
+					if (nextException.IsMatch(this.cycleName)) {
+						continue;
+					}
+
+					throw nextException;
 				}
 			}
 
@@ -59,8 +63,12 @@ REDO:
 
 					throw breakException;
 				}
-				catch (Next) {
-					continue;
+				catch (Next nextException) {
+					if (nextException.IsMatch(this.cycleName)) {
+						continue;
+					}
+
+					throw nextException;
 				}
 				catch (Redo redoException) {
 					if (redoException.IsMatch(this.cycleName)) {

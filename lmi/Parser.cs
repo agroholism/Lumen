@@ -36,104 +36,92 @@ namespace Lumen.Lmi {
 		private Expression Expression() {
 			Token current = this.GetToken(0);
 
-			switch (current.Type) {
-				case TokenType.RETURN: // kk
-					this.Match(TokenType.RETURN);
+			return current.Type switch
+			{
+				TokenType.RETURN => this.ParseReturn(),
+				TokenType.MATCH => this.ParseMatch(),
+				TokenType.TRY => this.ParseTry(),
+				TokenType.USE => this.ParseUse(),
+				TokenType.ANNOTATION => this.ParseWithAnnotation(),
+				TokenType.NEXT => this.ParseNext(),
+				TokenType.EXIT => this.ParseExit(),
+				TokenType.REDO => this.ParseRedo(),
+				TokenType.RETRY => this.ParseRetry(),
+				TokenType.TYPE => this.ParseTypeDeclaration(),
+				TokenType.IMPORT => this.ParseImport(),
+				TokenType.IF => this.ParseIf(),
+				TokenType.MODULE => this.ParseModule(),
+				TokenType.LOOP => this.ParseLoop(),
+				TokenType.LET => this.ParseDeclaration(),
+				TokenType.FOR => this.ParseFor(),
+				TokenType.ASSERT => this.ParseAssert(),
+				_ => this.LogikOr(),
+			};
+		}
 
-					Expression ret =
-						new Return(!this.IsValidToken() ? UnitLiteral.Instance : this.Expression());
+		private Expression ParseAssert() {
+			this.Consume(TokenType.ASSERT);
 
-					if (this.Match(TokenType.WHEN)) {
-						return new Condition(this.Expression(), ret, UnitLiteral.Instance);
-					}
+			Int32 line = this.line;
+			return new Assert(this.Expression(), this.file, line);
+		}
 
-					return ret;
-				case TokenType.MATCH:
-					this.Match(TokenType.MATCH);
-					return this.ParseMatch();
-				case TokenType.TRY:
-					this.Match(TokenType.TRY);
-					return this.ParseTry();
-				case TokenType.USE:
-					this.Match(TokenType.USE);
-					return this.ParseUse();
-				case TokenType.ANNOTATION:
-					this.Match(TokenType.ANNOTATION);
-					return this.ParseWithAnnotation();
-				case TokenType.NEXT:
-					this.Match(TokenType.NEXT);
-					Expression nextExpression = Next.Instance;
+		private Expression ParseRetry() {
+			this.Consume(TokenType.RETRY);
 
-					if (this.Match(TokenType.WHEN)) {
-						return new Condition(this.Expression(), nextExpression, UnitLiteral.Instance);
-					}
+			Expression retry = new Retry();
 
-					return nextExpression;
-				case TokenType.EXIT:
-					this.Match(TokenType.EXIT);
+			return this.Match(TokenType.WHEN)
+				? new Condition(this.Expression(), retry, UnitLiteral.Instance)
+				: retry;
+		}
 
-					Expression breakExpression =
-						new Break(this.LookMatch(0, TokenType.WORD) ?
-						this.Consume(TokenType.WORD).Text : null);
+		private Expression ParseRedo() {
+			this.Consume(TokenType.REDO);
 
-					if (this.Match(TokenType.WHEN)) {
-						return new Condition(this.Expression(), breakExpression, UnitLiteral.Instance);
-					}
+			Expression redo =
+				new Redo(this.LookMatch(0, TokenType.WORD) ? this.Consume(TokenType.WORD).Text : null);
 
-					return breakExpression;
-				case TokenType.REDO:
-					this.Match(TokenType.REDO);
+			return this.Match(TokenType.WHEN) 
+				? new Condition(this.Expression(), redo, UnitLiteral.Instance) 
+				: redo;
+		}
 
-					Expression redoExpression =
-						new Redo(this.LookMatch(0, TokenType.WORD) ?
-						this.Consume(TokenType.WORD).Text : null);
+		private Expression ParseExit() {
+			this.Consume(TokenType.EXIT);
 
-					if (this.Match(TokenType.WHEN)) {
-						return new Condition(this.Expression(), redoExpression, UnitLiteral.Instance);
-					}
+			Expression exit =
+				new Break(this.LookMatch(0, TokenType.WORD) ? this.Consume(TokenType.WORD).Text : null);
 
-					return redoExpression;
-				case TokenType.RETRY:
-					this.Match(TokenType.RETRY);
+			return this.Match(TokenType.WHEN) 
+				? new Condition(this.Expression(), exit, UnitLiteral.Instance) 
+				: exit;
+		}
 
-					Expression retryExpression = new Retry();
+		private Expression ParseNext() {
+			this.Consume(TokenType.NEXT);
 
-					if (this.Match(TokenType.WHEN)) {
-						return new Condition(this.Expression(), retryExpression, UnitLiteral.Instance);
-					}
+			Expression next =
+				new Next(this.LookMatch(0, TokenType.WORD) ? this.Consume(TokenType.WORD).Text : null);
 
-					return retryExpression;
-				case TokenType.TYPE:
-					this.Match(TokenType.TYPE);
-					return this.ParseTypeDeclaration();
-				case TokenType.IMPORT:
-					this.Match(TokenType.IMPORT);
-					return this.ParseImport();
-				case TokenType.IF:
-					this.Match(TokenType.IF);
-					return this.ParseIf();
-				case TokenType.MODULE:
-					this.Match(TokenType.MODULE);
-					return this.ParseModule();
-				case TokenType.LOOP:
-					this.Match(TokenType.LOOP);
-					return this.ParseWhile();
-				case TokenType.LET:
-					this.Match(TokenType.LET);
-					return this.ParseDeclaration();
-				case TokenType.FOR:
-					this.Match(TokenType.FOR);
-					return this.ParseFor();
-				case TokenType.ASSERT:
-					this.Match(TokenType.ASSERT);
-					Int32 currentLine = this.line;
-					return new Assert(this.Expression(), this.file, currentLine);
-				default:
-					return this.LogikOr();
-			}
+			return this.Match(TokenType.WHEN) 
+				? new Condition(this.Expression(), next, UnitLiteral.Instance) 
+				: next;
+		}
+
+		private Expression ParseReturn() {
+			this.Consume(TokenType.RETURN);
+
+			Expression result =
+				new Return(!this.IsValidToken() ? UnitLiteral.Instance : this.Expression());
+
+			return this.Match(TokenType.WHEN) 
+				? new Condition(this.Expression(), result, UnitLiteral.Instance) 
+				: result;
 		}
 
 		private Expression ParseWithAnnotation() {
+			this.Consume(TokenType.ANNOTATION);
 			String name = this.Consume(TokenType.WORD).Text;
 			this.Match(TokenType.EOC);
 
@@ -147,6 +135,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseTry() {
+			this.Consume(TokenType.TRY);
 			this.Match(TokenType.COLON);
 			Expression tryBody = this.Expression();
 			this.Match(TokenType.EOC);
@@ -177,6 +166,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseUse() {
+			this.Consume(TokenType.USE);
 			Int32 savedLine = this.line;
 
 			IPattern pattern = this.ParsePattern();
@@ -192,6 +182,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseTypeDeclaration() {
+			this.Consume(TokenType.TYPE);
 			// type typeName
 			String typeName = this.Consume(TokenType.WORD).Text;
 			// type typeName =
@@ -342,6 +333,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseMatch() {
+			this.Consume(TokenType.MATCH);
 			Expression matchedExpression = this.Expression();
 			this.Match(TokenType.COLON);
 			this.Match(TokenType.EOC);
@@ -536,6 +528,7 @@ namespace Lumen.Lmi {
 
 		// TODO
 		private Expression ParseImport() {
+			this.Consume(TokenType.IMPORT);
 			// import x, || import x from
 			if (this.LookMatch(1, TokenType.SPLIT) || this.LookMatch(1, TokenType.FROM)) {
 				List<String> entities = new List<String>();
@@ -576,6 +569,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseModule() {
+			this.Consume(TokenType.MODULE);
 			String name = this.Consume(TokenType.WORD).Text;
 			List<Expression> declarations = new List<Expression>();
 			this.Match(TokenType.BLOCK_START);
@@ -587,6 +581,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseDeclaration() {
+			this.Consume(TokenType.LET);
 			Int32 line = this.line;
 
 			IPattern pattern = this.ParsePattern();
@@ -628,6 +623,7 @@ namespace Lumen.Lmi {
 		}
 
 		private ForCycle ParseFor() {
+			this.Consume(TokenType.FOR);
 			IPattern pattern = this.ParsePattern();
 
 			this.Consume(TokenType.IN);
@@ -650,6 +646,7 @@ namespace Lumen.Lmi {
 		}
 
 		private Expression ParseIf() {
+			this.Consume(TokenType.IF);
 			Expression condition = this.Expression();
 
 			this.Match(TokenType.COLON);
@@ -668,7 +665,8 @@ namespace Lumen.Lmi {
 			return new Condition(condition, trueBody, falseBody);
 		}
 
-		private Expression ParseWhile() {
+		private Expression ParseLoop() {
+			this.Consume(TokenType.LOOP);
 			String cycleName = this.Match(TokenType.AS) ? this.Consume(TokenType.WORD).Text : null;
 			this.Match(TokenType.EOC);
 			if (this.LookMatch(0, TokenType.BAR)) {
