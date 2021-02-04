@@ -112,12 +112,12 @@ namespace Lumen.Lmi {
 		private Expression ParseReturn() {
 			this.Consume(TokenType.RETURN);
 
-			Expression result =
+			Expression @return =
 				new Return(!this.IsValidToken() ? UnitLiteral.Instance : this.Expression());
 
 			return this.Match(TokenType.WHEN) 
-				? new Condition(this.Expression(), result, UnitLiteral.Instance) 
-				: result;
+				? new Condition(this.Expression(), @return, UnitLiteral.Instance) 
+				: @return;
 		}
 
 		private Expression ParseWithAnnotation() {
@@ -137,10 +137,13 @@ namespace Lumen.Lmi {
 		private Expression ParseTry() {
 			this.Consume(TokenType.TRY);
 			this.Match(TokenType.COLON);
+
 			Expression tryBody = this.Expression();
+
 			this.Match(TokenType.EOC);
+
 			Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
-			Expression finallyBody = null;
+			Expression ensure = null;
 
 			if (this.Match(TokenType.EXCEPT)) {
 				this.Match(TokenType.COLON);
@@ -159,10 +162,10 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.ENSURE)) {
 				this.Match(TokenType.COLON);
 
-				finallyBody = this.Expression();
+				ensure = this.Expression();
 			}
 
-			return new ExceptionHandling(tryBody, patterns, finallyBody);
+			return new ExceptionHandling(tryBody, patterns, ensure);
 		}
 
 		private Expression ParseUse() {
@@ -334,17 +337,17 @@ namespace Lumen.Lmi {
 
 		private Expression ParseMatch() {
 			this.Consume(TokenType.MATCH);
+
 			Expression matchedExpression = this.Expression();
+
 			this.Match(TokenType.COLON);
 			this.Match(TokenType.EOC);
 
 			Dictionary<IPattern, Expression> patterns = new Dictionary<IPattern, Expression>();
 
-			while (this.LookMatch(0, TokenType.BAR)) {
-				this.Match(TokenType.BAR);
-
+			while (this.Match(TokenType.BAR)) {
 				IPattern pattern = this.ParsePattern();
-				this.Match(TokenType.LAMBDA);
+				this.Consume(TokenType.LAMBDA);
 
 				Expression body = this.Expression();
 				this.Match(TokenType.EOC);
@@ -630,17 +633,11 @@ namespace Lumen.Lmi {
 
 			Expression container = this.Expression();
 
-			Expression when = this.Match(TokenType.WHEN) ? this.Expression() : null;
-
 			String cycleName = this.Match(TokenType.AS) ? this.Consume(TokenType.WORD).Text : null;
 
 			this.Match(TokenType.COLON);
 
 			Expression body = this.Expression();
-
-			if (when != null) {
-				body = new Condition(when, body, UnitLiteral.Instance);
-			}
 
 			return new ForCycle(cycleName, pattern, container, body);
 		}
