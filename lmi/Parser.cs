@@ -587,6 +587,15 @@ namespace Lumen.Lmi {
 			this.Consume(TokenType.LET);
 			Int32 line = this.line;
 
+			Boolean isRec = false;
+
+			Token currentToken = this.GetToken(0);
+
+			if(currentToken.Type == TokenType.WORD && currentToken.Text == "rec") {
+				this.Consume(TokenType.WORD);
+				isRec = true;
+			}
+
 			IPattern pattern = this.ParsePattern();
 
 			if (this.Match(TokenType.EQUALS)) {
@@ -620,6 +629,19 @@ namespace Lumen.Lmi {
 
 			if (this.Match(TokenType.EQUALS)) {
 				body = this.Expression();
+			}
+
+			if(isRec) {
+				BindingDeclaration binding = new BindingDeclaration(new NamePattern(name),
+						new IdExpression("rec", this.file, line), this.file, line);
+
+				if (body is Block block) {
+					block.expressions.Insert(0, binding);
+				} else {
+					body = new Block(new List<Expression> {
+						binding, body
+					});
+				}
 			}
 
 			return new FunctionDeclaration(name, arguments, body, line, this.file);
