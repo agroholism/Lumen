@@ -119,9 +119,9 @@ namespace Lumen.Lang {
 			this.SetMember("Inf", new Number(Double.PositiveInfinity));
 			this.SetMember("Nan", new Number(Double.NaN));
 
-			this.SetMember("Nl", new Text(Environment.NewLine));
+			this.SetMember("NewLine", new Text(Environment.NewLine));
 
-			this.SetMember("Pi", (Number)Math.PI);
+			this.SetMember("PI", (Number)Math.PI);
 			this.SetMember("E", (Number)Math.E);
 
 			this.SetMember("writeFile", new LambdaFun((scope, args) => {
