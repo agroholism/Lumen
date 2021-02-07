@@ -2,9 +2,7 @@
 
 namespace Lumen.Lang {
 	internal class OrdModule : SystemClass {
-		internal OrdModule() {
-			this.Name = "Ord";
-
+		internal OrdModule() : base("Ord") {
 			/*this.Members["[requirements]"] = new Array(new LambdaFun(null) {
 				Name = "compare",
 				Arguments = new System.Collections.Generic.List<IPattern> {
@@ -101,7 +99,7 @@ namespace Lumen.Lang {
 				Value y = scope["y"];
 				Value z = scope["z"];
 
-				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
+				Fun comparator = x.Type.GetMember("compare").ToFunction(scope);
 
 				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) <= 0
 				&& comparator.Call(scope, x, z).ToDouble(scope) <= 0);
@@ -118,7 +116,7 @@ namespace Lumen.Lang {
 				Value y = scope["y"];
 				Value z = scope["z"];
 
-				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
+				Fun comparator = x.Type.GetMember("compare").ToFunction(scope);
 
 				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) < 0
 				&& comparator.Call(scope, x, z).ToDouble(scope) <= 0);
@@ -135,7 +133,7 @@ namespace Lumen.Lang {
 				Value y = scope["y"];
 				Value z = scope["z"];
 
-				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
+				Fun comparator = x.Type.GetMember("compare").ToFunction(scope);
 
 				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) <= 0
 				&& comparator.Call(scope, x, z).ToDouble(scope) < 0);
@@ -152,7 +150,7 @@ namespace Lumen.Lang {
 				Value y = scope["y"];
 				Value z = scope["z"];
 
-				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
+				Fun comparator = x.Type.GetMember("compare").ToFunction(scope);
 
 				return new Logical(comparator.Call(new Scope(scope), y, x).ToDouble(scope) < 0
 				&& comparator.Call(scope, x, z).ToDouble(scope) < 0);

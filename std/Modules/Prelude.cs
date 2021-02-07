@@ -21,8 +21,8 @@ namespace Lumen.Lang {
 		public static Class Context { get; } = new Context();
 
 		public static ErrorModule IndexOutOfRange { get; } = new IndexOutOfRange();
-		public static ErrorModule FunctionIsNotImplemented { get; } = new FunctionIsNotImplemented();
-		public static ErrorModule AssertError { get; } = new AssertError();
+		public static NotImplemented NotImplemented { get; } = new NotImplemented();
+		public static AssertFailed AssertFailed { get; } = new AssertFailed();
 		public static ErrorModule ConvertError { get; } = new ConvertError();
 		public static ErrorModule CollectionIsEmpty { get; } = new CollectionIsEmpty();
 		public static ErrorModule InvalidOperation { get; } = new InvalidOperation();
@@ -31,24 +31,23 @@ namespace Lumen.Lang {
 
 		public static Module Any { get; } = new AnyModule();
 
-		public static Module Unit { get; } = new UnitModule();
+		public static IType Unit { get; } = new UnitModule();
 
-		public static Module Iterator { get; } = new IteratorModule();
-		public static Module Mut { get; } = new MutModule();
-		public static Module Seq { get; } = new SeqModule();
-		public static Module Range { get; } = new RangeModule();
-		public static Module MutArray { get; } = new MutArrayModule();
+		public static IType Iterator { get; } = new IteratorModule();
+		public static IType Mut { get; } = new MutModule();
+		public static IType Seq { get; } = new SeqModule();
+		public static IType Range { get; } = new RangeModule();
+		public static IType MutArray { get; } = new MutArrayModule();
 		public static IMutableType Function { get; } = new FunctionModule();
-		public static Module Number { get; } = new NumberModule();
-		public static Module MutMap { get; } = new MutMapModule();
-		public static Module Pair { get; } = new MutMapModule.PairModule();
-		public static Module Text { get; } = new TextModule();
-		public static Module List { get; } = new ListModule();
-		public static Module Future { get; } = new FutureModule();
+		public static IType Number { get; } = new NumberModule();
+		public static IType MutMap { get; } = new MutMapModule();
+		public static IType Text { get; } = new TextModule();
+		public static IType List { get; } = new ListModule();
+		public static IType Future { get; } = new FutureModule();
 
-		public static Module Logical { get; } = new LogicalModule();
+		public static IType Logical { get; } = new LogicalModule();
 
-		public static Module Option { get; } = new OptionModule();
+		public static IType Option { get; } = new OptionModule();
 		public static IType None { get; } = (Option as OptionModule).None;
 		public static Constructor Some { get; } = (Option as OptionModule).Some;
 
@@ -62,7 +61,7 @@ namespace Lumen.Lang {
 
 		public static Dictionary<String, Module> GlobalImportCache { get; } = new Dictionary<String, Module>();
 
-		private Prelude() {
+		private Prelude() : base("prelude") {
 			this.SetMember("Prelude", this);
 
 			this.SetMember("Any", Any);
@@ -82,8 +81,8 @@ namespace Lumen.Lang {
 			this.SetMember("CollectionIsEmpty", CollectionIsEmpty);
 			this.SetMember("InvalidOperation", InvalidOperation);
 			this.SetMember("InvalidArgument", InvalidArgument);
-			this.SetMember("FunctionIsNotImplemented", FunctionIsNotImplemented);
-			this.SetMember("AssertError", AssertError);
+			this.SetMember("FunctionIsNotImplemented", NotImplemented);
+			this.SetMember("AssertError", AssertFailed);
 			this.SetMember("ConvertError", ConvertError);
 			this.SetMember("Error", Error);
 
@@ -389,12 +388,12 @@ namespace Lumen.Lang {
 
 		public static void Assert(Boolean condition, Scope scope) {
 			if (!condition) {
-				throw AssertError.constructor.ToException();
+				throw AssertFailed.constructor.ToException();
 			}
 		}
 
 		public static void FunctionIsNotImplementedForType(String functionName, Value typeName) {
-			throw FunctionIsNotImplemented.constructor.MakeExceptionInstance(typeName, new Text(functionName)).ToException();
+			throw NotImplemented.Requirement.MakeExceptionInstance(typeName, new Text(functionName)).ToException();
 
 		}
 	}

@@ -1,8 +1,6 @@
 ﻿namespace Lumen.Lang {
 	internal class ExceptionClass : SystemClass {
-		internal ExceptionClass() {
-			this.Name = "Exception";
-
+		internal ExceptionClass() : base("Exception") {
 			this.SetMember("message", new LambdaFun((scope, args) => {
 				return new Text($"exception raised");
 			}) {

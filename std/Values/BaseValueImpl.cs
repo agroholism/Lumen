@@ -7,7 +7,7 @@ namespace Lumen.Lang {
 		public virtual Int32 CompareTo(Object obj) {
 			if (obj is Value value) {
 				if (this.Type.HasImplementation(Prelude.Ord)
-					&& this.Type.GetMember("compare", null).TryConvertToFunction(out Fun comparator)) {
+					&& this.Type.GetMember("compare").TryConvertToFunction(out Fun comparator)) {
 					return comparator.Call(new Scope(), this, value).ToInt(null);
 				}
 			}
@@ -17,7 +17,7 @@ namespace Lumen.Lang {
 
 		public virtual String ToString(String format, IFormatProvider formatProvider) {
 			if (this.Type.HasImplementation(Prelude.Format) &&
-				this.Type.GetMember("format", null).TryConvertToFunction(out Fun function)) {
+				this.Type.GetMember("format").TryConvertToFunction(out Fun function)) {
 				function.Call(new Scope(), this, new Text(format ?? "")).ToString();
 			}
 

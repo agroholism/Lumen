@@ -6,11 +6,11 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
 	public class ExceptionConstructor : Constructor, IExceptionConstructor, Fun {
-		public ExceptionConstructor(String name, Module parent, Dictionary<String, List<IType>> fields)
+		public ExceptionConstructor(String name, Type parent, Dictionary<String, List<IType>> fields)
 			: base(name, parent, fields) {
 		}
 
-		public ExceptionConstructor(String name, Module parent, params String[] fields)
+		public ExceptionConstructor(String name, Type parent, params String[] fields)
 			:base(name, parent, fields) {
 		}
 

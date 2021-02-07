@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class OptionModule : Module {
+	internal class OptionModule : Type {
 		public Constructor Some { get; private set; }
 		public IType None { get; private set; }
 
-		public OptionModule() {
-			this.Name = "Option";
-
+		public OptionModule(): base("Option") {
 			this.AppendImplementation(Prelude.Monad);
 			this.AppendImplementation(Prelude.Default);
 

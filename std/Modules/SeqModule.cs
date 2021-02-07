@@ -4,10 +4,8 @@ using System.Linq;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class SeqModule : Module {
-		public SeqModule() {
-			this.Name = "Seq";
-
+	internal class SeqModule : Type {
+		public SeqModule() : base("Seq") {
 			this.SetMember("empty", new LambdaFun((scope, args) => {
 				return new Seq(Enumerable.Empty<Value>());
 			}) {
@@ -61,10 +59,8 @@ namespace Lumen.Lang {
 		}
 	}
 
-	internal class RangeModule : Module {
-		public RangeModule() {
-			this.Name = "Range";
-
+	internal class RangeModule : Type {
+		public RangeModule() : base("Range") {
 			this.SetMember("default", new LambdaFun((scope, args) => {
 				return new InfinityRange();
 			}) {

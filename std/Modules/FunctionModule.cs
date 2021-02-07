@@ -5,9 +5,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal sealed class FunctionModule : Type {
-		internal FunctionModule() {
-			this.Name = "Function";
-
+		internal FunctionModule() : base("Function") {
 			this.AppendImplementation(Prelude.Monoid);
 			this.AppendImplementation(Prelude.Monad);
 
@@ -21,7 +19,7 @@ namespace Lumen.Lang {
 					Value mx = m.Call(new Scope(), x);
 					Value fx = f.Call(new Scope(), x);
 
-					return mx.Type.GetMember("+", inScope).ToFunction(inScope)
+					return mx.Type.GetMember("+").ToFunction(inScope)
 						.Call(new Scope(), mx, fx);
 				}) {
 					Parameters = new List<IPattern> {
@@ -37,7 +35,7 @@ namespace Lumen.Lang {
 
 			LambdaFun emptyFunction = new LambdaFun((inScope, inArgs) => {
 				return inScope["x"].Type
-							.GetMember("empty", inScope)
+							.GetMember("empty")
 							.ToFunction(inScope)
 							.Call(new Scope(), Const.UNIT);
 			}) {

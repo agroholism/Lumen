@@ -2,10 +2,8 @@
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal sealed class LogicalModule : Module {
-		internal LogicalModule() {
-			this.Name = "Logical";
-
+	internal sealed class LogicalModule : Type {
+		internal LogicalModule() : base("Logical") {
 			#region operators
 
 			this.SetMember("compare", new LambdaFun((scope, args) => {

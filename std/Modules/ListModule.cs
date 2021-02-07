@@ -4,10 +4,8 @@ using System.Linq;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class ListModule : Module {
-		public ListModule() {
-			this.Name = "List";
-
+	internal class ListModule : Type {
+		public ListModule() : base("List") {
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				return new List(new LinkedList(scope["head"], scope["tail"].ToLinkedList(scope)));
 			}) {

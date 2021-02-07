@@ -6,9 +6,9 @@ namespace Lumen.Lang {
 
 		public override IType Type => this.Parent; 
 
-		public Module Parent { get; set; }
+		public Type Parent { get; set; }
 
-		public SingletonConstructor(String name, Module parent) {
+		public SingletonConstructor(String name, Type parent) {
 			this.Parent = parent;
 			this.Name = name;
 		}
@@ -17,16 +17,12 @@ namespace Lumen.Lang {
 			return this;
 		}
 
-		public Value GetMember(String name, Scope scope) {
+		public Value GetMember(String name) {
 			if (this.TryGetMember(name, out Value result)) {
 				return result;
 			}
 
 			throw new LumenException($"fne {name} {this.Name}");
-		}
-
-		public void SetMember(String name, Value value, Scope scope) {
-
 		}
 
 		public override String ToString() {
@@ -50,8 +46,12 @@ namespace Lumen.Lang {
 			return value == this;
 		}
 
-		public Boolean HasImplementation(Module typeClass) {
+		public Boolean HasImplementation(Class typeClass) {
 			return this.Parent.HasImplementation(typeClass);
+		}
+
+		public Boolean HasMember(String name) {
+			return this.Parent.HasMember(name);
 		}
 	}
 }

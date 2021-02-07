@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
@@ -6,10 +7,10 @@ namespace Lumen.Lang {
 		public LumenException MakeExceptionInstance(params Value[] values);
 	}
 
-	public abstract class ErrorModule : Module, IExceptionConstructor {
+	public abstract class ErrorModule : Type, IExceptionConstructor {
 		public ExceptionConstructor constructor;
 
-		public ErrorModule() {
+		public ErrorModule(String name) : base(name) {
 			this.AppendImplementation(Prelude.Exception);
 		}
 
@@ -19,9 +20,7 @@ namespace Lumen.Lang {
 	}
 
 	public sealed class Error : ErrorModule {
-		internal Error() : base() {
-			this.Name = "Error";
-
+		internal Error() : base("Error") {
 			this.constructor = new ExceptionConstructor("Error", this, "message");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
@@ -43,9 +42,7 @@ namespace Lumen.Lang {
 	}
 
 	public sealed class InvalidOperation : ErrorModule {
-		internal InvalidOperation() : base() {
-			this.Name = "InvalidOperation";
-
+		internal InvalidOperation() : base("InvalidOperation") {
 			this.constructor = new ExceptionConstructor("InvalidOperation", this, "message");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
@@ -67,9 +64,7 @@ namespace Lumen.Lang {
 	}
 
 	public sealed class CollectionIsEmpty : ErrorModule {
-		internal CollectionIsEmpty() : base() {
-			this.Name = "CollectionIsEmpty";
-
+		internal CollectionIsEmpty() : base("CollectionIsEmpty") {
 			this.constructor = new ExceptionConstructor("CollectionIsEmpty", this);
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
@@ -86,11 +81,9 @@ namespace Lumen.Lang {
 		}
 	}
 
-	public sealed class AssertError : ErrorModule {
-		internal AssertError() : base() {
-			this.Name = "AssertError";
-
-			this.constructor = new ExceptionConstructor("AssertError", this, "message");
+	public sealed class AssertFailed : ErrorModule {
+		internal AssertFailed() : base("AssertFailed") {
+			this.constructor = new ExceptionConstructor("AssertFailed", this, "message");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
 				return this.MakeExceptionInstance();
@@ -104,12 +97,14 @@ namespace Lumen.Lang {
 				Parameters = Const.Self
 			});
 		}
+
+		public LumenException CreateAssertFailed(String message) {
+			return this.constructor.MakeExceptionInstance(new Text(message));
+		}
 	}
 
 	public sealed class ConvertError : ErrorModule {
-		internal ConvertError() : base() {
-			this.Name = "ConvertError";
-
+		internal ConvertError() : base("ConvertError") {
 			this.constructor = new ExceptionConstructor("ConvertError", this, "fromType", "targetType");
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
@@ -133,9 +128,7 @@ namespace Lumen.Lang {
 	}
 
 	public sealed class InvalidArgument : ErrorModule {
-		internal InvalidArgument() : base() {
-			this.Name = "InvalidArgument";
-
+		internal InvalidArgument() : base("InvalidArgument") {
 			this.constructor = new ExceptionConstructor("InvalidArgument", this, "name", "message");
 
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
@@ -157,26 +150,25 @@ namespace Lumen.Lang {
 		}
 	}
 
-	public sealed class FunctionIsNotImplemented : ErrorModule {
-		internal FunctionIsNotImplemented() : base() {
-			this.Name = "FunctionIsNotImplemented";
+	public sealed class NotImplemented : Type {
+		public ExceptionConstructor Requirement { get; private set; }
+		public ExceptionConstructor Todo { get; private set; }
 
-			this.constructor =
-			   new ExceptionConstructor("FunctionIsNotImplemented", this, "typeObject", "functionName");
-
-			this.SetMember("<init>", new LambdaFun((e, args) => {
-				return this.MakeExceptionInstance(e["typeObject"], e["functionName"]);
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("typeObject"),
-					new NamePattern("functionName")
-				}
-			});
+		internal NotImplemented() : base("NotImplemented") {
+			this.Requirement =
+			   new ExceptionConstructor("Requirement", this, "typeObject", "functionName");
+			this.Todo =
+			   new ExceptionConstructor("Todo", this, "reason");
 
 			this.SetMember("getMessage", new LambdaFun((e, args) => {
 				Instance self = e["self"] as Instance;
 
-				return new Text(Exceptions.FUNCTION_IS_NOT_IMPLEMENTED_FOR_TYPE.F(self.GetField("functionName"), self.GetField("typeObject")));
+				if (this.Requirement.IsParentOf(self)) {
+
+					return new Text(Exceptions.FUNCTION_IS_NOT_IMPLEMENTED_FOR_TYPE.F(self.GetField("functionName"), self.GetField("typeObject")));
+				}
+
+				return self.GetField("reason");
 			}) {
 				Parameters = Const.Self
 			});
@@ -184,9 +176,7 @@ namespace Lumen.Lang {
 	}
 
 	public sealed class IndexOutOfRange : ErrorModule {
-		internal IndexOutOfRange() : base() {
-			this.Name = "IndexOutOfRange";
-
+		internal IndexOutOfRange() : base("IndexOutOfRange") {
 			this.constructor = new ExceptionConstructor("IndexOutOfRange", this);
 
 			this.SetMember("<init>", new LambdaFun((scope, args) => {

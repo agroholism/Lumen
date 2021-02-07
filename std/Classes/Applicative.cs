@@ -4,14 +4,12 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Applicative : SystemClass {
-		internal Applicative() {
-			this.Name = "Applicative";
-
+		internal Applicative() : base("Applicative") {
 			this.AppendImplementation(Prelude.Functor);
 
 			this.SetMember("-<<", new LambdaFun((scope, args) => {
 				Value appl = scope["appl"];
-				return appl.Type.GetMember("lift", scope).ToFunction(scope)
+				return appl.Type.GetMember("lift").ToFunction(scope)
 					.Call(scope, scope["func"], appl);
 			}) {
 				Name = "-<<",
@@ -23,7 +21,7 @@ namespace Lumen.Lang {
 
 			this.SetMember(">>-", new LambdaFun((scope, args) => {
 				Value appl = scope["appl"];
-				return appl.Type.GetMember("lift", scope).ToFunction(scope)
+				return appl.Type.GetMember("lift").ToFunction(scope)
 					.Call(scope, scope["func"], appl);
 			}) {
 				Name = ">>-",
@@ -35,10 +33,10 @@ namespace Lumen.Lang {
 
 			this.SetMember("map", new LambdaFun((scope, args) => {
 				Value appl = scope["appl"];
-				Value function = appl.Type.GetMember("wrap", scope).ToFunction(scope)
+				Value function = appl.Type.GetMember("wrap").ToFunction(scope)
 					.Call(new Scope(), scope["func"]);
 
-				return appl.Type.GetMember("lift", scope).ToFunction(scope)
+				return appl.Type.GetMember("lift").ToFunction(scope)
 					.Call(new Scope(), appl, function);
 			}) {
 				Name = "lift",

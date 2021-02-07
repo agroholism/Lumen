@@ -11,16 +11,16 @@ namespace Lumen.Lang {
 		public override IType Type => Prelude.Function;
 
 		public List<IPattern> Parameters { get; set; }
-		public Module Parent { get; set; }
+		public Type Parent { get; set; }
 
-		public Constructor(String name, Module parent, Dictionary<String, List<IType>> fields) {
+		public Constructor(String name, Type parent, Dictionary<String, List<IType>> fields) {
 			this.Parent = parent;
 			this.Name = name;
 			this.Fields = fields;
 			this.Parameters = fields.Select(i => (IPattern)new TypesPattern(i.Key, i.Value)).ToList();
 		}
 
-		public Constructor(String name, Module parent, params String[] fields) {
+		public Constructor(String name, Type parent, params String[] fields) {
 			this.Parent = parent;
 			this.Name = name;
 			Dictionary<String, List<IType>> dict = new();
@@ -48,10 +48,6 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public void SetMember(String name, Value value, Scope scope) {
-
-		}
-
 		public override String ToString() {
 			return $"{this.Name}";
 		}
@@ -70,7 +66,7 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Value GetMember(String name, Scope scope) {
+		public Value GetMember(String name) {
 			if (this.TryGetMember(name, out Value result)) {
 				return result;
 			}
@@ -86,8 +82,12 @@ namespace Lumen.Lang {
 			return this.MakeInstance(arguments);
 		}
 
-		public Boolean HasImplementation(Module typeClass) {
+		public Boolean HasImplementation(Class typeClass) {
 			return this.Parent.HasImplementation(typeClass);
+		}
+
+		public Boolean HasMember(String name) {
+			return this.Parent.HasMember(name);
 		}
 	}
 }

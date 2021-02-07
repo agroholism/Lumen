@@ -4,10 +4,8 @@ using System.Linq;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class MutMapModule : Module {
-		internal MutMapModule() {
-			this.Name = "MutMap";
-
+	internal class MutMapModule : Type {
+		internal MutMapModule() : base("MutMap") {
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
 				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
 				List<Value> indices = scope["indices"].ToList(scope);
@@ -147,25 +145,6 @@ namespace Lumen.Lang {
 
 			this.AppendImplementation(Prelude.Default);
 			this.AppendImplementation(Prelude.Collection);
-		}
-
-		internal class PairModule : Module {
-			public static IType ctor;
-
-			public PairModule() {
-				this.Name = "Map.Pair";
-
-				ctor = Helper.CreateConstructor("Pair", this, new List<System.String> { "fst", "snd" });
-
-				this.SetMember("init", new LambdaFun((scope, args) => {
-					return Helper.CreatePair(scope["fst"], scope["snd"]);
-				}) {
-					Parameters = new List<IPattern> {
-						new NamePattern("fst"),
-						new NamePattern("snd")
-					}
-				});
-			}
 		}
 	}
 }

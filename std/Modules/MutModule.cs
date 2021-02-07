@@ -2,10 +2,8 @@
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class MutModule : Module {
-		public MutModule() {
-			this.Name = "Mut";
-
+	internal class MutModule : Type {
+		public MutModule() : base("Mut") {
 			this.AppendImplementation(Prelude.Format);
 			this.AppendImplementation(Prelude.Monad);
 			this.AppendImplementation(Prelude.Default);

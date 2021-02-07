@@ -6,9 +6,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Collection : SystemClass {
-		internal Collection() {
-			this.Name = "Collection";
-
+		internal Collection() : base("Collection") {
 			this.SetMember("toSeq", new LambdaFun((scope, args) => {
 				Prelude.FunctionIsNotImplementedForType("Collection.toSeq", scope["self"].Type);
 				return Const.UNIT;

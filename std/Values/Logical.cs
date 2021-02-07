@@ -37,7 +37,7 @@ namespace Lumen.Lang {
 
 		public String ToString(String format, IFormatProvider formatProvider) {
 			if (this.Type.HasImplementation(Prelude.Format) &&
-				this.Type.GetMember("format", null).TryConvertToFunction(out Fun function)) {
+				this.Type.GetMember("format").TryConvertToFunction(out Fun function)) {
 				function.Call(new Scope(), this, new Text(format ?? "")).ToString();
 			}
 

@@ -3,8 +3,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Clone : SystemClass {
-		internal Clone() {
-			this.Name = "Clone";
+		internal Clone() : base("Clone") {
 		}
 
 		public override void OnImplement(Module target) {

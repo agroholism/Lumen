@@ -100,10 +100,8 @@ namespace Lumen.Lang {
 		}
 	}
 
-	internal sealed class NumberModule : Module {
-		internal NumberModule() {
-			this.Name = "Number";
-
+	internal sealed class NumberModule : Type {
+		internal NumberModule() : base("Number") {
 			#region operators
 
 			// self...other

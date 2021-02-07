@@ -20,12 +20,11 @@ namespace Lumen.Lmi {
 		}
 
 		public Value Eval(Scope scope) {
-			var result = this.expression.Eval(scope);
+			Value result = this.expression.Eval(scope);
 
 			if (!result.ToBoolean()) {
-				var exception = Prelude.AssertError.MakeExceptionInstance(new Text(
-					$"assert is broken {this.expression}"
-				)).ToException();
+				LumenException exception = 
+					Prelude.AssertFailed.CreateAssertFailed($"assert is broken {this.expression}").ToException();
 
 				String currentFunctionName = null;
 

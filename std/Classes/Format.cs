@@ -4,9 +4,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Format : SystemClass {
-		internal Format() {
-			this.Name = "Format";
-
+		internal Format() : base("Format") {
 			this.SetMember("format", new LambdaFun((scope, args) => {
 				Prelude.FunctionIsNotImplementedForType("Format.format", scope["x"].Type);
 				return Const.UNIT;

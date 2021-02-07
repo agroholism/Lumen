@@ -3,10 +3,8 @@
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class IteratorModule : Module {
-		public IteratorModule() {
-			this.Name = "Iterator";
-
+	internal class IteratorModule : Type {
+		public IteratorModule() : base("Iterator") {
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				Value x = scope["stream"];
 

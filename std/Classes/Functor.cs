@@ -4,12 +4,10 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Functor : SystemClass {
-		internal Functor() {
-			this.Name = "Functor";
-
+		internal Functor() : base("Functor") {
 			this.SetMember(">>", new LambdaFun((scope, args) => {
 				Value functor = scope["functor"];
-				return functor.Type.GetMember("map", scope).ToFunction(scope)
+				return functor.Type.GetMember("map").ToFunction(scope)
 					.Call(new Scope(scope), scope["function"], functor);
 			}) {
 				Name = ">>",
@@ -21,7 +19,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("<<", new LambdaFun((scope, args) => {
 				Value functor = scope["functor"];
-				return functor.Type.GetMember("map", scope).ToFunction(scope)
+				return functor.Type.GetMember("map").ToFunction(scope)
 					.Call(new Scope(scope), scope["function"], functor);
 			}) {
 				Name = "<<",

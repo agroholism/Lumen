@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal sealed class FutureModule : Module {
-		internal FutureModule() {
-			this.Name = "Future";
-
+	internal sealed class FutureModule : Type {
+		internal FutureModule() : base("Future") {
 			this.AppendImplementation(Prelude.Monad);
 
 			this.SetMember("run", new LambdaFun((scope, args) => {

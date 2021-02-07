@@ -4,9 +4,8 @@ using System.Linq;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class MutArrayModule : Module {
-		public MutArrayModule() {
-			this.Name = "MutArray";
+	internal class MutArrayModule : Type {
+		public MutArrayModule() : base("MutArray") {
 
 			/*
 Array.add+2404

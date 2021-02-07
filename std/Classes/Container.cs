@@ -4,9 +4,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Container : SystemClass {
-		internal Container () {
-			this.Name = "Container";
-
+		internal Container () : base("Container") {
 			this.AppendImplementation(Prelude.Collection);
 			this.AppendImplementation(Prelude.Monoid);
 			this.AppendImplementation(Prelude.Monad);
@@ -24,7 +22,7 @@ namespace Lumen.Lang {
 
 		public override void OnImplement(Module target) {
 			target.SetMemberIfAbsent("empty", new LambdaFun((scope, args) => {
-				return target.GetMember("fromSeq", scope)
+				return target.GetMember("fromSeq")
 					.ToFunction(scope).Call(new Scope(scope), Seq.Empty);
 			}) {
 				Parameters = new List<IPattern> {

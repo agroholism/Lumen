@@ -56,7 +56,7 @@ namespace Lumen.Lang {
 
 			foreach (Value use in this.usings) {
 				if (use is Module m) {
-					if (m.Contains(name)) {
+					if (m.HasMember(name)) {
 						return true;
 					}
 				}

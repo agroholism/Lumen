@@ -5,9 +5,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class AnyModule : Module {
-		internal AnyModule() {
-			this.Name = "Any";
-
+		internal AnyModule() : base("Any") {
 			this.SetMember("toText", new LambdaFun((e, args) => {
 				Value self = e["self"];
 

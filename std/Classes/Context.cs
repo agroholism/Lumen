@@ -4,9 +4,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Context : SystemClass {
-		internal Context() {
-			this.Name = "Context";
-
+		internal Context() : base("Context") {
 			this.SetMember("onEnter", new LambdaFun((scope, args) => {
 				return scope["x"];
 			}) {

@@ -4,9 +4,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Monad : SystemClass {
-		internal Monad() {
-			this.Name = "Monad";
-
+		internal Monad() : base ("Monad") {
 			this.AppendImplementation(Prelude.Applicative);
 
 			this.SetMember("bind", new LambdaFun((scope, args) => {
@@ -22,7 +20,7 @@ namespace Lumen.Lang {
 
 			this.SetMember(">>=", new LambdaFun((scope, args) => {
 				Value monad = scope["monad"];
-				return monad.Type.GetMember("bind", scope).ToFunction(scope).Call(new Scope(), scope["fn"], monad);
+				return monad.Type.GetMember("bind").ToFunction(scope).Call(new Scope(), scope["fn"], monad);
 			}) {
 				Name = ">>=",
 				Parameters = new List<IPattern> {
@@ -33,7 +31,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("=<<", new LambdaFun((scope, args) => {
 				Value monad = scope["monad"];
-				return monad.Type.GetMember("bind", scope).ToFunction(scope).Call(new Scope(), scope["fn"], monad);
+				return monad.Type.GetMember("bind").ToFunction(scope).Call(new Scope(), scope["fn"], monad);
 			}) {
 				Name = "=<<",
 				Parameters = new List<IPattern> {
@@ -46,8 +44,8 @@ namespace Lumen.Lang {
 				Value mf = scope["mf"];
 				Value ma = scope["ma"];
 
-				Fun wrap = mf.Type.GetMember("wrap", scope).ToFunction(scope);
-				Fun mabind = ma.Type.GetMember(">>=", scope).ToFunction(scope);
+				Fun wrap = mf.Type.GetMember("wrap").ToFunction(scope);
+				Fun mabind = ma.Type.GetMember(">>=").ToFunction(scope);
 
 				return mf.CallMethod(">>=", scope, new LambdaFun((inScope, inArgs) => {
 					Fun f = inScope["f"].ToFunction(inScope); // mf >>= fun f -> ...

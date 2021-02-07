@@ -7,10 +7,8 @@ using System.Text;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal sealed class TextModule : Module {
-		internal TextModule() {
-			this.Name = "Text";
-
+	internal sealed class TextModule : Type {
+		internal TextModule() : base("Text") {
 			#region operators
 
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {

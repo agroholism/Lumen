@@ -5,9 +5,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class Monoid : SystemClass {
-		internal Monoid() {
-			this.Name = "Monoid";
-
+		internal Monoid() : base("Monoid") {
 			this.SetMember("+", new LambdaFun((scope, args) => {
 				Prelude.FunctionIsNotImplementedForType("Monoid.+", scope["x"].Type);
 				return Const.UNIT;
@@ -41,7 +39,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("concat", new LambdaFun((scope, args) => {
 				return scope["monoids"].ToSeq(scope).Aggregate((x, y) => 
-					x.Type.GetMember("+", scope).ToFunction(scope).Call(new Scope(), x, y));
+					x.Type.GetMember("+").ToFunction(scope).Call(new Scope(), x, y));
 			}) {
 				Name = "concat",
 				Parameters = new List<IPattern> {

@@ -40,7 +40,7 @@ namespace Lumen.Lang.Patterns {
 				return MatchResult.Delayed;
 			}
 			else {
-				foreach (Module i in this.implements.Select(i => i.Eval(scope) as Module)) {
+				foreach (Class i in this.implements.Select(i => i.Eval(scope) as Class)) {
 					if (!itype.HasImplementation(i)) {
 						return new MatchResult (
 							MatchResultKind.Fail,

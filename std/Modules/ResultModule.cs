@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class ResultModule : Module {
+	internal class ResultModule : Type {
 		public Constructor Success { get; private set; }
 		public Constructor Failed { get; private set; }
 
-		public ResultModule() {
-			this.Name = "Result";
-
+		public ResultModule() : base("Result") {
 			this.Success = Helper.CreateConstructor("Result.Success", this,
 				new List<String> { "value" }) as Constructor;
 			this.Failed = Helper.CreateConstructor("Result.Failed", this,

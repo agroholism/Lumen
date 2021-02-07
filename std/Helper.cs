@@ -24,18 +24,18 @@ namespace Lumen.Lang {
 		}
 
 		public static Value CallMethod(this Value self, String name, Scope scope) {
-			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), self);
+			return self.Type.GetMember(name).ToFunction(scope).Call(new Scope(scope), self);
 		}
 
 		public static Value CallMethod(this Value self, String name, Scope scope, Value arg) {
-			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), self, arg);
+			return self.Type.GetMember(name).ToFunction(scope).Call(new Scope(scope), self, arg);
 		}
 
 		public static Value CallMethodFlip(this Value self, String name, Scope scope, Value arg) {
-			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), arg, self);
+			return self.Type.GetMember(name).ToFunction(scope).Call(new Scope(scope), arg, self);
 		}
 
-		public static IConstructor CreateConstructor(String name, Module baseType, List<String> fields) {
+		public static IConstructor CreateConstructor(String name, Type baseType, List<String> fields) {
 			if (fields.Count == 0) {
 				return new SingletonConstructor(name, baseType);
 			}
@@ -50,7 +50,7 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public static IConstructor CreateConstructor(String name, Module baseType, Dictionary<String, List<IType>> fields) {
+		public static IConstructor CreateConstructor(String name, Type baseType, Dictionary<String, List<IType>> fields) {
 			if (fields.Count == 0) {
 				return new SingletonConstructor(name, baseType);
 			}
@@ -60,7 +60,7 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public static IConstructor CreateConstructor(String name, Module baseType, params String[] fields) {
+		public static IConstructor CreateConstructor(String name, Type baseType, params String[] fields) {
 			if (fields.Length == 0) {
 				return new SingletonConstructor(name, baseType);
 			}
@@ -97,15 +97,6 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public static Instance CreatePair(Value key, Value value) {
-			Instance result = new Instance(MutMapModule.PairModule.ctor as Constructor);
-
-			result.Items[0] = key;
-			result.Items[1] = value;
-
-			return result;
-		}
-
 		public static Value CreatePair(KeyValuePair<Value, Value> pair) {
 			return new List(pair.Key, pair.Value);
 		}
@@ -123,7 +114,7 @@ namespace Lumen.Lang {
 				return new Seq(values);
 			}
 
-			return (type.GetMember("fromSeq", scope) as Fun).Call(new Scope(scope), new Seq(values));
+			return (type.GetMember("fromSeq") as Fun).Call(new Scope(scope), new Seq(values));
 		}
 
 		public static Value MakePartial(Fun function, Value[] vals) {
