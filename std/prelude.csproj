@@ -54,6 +54,7 @@
     <Compile Include="Modules\RangeModule.cs" />
     <Compile Include="Patterns\ContextPattern.cs" />
     <Compile Include="Values\FunctionalType.cs" />
+    <Compile Include="Values\Fun\PartialFun.cs" />
     <Compile Include="Values\GenericLater.cs" />
     <Compile Include="Expression\NativeExpression.cs" />
     <Compile Include="Patterns\ExactTypePattern.cs" />

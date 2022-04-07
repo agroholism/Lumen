@@ -10,6 +10,7 @@ namespace Lumen.Lang {
 
 			this.AppendImplementation(Prelude.Monoid);
 			this.AppendImplementation(Prelude.Monad);
+			this.AppendImplementation(Prelude.Functor);
 
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				Fun m = scope["fc"].ToFunction(scope);
