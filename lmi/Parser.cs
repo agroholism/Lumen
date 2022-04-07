@@ -209,9 +209,15 @@ namespace Lumen.Lmi {
 					this.Match(currentToken.Type);
 					return this.ParseAliasDeclaration(typeName);
 				}
+			} else if (currentToken.Type == TokenType.FUN) {
+				return this.ParseFunctionalTypeDeclaration(typeName);
 			}
 
 			return this.ParseVariantDeclaration(typeName);
+		}
+
+		private Expression ParseFunctionalTypeDeclaration(string typeName) {
+			return new FunctionalTypeDeclaration(typeName, this.Primary());
 		}
 
 		private Expression ParseExceptionDeclaration(String typeName) {

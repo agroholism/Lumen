@@ -52,6 +52,7 @@
     <Compile Include="Classes\Monad.cs" />
     <Compile Include="Classes\Monoid.cs" />
     <Compile Include="Patterns\ContextPattern.cs" />
+    <Compile Include="Values\FunctionalType.cs" />
     <Compile Include="Values\GenericLater.cs" />
     <Compile Include="Expression\NativeExpression.cs" />
     <Compile Include="Patterns\ExactTypePattern.cs" />
@@ -65,16 +66,16 @@
     <Compile Include="Values\Class.cs" />
     <Compile Include="Values\Constructors\ExceptionConstructor.cs" />
     <Compile Include="Values\Constructors\IConstructor.cs" />
-    <Compile Include="Values\Generators\LumenGenerator.cs" />
-    <Compile Include="Values\Generators\LumenIterator.cs" />
+    <Compile Include="Values\Generators\CustomFlow.cs" />
+    <Compile Include="Values\Generators\FlowAutomat.cs" />
     <Compile Include="Modules\MutModule.cs" />
-    <Compile Include="Modules\IteratorModule.cs" />
+    <Compile Include="Modules\FlowAutomatModule.cs" />
     <Compile Include="Values\Future.cs" />
     <Compile Include="Values\Unit.cs" />
     <Compile Include="Values\Constructors\Constructor.cs" />
     <Compile Include="ClosureManager.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="Modules\SeqModule.cs" />
+    <Compile Include="Modules\FlowModule.cs" />
     <Compile Include="Modules\OptionModule.cs" />
     <Compile Include="Classes\Format.cs" />
     <Compile Include="Classes\Ord.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Modules\LogicalModule.cs" />
     <Compile Include="Classes\Collection.cs" />
     <Compile Include="Modules\TextModule.cs" />
-    <Compile Include="Values\Collections\Seq.cs" />
+    <Compile Include="Values\Collections\Flow.cs" />
     <Compile Include="Values\Instance.cs" />
     <Compile Include="Values\Fun\LambdaFun.cs" />
     <Compile Include="Values\Fun\UserFun.cs" />

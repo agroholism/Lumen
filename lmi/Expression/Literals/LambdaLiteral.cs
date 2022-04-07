@@ -26,7 +26,7 @@ namespace Lumen.Lmi {
 
 			if (manager.HasYield) {
 				return new LambdaFun((generatorScope, _) =>
-					new Seq(new LumenGenerator(closuredBody, generatorScope)), closuredParameters
+					new Flow(new CustomFlow(closuredBody, generatorScope)), closuredParameters
 				);
 			}
 

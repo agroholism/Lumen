@@ -3,16 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
-	public class LumenIterator : BaseValueImpl, IEnumerator<Value> {
+	public class FlowAutomat : BaseValueImpl, IEnumerator<Value> {
 		private IEnumerator<Value> internalValue;
 		private Scope scope;
 
-		public override IType Type => Prelude.Iterator;
+		public override IType Type => FlowModule.Automat;
 
 		public Value Current => this.internalValue.Current;
 		Object IEnumerator.Current => this.internalValue.Current;
 
-		public LumenIterator(IEnumerator<Value> internalValue, Scope scope) {
+		public Value AutomatResult => 
+			this.scope.ExistsInThisScope(Constants.YIELD_RESULT_SPECIAL_NAME) ? this.scope[Constants.YIELD_RESULT_SPECIAL_NAME] : null;
+
+		public FlowAutomat(IEnumerator<Value> internalValue, Scope scope) {
 			this.internalValue = internalValue;
 			this.scope = scope;
 		}
@@ -53,7 +56,7 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
-			return $"[Iterator #{this.GetHashCode()}]";
+			return $"[Flow.Automat #{this.GetHashCode()}]";
 		}
 	}
 
@@ -63,6 +66,6 @@ namespace Lumen.Lang {
 		}
 
 		public Value Value { get; set; }
-		public override IType Type => throw new System.NotImplementedException();
+		public override IType Type => throw new NotImplementedException();
 	}
 }

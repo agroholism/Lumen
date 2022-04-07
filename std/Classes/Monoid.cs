@@ -40,7 +40,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("concat", new LambdaFun((scope, args) => {
-				return scope["monoids"].ToSeq(scope).Aggregate((x, y) => 
+				return scope["monoids"].ToFlow(scope).Aggregate((x, y) => 
 					x.Type.GetMember("+", scope).ToFunction(scope).Call(new Scope(), x, y));
 			}) {
 				Name = "concat",

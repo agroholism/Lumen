@@ -3,12 +3,12 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
-	public sealed class Seq : Value {
+	public sealed class Flow : Value {
 		internal IEnumerable<Value> InternalValue { get; private set; }
 
-		public static Seq Empty => new Seq(Enumerable.Empty<Value>());
+		public static Flow Empty => new Flow(Enumerable.Empty<Value>());
 
-		public Seq(IEnumerable<Value> innerValue) {
+		public Flow(IEnumerable<Value> innerValue) {
 			this.InternalValue = innerValue;
 		}
 
@@ -20,10 +20,20 @@ namespace Lumen.Lang {
 			throw new LumenException($"can not compare value of type 'Kernel.Enumerator' with value of type '{obj.GetType()}'");
 		}
 
-		public IType Type => Prelude.Seq;
+		public Boolean IsCustomFlow { get => this.InternalValue is CustomFlow; }
+
+		public FlowAutomat GetAutomat() {
+			if (this.IsCustomFlow) {
+				return (this.InternalValue as CustomFlow).GetEnumerator() as FlowAutomat;
+			}
+
+			return null;
+		}
+
+		public IType Type => Prelude.Flow;
 
 		public override String ToString() {
-			return $"[Stream #{this.GetHashCode()}]";
+			return $"[Flow #{this.GetHashCode()}]";
 		}
 
 		public String ToString(String format, IFormatProvider formatProvider) {

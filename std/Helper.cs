@@ -119,11 +119,11 @@ namespace Lumen.Lang {
 				return new MutArray(values.ToList());
 			}
 
-			if (type == Prelude.Seq) {
-				return new Seq(values);
+			if (type == Prelude.Flow) {
+				return new Flow(values);
 			}
 
-			return (type.GetMember("fromSeq", scope) as Fun).Call(new Scope(scope), new Seq(values));
+			return (type.GetMember("fromSeq", scope) as Fun).Call(new Scope(scope), new Flow(values));
 		}
 
 		public static Value MakePartial(Fun function, Value[] vals) {

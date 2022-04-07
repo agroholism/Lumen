@@ -20,8 +20,23 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			foreach(Value i in this.expression.Eval(scope).ToSeq(scope)) {
-				yield return i;
+			IEnumerable<Value> flow = this.expression.Eval(scope).ToFlow(scope);
+			
+			if (flow is CustomFlow) {
+				FlowAutomat automat = flow.GetEnumerator() as FlowAutomat;
+
+				while (automat.MoveNext()) {
+					yield return automat.Current;
+				}
+
+				Value result = automat.AutomatResult;
+				if (result != null) {
+					yield return new GeneratorExpressionTerminalResult(result);
+				}
+			} else {
+				foreach (Value i in this.expression.Eval(scope).ToFlow(scope)) {
+					yield return i;
+				}
 			}
 		}
 	}

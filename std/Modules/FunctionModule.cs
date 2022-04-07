@@ -139,7 +139,7 @@ namespace Lumen.Lang {
 			}
 
 			this.SetMember("concatWith", new LambdaFun((scope, args) => {
-				IEnumerable<Value> functions = scope["functions"].ToSeq(scope);
+				IEnumerable<Value> functions = scope["functions"].ToFlow(scope);
 				Fun with = scope["with"].ToFunction(scope);
 
 				return functions.Select(i => i.ToFunction(scope))

@@ -33,9 +33,8 @@ namespace Lumen.Lang {
 
 		public static Module Unit { get; } = new UnitModule();
 
-		public static Module Iterator { get; } = new IteratorModule();
 		public static Module Mut { get; } = new MutModule();
-		public static Module Seq { get; } = new SeqModule();
+		public static Module Flow { get; } = new FlowModule();
 		public static Module Range { get; } = new RangeModule();
 		public static Module MutArray { get; } = new MutArrayModule();
 		public static Module Function { get; } = new FunctionModule();
@@ -98,10 +97,9 @@ namespace Lumen.Lang {
 			this.SetMember("Failed", Failed);
 
 			this.SetMember("Range", Range);
-			this.SetMember("Iterator", Iterator);
 			this.SetMember("Mut", Mut);
 			this.SetMember("List", List);
-			this.SetMember("Seq", Seq);
+			this.SetMember("Flow", Flow);
 			this.SetMember("MutArray", MutArray);
 			this.SetMember("Number", Number);
 			this.SetMember("Logical", Logical);
@@ -186,14 +184,14 @@ namespace Lumen.Lang {
 
 				if (File.Exists(fileName)) {
 					try {
-						return new Seq(File.ReadLines(fileName).Select(i => new Text(i)));
+						return new Flow(File.ReadLines(fileName).Select(i => new Text(i)));
 					}
 					catch {
-						return Lang.Seq.Empty;
+						return Lang.Flow.Empty;
 					}
 				}
 
-				return Lang.Seq.Empty;
+				return Lang.Flow.Empty;
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("fileName")
@@ -302,7 +300,7 @@ namespace Lumen.Lang {
 					return new List();
 				}
 
-				return new List(init.ToSeq(scope));
+				return new List(init.ToFlow(scope));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("init")
@@ -313,10 +311,10 @@ namespace Lumen.Lang {
 				Value init = scope["init"];
 
 				if (init == Const.UNIT) {
-					return new Seq(Enumerable.Empty<Value>());
+					return new Flow(Enumerable.Empty<Value>());
 				}
 
-				return new Seq(init.ToSeq(scope));
+				return new Flow(init.ToFlow(scope));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("init")
@@ -330,7 +328,7 @@ namespace Lumen.Lang {
 					return new MutArray();
 				}
 
-				return new MutArray(init.ToSeq(scope));
+				return new MutArray(init.ToFlow(scope));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("init")
@@ -345,8 +343,8 @@ namespace Lumen.Lang {
 					return result;
 				}
 
-				foreach (Value i in value.ToSeq(scope)) {
-					List<Value> stream = i.ToSeq(scope).Take(2).ToList();
+				foreach (Value i in value.ToFlow(scope)) {
+					List<Value> stream = i.ToFlow(scope).Take(2).ToList();
 					result.InternalValue[stream[0]] = stream[1];
 				}
 

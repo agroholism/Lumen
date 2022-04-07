@@ -25,7 +25,7 @@ namespace Lumen.Lang {
 		public override void OnImplement(Module target) {
 			target.SetMemberIfAbsent("empty", new LambdaFun((scope, args) => {
 				return target.GetMember("fromSeq", scope)
-					.ToFunction(scope).Call(new Scope(scope), Seq.Empty);
+					.ToFunction(scope).Call(new Scope(scope), Flow.Empty);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("_")

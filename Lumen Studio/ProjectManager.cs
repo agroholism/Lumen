@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Lumen.Studio {
@@ -29,7 +26,11 @@ namespace Lumen.Studio {
 		public static FileSystemWatcher Watcher { get; set; }
 
 		static ProjectManager() {
-			ProjectViewier.NodeMouseDoubleClick += (sender, e) => OpenFile((e.Node as FileNode).Path, true);
+			ProjectViewier.NodeMouseDoubleClick += (sender, e) => {
+				if (e.Node is FileNode fileNode) {
+					OpenFile(fileNode.Path, true);
+				}
+			};
 			ProjectViewier.NodeMouseClick += NodeMouseClick;
 			ProjectViewier.AfterExpand += (sender, e) => {
 				if (e.Node.ImageIndex == 14) {
@@ -167,7 +168,7 @@ namespace Lumen.Studio {
 			MainForm.MainPictureBox.ImageLocation = path;
 		}
 
-		class FileNode : TreeNode {
+		public class FileNode : TreeNode {
 			public static ContextMenuStrip menu = new ContextMenuStrip();
 
 			public String Path { get; set; }
@@ -189,7 +190,7 @@ namespace Lumen.Studio {
 			}
 		}
 
-		class FolderNode : TreeNode {
+		public class FolderNode : TreeNode {
 			public static ContextMenuStrip menu = new ContextMenuStrip {
 
 			};

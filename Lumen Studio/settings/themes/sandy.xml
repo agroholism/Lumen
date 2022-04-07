@@ -12,30 +12,30 @@
   
 	<IconPack path="icons/standart"/>
 
-	<Background color="#back"/>
-	<Foreground color="#fore"/>
-	<Grid color="#lines"/>
+	<Background color="2; 44; 55"/>
+	<Foreground color="108, 149, 79"/>
+	<Grid color="7; 54; 66"/>
 
   <TopMenu>
-    <Background color="#back" />
-    <SelectedBackground color="#lines" />
-    <Foreground color="#fore" />
-    <Borders color="#lines"/>
-    <ArrowColor color="#lines"/>
-    <SelectedArrowColor color="#back"/>
+    <Background color="#2; 44; 55" />
+    <SelectedBackground color="7; 54; 66" />
+    <Foreground color="108, 149, 79" />
+    <Borders color="7; 54; 66"/>
+    <ArrowColor color="7; 54; 66"/>
+    <SelectedArrowColor color="2; 44; 55"/>
   </TopMenu>
 
   <BottomMenu>
-    <Background color="#back" />
-    <SelectedBackground color="#lines" />
-    <Foreground color="#fore" />
-    <Borders color="#lines"/>
-    <ArrowColor color="#lines"/>
+    <Background color="2; 44; 55" />
+    <SelectedBackground color="7; 54; 66" />
+    <Foreground color="108, 149, 79" />
+    <Borders color="7; 54; 66"/>
+    <ArrowColor color="7; 54; 66"/>
   </BottomMenu>
 
   <TextBox>
-    <Background color="#back"/>
-    <Foreground color="#fore"/>
+    <Background color="2; 44; 55"/>
+    <Foreground color="108, 149, 79"/>
   </TextBox>
 
   <Breakpoints>
@@ -54,26 +54,26 @@
   </Breakpoints>
 
   <AutocompleteMenu>
-    <Background color="#back" />
-    <SelectedBackground color="#lines" />
-    <Foreground color="#fore" />
-    <Borders color="#lines"/>
-    <ArrowColor color="#lines"/>
+    <Background color="2; 44; 55" />
+    <SelectedBackground color="7; 54; 66" />
+    <Foreground color="108, 149, 79" />
+    <Borders color="7; 54; 66"/>
+    <ArrowColor color="7; 54; 66"/>
     <ToolTip>
-      <Background color="#lines" />
-      <Foreground color="#fore" />
-      <Borders color="#lines"/>
+      <Background color="7; 54; 66" />
+      <Foreground color="108, 149, 79" />
+      <Borders color="7; 54; 66"/>
     </ToolTip>
   </AutocompleteMenu>
 
   <Syntax>
-		<Casual foreColor="#fore"/>
+		<Casual foreColor="108, 149, 79"/>
 		<Keyword1 foreColor="140, 85, 66"/>
 		<Keyword2 foreColor="140, 85, 66"/>
 		<Text1 foreColor="#428684" />
 		<Text2 foreColor="#428684" />
 		<Number foreColor="200; 200; 200" />
-		<Comment1 foreColor= "0, 255, 0"/>
+		<Comment1 foreColor= "50, 50, 50"/>
 		<Comment2 foreColor= "0, 255, 0"/>
 		<Function foreColor= "#266C8F"/>
 		<Class foreColor= "148, 93, 132"/>

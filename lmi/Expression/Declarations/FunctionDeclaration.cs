@@ -42,7 +42,7 @@ namespace Lumen.Lmi {
 				}
 				
 				result = new LambdaFun((scope1, args) => 
-					new Seq(new LumenGenerator(closuredBody, scope1))) {
+					new Flow(new CustomFlow(closuredBody, scope1))) {
 					Parameters = closuredPatterns,
 					Name = this.name
 				};

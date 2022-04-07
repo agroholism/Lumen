@@ -162,7 +162,7 @@ namespace Lumen.Lang {
 				}
 
 				Task<Value>[] futures =
-					futureOrFutures.ToSeq(scope)
+					futureOrFutures.ToFlow(scope)
 					.Select(i => i.ToFuture(scope).Task)
 					.ToArray();
 
@@ -179,7 +179,7 @@ namespace Lumen.Lang {
 
 
 			this.SetMember("whenAll", new LambdaFun((scope, args) => {
-				IEnumerable<Value> futures = scope["futures"].ToSeq(scope);
+				IEnumerable<Value> futures = scope["futures"].ToFlow(scope);
 
 				IEnumerable<Task<Value>> tasks =
 					futures.Select(i => i.ToFuture(scope).Task);
@@ -195,7 +195,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("whenAny", new LambdaFun((scope, args) => {
-				IEnumerable<Value> futures = scope["futures"].ToSeq(scope);
+				IEnumerable<Value> futures = scope["futures"].ToFlow(scope);
 
 				IEnumerable<Task<Value>> tasks =
 					futures.Select(i => (i as Future).Task); // unsafe!

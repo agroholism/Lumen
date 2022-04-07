@@ -22,7 +22,7 @@ namespace Lumen.Lang {
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
 				Value self = scope["self"];
 				IType typeParameter = self.Type;
-				IEnumerable<Value> values = self.ToSeq(scope);
+				IEnumerable<Value> values = self.ToFlow(scope);
 
 				List<Value> indices = scope["indices"].ToList(scope);
 
@@ -164,7 +164,7 @@ namespace Lumen.Lang {
 					Int32 actualIndex = 0;
 					Int32? counted = null;
 
-					return Helper.FromSeq(typeParameter, index.ToSeq(scope).Select(i => {
+					return Helper.FromSeq(typeParameter, index.ToFlow(scope).Select(i => {
 						if (i is Number) {
 							if (counted == null) {
 								(actualIndex, counted) = NormalizeIndex(i.ToInt(scope), values);
@@ -198,7 +198,7 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember(Constants.USTAR, new LambdaFun((scope, args) => (Number)scope["values"].ToSeq(scope).Count()) {
+			this.SetMember(Constants.USTAR, new LambdaFun((scope, args) => (Number)scope["values"].ToFlow(scope).Count()) {
 				Parameters = new List<IPattern> { new NamePattern("values") }
 			});
 
@@ -215,12 +215,12 @@ namespace Lumen.Lang {
 						return new InfinityRange(num.value);
 					}
 
-					IEnumerable<Value> value = self.ToSeq(scope);
+					IEnumerable<Value> value = self.ToFlow(scope);
 
-					return new Seq(Step(value, foldf.ToInt(scope)));
+					return new Flow(Step(value, foldf.ToInt(scope)));
 				}
 
-				IEnumerable<Value> values = self.ToSeq(scope);
+				IEnumerable<Value> values = self.ToFlow(scope);
 
 				Fun func = scope["foldf"].ToFunction(scope);
 
@@ -234,7 +234,7 @@ namespace Lumen.Lang {
 
 			this.SetMember(Constants.STAR, new LambdaFun((scope, args) => {
 				IType typeParameter = scope["values"].Type;
-				IEnumerable<Value> value = scope["values"].ToSeq(scope);
+				IEnumerable<Value> value = scope["values"].ToFlow(scope);
 				Value other = scope["x"];
 
 				if (other == Const.UNIT) {
@@ -244,8 +244,8 @@ namespace Lumen.Lang {
 				return other switch
 				{
 					Text text => new Text(String.Join((String)text, value)),
-					Fun fun => new Seq(value.Select(it => fun.Call(new Scope(scope), it))),
-					_ => new Seq(this.Cycle(value, (Int32)other.ToDouble(scope))),
+					Fun fun => new Flow(value.Select(it => fun.Call(new Scope(scope), it))),
+					_ => new Flow(this.Cycle(value, (Int32)other.ToDouble(scope))),
 				};
 			}) {
 				Parameters = new List<IPattern> {
@@ -255,10 +255,10 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.MINUS, new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["values"].ToSeq(scope);
-				IEnumerable<Value> valuesx = scope["values'"].ToSeq(scope);
+				IEnumerable<Value> values = scope["values"].ToFlow(scope);
+				IEnumerable<Value> valuesx = scope["values'"].ToFlow(scope);
 
-				return new Seq(values.Except(valuesx));
+				return new Flow(values.Except(valuesx));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("values"),
@@ -267,10 +267,10 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["values"].ToSeq(scope);
-				IEnumerable<Value> valuesx = scope["values'"].ToSeq(scope);
+				IEnumerable<Value> values = scope["values"].ToFlow(scope);
+				IEnumerable<Value> valuesx = scope["values'"].ToFlow(scope);
 
-				return new Seq(values.Concat(valuesx));
+				return new Flow(values.Concat(valuesx));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("values"),
@@ -313,7 +313,7 @@ namespace Lumen.Lang {
 			}
 
 			this.SetMember("average", new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
 				try {
 					Value sum = Sum(values, scope);
@@ -337,7 +337,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("min", new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
 				try {
 					return Min(values, scope);
@@ -352,7 +352,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("max", new LambdaFun((scope, args) => {
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
 				try {
 					return Max(values, scope);
@@ -369,7 +369,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("fold", new LambdaFun((scope, args) => {
 				Fun folder = scope["folder"].ToFunction(scope);
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
 				try {
 					return values.Aggregate((x, y) => folder.Call(new Scope(scope), x, y));
@@ -386,7 +386,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("foldInit", new LambdaFun((scope, args) => {
 				Fun folder = scope["folder"].ToFunction(scope);
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
 				Value init = scope["init"];
 
@@ -401,7 +401,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("foldr", new LambdaFun((scope, args) => {
 				Fun folder = scope["folder"].ToFunction(scope);
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
 				try {
 					return values.Reverse().Aggregate((x, y) => folder.Call(new Scope(scope), x, y));
@@ -417,7 +417,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("foldrInit", new LambdaFun((scope, args) => {
 				Fun folder = scope["folder"].ToFunction(scope);
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
 				Value init = scope["init"];
 
@@ -432,7 +432,7 @@ namespace Lumen.Lang {
 
 
 			this.SetMember("first", new LambdaFun((scope, args) => {
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				Value result = self.FirstOrDefault();
 
@@ -444,7 +444,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("last", new LambdaFun((scope, args) => {
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				Value result = self.LastOrDefault();
 
@@ -457,7 +457,7 @@ namespace Lumen.Lang {
 
 
 			this.SetMember("count", new LambdaFun((scope, args) => {
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				return new Number(self.Count());
 			}) {
@@ -468,7 +468,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("countOf", new LambdaFun((scope, args) => {
 				Value elem = scope["elem"];
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				return new Number(self.Count(i => elem.Equals(i)));
 			}) {
@@ -480,7 +480,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("countWhen", new LambdaFun((scope, args) => {
 				Value pred = scope["pred"];
-				IEnumerable<Value> stream = scope["self"].ToSeq(scope);
+				IEnumerable<Value> stream = scope["self"].ToFlow(scope);
 
 				Fun fun = pred.ToFunction(scope);
 				return new Number(stream.Count(i => fun.Call(new Scope(scope), i).ToBoolean()));
@@ -493,7 +493,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("isAll", new LambdaFun((scope, args) => {
 				Fun predicate = scope["predicate"].ToFunction(scope);
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				return new Logical(self.All(x => predicate.Call(new Scope(scope), x).ToBoolean()));
 			}) {
@@ -504,7 +504,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("isAny", new LambdaFun((scope, args) => {
 				Fun predicate = scope["predicate"].ToFunction(scope);
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				return new Logical(self.Any(x => predicate.Call(new Scope(scope), x).ToBoolean()));
 			}) {
@@ -516,9 +516,9 @@ namespace Lumen.Lang {
 
 			this.SetMember("filter", new LambdaFun((scope, args) => {
 				Fun predicate = scope["predicate"].ToFunction(scope);
-				IEnumerable<Value> values = scope["self"].ToSeq(scope);
+				IEnumerable<Value> values = scope["self"].ToFlow(scope);
 
-				return new Seq(values.Where(i => predicate.Call(new Scope(scope), i).ToBoolean()));
+				return new Flow(values.Where(i => predicate.Call(new Scope(scope), i).ToBoolean()));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("predicate"),
@@ -530,7 +530,7 @@ namespace Lumen.Lang {
 				Value fc = scope["fc"];
 				IType typeParameter = fc.Type;
 				Fun mapper = scope["fn"].ToFunction(scope);
-				IEnumerable<Value> values = fc.ToSeq(scope);
+				IEnumerable<Value> values = fc.ToFlow(scope);
 
 				return Helper.FromSeq(typeParameter,
 					values.Select(i => mapper.Call(new Scope(scope), i)), scope);
@@ -544,7 +544,7 @@ namespace Lumen.Lang {
 			this.SetMember("mapi", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
 				Fun mapper = scope["mapper"].ToFunction(scope);
-				IEnumerable<Value> values = self.ToSeq(scope);
+				IEnumerable<Value> values = self.ToFlow(scope);
 				IType typeParameter = self.Type;
 
 				return Helper.FromSeq(typeParameter, values.Select((i, index) => mapper.Call(new Scope(scope), new Number(index), i)), scope);
@@ -564,9 +564,9 @@ namespace Lumen.Lang {
 			}
 			
 			this.SetMember("lift", new LambdaFun((scope, args) => {
-				IEnumerable<Value> obj = scope["other"].ToSeq(scope);
+				IEnumerable<Value> obj = scope["other"].ToFlow(scope);
 				Value self = scope["self"];
-				IEnumerable<Value> selfStream = self.ToSeq(scope);
+				IEnumerable<Value> selfStream = self.ToFlow(scope);
 
 				return Helper.FromSeq(
 					scope["other"].Type,
@@ -582,12 +582,12 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("bind", new LambdaFun((scope, args) => {
-				IEnumerable<Value> monad = scope["monad"].ToSeq(scope);
+				IEnumerable<Value> monad = scope["monad"].ToFlow(scope);
 				Fun fn = scope["fn"].ToFunction(scope);
 
 				return Helper.FromSeq(
 					scope["monad"].Type,
-					Flatten2(monad.Select(i => fn.Call(new Scope(), i).ToSeq(scope)), scope),
+					Flatten2(monad.Select(i => fn.Call(new Scope(), i).ToFlow(scope)), scope),
 					scope);
 			}) {
 				Parameters = new List<IPattern> {
@@ -598,7 +598,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("iter", new LambdaFun((scope, args) => {
 				Fun action = scope["action"].ToFunction(scope);
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				foreach (Value i in self) {
 					action.Call(new Scope(scope), i);
@@ -614,7 +614,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("iteri", new LambdaFun((scope, args) => {
 				Fun action = scope["action"].ToFunction(scope);
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 
 				Int32 index = 0;
 				foreach (Value i in self) {
@@ -632,7 +632,7 @@ namespace Lumen.Lang {
 
 
 			this.SetMember("find", new LambdaFun((scope, args) => {
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 				Fun predicate = scope["predicate"].ToFunction(scope);
 
 				foreach (Value i in self) {
@@ -649,7 +649,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("findAll", new LambdaFun((scope, args) => {
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 				Fun predicate = scope["predicate"].ToFunction(scope);
 
 				List<Value> result = new List<Value>();
@@ -669,7 +669,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("sort", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				return Helper.FromSeq(self.Type, value.OrderBy(x => x), scope);
 			}) {
@@ -678,7 +678,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("sortBy", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Fun mutator = scope["other"].ToFunction(scope);
 				return Helper.FromSeq(self.Type, value.OrderBy(i => mutator.Call(new Scope(scope), i)), scope);
@@ -690,7 +690,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("sortWith", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Fun comparator = scope["other"].ToFunction(scope);
 				return Helper.FromSeq(self.Type, value.OrderBy(i => i, new CompareUtil(comparator, scope)), scope);
@@ -702,7 +702,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("sortDescending", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				return Helper.FromSeq(self.Type, value.OrderByDescending(x => x), scope);
 			}) {
@@ -711,7 +711,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("sortDescendingBy", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Fun mutator = scope["other"].ToFunction(scope);
 				return Helper.FromSeq(self.Type, value.OrderByDescending(i => mutator.Call(new Scope(scope), i)), scope);
@@ -723,7 +723,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("sortDescendingWith", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Fun comparator = scope["other"].ToFunction(scope);
 				return Helper.FromSeq(self.Type, value.OrderByDescending(i => i, new CompareUtil(comparator, scope)), scope);
@@ -735,7 +735,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("take", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Int32 count = scope["count"].ToInt(scope);
 
@@ -748,7 +748,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("takeWhile", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Fun predicate = scope["predicate"].ToFunction(scope);
 
@@ -761,7 +761,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("skip", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Int32 count = scope["count"].ToInt(scope);
 
@@ -774,7 +774,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("skipWhile", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
-				IEnumerable<Value> value = self.ToSeq(scope);
+				IEnumerable<Value> value = self.ToFlow(scope);
 
 				Fun predicate = scope["predicate"].ToFunction(scope);
 
@@ -789,7 +789,7 @@ namespace Lumen.Lang {
 			this.SetMember("unique", new LambdaFun((scope, args) => {
 				Value self = scope["self"];
 
-				return Helper.FromSeq(self.Type, self.ToSeq(scope).Distinct(), scope);
+				return Helper.FromSeq(self.Type, self.ToFlow(scope).Distinct(), scope);
 			}) {
 				Parameters = new List<IPattern> {
 					new ExactTypePattern("self", this),
@@ -800,7 +800,7 @@ namespace Lumen.Lang {
 				Value self = scope["self"];
 
 				return Helper.FromSeq(self.Type,
-					self.ToSeq(scope).Except(scope["other"].ToSeq(scope)), scope);
+					self.ToFlow(scope).Except(scope["other"].ToFlow(scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
 					new ExactTypePattern("self", this) , new NamePattern("other")
@@ -811,7 +811,7 @@ namespace Lumen.Lang {
 				Value self = scope["self"];
 
 				return Helper.FromSeq(self.Type,
-					self.ToSeq(scope).Intersect(scope["other"].ToSeq(scope)), scope);
+					self.ToFlow(scope).Intersect(scope["other"].ToFlow(scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
 					new ExactTypePattern("self", this),
@@ -823,7 +823,7 @@ namespace Lumen.Lang {
 				Value self = scope["self"];
 
 				return Helper.FromSeq(self.Type,
-					self.ToSeq(scope).Union(scope["other"].ToSeq(scope)), scope);
+					self.ToFlow(scope).Union(scope["other"].ToFlow(scope)), scope);
 			}) {
 				Parameters = new List<IPattern> {
 					new ExactTypePattern("self", this),
@@ -834,16 +834,16 @@ namespace Lumen.Lang {
 
 
 			this.SetMember("zip", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToSeq(e.Get("this"), e);
+				IEnumerable<Value> v = Converter.ToFlow(e.Get("this"), e);
 				if (args.Length == 1) {
-					return new MutArray(v.Zip<Value, Value, Value>(Converter.ToSeq(args[0], e), (x, y) => new MutArray(new List<Value> { x, y })).ToList());
+					return new MutArray(v.Zip<Value, Value, Value>(Converter.ToFlow(args[0], e), (x, y) => new MutArray(new List<Value> { x, y })).ToList());
 				}
 
-				return new Seq(v.Zip(Converter.ToSeq(args[0], e), (x, y) => ((Fun)args[1]).Call(new Scope(e), x, y)));
+				return new Flow(v.Zip(Converter.ToFlow(args[0], e), (x, y) => ((Fun)args[1]).Call(new Scope(e), x, y)));
 			}));
 
 			this.SetMember("join", new LambdaFun((e, args) => {
-				IEnumerable<Value> self = e["self"].ToSeq(e);
+				IEnumerable<Value> self = e["self"].ToFlow(e);
 				String delim = e["delim"].ToString();
 
 				return new Text(String.Join(delim, self));
@@ -855,9 +855,9 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("step", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToSeq(e.Get("self"), e);
+				IEnumerable<Value> v = Converter.ToFlow(e.Get("self"), e);
 
-				return new Seq(Step(v, e["count"].ToInt(e)));
+				return new Flow(Step(v, e["count"].ToInt(e)));
 			}) {
 				Parameters = new List<IPattern> {
 					new ExactTypePattern("self", this),
@@ -866,7 +866,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("contains", new LambdaFun((scope, args) => {
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 				return new Logical(self.Contains(scope["elem"]));
 			}) {
 				Parameters = new List<IPattern> {
@@ -876,7 +876,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("exists?", new LambdaFun((e, args) => {
-				IEnumerable<Value> v = Converter.ToSeq(e.Get("this"), e);
+				IEnumerable<Value> v = Converter.ToFlow(e.Get("this"), e);
 				return new Logical(v.FirstOrDefault(i => Converter.ToBoolean(((Fun)args[0]).Call(new Scope(e), i))) != null);
 			}) {
 				Parameters = new List<IPattern> {
@@ -886,7 +886,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toList", new LambdaFun((scope, args) => {
-				IEnumerable<Value> self = scope["self"].ToSeq(scope);
+				IEnumerable<Value> self = scope["self"].ToFlow(scope);
 				return new List(LinkedList.Create(self));
 			}) {
 				Parameters = new List<IPattern> {
@@ -896,7 +896,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("fromList", new LambdaFun((scope, args) => {
 				IEnumerable<Value> result = scope["self"].ToLinkedList(scope);
-				return new Seq(result);
+				return new Flow(result);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")

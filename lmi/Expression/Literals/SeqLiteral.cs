@@ -19,7 +19,7 @@ namespace Lumen.Lmi {
 			IEnumerable<Value> ToStream(List<Expression> exps) {
 				foreach (Expression exp in exps) {
 					if (exp is From from) {
-						foreach (Value i in from.Eval(e).ToSeq(e)) {
+						foreach (Value i in from.Eval(e).ToFlow(e)) {
 							yield return i;
 						}
 					}
@@ -29,7 +29,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			return new Seq(ToStream(this.elements));
+			return new Flow(ToStream(this.elements));
 		}
 
 		public override System.String ToString() {
@@ -50,7 +50,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			yield return new GeneratorExpressionTerminalResult(new Seq(result));
+			yield return new GeneratorExpressionTerminalResult(new Flow(result));
 		}
 	}
 }

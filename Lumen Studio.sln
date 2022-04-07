@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28621.142
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lumen Studio", "Lumen Studio\Lumen Studio.csproj", "{BAE2519A-C953-457F-9CD2-D17844FD4440}"
 EndProject
@@ -15,17 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		diary.txt = diary.txt
 		platform.txt = platform.txt
-		..\prelude.lm = ..\prelude.lm
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ide", "ide", "{B27631EC-F586-4BBD-A856-5706E01616B8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xmltools", "xmltools\xmltools.csproj", "{D21B8DBE-5E42-42AC-B33C-AA9379D3FAAD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prelude", "prelude", "{F4A9C41D-FA40-4B3F-8CE4-DAEE67AEDBA1}"
-	ProjectSection(SolutionItems) = preProject
-		..\prelude.lm = ..\prelude.lm
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proposals", "proposals", "{2F8349B1-07DE-4653-A12D-06BCD674700B}"
 	ProjectSection(SolutionItems) = preProject
@@ -83,7 +77,6 @@ Global
 		{BAE2519A-C953-457F-9CD2-D17844FD4440} = {B27631EC-F586-4BBD-A856-5706E01616B8}
 		{FF4D45BF-08A3-45EE-8163-41C35D748A8C} = {B27631EC-F586-4BBD-A856-5706E01616B8}
 		{D21B8DBE-5E42-42AC-B33C-AA9379D3FAAD} = {B27631EC-F586-4BBD-A856-5706E01616B8}
-		{F4A9C41D-FA40-4B3F-8CE4-DAEE67AEDBA1} = {3794AE63-E79D-4CA4-A969-B10A3A382F29}
 		{2F8349B1-07DE-4653-A12D-06BCD674700B} = {3794AE63-E79D-4CA4-A969-B10A3A382F29}
 		{6DD14A85-CCFC-4774-BD26-0F5772512319} = {B27631EC-F586-4BBD-A856-5706E01616B8}
 	EndGlobalSection

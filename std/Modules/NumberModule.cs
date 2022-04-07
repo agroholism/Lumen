@@ -12,7 +12,7 @@ namespace Lumen.Lang {
 		public Boolean IsInclusive => false;
 		public Boolean IsDownToUp => this.Step >= 0;
 
-		public override IType Type => Prelude.Seq;
+		public override IType Type => Prelude.Flow;
 
 		public InfinityRange() {
 			this.Step = 1;
@@ -42,7 +42,7 @@ namespace Lumen.Lang {
 		public Boolean IsInclusive { get; private set; }
 		public Boolean IsDownToUp => (this.Start ?? 0) <= (this.end ?? Double.PositiveInfinity);
 
-		public override IType Type => Prelude.Seq;
+		public override IType Type => Prelude.Flow;
 
 		public NumberRange Clone(Double step) {
 			return new NumberRange(this.Start ?? Double.PositiveInfinity,

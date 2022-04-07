@@ -25,13 +25,13 @@ namespace Lumen.Lmi {
 		}
 
 		public Value Eval(Scope e) {
-			return new Seq(this.Generator(new Scope(e)));
+			return new Flow(this.Generator(new Scope(e)));
 		}
 
 		internal IEnumerable<Value> Generator(Scope scope) {
 			Value current;
 
-			foreach (Value i in this.container.Eval(scope).ToSeq(scope)) {
+			foreach (Value i in this.container.Eval(scope).ToFlow(scope)) {
 				var inner = new Scope(scope);
 				this.names.Match(i, inner);
 

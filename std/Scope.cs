@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Lumen.Lang {
 	public class Scope {
-		public IDictionary<String, Value> variables;
-		public List<Module> usings;
-		public Scope parent;
+		public readonly IDictionary<String, Value> variables;
+		public readonly List<Module> usings;
+		public readonly Scope parent;
 		public Dictionary<String, List<Value>> attributes;
 
 		private IEnumerable<String> AvailableNames {
@@ -128,11 +128,11 @@ namespace Lumen.Lang {
 			}
 
 			List<String> maybe = new List<String>();
-		/*	foreach (KeyValuePair<String, Value> i in this.variables) {
-				if (Helper.Tanimoto(i.Key, name) > 0.4) {
+			foreach (KeyValuePair<String, Value> i in this.variables) {
+				if (Helper.Levenshtein(i.Key, name) > 0.4) {
 					maybe.Add(i.Key);
 				}
-			}*/
+			}
 
 			throw new LumenException(Exceptions.UNKNOWN_NAME.F(name)) {
 				Note = maybe.Count > 0 ? $"Maybe you mean {Environment.NewLine}{String.Join(Environment.NewLine, maybe)}" : null

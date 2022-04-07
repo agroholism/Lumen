@@ -3,30 +3,30 @@
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class IteratorModule : Module {
-		public IteratorModule() {
-			this.Name = "Iterator";
+	internal class AutomatModule : Module {
+		public AutomatModule() {
+			this.Name = "Automat";
 
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
 				Value x = scope["stream"];
 
-				if (x is Seq s && s.InternalValue is LumenGenerator lgn) {
+				if (x is Flow s && s.InternalValue is CustomFlow lgn) {
 					return lgn.GetEnumerator() as Value;
 				}
 
-				IEnumerable<Value> stream = x.ToSeq(scope);
+				IEnumerable<Value> stream = x.ToFlow(scope);
 
-				return new LumenIterator(stream.GetEnumerator(), scope);
+				return new FlowAutomat(stream.GetEnumerator(), scope);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("stream")
 				}
 			});
 
-			this.SetMember("moveNext", new LambdaFun((scope, args) => {
+			this.SetMember("move", new LambdaFun((scope, args) => {
 				Value iter = scope["iter"];
 
-				if (iter is LumenIterator generator) {
+				if (iter is FlowAutomat generator) {
 					return new Logical(generator.MoveNext(scope["val"]));
 				}
 
@@ -41,12 +41,22 @@ namespace Lumen.Lang {
 			this.SetMember("getCurrent", new LambdaFun((scope, args) => {
 				Value iter = scope["iter"];
 
-				if (iter is LumenIterator generator) {
-					var res = generator.Current;
-					if (res is GeneratorExpressionTerminalResult terminalResult) {
-						return terminalResult.Value;
-					}
-					return res;
+				if (iter is FlowAutomat generator) {
+					return generator.Current;
+				}
+
+				throw new Expressions.Break(null);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("iter")
+				}
+			});
+
+			this.SetMember("getResult", new LambdaFun((scope, args) => {
+				Value iter = scope["iter"];
+
+				if (iter is FlowAutomat generator) {
+					return generator.AutomatResult;
 				}
 
 				throw new Expressions.Break(null);
@@ -59,12 +69,8 @@ namespace Lumen.Lang {
 			this.SetMember("getNext", new LambdaFun((scope, args) => {
 				Value iter = scope["iter"];
 
-				if (iter is LumenIterator generator) {
-					var res = generator.Next();
-					if (res is GeneratorExpressionTerminalResult terminalResult) {
-						throw new Expressions.Return(terminalResult.Value);
-					}
-					return res;
+				if (iter is FlowAutomat generator) {
+					return generator.Next();
 				}
 
 				throw new Expressions.Break(null);
@@ -74,10 +80,12 @@ namespace Lumen.Lang {
 				}
 			});
 
+
+
 			this.SetMember("!", new LambdaFun((scope, args) => {
 				Value iter = scope["iter"];
 
-				if (iter is LumenIterator generator) {
+				if (iter is FlowAutomat generator) {
 					return generator.Next();
 				}
 
@@ -92,31 +100,23 @@ namespace Lumen.Lang {
 			this.SetMember("send", new LambdaFun((scope, args) => {
 				Value x = scope["iter"];
 
-				if (x is LumenIterator generator) {
-					Value res = generator.Send(scope["value"]);
-					if(res is GeneratorExpressionTerminalResult terminalResult) {
-						throw new Expressions.Return(terminalResult.Value);
-					}
-					return res;
+				if (x is FlowAutomat generator) {
+					return generator.Send(scope["value"]);
 				}
 
 				throw new Expressions.Break(null);
 			}) {
 				Parameters = new List<IPattern> {
+					new NamePattern("value"),
 					new NamePattern("iter"),
-					new NamePattern("value")
 				}
 			});
 
 			this.SetMember("throw", new LambdaFun((scope, args) => {
 				Value x = scope["iterator"];
 
-				if (x is LumenIterator generator) {
-					Value res = generator.Throw(scope["ex"]);
-					if (res is GeneratorExpressionTerminalResult terminalResult) {//?
-						throw new Expressions.Return(terminalResult.Value);
-					}
-					return res;
+				if (x is FlowAutomat generator) {
+					return generator.Throw(scope["ex"]);
 				}
 
 				throw new Expressions.Break(null);
@@ -130,7 +130,7 @@ namespace Lumen.Lang {
 			this.SetMember("<-", new LambdaFun((scope, args) => {
 				Value x = scope["iter"];
 
-				if (x is LumenIterator generator) {
+				if (x is FlowAutomat generator) {
 					return generator.Send(scope["value"]);
 				}
 
@@ -145,13 +145,13 @@ namespace Lumen.Lang {
 			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
 				Value x = scope["stream"];
 
-				if (x is Seq s && s.InternalValue is LumenGenerator lgn) {
+				if (x is Flow s && s.InternalValue is CustomFlow lgn) {
 					return lgn.GetEnumerator() as Value;
 				}
 
-				IEnumerable<Value> stream = x.ToSeq(scope);
+				IEnumerable<Value> stream = x.ToFlow(scope);
 
-				return new LumenIterator(stream.GetEnumerator(), scope);
+				return new FlowAutomat(stream.GetEnumerator(), scope);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("stream")

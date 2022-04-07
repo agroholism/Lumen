@@ -64,7 +64,7 @@ namespace Lumen.Lang {
 		}
 
 		public static Boolean TryConvertToSeq(this Value value, Scope scope, out IEnumerable<Value> result) {
-			if (value is Seq stream) {
+			if (value is Flow stream) {
 				result = stream.InternalValue;
 				return true;
 			}
@@ -77,7 +77,7 @@ namespace Lumen.Lang {
 			if (value.Type.HasImplementation(Prelude.Collection)
 				&& value.Type.TryGetMember("toSeq", out Value converterPrototype)
 				&& converterPrototype.TryConvertToFunction(out Fun converter)) {
-				result = converter.Call(new Scope(scope), value).ToSeq(scope);
+				result = converter.Call(new Scope(scope), value).ToFlow(scope);
 				return true;
 			}
 
@@ -85,12 +85,12 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public static IEnumerable<Value> ToSeq(this Value value, Scope scope) {
+		public static IEnumerable<Value> ToFlow(this Value value, Scope scope) {
 			if(value.TryConvertToSeq(scope, out var result)) {
 				return result;
 			}
 
-			throw Helper.CreateConvertError(value.Type, Prelude.Seq).ToException();
+			throw Helper.CreateConvertError(value.Type, Prelude.Flow).ToException();
 		}
 
 		public static Boolean TryConvertToException(this Value value, out LumenException result) {

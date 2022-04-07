@@ -4,12 +4,16 @@ using System.Linq;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class SeqModule : Module {
-		public SeqModule() {
-			this.Name = "Seq";
+	internal class FlowModule : Module {
+		public static Module Automat { get; } = new AutomatModule();
+
+		public FlowModule() {
+			this.Name = "Flow";
+
+			this.SetMember("Automat", Automat);
 
 			this.SetMember("empty", new LambdaFun((scope, args) => {
-				return new Seq(Enumerable.Empty<Value>());
+				return new Flow(Enumerable.Empty<Value>());
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("x")
@@ -17,7 +21,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("wrap", new LambdaFun((scope, args) => {
-				return new Seq(Enumerable.Repeat(scope["init"], 1));
+				return new Flow(Enumerable.Repeat(scope["init"], 1));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("init")
@@ -25,7 +29,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("replicate", new LambdaFun((scope, args) => {
-				return new Seq(Enumerable.Repeat(scope["init"], scope["len"].ToInt(scope)));
+				return new Flow(Enumerable.Repeat(scope["init"], scope["len"].ToInt(scope)));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("init"),
@@ -34,13 +38,13 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
-				return new Seq(Enumerable.Empty<Value>());
+				return new Flow(Enumerable.Empty<Value>());
 			}) {
 				Parameters = new List<IPattern> { }
 			});
 
 			this.SetMember("toSeq", new LambdaFun((e, args) => {
-				return new Seq(e["this"].ToList(e));
+				return new Flow(e["this"].ToList(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("this")
@@ -126,7 +130,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toSeq", new LambdaFun((e, args) => {
-				return new Seq(e["self"].ToSeq(e));
+				return new Flow(e["self"].ToFlow(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")

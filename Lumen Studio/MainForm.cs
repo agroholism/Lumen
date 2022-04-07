@@ -209,8 +209,8 @@ namespace Lumen.Studio {
 				MainTextBoxManager.Menu.listView.HoveredColor = Settings.AutocompleteMenu.SelectedBackground;
 				MainTextBoxManager.Menu.listView.SelectedColor = Settings.AutocompleteMenu.SelectedBackground;
 
-				// MainTextBoxManager.Menu.listView.ToolTipBackgroundColor = Settings.AutocompleteMenu.ToolTipBackColor;
-				// MainTextBoxManager.Menu.listView.ToolTipForegroundColor = Settings.AutocompleteMenu.ToolTipForeColor;
+				MainTextBoxManager.Menu.listView.ToolTipBackgroundColor = Settings.AutocompleteMenu.ToolTipBackColor;
+				MainTextBoxManager.Menu.listView.ToolTipForegroundColor = Settings.AutocompleteMenu.ToolTipForeColor;
 			}
 
 			MainTextBoxManager.Menu.BackColor = Settings.AutocompleteMenu.Background;
@@ -301,15 +301,15 @@ namespace Lumen.Studio {
 
 					Lang.Scope scope = new Lang.Scope();
 
-					scope.Bind("_lsOnDebug", new Lang.LambdaFun((_scope, args) => {
+					/*scope.Bind("_lsOnDebug", new Lang.LambdaFun((_scope, args) => {
 						this.BreakpointOnLine(Lang.Converter.ToInt(_scope["line"], scope) - 1);
 						this.Review(_scope.parent, "");
 						return Lang.Const.UNIT;
 					}) {
-						Parameters = new List<Lang.Expressions.IPattern> {
+						Parameters = new List<Lumen.Lang.Expressions.IP> {
 							new Lang.Expressions.NamePattern("line")
 						}
-					});
+					});*/
 
 					this.WorkingThread = new Thread(() => {
 						Lmi.Interpriter.Start("main.lm", scope);
@@ -713,7 +713,8 @@ namespace Lumen.Studio {
 			}
 
 			foreach (String i in Directory.EnumerateFiles(path)) {
-				node.Nodes.Add(i, i.Replace(path + "\\", ""), this.GetImageIndex(i), this.GetImageIndex(i));
+				//node.Nodes.Add(i, i.Replace(path + "\\", ""), this.GetImageIndex(i), this.GetImageIndex(i));
+				node.Nodes.Add(new ProjectManager.FileNode(i, this.GetImageIndex(i)));
 			}
 		}
 

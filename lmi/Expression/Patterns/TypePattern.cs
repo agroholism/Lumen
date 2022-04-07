@@ -77,6 +77,17 @@ namespace Lumen.Lang.Patterns {
 					continue;
 				} 
 
+				if (requiredType is IType type && type is FunctionalType ft) {
+					if (type.IsParentOf(value)) {
+						continue;
+					}
+
+					return new MatchResult(
+						MatchResultKind.Fail,
+						$"value does not fits to the requirements of the functional type {ft.Name}"
+					);
+				}
+
 				return new MatchResult(
 					MatchResultKind.Fail,
 					$"wait value of type {requiredType} given {value.Type}"

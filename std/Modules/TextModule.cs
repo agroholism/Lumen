@@ -53,7 +53,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				Value other = scope["other"];
 
-				return new Text(String.Format(self, other.ToSeq(scope).ToArray()));
+				return new Text(String.Format(self, other.ToFlow(scope).ToArray()));
 			}) {
 				Parameters = Const.SelfOther
 			});
@@ -100,7 +100,7 @@ namespace Lumen.Lang {
 					Value index = indices[0];
 
 					if (index is Fun fun) {
-						return new Seq(from ch in self
+						return new Flow(from ch in self
 										  select new Text(ch.ToString()) into value
 										  where fun.Call(new Scope(scope), value).ToBoolean()
 										  select value);
@@ -118,7 +118,7 @@ namespace Lumen.Lang {
 
 					StringBuilder buffer = new StringBuilder();
 
-					foreach (Value i in index.ToSeq(scope)) {
+					foreach (Value i in index.ToFlow(scope)) {
 						if (i is Number) {
 							Int32 newIndex = Helper.Index(i.ToInt(scope), self.Length);
 
@@ -181,7 +181,7 @@ namespace Lumen.Lang {
 			// Исключения: 
 			//	ConvertException: невозможно преобразовать объект к типу Stream
 			this.SetMember("concat", new LambdaFun((scope, args) => {
-				return new Text(String.Concat(scope["values"].ToSeq(scope)));
+				return new Text(String.Concat(scope["values"].ToFlow(scope)));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("values")
@@ -297,7 +297,7 @@ namespace Lumen.Lang {
 			this.SetMember("getChars", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				return new Seq(self.Select<Char, Value>(x => new Number(x)));
+				return new Flow(self.Select<Char, Value>(x => new Number(x)));
 			}) {
 				Parameters = Const.Self
 			});
@@ -579,7 +579,7 @@ namespace Lumen.Lang {
 			this.SetMember("toSeq", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				return new Seq(this.GlobalizationEach(self));
+				return new Flow(this.GlobalizationEach(self));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")
@@ -587,7 +587,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
-				IEnumerable<Value> stream = scope["stream"].ToSeq(scope);
+				IEnumerable<Value> stream = scope["stream"].ToFlow(scope);
 				return new Text(String.Concat(stream));
 			}) {
 				Parameters = new List<IPattern> {

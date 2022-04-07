@@ -1,66 +1,73 @@
-﻿let path first second =
-	if first.endsWith "\\":
-		first + if second.endsWith "\\": second else: second + "\\"
-	else 
-		"\(first)\\\(second)\\"
+﻿// let path first second =
+// 	if first.endsWith "\\":
+// 		first + if second.endsWith "\\": second else: second + "\\"
+// 	else 
+// 		"\(first)\\\(second)\\"
 
-let path parts =
-	parts / path
+// let path parts =
+// 	parts / path
 
-let rel x = path config.host x
+// let rel x = path config.host x
 
-let script name =
-    if config.enable_script:
-        return "<script type=\"text/javascript\" src=\"\(rel "scripts/\(name).js")\"> </script>"
-    else:
-        return ""
+// let script name =
+//     if config.enable_script:
+//         return "<script type=\"text/javascript\" src=\"\(rel "scripts/\(name).js")\"> </script>"
+//     else:
+//         return ""
 
-let style name =
-	"<link rel=\"stylesheet\" href=\"#{rel("styles/#{name}.css")}\">"
+// let style name =
+// 	"<link rel=\"stylesheet\" href=\"#{rel("styles/#{name}.css")}\">"
 
-type Template = ... where
-	let release self resdir params = ...
-
-
-
-module Components where
-	type Menu = Menu heading items
-
-	let menu () = null []
-
-	let menu(...items, heading:=void) {
-		if heading is void {
-			return div(
-				ul(...components.process_items(items), cls:="anatomy-menu-list"),
-				cls:="anatomy-menu"
-			)
-		} else {
-			return div(
-				components.menu_heading(heading.text, heading.href),
-				ul(...components.process_items(items), cls:="anatomy-menu-list"),
-				cls:="anatomy-menu"
-			)
-		}
-	}
-
-	let components.menu_heading(content, href:="\#") {
-		return "<a href=\"#href\" class=\"anatomy-menu-heading anatomy-menu-link\">#content</a>"
-	}
-
-	let components.process_items(items) {
-		let result := vec()
-		for let item in items {
-			result += components.process_item(item)
-		}
-		return result
-	}
-
-	let components.process_item(item) {
-		return "<li class=\"anatomy-menu-item\"><a href=\"#{item.href}\" class=\"anatomy-menu-link\">#{item.text}</a></li>"
-	}
+// type Template = ... where
+// 	let release self resdir params = ...
 
 
 
-let menu = 
-Menu [Menu.Item "Home"]
->>= onItemClick "onItemClick"
+// module Components where
+// 	type Menu = Menu heading items
+
+// 	let menu () = null []
+
+// 	let menu(...items, heading:=void) {
+// 		if heading is void {
+// 			return div(
+// 				ul(...components.process_items(items), cls:="anatomy-menu-list"),
+// 				cls:="anatomy-menu"
+// 			)
+// 		} else {
+// 			return div(
+// 				components.menu_heading(heading.text, heading.href),
+// 				ul(...components.process_items(items), cls:="anatomy-menu-list"),
+// 				cls:="anatomy-menu"
+// 			)
+// 		}
+// 	}
+
+// 	let components.menu_heading(content, href:="\#") {
+// 		return "<a href=\"#href\" class=\"anatomy-menu-heading anatomy-menu-link\">#content</a>"
+// 	}
+
+// 	let components.process_items(items) {
+// 		let result := vec()
+// 		for let item in items {
+// 			result += components.process_item(item)
+// 		}
+// 		return result
+// 	}
+
+// 	let components.process_item(item) {
+// 		return "<li class=\"anatomy-menu-item\"><a href=\"#{item.href}\" class=\"anatomy-menu-link\">#{item.text}</a></li>"
+// 	}
+
+
+
+// let menu = 
+// Menu [Menu.Item "Home"]
+// >>= onItemClick "onItemClick"
+
+let ints = fun ->
+	yield 1
+	yield from Stream.map (_+1) (rec ())
+
+for i in ints:
+	println i

@@ -107,6 +107,7 @@
     <Compile Include="Expression\Patterns\UnitPattern.cs" />
     <Compile Include="Expression\From.cs" />
     <Compile Include="Expression\InternWithBindingDeclaration.cs" />
+    <Compile Include="FunctionalTypeDeclaration.cs" />
     <Compile Include="Interpriter.cs" />
     <Compile Include="Expression\Literals\ArrayLiteral.cs" />
     <Compile Include="Expression\Declarations\ConstructorMetadata.cs" />

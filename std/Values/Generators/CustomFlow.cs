@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	public class LumenGenerator : IEnumerable<Value> {
+	public class CustomFlow : IEnumerable<Value> {
 		private Expression generatorBody;
 		private Scope associatedScope;
 
-		public LumenGenerator(Expression generatorBody, Scope associatedScope) {
+		public CustomFlow(Expression generatorBody, Scope associatedScope) {
 			this.generatorBody = generatorBody;
 			this.associatedScope = associatedScope;
 		}
@@ -31,12 +31,12 @@ namespace Lumen.Lang {
 				}
 
 				if (exitValue != null) {
-					yield return exitValue;
+					scope.Bind(Constants.YIELD_RESULT_SPECIAL_NAME, exitValue);
 					yield break;
 				}
 
 				if(enumerator.Current is GeneratorExpressionTerminalResult terminalResult) {
-					yield return terminalResult.Value;
+					scope.Bind(Constants.YIELD_RESULT_SPECIAL_NAME, terminalResult);
 					yield break;
 				}
 
@@ -46,7 +46,7 @@ namespace Lumen.Lang {
 
 		public IEnumerator<Value> GetEnumerator() {
 			Scope scope = new Scope(this.associatedScope);
-			return new LumenIterator(this.Run(scope).GetEnumerator(), scope);
+			return new FlowAutomat(this.Run(scope).GetEnumerator(), scope);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {

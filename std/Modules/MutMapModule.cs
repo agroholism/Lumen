@@ -72,7 +72,7 @@ namespace Lumen.Lang {
 					return result;
 				}
 
-				foreach (Value i in value.ToSeq(e)) {
+				foreach (Value i in value.ToFlow(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
@@ -118,7 +118,7 @@ namespace Lumen.Lang {
 				Value value = e["stream"];
 				MutMap result = new MutMap();
 
-				foreach (Value i in value.ToSeq(e)) {
+				foreach (Value i in value.ToFlow(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
@@ -132,7 +132,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("toSeq", new LambdaFun((e, args) => {
 				IDictionary<Value, Value> self = ((MutMap)e["self"]).InternalValue;
-				return new Seq(self.Select(Helper.CreatePair));
+				return new Flow(self.Select(Helper.CreatePair));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")

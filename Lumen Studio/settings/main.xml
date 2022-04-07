@@ -5,7 +5,7 @@
   <Language name="ru-RU"/>
   
   <!-- Theme of interface -->
-  <EnabledTheme name="standartDark" />
+  <EnabledTheme name="sandy" />
 
   <!--  List of aviable themes -->
   <AviableThemes>
@@ -41,7 +41,7 @@
   </ProjectTypes>
   
   <!-- List of aviable extensions -->
-  <Extensions>
-    <Extension name="xmltools" enabled="true" />
-  </Extensions>
+  <!--Extensions>
+    <Extension name="xmltools" enabled="false" />
+  </Extensions-->
 </MainSettings>

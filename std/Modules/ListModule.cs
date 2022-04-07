@@ -26,8 +26,8 @@ namespace Lumen.Lang {
 
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				IType typeParameter = scope["values"].Type;
-				IEnumerable<Value> values = scope["values"].ToSeq(scope);
-				IEnumerable<Value> valuesx = scope["values'"].ToSeq(scope);
+				IEnumerable<Value> values = scope["values"].ToFlow(scope);
+				IEnumerable<Value> valuesx = scope["values'"].ToFlow(scope);
 
 				return new List(values.Concat(valuesx));
 			}) {
@@ -83,7 +83,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("filter", new LambdaFun((scope, args) => {
 				Fun mapper = scope["pred"].ToFunction(scope);
-				IEnumerable<Value> values = scope["list"].ToSeq(scope);
+				IEnumerable<Value> values = scope["list"].ToFlow(scope);
 
 				return new List(values.Where(i => mapper.Call(new Scope(scope), i).ToBoolean()));
 			}) {
@@ -145,7 +145,7 @@ namespace Lumen.Lang {
 				}
 			});
 			this.SetMember("toSeq", new LambdaFun((e, args) => {
-				return new Seq(e["this"].ToLinkedList(e));
+				return new Flow(e["this"].ToLinkedList(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("this")
@@ -160,7 +160,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
-				return new List(scope["x"].ToSeq(scope));
+				return new List(scope["x"].ToFlow(scope));
 			}) {
 				Name = "fromSeq",
 				Parameters = new List<IPattern> {
