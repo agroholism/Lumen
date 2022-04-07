@@ -506,12 +506,12 @@ namespace Lumen.Lmi {
 
 				do {
 					if (this.Match(TokenType.NOT)) {
-						exps.Add(this.Primary());
+						exps.Add(this.Dot());
 						result = new NotPattern(new TypePattern(result, exps));
 						exps = new List<Expression>();
 					}
 					else {
-						exps.Add(this.Primary());
+						exps.Add(this.Dot());
 					}
 				} while (this.Match(TokenType.SPLIT));
 
