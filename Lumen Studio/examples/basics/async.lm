@@ -1,0 +1,13 @@
+﻿let rec makeContinuation (future: Future) (automat: Flow.Automat) = 
+	future
+	|> Future.catch (Flow.Automat.throw _ automat)
+	>>= fun yielded ->
+		match Flow.Automat.moveWith yielded automat:
+        | Flow.Automat.State.Inter value -> makeContinuation value automat
+        | Flow.Automat.State.Final value -> value |> Future.wrap
+
+let initialContinuationMaker = 
+	Future.wrap () |> makeContinuation
+
+let async (fn: Function) =
+    fn >> Flow.Automat >> initialContinuationMaker

@@ -130,6 +130,7 @@
       <DependentUpon>RegexTester.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="examples\basics\async.lm" />
     <None Include="examples\basics\fibbonacci.lm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
