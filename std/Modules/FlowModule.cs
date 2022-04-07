@@ -5,7 +5,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	internal class FlowModule : Module {
-		public static Module Automat { get; } = new AutomatModule();
+		public AutomatModule Automat { get; } = new AutomatModule();
 
 		public FlowModule() {
 			this.Name = "Flow";
@@ -63,82 +63,131 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Default);
 			this.AppendImplementation(Prelude.Container);
 		}
-	}
 
-	internal class RangeModule : Module {
-		public RangeModule() {
-			this.Name = "Range";
+		internal class AutomatModule : Module {
+			public AutomatStateModule State { get; private set; } = new AutomatStateModule();
 
-			this.SetMember("default", new LambdaFun((scope, args) => {
-				return new InfinityRange();
-			}) {
-				Parameters = new List<IPattern> { }
-			});
+			public AutomatModule() {
+				this.Name = "Flow.Automat";
 
-			this.SetMember("hasEnd", new LambdaFun((e, args) => {
-				var self = e["self"];
+				this.SetMember("State", this.State);
 
-				if(self is InfinityRange) {
-					return new Logical(false);
+				this.SetMember("<init>", new LambdaFun((scope, args) => {
+					IEnumerable<Value> flow = scope["flow"].ToFlow(scope);
+
+					// Enumerator in CustomFlow is FlowAutomat by default,
+					// so we should avoid additional wrappers to prevent problems
+					// with yield operators
+					if (flow is CustomFlow customFlow) {
+						return customFlow.GetEnumerator() as Value;
+					}
+
+					return new FlowAutomat(flow.GetEnumerator(), scope);
+				}) {
+					Parameters = new List<IPattern> {
+					new NamePattern("flow")
+				}
+				});
+
+				this.SetMember("move", new LambdaFun((scope, args) => {
+					Value value = scope["automat"];
+
+					if (value is FlowAutomat automat) {
+						if (automat.MoveNext(Const.UNIT)) {
+							return State.MakeInter(automat.Current);
+						} else {
+							return State.MakeFinal(automat.Result ?? Prelude.None);
+						}
+					}
+
+					throw new Expressions.Break(null);
+				}) {
+					Parameters = new List<IPattern> {
+					new NamePattern("automat"),
+				}
+				});
+
+				this.SetMember("moveWith", new LambdaFun((scope, args) => {
+					Value value = scope["automat"];
+
+					if (value is FlowAutomat automat) {
+						if (automat.MoveNext(scope["value"])) {
+							return State.MakeInter(automat.Current);
+						} else {
+							return State.MakeFinal(automat.Result ?? Prelude.None);
+						}
+					}
+
+					throw new Expressions.Break(null);
+				}) {
+					Parameters = new List<IPattern> {
+					new NamePattern("value"),
+					new NamePattern("automat"),
+				}
+				});
+
+				this.SetMember("throw", new LambdaFun((scope, args) => {
+					Value value = scope["automat"];
+
+					if (value is FlowAutomat automat) {
+						if (automat.Throw(scope["exception"])) {
+							return State.MakeInter(automat.Current);
+						} else {
+							return State.MakeFinal(automat.Result ?? Prelude.None);
+						}
+					}
+
+					throw new Expressions.Break(null);
+				}) {
+					Parameters = new List<IPattern> {
+					new NamePattern("exception"),
+					new NamePattern("automat")
+				}
+				});
+
+				this.SetMember("fromSeq", new LambdaFun((scope, args) => {
+					Value x = scope["stream"];
+
+					if (x is Flow s && s.InternalValue is CustomFlow lgn) {
+						return lgn.GetEnumerator() as Value;
+					}
+
+					IEnumerable<Value> stream = x.ToFlow(scope);
+
+					return new FlowAutomat(stream.GetEnumerator(), scope);
+				}) {
+					Parameters = new List<IPattern> {
+					new NamePattern("stream")
+				}
+				});
+			}
+
+			internal class AutomatStateModule : Module {
+				internal Constructor Inter { get; private set; }
+				internal Constructor Final { get; private set; }
+
+				public AutomatStateModule() {
+					this.Name = "Flow.Automat.State";
+
+					this.Inter = Helper.CreateConstructor($"{this.Name}.Inter", this, new List<String> { "value" }) as Constructor;
+					this.Final = Helper.CreateConstructor($"{this.Name}.Final", this, new List<String> { "value" }) as Constructor;
+
+					this.SetMember("Inter", this.Inter);
+					this.SetMember("Final", this.Final);
 				}
 
-				if(self is NumberRange numrabge) {
-					return new Logical(numrabge.HasEnd);
+				public Value MakeInter(Value value) {
+					Instance result = new Instance(this.Inter);
+					result.Items[0] = value;
+					return result;
 				}
 
-				throw new LumenException("hasEnd");
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("self")
+				public Value MakeFinal(Value value) {
+					Instance result = new Instance(this.Final);
+					result.Items[0] = value;
+					return result;
 				}
-			});
-
-			this.SetMember("hasStart", new LambdaFun((e, args) => {
-				var self = e["self"];
-
-				if (self is InfinityRange) {
-					return new Logical(false);
-				}
-
-				if (self is NumberRange numrabge) {
-					return new Logical(numrabge.HasStart);
-				}
-
-				throw new LumenException("hasStart");
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("self")
-				}
-			});
-
-			this.SetMember("getStep", new LambdaFun((e, args) => {
-				var self = e["self"];
-
-				if (self is InfinityRange infRange) {
-					return new Number(infRange.Step);
-				}
-
-				if (self is NumberRange numrabge) {
-					return new Number(numrabge.Step);
-				}
-
-				throw new LumenException("hasStart");
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("self")
-				}
-			});
-
-			this.SetMember("toSeq", new LambdaFun((e, args) => {
-				return new Flow(e["self"].ToFlow(e));
-			}) {
-				Parameters = new List<IPattern> {
-					new NamePattern("self")
-				}
-			});
-
-			this.AppendImplementation(Prelude.Default);
-			this.AppendImplementation(Prelude.Collection);
+			}
 		}
 	}
 }

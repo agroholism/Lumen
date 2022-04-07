@@ -34,7 +34,7 @@ namespace Lumen.Lang {
 		public static Module Unit { get; } = new UnitModule();
 
 		public static Module Mut { get; } = new MutModule();
-		public static Module Flow { get; } = new FlowModule();
+		internal static FlowModule Flow { get; } = new FlowModule();
 		public static Module Range { get; } = new RangeModule();
 		public static Module MutArray { get; } = new MutArrayModule();
 		public static Module Function { get; } = new FunctionModule();
@@ -352,6 +352,14 @@ namespace Lumen.Lang {
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("init")
+				}
+			});
+
+			this.SetMember("run", new LambdaFun((scope, args) => {
+				return scope["f"].ToFunction(scope).Call(new Scope(scope), Const.UNIT);
+			}) {
+				Parameters = new List<IPattern> {
+					new ExactTypePattern("f", Function),
 				}
 			});
 

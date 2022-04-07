@@ -51,6 +51,7 @@
     <Compile Include="CallStackRecord.cs" />
     <Compile Include="Classes\Monad.cs" />
     <Compile Include="Classes\Monoid.cs" />
+    <Compile Include="Modules\RangeModule.cs" />
     <Compile Include="Patterns\ContextPattern.cs" />
     <Compile Include="Values\FunctionalType.cs" />
     <Compile Include="Values\GenericLater.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="Values\Generators\CustomFlow.cs" />
     <Compile Include="Values\Generators\FlowAutomat.cs" />
     <Compile Include="Modules\MutModule.cs" />
-    <Compile Include="Modules\FlowAutomatModule.cs" />
     <Compile Include="Values\Future.cs" />
     <Compile Include="Values\Unit.cs" />
     <Compile Include="Values\Constructors\Constructor.cs" />

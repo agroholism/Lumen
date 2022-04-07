@@ -29,7 +29,7 @@ namespace Lumen.Lmi {
 					yield return automat.Current;
 				}
 
-				Value result = automat.AutomatResult;
+				Value result = automat.Result;
 				if (result != null) {
 					yield return new GeneratorExpressionTerminalResult(result);
 				}

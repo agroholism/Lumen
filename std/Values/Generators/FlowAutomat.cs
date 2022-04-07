@@ -7,12 +7,12 @@ namespace Lumen.Lang {
 		private IEnumerator<Value> internalValue;
 		private Scope scope;
 
-		public override IType Type => FlowModule.Automat;
+		public override IType Type => Prelude.Flow.Automat;
 
 		public Value Current => this.internalValue.Current;
 		Object IEnumerator.Current => this.internalValue.Current;
 
-		public Value AutomatResult => 
+		public Value Result => 
 			this.scope.ExistsInThisScope(Constants.YIELD_RESULT_SPECIAL_NAME) ? this.scope[Constants.YIELD_RESULT_SPECIAL_NAME] : null;
 
 		public FlowAutomat(IEnumerator<Value> internalValue, Scope scope) {
@@ -20,16 +20,10 @@ namespace Lumen.Lang {
 			this.scope = scope;
 		}
 
-		public Value Send(Value value) {
-			this.scope?.Bind(Constants.YIELD_VALUE_SPECIAL_NAME, value);
-
-			return this.Next();
-		}
-
-		public Value Throw(Value value) {
+		public Boolean Throw(Value value) {
 			this.scope?.Bind(Constants.YIELD_EXCEPTION_SPECIAL_NAME, value);
 
-			return this.Next();
+			return this.MoveNext();
 		}
 
 		public Value Next() {
