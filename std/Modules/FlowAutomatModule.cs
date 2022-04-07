@@ -8,18 +8,19 @@ namespace Lumen.Lang {
 			this.Name = "Automat";
 
 			this.SetMember("<init>", new LambdaFun((scope, args) => {
-				Value x = scope["stream"];
+				IEnumerable<Value> flow = scope["flow"].ToFlow(scope);
 
-				if (x is Flow s && s.InternalValue is CustomFlow lgn) {
-					return lgn.GetEnumerator() as Value;
+				// Enumerator in CustomFlow is FlowAutomat by default,
+				// so we should avoid additional wrappers to prevent problems
+				// with yield operators
+				if (flow is CustomFlow customFlow) {
+					return customFlow.GetEnumerator() as Value;
 				}
 
-				IEnumerable<Value> stream = x.ToFlow(scope);
-
-				return new FlowAutomat(stream.GetEnumerator(), scope);
+				return new FlowAutomat(flow.GetEnumerator(), scope);
 			}) {
 				Parameters = new List<IPattern> {
-					new NamePattern("stream")
+					new NamePattern("flow")
 				}
 			});
 
