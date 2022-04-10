@@ -562,7 +562,8 @@ namespace Lumen.Lmi {
 			List<(String name, String alias)> importedNames = new List<(String name, String alias)>();
 
 			// import x, || import x from
-			if (this.LookMatch(1, TokenType.SPLIT) || this.LookMatch(1, TokenType.FROM)) {
+			if (this.LookMatch(1, TokenType.SPLIT) || this.LookMatch(3, TokenType.SPLIT) 
+				|| this.LookMatch(1, TokenType.FROM) || this.LookMatch(3, TokenType.FROM)) {
 				do {
 					String name = this.Consume(TokenType.WORD).Text;
 					String alias = null;

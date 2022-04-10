@@ -32,7 +32,7 @@ namespace Lumen.Lmi {
 
 		public Value Eval(Scope scope) {
 			(Module root, Value result) = new OpaqueImport(this.line, this.fileName)
-				.Import(Path.GetDirectoryName(this.fileName), this.importPath);
+				.Import(Path.GetDirectoryName(this.fileName), this.importPath, scope);
 
 			if (this.IsFrom) {
 				if (result is not Module module) {

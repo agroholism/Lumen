@@ -18,7 +18,11 @@ namespace Lumen.Lmi.Importing {
 			this.fileName = fileName;
 		}
 
-		public (Module root, Value value) Import(String currentModuleDirectory, List<String> modulesPath) {
+		public (Module root, Value value) Import(String currentModuleDirectory, List<String> modulesPath, Scope scope) {
+			if (TryImportFromScope(scope, modulesPath, out Value? result, out Module? module)) {
+				return (module!, result!);
+			}
+
 			if (modulesPath.Count == 0) {
 				throw new LumenImportException("please specify at least one module to import", this.lineNo, this.fileName);
 			}
@@ -113,6 +117,23 @@ namespace Lumen.Lmi.Importing {
 			}
 
 			return (rootModule, currentModule);
+		}
+
+		private static Boolean TryImportFromScope(Scope scope, List<String> modulesPath, out Value? result, out Module? root) {
+			if (scope.TryGet(modulesPath.First(), out result)) {
+				if (result is not Module moduleLike) {
+					result = null;
+					root = null;
+					return false;
+				}
+
+				root = moduleLike;
+				result = ImportRestAsVirtual(modulesPath.Skip(1).ToList(), moduleLike);
+				return true;
+			}
+
+			root = null;
+			return false;
 		}
 
 		private static (Module? module, Boolean nextIsVirtual) ImportIntermediateModule(String currentImportLocation, String requiredModuleName, Module? parent) {
