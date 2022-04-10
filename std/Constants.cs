@@ -7,6 +7,8 @@ namespace Lumen.Lang {
 		public const String YIELD_RESULT_SPECIAL_NAME = "[yield-result]";
 		public const String LAST_EXCEPTION_SPECIAL_NAME = "[last-exception]";
 
+		public const String PARENT_MODULE_SPECIAL_NAME = "[parent-module]";
+
 		public const String NOT = "not";
 		public const String AND = "and";
 		public const String OR = "or";

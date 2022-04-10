@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Lumen.Lang;
 using Lumen.Lang.Expressions;
@@ -26,18 +25,31 @@ namespace Lumen.Lmi {
 			List<Expression> result = new List<Expression>();
 
 			while (!this.Match(TokenType.EOF)) {
-				result.Add(this.Expression());
+				result.Add(this.PrivateExpression());
 				this.Match(TokenType.EOC);
 			}
 
 			return result;
 		}
 
+		private Expression PrivateExpression() {
+			if (this.Match(TokenType.PRIVATE)) {
+				Expression declaraion = this.Expression();
+
+				if (declaraion is FunctionDeclaration or VariantDeclaration or BindingDeclaration) {
+					return new PrivateDeclaration(declaraion);
+				} else {
+					throw new LumenException("can not use private modifier here");
+				}
+			}
+
+			return this.Expression();
+		}
+
 		private Expression Expression() {
 			Token current = this.GetToken(0);
 
-			return current.Type switch
-			{
+			return current.Type switch {
 				TokenType.RETURN => this.ParseReturn(),
 				TokenType.MATCH => this.ParseMatch(),
 				TokenType.TRY => this.ParseTry(),
@@ -82,8 +94,8 @@ namespace Lumen.Lmi {
 			Expression redo =
 				new Redo(this.LookMatch(0, TokenType.WORD) ? this.Consume(TokenType.WORD).Text : null);
 
-			return this.Match(TokenType.WHEN) 
-				? new Condition(this.Expression(), redo, UnitLiteral.Instance) 
+			return this.Match(TokenType.WHEN)
+				? new Condition(this.Expression(), redo, UnitLiteral.Instance)
 				: redo;
 		}
 
@@ -93,8 +105,8 @@ namespace Lumen.Lmi {
 			Expression exit =
 				new Break(this.LookMatch(0, TokenType.WORD) ? this.Consume(TokenType.WORD).Text : null);
 
-			return this.Match(TokenType.WHEN) 
-				? new Condition(this.Expression(), exit, UnitLiteral.Instance) 
+			return this.Match(TokenType.WHEN)
+				? new Condition(this.Expression(), exit, UnitLiteral.Instance)
 				: exit;
 		}
 
@@ -104,19 +116,31 @@ namespace Lumen.Lmi {
 			Expression next =
 				new Next(this.LookMatch(0, TokenType.WORD) ? this.Consume(TokenType.WORD).Text : null);
 
-			return this.Match(TokenType.WHEN) 
-				? new Condition(this.Expression(), next, UnitLiteral.Instance) 
+			return this.Match(TokenType.WHEN)
+				? new Condition(this.Expression(), next, UnitLiteral.Instance)
 				: next;
 		}
 
 		private Expression ParseReturn() {
 			this.Consume(TokenType.RETURN);
 
+			// Tail recursion
+			if (this.Match(TokenType.TAIL_REC)) {
+				List<Expression> args = new List<Expression>();
+
+				while (this.IsValidToken()) {
+					args.Add(this.Dot());
+				}
+
+				Expression res = new Tailrec(args, this.file, this.line);
+				return res;
+			}
+
 			Expression @return =
 				new Return(!this.IsValidToken() ? UnitLiteral.Instance : this.Expression());
 
-			return this.Match(TokenType.WHEN) 
-				? new Condition(this.Expression(), @return, UnitLiteral.Instance) 
+			return this.Match(TokenType.WHEN)
+				? new Condition(this.Expression(), @return, UnitLiteral.Instance)
 				: @return;
 		}
 
@@ -196,16 +220,13 @@ namespace Lumen.Lmi {
 				if (currentToken.Text == "variant") {
 					this.Match(currentToken.Type);
 					return this.ParseVariantDeclaration(typeName);
-				}
-				else if (currentToken.Text == "exception") {
+				} else if (currentToken.Text == "exception") {
 					this.Match(currentToken.Type);
 					return this.ParseExceptionDeclaration(typeName);
-				}
-				else if (currentToken.Text == "class") {
+				} else if (currentToken.Text == "class") {
 					this.Match(currentToken.Type);
 					return this.ParseClassDeclaration(typeName);
-				}
-				else if (currentToken.Text == "alias") {
+				} else if (currentToken.Text == "alias") {
 					this.Match(currentToken.Type);
 					return this.ParseAliasDeclaration(typeName);
 				}
@@ -244,8 +265,7 @@ namespace Lumen.Lmi {
 				while (!this.Match(TokenType.BLOCK_END) && !this.Match(TokenType.EOF)) {
 					if (this.Match(TokenType.IMPLEMENTS)) {
 						derivings.Add(this.Expression());
-					}
-					else {
+					} else {
 						members.Add(this.Expression());
 					}
 					this.Match(TokenType.EOC);
@@ -275,8 +295,7 @@ namespace Lumen.Lmi {
 				while (!this.Match(TokenType.BLOCK_END) && !this.Match(TokenType.EOF)) {
 					if (this.Match(TokenType.IMPLEMENTS)) {
 						derivings.Add(this.Expression());
-					}
-					else {
+					} else {
 						members.Add(this.Expression());
 					}
 					this.Match(TokenType.EOC);
@@ -304,8 +323,7 @@ namespace Lumen.Lmi {
 				while (!this.Match(TokenType.BLOCK_END) && !this.Match(TokenType.EOF)) {
 					if (this.Match(TokenType.IMPLEMENTS)) {
 						derivings.Add(this.Expression());
-					}
-					else {
+					} else {
 						members.Add(this.Expression());
 					}
 					this.Match(TokenType.EOC);
@@ -421,15 +439,12 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.PAREN_OPEN)) {
 				result = this.ParsePattern();
 				this.Match(TokenType.PAREN_CLOSE);
-			}
-			else if (this.Match(TokenType.VOID)) {
+			} else if (this.Match(TokenType.VOID)) {
 				result = UnitPattern.Instance;
-			}
-			else if (this.Match(TokenType.ARRAY_OPEN)) {
+			} else if (this.Match(TokenType.ARRAY_OPEN)) {
 				if (this.Match(TokenType.ARRAY_CLOSE)) {
 					result = EmptyArrayPattern.Instance;
-				}
-				else {
+				} else {
 					List<IPattern> subpatterns = new List<IPattern>();
 
 					while (!this.Match(TokenType.ARRAY_CLOSE)) {
@@ -439,12 +454,10 @@ namespace Lumen.Lmi {
 
 					result = new ArrayPattern(subpatterns);
 				}
-			}
-			else if (this.Match(TokenType.LIST_OPEN)) {
+			} else if (this.Match(TokenType.LIST_OPEN)) {
 				if (this.Match(TokenType.COLLECTION_CLOSE)) {
 					result = EmptyListPattern.Instance;
-				}
-				else {
+				} else {
 					List<IPattern> subpatterns = new List<IPattern>();
 
 					while (!this.Match(TokenType.COLLECTION_CLOSE)) {
@@ -454,23 +467,18 @@ namespace Lumen.Lmi {
 
 					result = new ListPattern(subpatterns);
 				}
-			}
-			else if (this.LookMatch(0, TokenType.NUMBER)) {
+			} else if (this.LookMatch(0, TokenType.NUMBER)) {
 				result = new ValuePattern(new Number(Double.Parse(this.Consume(TokenType.NUMBER).Text)));
-			}
-			else if (this.LookMatch(0, TokenType.TEXT)) {
+			} else if (this.LookMatch(0, TokenType.TEXT)) {
 				result = new ValuePattern(new Text(this.Consume(TokenType.TEXT).Text));
-			}
-			else if (this.LookMatch(0, TokenType.WORD)) {
+			} else if (this.LookMatch(0, TokenType.WORD)) {
 				String name = this.Consume(TokenType.WORD).Text;
 
 				if (name == "_") {
 					result = DiscardPattern.Instance;
-				}
-				else if (Char.IsLower(name[0]) && !this.LookMatch(0, TokenType.DOT)) {
+				} else if (Char.IsLower(name[0]) && !this.LookMatch(0, TokenType.DOT)) {
 					result = new NamePattern(name);
-				}
-				else {
+				} else {
 					Expression constructor = new IdExpression(name, this.file, this.line);
 					while (this.Match(TokenType.DOT)) {
 						String fname = this.Consume(TokenType.WORD).Text;
@@ -509,8 +517,7 @@ namespace Lumen.Lmi {
 						exps.Add(this.Dot());
 						result = new NotPattern(new TypePattern(result, exps));
 						exps = new List<Expression>();
-					}
-					else {
+					} else {
 						exps.Add(this.Dot());
 					}
 				} while (this.Match(TokenType.SPLIT));
@@ -538,43 +545,48 @@ namespace Lumen.Lmi {
 		// TODO
 		private Expression ParseImport() {
 			this.Consume(TokenType.IMPORT);
+
+			List<String> ParseImportPath() {
+				List<String> importPath = new List<String>();
+
+				importPath.Add(this.Consume(TokenType.WORD).Text);
+				while (this.Match(TokenType.DOT)) {
+					importPath.Add(this.Consume(TokenType.WORD).Text);
+				}
+
+				return importPath;
+			}
+
+			String mainAlias = null;
+
+			List<(String name, String alias)> importedNames = new List<(String name, String alias)>();
+
 			// import x, || import x from
 			if (this.LookMatch(1, TokenType.SPLIT) || this.LookMatch(1, TokenType.FROM)) {
-				List<String> entities = new List<String>();
-				Boolean importAll = false;
-
-				// import * from
-				if (this.Match(TokenType.STAR)) {
-					importAll = true;
-				}
-				else {
-					while (this.LookMatch(1, TokenType.SPLIT)) {
-						entities.Add(this.Consume(TokenType.WORD).Text);
-						this.Match(TokenType.SPLIT);
+				do {
+					String name = this.Consume(TokenType.WORD).Text;
+					String alias = null;
+					if (this.Match(TokenType.AS)) {
+						alias = this.Consume(TokenType.WORD).Text;
 					}
-					entities.Add(this.Consume(TokenType.WORD).Text);
-				}
+					importedNames.Add((name, alias));
+				} while (this.Match(TokenType.SPLIT));
 
 				this.Consume(TokenType.FROM);
+			}
 
-				// name1.name2....
-				StringBuilder pathBuild = new StringBuilder(this.Consume(TokenType.WORD).Text);
+			List<String> importPath = ParseImportPath();
 
-				while (this.Match(TokenType.DOT)) {
-					pathBuild.Append("\\").Append(this.Consume(TokenType.WORD).Text);
+
+			if (this.Match(TokenType.AS)) {
+				if (importedNames.Count > 0) {
+					throw new LumenException("expression \"from ... as ...\" is forbidden", this.line, this.file);
 				}
 
-				return new Import(pathBuild.ToString(), /*isFrom*/true, importAll, entities, this.file, this.line);
+				mainAlias = this.Consume(TokenType.WORD).Text;
 			}
 
-			// import x... (!from)
-			StringBuilder pathBuilder = new StringBuilder(this.Consume(TokenType.WORD).Text);
-
-			while (this.Match(TokenType.DOT)) {
-				pathBuilder.Append("\\").Append(this.Consume(TokenType.WORD).Text);
-			}
-
-			return new Import(pathBuilder.ToString(), false, false, null, this.file, this.line);
+			return new Import(importPath, importedNames, mainAlias, this.file, this.line);
 		}
 
 		private Expression ParseModule() {
@@ -597,7 +609,7 @@ namespace Lumen.Lmi {
 
 			Token currentToken = this.GetToken(0);
 
-			if(currentToken.Type == TokenType.WORD && currentToken.Text == "rec") {
+			if (currentToken.Type == TokenType.WORD && currentToken.Text == "rec") {
 				this.Consume(TokenType.WORD);
 				isRec = true;
 			}
@@ -637,7 +649,7 @@ namespace Lumen.Lmi {
 				body = this.Expression();
 			}
 
-			if(isRec) {
+			if (isRec) {
 				BindingDeclaration binding = new BindingDeclaration(new NamePattern(name),
 						new IdExpression("rec", this.file, line), this.file, line);
 
@@ -770,7 +782,7 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.IS)) {
 				Int32 lineNumber = this.line;
 
-				if(this.Match(TokenType.NOT)) {
+				if (this.Match(TokenType.NOT)) {
 					return new BinaryOperator(new IsOperator(exp, this.FunctionalOperators(), lineNumber, this.file), UnitLiteral.Instance, Constants.NOT, lineNumber, this.file);
 				}
 
@@ -1030,11 +1042,9 @@ namespace Lumen.Lmi {
 					// (...).x
 					if (this.LookMatch(0, TokenType.WORD)) {
 						res = new DotOperator(res, this.Consume(TokenType.WORD).Text, this.file, line);
-					}
-					else if (this.LookMatch(0, TokenType.LIST_OPEN)) {
+					} else if (this.LookMatch(0, TokenType.LIST_OPEN)) {
 						res = this.Slice(res);
-					}
-					else if (this.Match(TokenType.TYPE)) {
+					} else if (this.Match(TokenType.TYPE)) {
 						res = new TypeOf(res, this.file, this.line);
 					}
 

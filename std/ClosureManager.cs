@@ -17,7 +17,7 @@ namespace Lumen.Lang {
 			this.Scope = scope;
 			this.declared = new List<String>();
 		}
-
+		
 		public void Declare(String name) {
 			if (!this.IsDeclared(name)) {
 				this.declared.Add(name);

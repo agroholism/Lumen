@@ -651,6 +651,9 @@ namespace Lumen.Lmi {
 				case "assert":
 					this.AddToken(TokenType.ASSERT);
 					break;
+				case "private":
+					this.AddToken(TokenType.PRIVATE);
+					break;
 				default:
 					this.AddToken(TokenType.WORD, word);
 					break;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	public class InfinityRange : BaseValueImpl {
+	public class InfinityRange : BaseValueImpl, IEnumerable<Value> {
 		public Double Step { get; private set; }
 
 		public Boolean HasStart => false;
@@ -12,7 +12,7 @@ namespace Lumen.Lang {
 		public Boolean IsInclusive => false;
 		public Boolean IsDownToUp => this.Step >= 0;
 
-		public override IType Type => Prelude.Flow;
+		public override IType Type => Prelude.Range;
 
 		public InfinityRange() {
 			this.Step = 1;
@@ -24,6 +24,16 @@ namespace Lumen.Lang {
 
 		public override String ToString() {
 			return $"...";
+		}
+
+		public IEnumerator<Value> GetEnumerator() {
+			while (true) {
+				yield return new Number(Double.NegativeInfinity);
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return this.GetEnumerator();
 		}
 	}
 
@@ -42,7 +52,7 @@ namespace Lumen.Lang {
 		public Boolean IsInclusive { get; private set; }
 		public Boolean IsDownToUp => (this.Start ?? 0) <= (this.end ?? Double.PositiveInfinity);
 
-		public override IType Type => Prelude.Flow;
+		public override IType Type => Prelude.Range;
 
 		public NumberRange Clone(Double step) {
 			return new NumberRange(this.Start ?? Double.PositiveInfinity,
@@ -50,7 +60,7 @@ namespace Lumen.Lang {
 		}
 
 		public NumberRange(Double begin, Double end, Boolean isInclusive)
-			: this(begin, end, begin <= end ? 1 : -1, isInclusive) { }
+			: this(begin, end, begin <= end || Double.IsInfinity(begin) ? 1 : -1, isInclusive) { }
 
 		public NumberRange(Double begin, Double end, Double step, Boolean isInclusive) {
 			this.Start = Double.IsInfinity(begin) ? null : (Double?)begin;

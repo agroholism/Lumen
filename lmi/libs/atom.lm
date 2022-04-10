@@ -1,0 +1,26 @@
+﻿private type Atom = 
+    | SimpleAtom uid
+    | NamedAtom uid name
+
+private let uidCounter = Mut 0
+private let globalAtomRegistry = MutMap ()
+
+/// Creates an unique atom
+let atom () =
+    uidCounter <- !uidCounter + 1
+    SimpleAtom (!uidCounter)
+
+/// Creates an unique atom for given name. Atoms with the same name
+/// are identical.
+let atom (name: Text) = 
+    match MutMap.get name globalAtomRegistry
+    | Some atom -> atom
+    | _ -> 
+        uidCounter <- !uidCounter + 1
+        let newAtom = NamedAtom (!uidCounter) name
+        globalAtomRegistry.[name] <- newAtom
+        newAtom
+
+let textAtomGenerator (template: Function) = atom >> _.uid >> template
+
+let textAtom = textAtomGenerator fun uid -> "atom-\(uid)"

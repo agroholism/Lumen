@@ -69,7 +69,7 @@ namespace Lumen.Lang {
 				return true;
 			}
 
-			if (value is NumberRange numberRange) {
+			if (value is IEnumerable<Value> numberRange) {
 				result = numberRange;
 				return true;
 			}

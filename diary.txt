@@ -139,16 +139,21 @@ Lumen 0.8
 + Monoid implementation for Function, Number
 + Alternative implementation for Collection
 
-28
-
-29
-
 03.01.2021
 + 1h refactoring stage 1
 + Number.parse, Number.tryParse
 + type pattern as constructor pattern
 + not pattern
 - if match
+
+08.o4.2022
++ atom, async modules
+
+09.04.2022
++ private keyword for top-level
+
+10.04.2022
++ import algorithm
 
 TODO:
 - fix import

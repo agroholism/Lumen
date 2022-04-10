@@ -51,7 +51,9 @@
     <Compile Include="CallStackRecord.cs" />
     <Compile Include="Classes\Monad.cs" />
     <Compile Include="Classes\Monoid.cs" />
+    <Compile Include="Modules\Module.cs" />
     <Compile Include="Modules\RangeModule.cs" />
+    <Compile Include="NameHelper.cs" />
     <Compile Include="Patterns\ContextPattern.cs" />
     <Compile Include="Values\FunctionalType.cs" />
     <Compile Include="Values\Fun\PartialFun.cs" />

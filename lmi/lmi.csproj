@@ -11,6 +11,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -108,6 +108,8 @@
     <Compile Include="Expression\From.cs" />
     <Compile Include="Expression\InternWithBindingDeclaration.cs" />
     <Compile Include="FunctionalTypeDeclaration.cs" />
+    <Compile Include="Importing\LumenImportException.cs" />
+    <Compile Include="Importing\ModuleImportManager.cs" />
     <Compile Include="Interpriter.cs" />
     <Compile Include="Expression\Literals\ArrayLiteral.cs" />
     <Compile Include="Expression\Declarations\ConstructorMetadata.cs" />
@@ -119,10 +121,12 @@
     <Compile Include="Expression\Literals\MapLiteral.cs" />
     <Compile Include="Expression\Generators\ListGenerator.cs" />
     <Compile Include="Expression\Patterns\NotPattern.cs" />
+    <Compile Include="Importing\OpaqueImport.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Expression\Control flow\Tailrec.cs" />
     <Compile Include="Expression\Control flow\Raise.cs" />
     <Compile Include="Expression\Patterns\RangePattern.cs" />
+    <Compile Include="PrivateDeclaration.cs" />
     <Compile Include="RangeOperator.cs" />
     <Compile Include="Expression\Literals\SeqLiteral.cs" />
     <Compile Include="Token.cs" />
@@ -148,6 +152,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="libs\async.lm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="libs\atom.lm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

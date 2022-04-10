@@ -204,4 +204,26 @@ namespace Lumen.Lang {
 			});
 		}
 	}
+
+	public sealed class PrivacyError : ErrorModule {
+		internal PrivacyError() : base() {
+			this.Name = "PrivacyError";
+
+			this.constructor = new ExceptionConstructor("PrivacyError", this, "message");
+
+			this.SetMember("<init>", new LambdaFun((scope, args) => {
+				return this.MakeExceptionInstance(scope["message"]);
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("message"),
+				}
+			});
+
+			this.SetMember("getMessage", new LambdaFun((scope, args) => {
+				return new Text((scope["self"] as Instance).GetField("message").ToString());
+			}) {
+				Parameters = Const.Self
+			});
+		}
+	}
 }

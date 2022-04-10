@@ -13,7 +13,7 @@ namespace Lumen.Lang {
 		Object IEnumerator.Current => this.internalValue.Current;
 
 		public Value Result => 
-			this.scope.ExistsInThisScope(Constants.YIELD_RESULT_SPECIAL_NAME) ? this.scope[Constants.YIELD_RESULT_SPECIAL_NAME] : null;
+			this.scope.IsExistsInThisScope(Constants.YIELD_RESULT_SPECIAL_NAME) ? this.scope[Constants.YIELD_RESULT_SPECIAL_NAME] : null;
 
 		public FlowAutomat(IEnumerator<Value> internalValue, Scope scope) {
 			this.internalValue = internalValue;

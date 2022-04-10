@@ -1,20 +1,28 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lumen.Lang {
 	public class Scope {
 		public readonly IDictionary<String, Value> variables;
 		public readonly List<Module> usings;
-		public readonly Scope parent;
-		public Dictionary<String, List<Value>> attributes;
+		public readonly Scope? parent;
+		private readonly HashSet<String> privates;
 
-		private IEnumerable<String> AvailableNames {
+		public IEnumerable<String> Privates {
+			get {
+				foreach (String item in this.privates) {
+					yield return item;
+				}
+			}
+		}
+
+		public IEnumerable<String> AvailableNames {
 			get {
 				foreach (var item in this.variables) {
 					yield return item.Key;
 				}
-
 
 				foreach (Module use in this.usings) {
 					foreach(var item in use.Members) {
@@ -30,19 +38,37 @@ namespace Lumen.Lang {
 			}
 		}
 
+		public IEnumerable<(String name, Value value)> ExportedVariables {
+			get {
+				foreach (KeyValuePair<String, Value> variable in this.variables) {
+					if (!this.IsPrivate(variable.Key)) {
+						yield return  (variable.Key, variable.Value);
+					}
+				}
+			}
+		}
+
 		public Value this[String name] {
 			get => this.Get(name);
 			set => this.Bind(name, value);
 		}
-
+		
 		public Scope() {
 			this.variables = new Dictionary<String, Value>();
 			this.usings = new List<Module> { Prelude.Instance };
-			this.attributes = new Dictionary<String, List<Value>>();
+			this.privates = new HashSet<String>();
 		}
-
+		
 		public Scope(Scope parent) : this() {
 			this.parent = parent;
+		}
+
+		public void DeclarePrivate(String name) {
+			this.privates.Add(name);
+		}
+
+		public Boolean IsPrivate(String name) {
+			return this.privates.Contains(name);
 		}
 
 		public void Remove(String name) {
@@ -65,11 +91,11 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Boolean ExistsInThisScope(String name) {
+		public Boolean IsExistsInThisScope(String name) {
 			return this.variables.ContainsKey(name);
 		}
 
-		public Boolean TryGetFromThisScope(String name, out Value result) {
+		public Boolean TryGetFromThisScope(String name, out Value? result) {
 			if (this.variables.TryGetValue(name, out Value value)) {
 				result = value;
 				return true;
@@ -79,7 +105,7 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Boolean TryGet(String name, out Value result) {
+		public Boolean TryGet(String name, out Value? result) {
 			if (this.variables.TryGetValue(name, out Value value)) {
 				result = value;
 				return true;
@@ -100,14 +126,6 @@ namespace Lumen.Lang {
 
 			result = null;
 			return false;
-		}
-
-		public void SetAttribute(String id, Value val) {
-			if (this.attributes.TryGetValue(id, out List<Value> attributesList)) {
-				attributesList.Add(val);
-			}
-
-			this.attributes[id] = new List<Value> { val };
 		}
 
 		public Value Get(String name) {
@@ -139,21 +157,18 @@ namespace Lumen.Lang {
 			};
 		}
 
+		/// <summary>
+		/// Binds a value with some name (there is no checking for binding existense)
+		/// </summary>
 		public void Bind(String name, Value value) {
 			this.variables[name] = value;
 		}
 
-		public void AddUsing(Module obj) {
-			this.usings.Add(obj);
-		}
-
-		public List<String> FindClosestNames(Double maxValue, String key) {
-			List<String> maybe = this.AvailableNames
-								.Where(i => Helper.Levenshtein(i, key) < maxValue)
-								.OrderBy(i => Helper.Levenshtein(i, key))
-								.Distinct()
-								.ToList();
-			return maybe;
+		/// <summary>
+		/// Adds module into the search path of the scope
+		/// </summary>
+		public void AddUsing(Module module) {
+			this.usings.Add(module);
 		}
 	}
 }

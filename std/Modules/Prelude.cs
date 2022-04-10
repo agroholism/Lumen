@@ -27,6 +27,7 @@ namespace Lumen.Lang {
 		public static ErrorModule CollectionIsEmpty { get; } = new CollectionIsEmpty();
 		public static ErrorModule InvalidOperation { get; } = new InvalidOperation();
 		public static ErrorModule InvalidArgument { get; } = new InvalidArgument();
+		public static ErrorModule PrivacyError { get; } = new PrivacyError();
 		public static ErrorModule Error { get; } = new Error();
 
 		public static Module Any { get; } = new AnyModule();
@@ -42,6 +43,7 @@ namespace Lumen.Lang {
 		public static Module MutMap { get; } = new MutMapModule();
 		public static Module Pair { get; } = new MutMapModule.PairModule();
 		public static Module Text { get; } = new TextModule();
+		public static Module Module { get; } = new ModuleModule();
 		public static Module List { get; } = new ListModule();
 		public static Module Future { get; } = new FutureModule();
 
@@ -58,8 +60,6 @@ namespace Lumen.Lang {
 		public static Prelude Instance { get; } = new Prelude();
 
 		#endregion
-
-		public static Dictionary<String, Module> GlobalImportCache { get; } = new Dictionary<String, Module>();
 
 		private Prelude() {
 			this.SetMember("Prelude", this);
@@ -84,6 +84,7 @@ namespace Lumen.Lang {
 			this.SetMember("FunctionIsNotImplemented", FunctionIsNotImplemented);
 			this.SetMember("AssertError", AssertError);
 			this.SetMember("ConvertError", ConvertError);
+			this.SetMember("PrivacyError", PrivacyError);
 			this.SetMember("Error", Error);
 
 			this.SetMember("Unit", Unit);
@@ -110,6 +111,8 @@ namespace Lumen.Lang {
 			this.SetMember("Future", Future);
 
 			this.SetMember("MutMap", MutMap);
+
+			this.SetMember("Module", Module);
 
 			this.SetMember("True", Const.TRUE);
 			this.SetMember("False", Const.FALSE);

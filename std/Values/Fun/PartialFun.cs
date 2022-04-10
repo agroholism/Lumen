@@ -35,7 +35,7 @@ namespace Lumen.Lang {
 		}
 
 		private void SetActualRecFunction(Scope scope) {
-			if (scope.ExistsInThisScope("rec") && scope["rec"] is not PartialFun) {
+			if (scope.IsExistsInThisScope("rec") && scope["rec"] is not PartialFun) {
 				return;
 			}
 

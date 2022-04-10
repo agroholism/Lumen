@@ -6,17 +6,27 @@ namespace Lumen.Lang {
 	public class Module : BaseValueImpl, IType {
 		public String Name { get; protected set; }
 		public Dictionary<String, Value> Members { get; protected set; }
-		protected List<Module> Mixins { get; private set; }
+		internal List<Module> Mixins { get; private set; }
+		private readonly HashSet<String> privates;
 
 		public override IType Type => Prelude.Function;
 
 		public Module() {
 			this.Members = new Dictionary<String, Value>();
 			this.Mixins = new List<Module>();
+			this.privates = new HashSet<string>();
 		}
 
 		public Module(String name) : this() {
 			this.Name = name;
+		}
+
+		public void DeclarePrivate(String name) {
+			this.privates.Add(name);
+		}
+
+		public Boolean IsPrivate(String name) {
+			return this.privates.Contains(name);
 		}
 
 		public Boolean Contains(String name) {
@@ -48,7 +58,9 @@ namespace Lumen.Lang {
 		}
 
 		public Boolean TryGetMember(String name, out Value result) {
-			if (this.Members.TryGetValue(name, out result)) {
+			result = null;
+
+			if (!this.IsPrivate(name) && this.Members.TryGetValue(name, out result)) {
 				return true;
 			}
 
@@ -70,6 +82,10 @@ namespace Lumen.Lang {
 				return result;
 			}
 
+			if (this.IsPrivate(name)) {
+				throw new LumenException(Prelude.PrivacyError.constructor, $"can not use private name \"{name}\" from module \"{this}\"");
+			}
+
 			List<String> maybe = this.FindClosestNames(5, name);
 
 			String note = null;
@@ -84,7 +100,7 @@ namespace Lumen.Lang {
 				note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}";
 			}
 
-			throw new LumenException($"Module {this.Name} does not contains a name \"{name}\"") {
+			throw new LumenException($"module \"{this}\" does not contains a name \"{name}\"") {
 				Note = note
 			};
 		}
@@ -131,6 +147,10 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
+			if (this.TryGetMember(Constants.PARENT_MODULE_SPECIAL_NAME, out Value parent) && parent is Module module) {
+				return $"{module}.{this.Name}";
+			}
+
 			return $"{this.Name}";
 		}
 	}

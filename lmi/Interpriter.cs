@@ -9,7 +9,6 @@ using Lumen.Lang;
 using String = System.String;
 using System.Linq;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Lumen.Lmi {
 	public static class Interpriter {

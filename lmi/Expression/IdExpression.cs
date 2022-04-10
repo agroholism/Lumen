@@ -19,22 +19,8 @@ namespace Lumen.Lmi {
 
 		public Value Eval(Scope scope) {
 			if (!scope.IsExsists(this.id)) {
-				List<String> maybe = scope.FindClosestNames(5, this.id);
-
-				String note = null;
-
-				if (maybe.Count == 1) {
-					note = $"Perhaps you meant '{maybe[0]}'?";
-				}
-				else if (maybe.Count > 3) {
-					note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe.Take(3))}";
-				}
-				else if (maybe.Count > 1) {
-					note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}";
-				}
-
 				throw new LumenException(Exceptions.UNKNOWN_NAME.F(this.id), this.line, this.file) {
-					Note = note
+					Note = NameHelper.MakeNamesNote(scope.AvailableNames, this.id),
 				};
 			}
 
@@ -48,22 +34,8 @@ namespace Lumen.Lmi {
 		public Expression Closure(ClosureManager manager) {
 			if (!manager.IsDeclared(this.id)) {
 				if (!manager.Scope.IsExsists(this.id)) {
-					List<String> maybe = manager.Scope.FindClosestNames(5, this.id);
-
-					String note = null;
-
-					if (maybe.Count == 1) {
-						note = $"Perhaps you meant '{maybe[0]}'?";
-					}
-					else if (maybe.Count > 3) {
-						note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe.Take(3))}";
-					}
-					else if (maybe.Count > 1) {
-						note = $"Perhaps you meant one of these names: {Environment.NewLine}\t{String.Join(Environment.NewLine + "\t", maybe)}";
-					}
-
 					throw new LumenException(Exceptions.UNKNOWN_NAME.F(this.id), this.line, this.file) {
-						Note = note
+						Note = NameHelper.MakeNamesNote(manager.Scope.AvailableNames, this.id),
 					};
 				}
 

@@ -74,6 +74,45 @@ namespace Lumen.Lang {
 				}
 			});
 
+			this.SetMember("contains", new LambdaFun((e, args) => {
+				var value = e["value"];
+				var self = e["self"];
+
+				if (self is InfinityRange) {
+					return new Logical(true);
+				}
+
+				if (self is NumberRange numrange) {
+					if (!numrange.HasEnd) {
+						if (!numrange.HasStart) {
+							return Const.FALSE;
+						}
+
+						return new Logical(numrange.Start.Value <= value.ToDouble(e));
+					} else if (!numrange.HasStart) {
+						if (numrange.IsInclusive) {
+							return new Logical(numrange.End.Value >= value.ToDouble(e));
+						}
+
+						return new Logical(numrange.End.Value > value.ToDouble(e));
+					}
+
+					if (numrange.IsInclusive) {
+						return new Logical(numrange.Start.Value <= value.ToDouble(e) && value.ToDouble(e) <= numrange.End.Value);
+					}
+
+					return new Logical(numrange.Start.Value <= value.ToDouble(e) && value.ToDouble(e) < numrange.End.Value);
+				}
+
+				throw new LumenException("hasEnd");
+			}) {
+				Parameters = new List<IPattern> {
+							new NamePattern("value"),
+					new NamePattern("self"),
+			
+				}
+			});
+
 			this.AppendImplementation(Prelude.Default);
 			this.AppendImplementation(Prelude.Collection);
 		}

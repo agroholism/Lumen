@@ -28,7 +28,7 @@ namespace Lumen.Lmi {
 				if (this.expressions[i] is BindingDeclaration binding) {
 					List<String> declared = binding.pattern.GetDeclaredVariables();
 					foreach (String x in declared) {
-						if (e.ExistsInThisScope(x)) {
+						if (e.IsExistsInThisScope(x)) {
 							savedBindings[x] = e[x];
 							e.Remove(x);
 						}
@@ -38,15 +38,17 @@ namespace Lumen.Lmi {
 				this.expressions[i].Eval(e);
 			}
 
+			Value result = Const.UNIT;
+
 			if (this.expressions.Count > 0) {
-				return this.expressions[this.expressions.Count - 1].Eval(e);
+				result = this.expressions[this.expressions.Count - 1].Eval(e);
 			}
 
 			foreach (KeyValuePair<String, Value> item in savedBindings) {
 				e[item.Key] = item.Value;
 			}
 
-			return Const.UNIT;
+			return result;
 		}
 
 		public override String ToString() {

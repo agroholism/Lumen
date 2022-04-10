@@ -53,7 +53,7 @@ namespace Lumen.Lmi {
 				new UserFun(closuredPatterns, closuredBody, this.name);
 
 			// Multi dispatching
-			if (scope.ExistsInThisScope(this.name)) {
+			if (scope.IsExistsInThisScope(this.name)) {
 				Value value = scope[this.name];
 
 				if (value is DispatcherFunction dispatcher) {

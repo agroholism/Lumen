@@ -15,7 +15,7 @@ namespace Lumen.Lang {
 
 		public Int32 Line => this.callStack.Count > 0 ? this.callStack[0].LineNumber : -1;
 		public String File => this.callStack[0].FileName;
-
+		
 		public LumenException(String message) : base(message) {
 			this.Type = Prelude.Error;
 			this.items = new[] { new Text(message) };

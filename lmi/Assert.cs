@@ -29,7 +29,7 @@ namespace Lumen.Lmi {
 
 				String currentFunctionName = null;
 
-				if (scope.ExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
+				if (scope.IsExistsInThisScope("rec") && scope["rec"] is Fun currentFunction) {
 					currentFunctionName = currentFunction.Name;
 				}
 
