@@ -2,7 +2,7 @@
 
 namespace Lumen.Lang {
 	public sealed class Mut : BaseValueImpl {
-		public IValue Value { get; set; }
+		internal IValue Value { get; set; }
 
 		public override IType Type => Prelude.Mut;
 
