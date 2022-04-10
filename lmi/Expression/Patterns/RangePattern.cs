@@ -1,33 +1,33 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
-using Lumen.Lang;
-using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang.Patterns {
 	internal class RangePattern : IPattern {
-		private IPattern left;
-		private IPattern right;
-		private Boolean isInclusive;
+		private readonly IPattern? left;
+		private readonly IPattern? right;
+		private readonly Boolean isInclusive;
 
-		public RangePattern(IPattern left, IPattern right, Boolean isInclusive) {
+		public RangePattern(IPattern? left, IPattern? right, Boolean isInclusive) {
 			this.left = left;
 			this.right = right;
 			this.isInclusive = isInclusive;
 		}
 
 		public MatchResult Match(IValue value, Scope scope) {
-			IValue leftValue = (this.left as ValuePattern)?.value;
-			IValue rightValue = (this.right as ValuePattern)?.value;
+			IValue? leftValue = (this.left as ValuePattern)?.Value;
+			IValue? rightValue = (this.right as ValuePattern)?.Value;
 
 			if (leftValue == null && rightValue == null) {
 				return MatchResult.Success;
 			}
 
 			if (leftValue == null) {
-				Fun _comparator = rightValue.Type.GetMember("compare", scope).ToFunction(scope);
-
 				try {
-					Double rightResult = _comparator.Call(scope, value, rightValue).ToDouble(scope);
+					Fun comparator = rightValue!.Type.GetMember("compare", scope).ToFunction(scope);
+
+					Double rightResult = comparator.Call(scope, value, rightValue).ToDouble(scope);
 
 					Boolean result = this.isInclusive ? rightResult <= 0 : rightResult < 0;
 
@@ -45,10 +45,10 @@ namespace Lumen.Lang.Patterns {
 				);
 			}
 
-			Fun comparator = leftValue.Type.GetMember("compare", scope).ToFunction(scope);
-
 			if (rightValue == null) {
 				try {
+					Fun comparator = leftValue.Type.GetMember("compare", scope).ToFunction(scope);
+
 					Boolean result = comparator.Call(new Scope(scope), leftValue, value).ToDouble(scope) <= 0;
 
 					if (result) {
@@ -66,6 +66,8 @@ namespace Lumen.Lang.Patterns {
 			}
 
 			try {
+				Fun comparator = leftValue.Type.GetMember("compare", scope).ToFunction(scope);
+
 				Double leftResult = comparator.Call(new Scope(scope), leftValue, value).ToDouble(scope);
 				Double rightResult = comparator.Call(scope, value, rightValue).ToDouble(scope);
 
