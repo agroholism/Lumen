@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public class Mut : BaseValueImpl {
+	public sealed class Mut : BaseValueImpl {
 		public IValue Value { get; set; }
 
 		public override IType Type => Prelude.Mut;
@@ -11,7 +11,7 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
-			return $"[Ref {this.Value}]";
+			return $"(Mut {this.Value})";
 		}
 	}
 }
