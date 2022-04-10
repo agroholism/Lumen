@@ -3,17 +3,17 @@ using System.Linq;
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
-	public sealed class Flow : Value {
-		internal IEnumerable<Value> InternalValue { get; private set; }
+	public sealed class Flow : IValue {
+		internal IEnumerable<IValue> InternalValue { get; private set; }
 
-		public static Flow Empty => new Flow(Enumerable.Empty<Value>());
+		public static Flow Empty => new Flow(Enumerable.Empty<IValue>());
 
-		public Flow(IEnumerable<Value> innerValue) {
+		public Flow(IEnumerable<IValue> innerValue) {
 			this.InternalValue = innerValue;
 		}
 
-		public Value Clone() {
-			return (Value)this.MemberwiseClone();
+		public IValue Clone() {
+			return (IValue)this.MemberwiseClone();
 		}
 
 		public Int32 CompareTo(Object obj) {

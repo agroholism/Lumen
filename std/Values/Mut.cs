@@ -2,11 +2,11 @@
 
 namespace Lumen.Lang {
 	public class Mut : BaseValueImpl {
-		public Value Value { get; set; }
+		public IValue Value { get; set; }
 
 		public override IType Type => Prelude.Mut;
 
-		public Mut(Value value) {
+		public Mut(IValue value) {
 			this.Value = value;
 		}
 

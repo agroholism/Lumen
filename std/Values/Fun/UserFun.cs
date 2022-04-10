@@ -25,7 +25,7 @@ namespace Lumen.Lang {
 			return this.Name ?? $"[Function {this.GetHashCode()}]";
 		}
 
-		public Value Call(Scope e, params Value[] arguments) {
+		public IValue Call(Scope e, params IValue[] arguments) {
 			if (this.Parameters.Count(i => i is not ContextPattern) > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
 			}
@@ -76,7 +76,7 @@ namespace Lumen.Lang {
 				offset--;
 			}
 
-			Value result;
+			IValue result;
 			try {
 				result = this.body.Eval(e);
 			}

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 
 namespace Lumen.Lang {
-	public class MutMap : Value {
-		internal Dictionary<Value, Value> InternalValue { get; private set; }
+	public class MutMap : IValue {
+		internal Dictionary<IValue, IValue> InternalValue { get; private set; }
 
 		public MutMap() {
-			this.InternalValue = new Dictionary<Value, Value>();
+			this.InternalValue = new Dictionary<IValue, IValue>();
 		}
 
-		public MutMap(Dictionary<Value, Value> value) {
+		public MutMap(Dictionary<IValue, IValue> value) {
 			this.InternalValue = value;
 		}
 
@@ -47,7 +47,7 @@ namespace Lumen.Lang {
 
 			StringBuilder builder = new StringBuilder("[");
 			Int32 indexer = 0;
-			foreach (KeyValuePair<Value, Value> i in this.InternalValue) {
+			foreach (KeyValuePair<IValue, IValue> i in this.InternalValue) {
 				builder.Append(i.Key + ": " + i.Value.ToString());
 				if (indexer < this.InternalValue.Count - 1) {
 					builder.Append(", ");

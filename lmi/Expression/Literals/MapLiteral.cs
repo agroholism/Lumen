@@ -14,8 +14,8 @@ namespace Lumen.Lmi {
             return this;
         }
 
-        public Value Eval(Scope e) {
-            Dictionary<Value, Value> res = new Dictionary<Value, Value>();
+        public IValue Eval(Scope e) {
+            Dictionary<IValue, IValue> res = new Dictionary<IValue, IValue>();
 
             foreach(KeyValuePair<Expression, Expression> i in this.exps) {
                 res.Add(i.Key.Eval(e), i.Value.Eval(e));
@@ -24,7 +24,7 @@ namespace Lumen.Lmi {
             return new MutMap(res);
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
             yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
         }
 	}

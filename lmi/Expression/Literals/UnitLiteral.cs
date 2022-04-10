@@ -16,11 +16,11 @@ namespace Lumen.Lmi {
             return this;
         }
 
-        public Value Eval(Scope scope) {
+        public IValue Eval(Scope scope) {
             return Const.UNIT;
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
             yield return new GeneratorExpressionTerminalResult(Const.UNIT);
         }
 

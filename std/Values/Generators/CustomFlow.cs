@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Lumen.Lang.Expressions;
 
 namespace Lumen.Lang {
-	public class CustomFlow : IEnumerable<Value> {
+	public class CustomFlow : IEnumerable<IValue> {
 		private Expression generatorBody;
 		private Scope associatedScope;
 
@@ -13,11 +13,11 @@ namespace Lumen.Lang {
 			this.associatedScope = associatedScope;
 		}
 
-		private IEnumerable<Value> Run(Scope scope) {
-			IEnumerator<Value> enumerator = this.generatorBody.EvalWithYield(scope).GetEnumerator();
+		private IEnumerable<IValue> Run(Scope scope) {
+			IEnumerator<IValue> enumerator = this.generatorBody.EvalWithYield(scope).GetEnumerator();
 
 			while (true) {
-				Value exitValue = null;
+				IValue exitValue = null;
 
 				try {
 					Boolean canMove = enumerator.MoveNext();
@@ -44,7 +44,7 @@ namespace Lumen.Lang {
 			}
 		}
 
-		public IEnumerator<Value> GetEnumerator() {
+		public IEnumerator<IValue> GetEnumerator() {
 			Scope scope = new Scope(this.associatedScope);
 			return new FlowAutomat(this.Run(scope).GetEnumerator(), scope);
 		}

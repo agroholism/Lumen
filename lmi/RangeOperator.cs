@@ -32,11 +32,11 @@ namespace Lumen.Lmi {
 				this.isInclusive, this.line, this.file);
 		}
 
-		public Value Eval(Scope scope) {
-			Value startValue = this.startExpression?.Eval(scope) ?? Const.UNIT;
-			Value endValue = this.endExpression?.Eval(scope) ?? Const.UNIT;
+		public IValue Eval(Scope scope) {
+			IValue startValue = this.startExpression?.Eval(scope) ?? Const.UNIT;
+			IValue endValue = this.endExpression?.Eval(scope) ?? Const.UNIT;
 
-			Value stepValue = this.stepExpression?.Eval(scope);
+			IValue stepValue = this.stepExpression?.Eval(scope);
 
 			if (startValue == Const.UNIT) {
 				if (endValue == Const.UNIT) {
@@ -47,7 +47,7 @@ namespace Lumen.Lmi {
 					return new InfinityRange();
 				}
 
-				Value result =
+				IValue result =
 						new Applicate(new DotOperator(
 						new ValueLiteral(endValue.Type), this.isInclusive ? Constants.RANGE_INCLUSIVE : Constants.RANGE_EXCLUSIVE,
 						this.file, this.line), new List<Expression> { new ValueLiteral(startValue), new ValueLiteral(endValue) }, this.file, this.line).Eval(scope);
@@ -62,7 +62,7 @@ namespace Lumen.Lmi {
 				return result;
 			}
 
-			Value _result = new Applicate(new DotOperator(
+			IValue _result = new Applicate(new DotOperator(
 				new ValueLiteral(startValue.Type), this.isInclusive ? Constants.RANGE_INCLUSIVE : Constants.RANGE_EXCLUSIVE,
 				this.file, this.line), new List<Expression> { new ValueLiteral(startValue), new ValueLiteral(endValue)
 				}, this.file, this.line).Eval(scope);
@@ -77,7 +77,7 @@ namespace Lumen.Lmi {
 			return _result;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

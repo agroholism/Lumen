@@ -14,7 +14,7 @@ namespace Lumen.Lmi {
             return this;
         }
 
-        public Value Eval(Scope e) {
+        public IValue Eval(Scope e) {
             return new Text(this.text);
         }
 
@@ -22,7 +22,7 @@ namespace Lumen.Lmi {
             return $"\"{this.text}\"";
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 	}

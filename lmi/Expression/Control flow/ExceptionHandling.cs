@@ -16,8 +16,8 @@ namespace Lumen.Lmi {
 			this.ensureBody = finallyBody;
 		}
 
-		public Value Eval(Scope scope) {
-			Value expressionResult = null;
+		public IValue Eval(Scope scope) {
+			IValue expressionResult = null;
 
 RETRY_OUTER:
 			Boolean isRetry = false;
@@ -29,7 +29,7 @@ RETRY_OUTER:
 				throw;
 			}
 			catch (Exception ex) {
-				Value raisedException = ex as LumenException ?? new LumenException(ex.Message);
+				IValue raisedException = ex as LumenException ?? new LumenException(ex.Message);
 
 				scope[Constants.LAST_EXCEPTION_SPECIAL_NAME] = raisedException;
 RETRY:
@@ -60,15 +60,15 @@ RETRY:
 			return expressionResult;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerator<Value> enumerator = this.tryBody.EvalWithYield(scope).GetEnumerator();
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerator<IValue> enumerator = this.tryBody.EvalWithYield(scope).GetEnumerator();
 
 			GeneratorExpressionTerminalResult tryExceptRescueResult = null;
 
 			Exception exception = null;
 			Boolean canNext = true;
 			while (true) {
-				Value value;
+				IValue value;
 
 				try {
 					if (!canNext) {
@@ -95,11 +95,11 @@ RETRY:
 			}
 
 			if (exception != null) {
-				Value raisedException = exception as LumenException ?? new LumenException(exception.Message);
+				IValue raisedException = exception as LumenException ?? new LumenException(exception.Message);
 
 				foreach (KeyValuePair<IPattern, Expression> exceptBody in this.exceptBodies) {
 					if (exceptBody.Key.Match(raisedException, scope).IsSuccess) {
-						foreach (Value evaluationResult in exceptBody.Value.EvalWithYield(scope)) {
+						foreach (IValue evaluationResult in exceptBody.Value.EvalWithYield(scope)) {
 							if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 								tryExceptRescueResult = terminalResult;
 							}
@@ -113,7 +113,7 @@ RETRY:
 			}
 
 			if (this.ensureBody != null) {
-				foreach (Value evaluationResult in this.ensureBody.EvalWithYield(scope)) {
+				foreach (IValue evaluationResult in this.ensureBody.EvalWithYield(scope)) {
 					yield return evaluationResult;
 				}
 			}

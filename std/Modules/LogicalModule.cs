@@ -9,7 +9,7 @@ namespace Lumen.Lang {
 			#region operators
 
 			this.SetMember("compare", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return (Number)scope["self"].CompareTo(other);
 			}) {

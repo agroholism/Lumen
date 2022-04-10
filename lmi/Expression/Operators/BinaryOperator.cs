@@ -21,7 +21,7 @@ namespace Lumen.Lmi {
 			this.fileName = file;
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			if (this.expressionOne is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.expressionTwo == null) {
@@ -41,7 +41,7 @@ namespace Lumen.Lmi {
 				return new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.file, _ide.line), this.operation, this.line, this.fileName));
 			}
 
-			Value operandOne = this.expressionOne.Eval(e);
+			IValue operandOne = this.expressionOne.Eval(e);
 
 			if (this.operation == "and") {
 				return !Converter.ToBoolean(operandOne) ? new Logical(false) : new Logical(Converter.ToBoolean(this.expressionTwo.Eval(e)));
@@ -63,7 +63,7 @@ namespace Lumen.Lmi {
 				return !Helper.IsEmpty(operandOne) ? operandOne : this.expressionTwo.Eval(e);
 			}
 
-			Value operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.UNIT;
+			IValue operandTwo = this.expressionTwo != null ? this.expressionTwo.Eval(e) : Const.UNIT;
 
 			List<Expression> exps = new List<Expression> { new ValueLiteral(operandOne) };
 			if (this.expressionTwo != null) {
@@ -79,7 +79,7 @@ namespace Lumen.Lmi {
 			return new Applicate(new DotOperator(new ValueLiteral(type), this.operation, this.fileName, this.line), exps, this.fileName, this.line).Eval(s);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope e) {
+		public IEnumerable<IValue> EvalWithYield(Scope e) {
 			if (this.expressionOne is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.expressionTwo == null) {
@@ -99,10 +99,10 @@ namespace Lumen.Lmi {
 				yield return new GeneratorExpressionTerminalResult(new UserFun(new List<IPattern> { new NamePattern("x") }, new BinaryOperator(new ValueLiteral(this.expressionOne.Eval(e)), new IdExpression("x", _ide.file, _ide.line), this.operation, this.line, this.fileName)));
 			}
 
-			IEnumerable<Value> ops = this.expressionOne.EvalWithYield(e);
-			Value operandOne = Const.UNIT;
+			IEnumerable<IValue> ops = this.expressionOne.EvalWithYield(e);
+			IValue operandOne = Const.UNIT;
 
-			foreach (Value i in ops) {
+			foreach (IValue i in ops) {
 				if (i is GeneratorExpressionTerminalResult cgv1) {
 					operandOne = cgv1.Value;
 				}
@@ -111,11 +111,11 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			Value operandTwo = Const.UNIT;
+			IValue operandTwo = Const.UNIT;
 
 			if (this.expressionTwo != null) {
-				IEnumerable<Value> ops2 = this.expressionTwo.EvalWithYield(e);
-				foreach (Value i in ops2) {
+				IEnumerable<IValue> ops2 = this.expressionTwo.EvalWithYield(e);
+				foreach (IValue i in ops2) {
 					if (i is GeneratorExpressionTerminalResult cgv2) {
 						operandTwo = cgv2.Value;
 					}

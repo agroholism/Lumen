@@ -21,7 +21,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(">>=", new LambdaFun((scope, args) => {
-				Value monad = scope["monad"];
+				IValue monad = scope["monad"];
 				return monad.Type.GetMember("bind", scope).ToFunction(scope).Call(new Scope(), scope["fn"], monad);
 			}) {
 				Name = ">>=",
@@ -32,7 +32,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("=<<", new LambdaFun((scope, args) => {
-				Value monad = scope["monad"];
+				IValue monad = scope["monad"];
 				return monad.Type.GetMember("bind", scope).ToFunction(scope).Call(new Scope(), scope["fn"], monad);
 			}) {
 				Name = "=<<",
@@ -43,8 +43,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("lift", new LambdaFun((scope, args) => {
-				Value mf = scope["mf"];
-				Value ma = scope["ma"];
+				IValue mf = scope["mf"];
+				IValue ma = scope["ma"];
 
 				Fun wrap = mf.Type.GetMember("wrap", scope).ToFunction(scope);
 				Fun mabind = ma.Type.GetMember(">>=", scope).ToFunction(scope);
@@ -53,9 +53,9 @@ namespace Lumen.Lang {
 					Fun f = inScope["f"].ToFunction(inScope); // mf >>= fun f -> ...
 
 					return mabind.Call(new Scope(scope), ma, new LambdaFun((inScope2, inArgs2) => {
-						Value a = inScope2["a"]; // ma >>= fun a -> ...
+						IValue a = inScope2["a"]; // ma >>= fun a -> ...
 
-						Value fa = f.Call(new Scope(), a); // f a
+						IValue fa = f.Call(new Scope(), a); // f a
 
 						return wrap.Call(new Scope(), fa); // pure (f a)
 

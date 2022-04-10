@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public class Unit : Value {
+	public class Unit : IValue {
 		public IType Type => Prelude.Unit;
 
 		public Int32 CompareTo(Object obj) {

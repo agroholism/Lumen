@@ -21,8 +21,8 @@ namespace Lumen.Lmi {
 			return new IndexationAssign(this.expression.Closure(manager) as Indexation, this.assignable.Closure(manager), this.Line, this.File);
 		}
 
-		public Value Eval(Scope e) {
-			Value value = this.expression.expression.Eval(e);
+		public IValue Eval(Scope e) {
+			IValue value = this.expression.expression.Eval(e);
 			List<Expression> exps = new List<Expression> {
 				new ArrayLiteral(this.expression.indices),
 				this.assignable,
@@ -33,7 +33,7 @@ namespace Lumen.Lmi {
 				new DotOperator(new ValueLiteral(value.Type), Constants.SETI, null, -1), exps, this.File, this.Line).Eval(e);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}

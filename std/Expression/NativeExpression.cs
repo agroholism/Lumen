@@ -12,11 +12,11 @@ namespace Lumen.Lang.Expressions {
 			return this;
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			return this.function(e);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}

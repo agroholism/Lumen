@@ -11,7 +11,7 @@ namespace Lumen.Lang.Patterns {
 
 		}
 
-        public MatchResult Match(Value value, Scope scope) {
+        public MatchResult Match(IValue value, Scope scope) {
             return MatchResult.Success;
         }
 

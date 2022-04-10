@@ -44,14 +44,14 @@ namespace Lumen.Lang.Patterns {
 			return this.subpattern.GetDeclaredVariables();
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			foreach (Expression requirement in this.requirements) {
 				if (requirement is IdExpression idExpression && idExpression.id.StartsWith("'")) {
 					scope[idExpression.id] = value.Type;
 					continue;
 				}
 
-				Value requiredType = requirement.Eval(scope);
+				IValue requiredType = requirement.Eval(scope);
 
 				if(requiredType is GenericLater) {
 					scope[(requirement as IdExpression).id] = value.Type;

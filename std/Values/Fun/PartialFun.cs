@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	public class PartialFun : Value, Fun {
+	public class PartialFun : IValue, Fun {
 		public Fun InnerFunction { get; set; }
-		public Value[] Args { get; set; }
+		public IValue[] Args { get; set; }
 		public Int32 restArgs;
 
 		public String Name { get; set; }
@@ -13,7 +13,7 @@ namespace Lumen.Lang {
 		public IType Parent { get; set; }
 		public IType Type => Prelude.Function;
 
-		public Value Call(Scope scope, params Value[] args) {
+		public IValue Call(Scope scope, params IValue[] args) {
 			if (this.restArgs > args.Length) {
 				return new PartialFun {
 					InnerFunction = this,
@@ -24,7 +24,7 @@ namespace Lumen.Lang {
 
 			this.SetActualRecFunction(scope);
 
-			List<Value> values = new List<Value>();
+			List<IValue> values = new List<IValue>();
 			values.AddRange(args);
 
 			for (Int32 i = 0; i < this.Args.Length; i++) {
@@ -39,7 +39,7 @@ namespace Lumen.Lang {
 				return;
 			}
 
-			Value actualRec = this.InnerFunction;
+			IValue actualRec = this.InnerFunction;
 
 			while (actualRec is PartialFun partial) {
 				actualRec = partial.InnerFunction;

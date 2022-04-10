@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
-	public struct Logical : Value {
+	public struct Logical : IValue {
 		private Boolean internalValue;
 		public IType Type => Prelude.Logical;
 

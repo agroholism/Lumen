@@ -26,7 +26,7 @@ namespace Lumen.Lang.Patterns {
 			return new List<String> { this.identifier };
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			if (value is GenericLater) {
 				return new MatchResult (
 					MatchResultKind.Fail,

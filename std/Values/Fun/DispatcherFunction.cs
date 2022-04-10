@@ -45,7 +45,7 @@ namespace Lumen.Lang {
 			return targetFunction.Parameters.Count == this.Parameters.Count;
 		}
 
-		public Value Call(Scope scope, params Value[] arguments) {
+		public IValue Call(Scope scope, params IValue[] arguments) {
 tail_recursion_entry:
 
 			List<String> notes = new List<String>();
@@ -120,7 +120,7 @@ tail_recursion_entry:
 					continue;
 				}
 
-				Value functionCallResult =
+				IValue functionCallResult =
 					potentialTarget.Call(scope, arguments);
 
 				// Returning TailRecursion means tailrec call

@@ -15,14 +15,14 @@ namespace Lumen.Lmi {
 			this.line = line;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			return this.res.Eval(scope).Type;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> evaluationResults = this.res.EvalWithYield(scope);
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerable<IValue> evaluationResults = this.res.EvalWithYield(scope);
 
-			foreach(Value evaluationResult in evaluationResults) {
+			foreach(IValue evaluationResult in evaluationResults) {
 				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					yield return new GeneratorExpressionTerminalResult(terminalResult.Value.Type);
 					yield break;

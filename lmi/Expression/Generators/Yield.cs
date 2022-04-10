@@ -15,15 +15,15 @@ namespace Lumen.Lmi {
 			return new Yield(this.expression.Closure(manager));
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			return this.expression.Eval(e);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return this.expression.Eval(scope);
 
 			if (scope.IsExsists(Constants.YIELD_EXCEPTION_SPECIAL_NAME)) {
-				Value ex = scope[Constants.YIELD_EXCEPTION_SPECIAL_NAME];
+				IValue ex = scope[Constants.YIELD_EXCEPTION_SPECIAL_NAME];
 				scope.Remove(Constants.YIELD_EXCEPTION_SPECIAL_NAME);
 				throw ex.ToException();
 			}

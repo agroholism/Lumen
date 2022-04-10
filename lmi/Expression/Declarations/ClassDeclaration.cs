@@ -19,7 +19,7 @@ namespace Lumen.Lmi {
 			this.derivingExpressions = derivings;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			Class moduleValue = new Class(this.className, this.typeParam ?? "_");
 
 			Scope moduleScope = new Scope(scope) {
@@ -47,7 +47,7 @@ namespace Lumen.Lmi {
 			return Const.UNIT;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			// yields are not support in class body so we ignore them
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}

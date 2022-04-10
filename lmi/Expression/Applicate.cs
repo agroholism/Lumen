@@ -19,8 +19,8 @@ namespace Lumen.Lmi {
 			this.fileName = fileName;
 		}
 
-		public Value Eval(Scope scope) {
-			Value callableValue = this.callableExpression.Eval(scope);
+		public IValue Eval(Scope scope) {
+			IValue callableValue = this.callableExpression.Eval(scope);
 
 			if (!callableValue.TryConvertToFunction(out Fun function)) {
 				LumenException invalidOperation =
@@ -34,11 +34,11 @@ namespace Lumen.Lmi {
 				return this.MakePartialFunction(function, scope);
 			}
 
-			Value[] parameters = this.argumentsExpressions.Select(i => i.Eval(scope)).ToArray();
+			IValue[] parameters = this.argumentsExpressions.Select(i => i.Eval(scope)).ToArray();
 
 tail_recursion_entry:
 			try {
-				Value functionCallResult =
+				IValue functionCallResult =
 					function.Call(new Scope(scope) { ["rec"] = function }, parameters);
 
 				// Returning TailRecursion means tailrec call
@@ -57,10 +57,10 @@ tail_recursion_entry:
 			}
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			Value callableValue = null;
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IValue callableValue = null;
 
-			foreach (Value evaluationResult in this.callableExpression.EvalWithYield(scope)) {
+			foreach (IValue evaluationResult in this.callableExpression.EvalWithYield(scope)) {
 				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					callableValue = terminalResult.Value;
 					break;
@@ -81,9 +81,9 @@ tail_recursion_entry:
 				yield return new GeneratorExpressionTerminalResult(this.MakePartialFunction(function, scope));
 			}
 
-			List<Value> arguments = new List<Value>();
+			List<IValue> arguments = new List<IValue>();
 			foreach (Expression argumentExpression in this.argumentsExpressions) {
-				foreach (Value argumentEvaluationResult in argumentExpression.EvalWithYield(scope)) {
+				foreach (IValue argumentEvaluationResult in argumentExpression.EvalWithYield(scope)) {
 					if (argumentEvaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 						arguments.Add(terminalResult.Value);
 						break;
@@ -93,9 +93,9 @@ tail_recursion_entry:
 				}
 			}
 
-			Value[] argumentsArray = arguments.ToArray();
+			IValue[] argumentsArray = arguments.ToArray();
 
-			Value functionCallResult = null;
+			IValue functionCallResult = null;
 
 			try {
 				functionCallResult = function.Call(new Scope(scope) { ["rec"] = function }, argumentsArray);
@@ -110,7 +110,7 @@ tail_recursion_entry:
 			yield return new GeneratorExpressionTerminalResult(functionCallResult);
 		}
 
-		private Value MakePartialFunction(Fun targetFunction, Scope scope) {
+		private IValue MakePartialFunction(Fun targetFunction, Scope scope) {
 			List<IPattern> wrapperParameters = new List<IPattern>();
 
 			List<Expression> newArguments = new List<Expression>();

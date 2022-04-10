@@ -14,12 +14,12 @@ namespace Lumen.Lmi {
             return new ListGenerator(this.sequenceGenerator.Closure(manager) as SequenceGenerator);
         }
 
-        public Value Eval(Scope e) {
+        public IValue Eval(Scope e) {
 			List list = new List(this.sequenceGenerator.Generator(e));
 			return list;
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}

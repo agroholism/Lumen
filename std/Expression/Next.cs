@@ -13,11 +13,11 @@ namespace Lumen.Lang.Expressions {
 			return this.label == otherLabel;
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			throw this;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}

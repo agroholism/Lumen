@@ -13,7 +13,7 @@ namespace Lumen.Lang.Patterns {
 			this.xsName = xsName;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			List list = value as List;
 
 			if (list == null || LinkedList.IsEmpty(list.Value)) {

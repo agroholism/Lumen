@@ -30,8 +30,8 @@ namespace Lumen.Lmi {
 			this.mainAlias = mainAlias;
 		}
 
-		public Value Eval(Scope scope) {
-			(Module root, Value result) = new OpaqueImport(this.line, this.fileName)
+		public IValue Eval(Scope scope) {
+			(Module root, IValue result) = new OpaqueImport(this.line, this.fileName)
 				.Import(Path.GetDirectoryName(this.fileName), this.importPath, scope);
 
 			if (this.IsFrom) {
@@ -50,7 +50,7 @@ namespace Lumen.Lmi {
 				}
 
 				foreach ((String name, String? alias) in this.namesToImport) {
-					if (module.TryGetMember(name, out Value importedValue)) {
+					if (module.TryGetMember(name, out IValue importedValue)) {
 						String actualName = alias ?? name;
 						scope.Bind(actualName, importedValue);
 					} else {
@@ -70,7 +70,7 @@ namespace Lumen.Lmi {
 			return Const.UNIT;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}
@@ -79,7 +79,7 @@ namespace Lumen.Lmi {
 			Scope scope = new Scope();
 			this.Eval(scope);
 
-			foreach (KeyValuePair<String, Value> i in scope.variables) {
+			foreach (KeyValuePair<String, IValue> i in scope.variables) {
 				manager.Declare(i.Key);
 			}
 

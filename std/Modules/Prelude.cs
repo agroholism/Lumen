@@ -174,7 +174,7 @@ namespace Lumen.Lang {
 				StreamReader stream = File.OpenText(fileName);
 				return new Future(stream.ReadToEndAsync().ContinueWith(task => {
 					stream.Dispose();
-					return (Value)new Text(task.Result);
+					return (IValue)new Text(task.Result);
 				}));
 			}) {
 				Parameters = new List<IPattern> {
@@ -237,7 +237,7 @@ namespace Lumen.Lang {
 			}
 
 			this.SetMember("typeOf", new LambdaFun((scope, args) => {
-				Value value = scope["value"];
+				IValue value = scope["value"];
 
 				return GetModule(value.Type);
 			}) {
@@ -248,7 +248,7 @@ namespace Lumen.Lang {
 
 			// 23/04
 			this.SetMember("println", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 
 				Console.WriteLine(x.ToString());
 
@@ -260,7 +260,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("print", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 
 				Console.Write(x.ToString());
 
@@ -297,7 +297,7 @@ namespace Lumen.Lang {
 			//122520
 
 			this.SetMember("listOf", new LambdaFun((scope, args) => {
-				Value init = scope["init"];
+				IValue init = scope["init"];
 
 				if (init == Const.UNIT) {
 					return new List();
@@ -311,10 +311,10 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("seqOf", new LambdaFun((scope, args) => {
-				Value init = scope["init"];
+				IValue init = scope["init"];
 
 				if (init == Const.UNIT) {
-					return new Flow(Enumerable.Empty<Value>());
+					return new Flow(Enumerable.Empty<IValue>());
 				}
 
 				return new Flow(init.ToFlow(scope));
@@ -325,7 +325,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("mutArrayOf", new LambdaFun((scope, args) => {
-				Value init = scope["init"];
+				IValue init = scope["init"];
 
 				if (init == Const.UNIT) {
 					return new MutArray();
@@ -339,15 +339,15 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("mutMapOf", new LambdaFun((scope, args) => {
-				Value value = scope["init"];
+				IValue value = scope["init"];
 				MutMap result = new MutMap();
 
 				if (value == Const.UNIT) {
 					return result;
 				}
 
-				foreach (Value i in value.ToFlow(scope)) {
-					List<Value> stream = i.ToFlow(scope).Take(2).ToList();
+				foreach (IValue i in value.ToFlow(scope)) {
+					List<IValue> stream = i.ToFlow(scope).Take(2).ToList();
 					result.InternalValue[stream[0]] = stream[1];
 				}
 
@@ -376,7 +376,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("also", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 				scope["f"].ToFunction(scope).Call(new Scope(scope), x);
 				return x;
 			}) {
@@ -387,7 +387,7 @@ namespace Lumen.Lang {
 			});
 		}
 
-		public static Value? DeconstructSome(Value some) {
+		public static IValue? DeconstructSome(IValue some) {
 			if (Some.IsParentOf(some)) {
 				Instance someInstance = some as Instance;
 				return someInstance.Items[0];
@@ -402,7 +402,7 @@ namespace Lumen.Lang {
 			}
 		}
 
-		public static void FunctionIsNotImplementedForType(String functionName, Value typeName) {
+		public static void FunctionIsNotImplementedForType(String functionName, IValue typeName) {
 			throw FunctionIsNotImplemented.constructor.MakeExceptionInstance(typeName, new Text(functionName)).ToException();
 
 		}

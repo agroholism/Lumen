@@ -121,7 +121,7 @@
     <Compile Include="Scope.cs" />
     <Compile Include="Values\Mut.cs" />
     <Compile Include="Values\Text.cs" />
-    <Compile Include="Values\Value.cs" />
+    <Compile Include="Values\IValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\MutArrayModule.cs" />
   </ItemGroup>

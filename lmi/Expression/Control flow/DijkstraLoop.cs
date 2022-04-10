@@ -14,7 +14,7 @@ namespace Lumen.Lmi {
 			this.guardsAndBodies = guardsAndBodies;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			Boolean atLeastOneGuardIsTrue = true;
 			while (atLeastOneGuardIsTrue) {
 REDO:
@@ -54,11 +54,11 @@ REDO:
 			return Const.UNIT;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			Boolean atLeastOneGuardIsTrue = true;
 
 			while (atLeastOneGuardIsTrue) {
-				IEnumerable<Value> yieldedValues = null;
+				IEnumerable<IValue> yieldedValues = null;
 REDO:
 				try {
 					atLeastOneGuardIsTrue = false;
@@ -97,7 +97,7 @@ REDO:
 				}
 
 				if (yieldedValues != null) {
-					foreach (Value yieldedValue in yieldedValues) {
+					foreach (IValue yieldedValue in yieldedValues) {
 						if (yieldedValue is GeneratorExpressionTerminalResult) {
 							continue;
 						}

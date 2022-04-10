@@ -21,19 +21,19 @@ namespace Lumen.Lmi {
 			this.line = line;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			Scope innerScope = new Scope(scope);
 
 			foreach (Expression expression in this.members) {
 				expression.Eval(innerScope);
 			}
 
-			Value extendable = this.extendableExpression.Eval(scope);
+			IValue extendable = this.extendableExpression.Eval(scope);
 
 			if(extendable is Module module) {
-				foreach (KeyValuePair<String, Value> i in innerScope.variables) {
+				foreach (KeyValuePair<String, IValue> i in innerScope.variables) {
 					if(module.Contains(i.Key)) {
-						Value value = module.GetMember(i.Key, scope);
+						IValue value = module.GetMember(i.Key, scope);
 						if(value is Fun function) {
 							DispatcherFunction disp = new DispatcherFunction(function.Name, function, i.Value as Fun);
 							module.SetMember(i.Key, disp);
@@ -54,7 +54,7 @@ namespace Lumen.Lmi {
 			return new Extend(this.extendableExpression.Closure(manager), this.members.Select(i => i.Closure(manager)).ToList(), this.derivings.Select(i => i.Closure(manager)).ToList(), this.file, this.line);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}

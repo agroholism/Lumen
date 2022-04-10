@@ -18,17 +18,17 @@ namespace Lumen.Lmi {
 			return this.expression.Closure(manager);
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			Fun function = this.expression.Eval(scope).ToFunction(scope);
 
-			Value type = new FunctionalType(this.name, function);
+			IValue type = new FunctionalType(this.name, function);
 
 			scope.Bind(this.name, type);
 
 			return type;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			throw new System.NotImplementedException();
 		}
 	}

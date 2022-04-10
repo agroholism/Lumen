@@ -3,15 +3,15 @@ using System.Linq;
 
 namespace Lumen.Lang {
 	public class Instance : BaseValueImpl {
-		public Value[] Items { get; }
+		public IValue[] Items { get; }
 		public override IType Type { get; }
 
 		public Instance(Constructor type) {
-			this.Items = new Value[type.Fields.Count];
+			this.Items = new IValue[type.Fields.Count];
 			this.Type = type;
 		}
 
-		public Boolean TryGetField(String name, out Value result) {
+		public Boolean TryGetField(String name, out IValue result) {
 			Int32 index = (this.Type as Constructor).Fields.Select(i => i.Key).ToList().IndexOf(name);
 
 			if (index != -1) {
@@ -23,8 +23,8 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Value GetField(String name) {
-			return this.TryGetField(name, out Value result)
+		public IValue GetField(String name) {
+			return this.TryGetField(name, out IValue result)
 				? result
 				: throw new LumenException(Exceptions.INSTANCE_OF_DOES_NOT_CONTAINS_FIELD.F(this.Type, name));
 		}
@@ -51,12 +51,12 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
-			if (this.Type.TryGetMember("toText", out Value value)
+			if (this.Type.TryGetMember("toText", out IValue value)
 				&& value.TryConvertToFunction(out Fun converter)) {
 				return converter.Call(new Scope(), this).ToString();
 			}
 
-			return "(" + this.Type.ToString() + " " + String.Join<Value>(" ", this.Items) + ")";
+			return "(" + this.Type.ToString() + " " + String.Join<IValue>(" ", this.Items) + ")";
 		}
 	}
 }

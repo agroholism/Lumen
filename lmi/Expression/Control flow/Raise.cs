@@ -21,7 +21,7 @@ namespace Lumen.Lmi {
 			return new Raise(this.expression.Closure(manager), this.from?.Closure(manager), this.file, this.line);
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			LumenException from = this.from?.Eval(scope)?.ToException(); // if not?
 
 			// raise have no arguments
@@ -32,7 +32,7 @@ namespace Lumen.Lmi {
 				throw catchedException;
 			}
 
-			Value value = this.expression.Eval(scope);
+			IValue value = this.expression.Eval(scope);
 
 			LumenException exception = value.ToException();
 
@@ -47,7 +47,7 @@ namespace Lumen.Lmi {
 			throw exception;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return this.Eval(scope);
 		}
 	}

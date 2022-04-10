@@ -19,8 +19,8 @@ namespace Lumen.Lmi {
 			this.lineNumber = lineName;
 		}
 
-        public Value Eval(Scope scope) {
-            Value assignableValue = this.assignableExpression.Eval(scope);
+        public IValue Eval(Scope scope) {
+            IValue assignableValue = this.assignableExpression.Eval(scope);
 
 			MatchResult matchResult = this.pattern.Match(assignableValue, scope);
 			if (!matchResult.IsSuccess) {
@@ -32,12 +32,12 @@ namespace Lumen.Lmi {
             return assignableValue;
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> assignableExpressionEvaluationResults = 
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerable<IValue> assignableExpressionEvaluationResults = 
 				this.assignableExpression.EvalWithYield(scope);
 
-			Value assignableValue = Const.UNIT;
-			foreach (Value evaluationResult in assignableExpressionEvaluationResults) {
+			IValue assignableValue = Const.UNIT;
+			foreach (IValue evaluationResult in assignableExpressionEvaluationResults) {
 				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					assignableValue = terminalResult.Value;
 					break;

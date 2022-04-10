@@ -23,15 +23,15 @@ namespace Lumen.Lang {
 			return Prelude.ConvertError.MakeExceptionInstance(fromType, targetType);
 		}
 
-		public static Value CallMethod(this Value self, String name, Scope scope) {
+		public static IValue CallMethod(this IValue self, String name, Scope scope) {
 			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), self);
 		}
 
-		public static Value CallMethod(this Value self, String name, Scope scope, Value arg) {
+		public static IValue CallMethod(this IValue self, String name, Scope scope, IValue arg) {
 			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), self, arg);
 		}
 
-		public static Value CallMethodFlip(this Value self, String name, Scope scope, Value arg) {
+		public static IValue CallMethodFlip(this IValue self, String name, Scope scope, IValue arg) {
 			return self.Type.GetMember(name, scope).ToFunction(scope).Call(new Scope(scope), arg, self);
 		}
 
@@ -77,19 +77,19 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public static Instance Success(Value value) {
+		public static Instance Success(IValue value) {
 			Instance result = new Instance(Prelude.Success);
 			result.Items[0] = value;
 			return result;
 		}
 
-		public static Instance Failed(Value value) {
+		public static Instance Failed(IValue value) {
 			Instance result = new Instance(Prelude.Failed);
 			result.Items[0] = value;
 			return result;
 		}
 
-		public static Instance CreateSome(Value value) {
+		public static Instance CreateSome(IValue value) {
 			Instance result = new Instance(Prelude.Some);
 
 			result.Items[0] = value;
@@ -97,7 +97,7 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public static Instance CreatePair(Value key, Value value) {
+		public static Instance CreatePair(IValue key, IValue value) {
 			Instance result = new Instance(MutMapModule.PairModule.ctor as Constructor);
 
 			result.Items[0] = key;
@@ -106,11 +106,11 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public static Value CreatePair(KeyValuePair<Value, Value> pair) {
+		public static IValue CreatePair(KeyValuePair<IValue, IValue> pair) {
 			return new List(pair.Key, pair.Value);
 		}
 
-		internal static Value FromSeq(IType type, IEnumerable<Value> values, Scope scope) {
+		internal static IValue FromSeq(IType type, IEnumerable<IValue> values, Scope scope) {
 			if (type == Prelude.List) {
 				return new List(LinkedList.Create(values));
 			}
@@ -126,7 +126,7 @@ namespace Lumen.Lang {
 			return (type.GetMember("fromSeq", scope) as Fun).Call(new Scope(scope), new Flow(values));
 		}
 
-		public static Value MakePartial(Fun function, Value[] vals) {
+		public static IValue MakePartial(Fun function, IValue[] vals) {
 			return new PartialFun {
 				InnerFunction = function,
 				Args = vals,
@@ -174,7 +174,7 @@ namespace Lumen.Lang {
 			return Prelude.InvalidArgument.MakeExceptionInstance(new Text(name), new Text(message));
 		}
 
-		public static Boolean IsEmpty(Value alt) {
+		public static Boolean IsEmpty(IValue alt) {
 			return alt.CallMethod("isEmpty", new Scope()).ToBoolean();
 		}
 	}

@@ -9,7 +9,7 @@ namespace Lumen.Lang.Patterns {
 			this.identifier = identifier;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			/*if(scope.ExistsInThisScope(this.identifier)) {
 				Console.WriteLine($"WARNING: there are rebinding {this.identifier} please don't use rebindings");
 			}*/

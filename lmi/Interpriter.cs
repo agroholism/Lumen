@@ -18,7 +18,7 @@ namespace Lumen.Lmi {
 
 		internal static readonly Scope mainScope = new Scope();
 
-		public static Value? Start(String fileName, Scope? scope = null) {
+		public static IValue? Start(String fileName, Scope? scope = null) {
 			String? code = TryRead(fileName);
 
 			if (code != null) {
@@ -46,7 +46,7 @@ namespace Lumen.Lmi {
 			Color = ConsoleColor.Gray;
 		}
 
-		public static Value Eval(String source, String fileName = "", Scope? scope = null) {
+		public static IValue Eval(String source, String fileName = "", Scope? scope = null) {
 			try {
 				List<Token> tokens = new Lexer(source, fileName).Tokenization();
 				return new Parser(tokens, fileName).Parse().Select(i =>

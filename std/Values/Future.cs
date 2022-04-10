@@ -2,11 +2,11 @@
 
 namespace Lumen.Lang {
 	public class Future : BaseValueImpl {
-		public System.Threading.Tasks.Task<Value> Task { get; set; }
+		public System.Threading.Tasks.Task<IValue> Task { get; set; }
 
 		public override IType Type => Prelude.Future;
 
-		public Future(System.Threading.Tasks.Task<Value> task) {
+		public Future(System.Threading.Tasks.Task<IValue> task) {
 			this.Task = task;
 		}
 

@@ -15,9 +15,9 @@ namespace Lumen.Lang.Patterns {
 			this.isInclusive = isInclusive;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
-			Value leftValue = (this.left as ValuePattern)?.value;
-			Value rightValue = (this.right as ValuePattern)?.value;
+		public MatchResult Match(IValue value, Scope scope) {
+			IValue leftValue = (this.left as ValuePattern)?.value;
+			IValue rightValue = (this.right as ValuePattern)?.value;
 
 			if (leftValue == null && rightValue == null) {
 				return MatchResult.Success;

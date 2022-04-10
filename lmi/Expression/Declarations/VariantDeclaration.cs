@@ -26,7 +26,7 @@ namespace Lumen.Lmi {
 			return new VariantDeclaration(this.typeName, this.constructors, this.members.Select(i => i.Closure(manager)).ToList(), this.implementsExpressions.Select(i => i.Closure(manager)).ToList());
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			Module createdType = new Module(this.typeName);
 
 			foreach (ConstructorMetadata i in this.constructors) {
@@ -52,7 +52,7 @@ namespace Lumen.Lmi {
 				expression.Eval(helperScope);
 			}
 
-			foreach (KeyValuePair<String, Value> i in helperScope.variables) {
+			foreach (KeyValuePair<String, IValue> i in helperScope.variables) {
 				createdType.SetMember(i.Key, i.Value);
 			}
 
@@ -69,7 +69,7 @@ namespace Lumen.Lmi {
 			return Const.UNIT;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

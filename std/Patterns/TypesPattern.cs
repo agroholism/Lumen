@@ -17,7 +17,7 @@ namespace Lumen.Lang.Patterns {
 			this.requirements = requirements;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			if (this.requirements.All(i => i.IsParentOf(value))) {
 				return this.subpattern.Match(value, scope);
 			}

@@ -56,7 +56,7 @@ namespace Lumen.Anatomy {
 		}
 	}
 
-	class Template : Value {
+	class Template : IValue {
 		public IType Type => TemplateType.Template;
 
 		public String templ;
@@ -71,7 +71,7 @@ namespace Lumen.Anatomy {
 			this.project = project;
 		}
 
-		public Value Clone() {
+		public IValue Clone() {
 			throw new NotImplementedException();
 		}
 

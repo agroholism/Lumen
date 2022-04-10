@@ -2,9 +2,9 @@
 
 namespace Lumen.Lang.Expressions {
 	public interface Expression {
-		Value Eval(Scope scope);
+		IValue Eval(Scope scope);
 
-		IEnumerable<Value> EvalWithYield(Scope scope);
+		IEnumerable<IValue> EvalWithYield(Scope scope);
 
 		Expression Closure(ClosureManager manager);
 	}

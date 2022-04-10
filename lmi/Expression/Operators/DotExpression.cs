@@ -20,7 +20,7 @@ namespace Lumen.Lmi {
 			this.line = line;
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			// _.something ~~ (x -> x.something)
 			if (this.expression is IdExpression idExpression && idExpression.id == "_") {
 				return new UserFun(
@@ -30,7 +30,7 @@ namespace Lumen.Lmi {
 			}
 			
 			try {
-				Value value = this.expression.Eval(e);
+				IValue value = this.expression.Eval(e);
 
 				if (value is Module module) {
 					return module.GetMember(this.memberName, e);
@@ -41,7 +41,7 @@ namespace Lumen.Lmi {
 				}
 
 				if (value is Instance instance 
-					&& instance.TryGetField(this.memberName, out Value result)) {
+					&& instance.TryGetField(this.memberName, out IValue result)) {
 					return result;
 				}
 
@@ -67,7 +67,7 @@ namespace Lumen.Lmi {
 			}
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

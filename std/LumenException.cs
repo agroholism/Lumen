@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Lumen.Lang {
-	public class LumenException : Exception, Value {
+	public class LumenException : Exception, IValue {
 		public IType Type { get; }
 
-		public Value[] items;
+		public IValue[] items;
 		private List<CallStackRecord> callStack;
 
 		public String Note { get; set; }
@@ -29,7 +29,7 @@ namespace Lumen.Lang {
 		}
 
 		public LumenException(Constructor type, String message, Int32 line = -1, String fileName = null) : base(message) {
-			this.items = new Value[type.Fields.Count];
+			this.items = new IValue[type.Fields.Count];
 			this.Type = type;
 			this.callStack = new List<CallStackRecord> {
 				new CallStackRecord(null, fileName, line)
@@ -114,7 +114,7 @@ namespace Lumen.Lang {
 			return result.ToString();
 		}
 
-		public Boolean TryGetField(String name, out Value result) {
+		public Boolean TryGetField(String name, out IValue result) {
 			Int32 index = (this.Type as ExceptionConstructor).Fields.Select(i => i.Key).ToList().IndexOf(name);
 
 			if (index != -1) {
@@ -126,8 +126,8 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Value GetField(String name) {
-			return this.TryGetField(name, out Value result)
+		public IValue GetField(String name) {
+			return this.TryGetField(name, out IValue result)
 				? result
 				: throw new LumenException(Exceptions.INSTANCE_OF_DOES_NOT_CONTAINS_FIELD.F(this.Type, name));
 		}
@@ -154,7 +154,7 @@ namespace Lumen.Lang {
 		}
 
 		public virtual Int32 CompareTo(Object obj) {
-			if (obj is Value value) {
+			if (obj is IValue value) {
 				if (this.Type.HasImplementation(Prelude.Ord)
 					&& this.Type.GetMember("compare", null).TryConvertToFunction(out Fun comparator)) {
 					return comparator.Call(new Scope(), this, value).ToInt(null);

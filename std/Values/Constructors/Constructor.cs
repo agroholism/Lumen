@@ -32,7 +32,7 @@ namespace Lumen.Lang {
 			this.Parameters = dict.Select(i => (IPattern)new TypesPattern(i.Key, i.Value)).ToList();
 		}
 
-		public Value MakeInstance(params Value[] values) {
+		public IValue MakeInstance(params IValue[] values) {
 			Instance result = new Instance(this);
 
 			Int32 current = 0;
@@ -48,7 +48,7 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public void SetMember(String name, Value value, Scope scope) {
+		public void SetMember(String name, IValue value, Scope scope) {
 
 		}
 
@@ -56,11 +56,11 @@ namespace Lumen.Lang {
 			return $"{this.Name}";
 		}
 
-		public Boolean TryGetMember(String name, out Value result) {
+		public Boolean TryGetMember(String name, out IValue result) {
 			return this.Parent.TryGetMember(name, out result);
 		}
 
-		public Boolean IsParentOf(Value value) {
+		public Boolean IsParentOf(IValue value) {
 			IType parent = value.Type;
 
 			if (parent == this) {
@@ -70,15 +70,15 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Value GetMember(String name, Scope scope) {
-			if (this.TryGetMember(name, out Value result)) {
+		public IValue GetMember(String name, Scope scope) {
+			if (this.TryGetMember(name, out IValue result)) {
 				return result;
 			}
 
 			throw new LumenException($"fne {name} {this.Name}");
 		}
 
-		public virtual Value Call(Scope e, params Value[] arguments) {
+		public virtual IValue Call(Scope e, params IValue[] arguments) {
 			if (this.Parameters.Count > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
 			}

@@ -2,6 +2,6 @@
 	public interface IConstructor : IType {
 		Module Parent { get; }
 
-		Value MakeInstance(params Value[] values);
+		IValue MakeInstance(params IValue[] values);
 	}
 }

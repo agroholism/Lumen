@@ -17,7 +17,7 @@ namespace Lumen.Lmi {
 			this.line = line;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			if (!scope.IsExsists(this.id)) {
 				throw new LumenException(Exceptions.UNKNOWN_NAME.F(this.id), this.line, this.file) {
 					Note = NameHelper.MakeNamesNote(scope.AvailableNames, this.id),
@@ -27,7 +27,7 @@ namespace Lumen.Lmi {
 			return scope.Get(this.id);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

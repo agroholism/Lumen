@@ -17,10 +17,10 @@ namespace Lumen.Lang {
 				Fun f = scope["fn"].ToFunction(scope);
 
 				return new LambdaFun((inScope, inArgs) => {
-					Value x = inScope["x"];
+					IValue x = inScope["x"];
 
-					Value mx = m.Call(new Scope(), x);
-					Value fx = f.Call(new Scope(), x);
+					IValue mx = m.Call(new Scope(), x);
+					IValue fx = f.Call(new Scope(), x);
 
 					return mx.Type.GetMember("+", inScope).ToFunction(inScope)
 						.Call(new Scope(), mx, fx);
@@ -52,7 +52,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("wrap", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 
 				return new LambdaFun((inScope, inArgs) => x) {
 					Parameters = new List<IPattern> {
@@ -85,7 +85,7 @@ namespace Lumen.Lang {
 				Fun appl = scope["appl"].ToFunction(scope);
 
 				return new LambdaFun((e, a) => {
-					Value arg = e["x"];
+					IValue arg = e["x"];
 
 					return appl.Call(new Scope(), arg).ToFunction(e)
 						.Call(new Scope(), func.Call(new Scope(), arg));
@@ -106,9 +106,9 @@ namespace Lumen.Lang {
 				Fun monad = scope["monad"].ToFunction(scope);
 
 				return new LambdaFun((inScope, inArgs) => {
-					Value arg = inScope["x"];
+					IValue arg = inScope["x"];
 
-					Value hres = monad.Call(new Scope(), arg);
+					IValue hres = monad.Call(new Scope(), arg);
 					Fun fres = func.Call(new Scope(), hres).ToFunction(inScope);
 
 					return fres.Call(new Scope(), arg);
@@ -126,10 +126,10 @@ namespace Lumen.Lang {
 
 			Fun ConcatWith(Fun m, Fun f, Fun with) {
 				return new LambdaFun((inScope, inArgs) => {
-					Value x = inScope["x"];
+					IValue x = inScope["x"];
 
-					Value mx = m.Call(new Scope(), x);
-					Value fx = f.Call(new Scope(), x);
+					IValue mx = m.Call(new Scope(), x);
+					IValue fx = f.Call(new Scope(), x);
 
 					return with.Call(new Scope(), mx, fx);
 				}) {
@@ -140,7 +140,7 @@ namespace Lumen.Lang {
 			}
 
 			this.SetMember("concatWith", new LambdaFun((scope, args) => {
-				IEnumerable<Value> functions = scope["functions"].ToFlow(scope);
+				IEnumerable<IValue> functions = scope["functions"].ToFlow(scope);
 				Fun with = scope["with"].ToFunction(scope);
 
 				return functions.Select(i => i.ToFunction(scope))

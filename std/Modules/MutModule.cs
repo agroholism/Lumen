@@ -46,7 +46,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("lift", new LambdaFun((scope, args) => {
 				Mut functor = scope["f"] as Mut;
-				Value m = scope["m"];
+				IValue m = scope["m"];
 				return m.CallMethodFlip("fmap", scope, functor.Value);
 			}) {
 				Parameters = new List<IPattern> {
@@ -89,7 +89,7 @@ namespace Lumen.Lang {
 			this.SetMember("swap", new LambdaFun((scope, args) => {
 				Mut state = scope["state"] as Mut;
 				Mut state2 = scope["state'"] as Mut;
-				Value temp = state.Value;
+				IValue temp = state.Value;
 				state.Value = state2.Value;
 				state2.Value = temp;
 				return state;

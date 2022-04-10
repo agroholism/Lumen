@@ -15,12 +15,12 @@ namespace Lumen.Lmi {
 			return new YieldFrom(this.expression.Closure(manager));
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			return this.expression.Eval(e);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> flow = this.expression.Eval(scope).ToFlow(scope);
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerable<IValue> flow = this.expression.Eval(scope).ToFlow(scope);
 			
 			if (flow is CustomFlow) {
 				FlowAutomat automat = flow.GetEnumerator() as FlowAutomat;
@@ -29,12 +29,12 @@ namespace Lumen.Lmi {
 					yield return automat.Current;
 				}
 
-				Value result = automat.Result;
+				IValue result = automat.Result;
 				if (result != null) {
 					yield return new GeneratorExpressionTerminalResult(result);
 				}
 			} else {
-				foreach (Value i in this.expression.Eval(scope).ToFlow(scope)) {
+				foreach (IValue i in this.expression.Eval(scope).ToFlow(scope)) {
 					yield return i;
 				}
 			}

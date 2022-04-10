@@ -15,7 +15,7 @@ namespace Lumen.Lang {
 
 			// let < x y = x.compare y < 0
 			this.SetMember(Constants.LT, new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0);
 			}) {
@@ -27,7 +27,7 @@ namespace Lumen.Lang {
 
 			// <=
 			this.SetMember(Constants.LESS_EQUALS, new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) <= 0);
 			}) {
@@ -39,7 +39,7 @@ namespace Lumen.Lang {
 
 			// >
 			this.SetMember(Constants.GT, new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) > 0);
 			}) {
@@ -51,7 +51,7 @@ namespace Lumen.Lang {
 
 			// >=
 			this.SetMember(Constants.GREATER_EQUALS, new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 
 				return new Logical(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) >= 0);
 			}) {
@@ -63,7 +63,7 @@ namespace Lumen.Lang {
 
 			// <=>
 			this.SetMember(Constants.SHIP, new LambdaFun((scope, args) => {
-				Value x = scope["x"];
+				IValue x = scope["x"];
 				return new Number(x.CallMethod("compare", scope, scope["y"]).ToDouble(scope));
 			}) {
 				Parameters = new System.Collections.Generic.List<IPattern> {
@@ -73,8 +73,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("min", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
 
 				return x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0 ? x : y;
 			}) {
@@ -85,8 +85,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("max", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
 
 				return x.CallMethod("compare", scope, scope["y"]).ToDouble(scope) < 0 ? y : x;
 			}) {
@@ -97,9 +97,9 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("between", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
-				Value z = scope["z"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
+				IValue z = scope["z"];
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
@@ -114,9 +114,9 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("betweenExIn", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
-				Value z = scope["z"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
+				IValue z = scope["z"];
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
@@ -131,9 +131,9 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("betweenInEx", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
-				Value z = scope["z"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
+				IValue z = scope["z"];
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 
@@ -148,9 +148,9 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("betweenExEx", new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
-				Value z = scope["z"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
+				IValue z = scope["z"];
 
 				Fun comparator = x.Type.GetMember("compare", scope).ToFunction(scope);
 

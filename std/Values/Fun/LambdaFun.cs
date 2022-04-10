@@ -23,7 +23,7 @@ namespace Lumen.Lang {
 			this.Parameters = parameters;
 		}
 
-		public Value Call(Scope e, params Value[] arguments) {
+		public IValue Call(Scope e, params IValue[] arguments) {
 			// Too less given args - partial application
 			if (this.Parameters?.Count > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
@@ -44,7 +44,7 @@ namespace Lumen.Lang {
 				counter++;
 			}
 
-			Value result;
+			IValue result;
 			try {
 				result = this._lambda(e, arguments);
 			}
@@ -78,7 +78,7 @@ namespace Lumen.Lang {
 			return this.ToString();
 		}
 
-		public Value Clone() {
+		public IValue Clone() {
 			return new LambdaFun(this._lambda) {
 				Parameters = this.Parameters,
 				Name = this.Name

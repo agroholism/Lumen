@@ -15,7 +15,7 @@ namespace Lumen.Lang.Patterns {
             this.subpatterns = patterns;
         }
 
-        public MatchResult Match(Value value, Scope scope) {
+        public MatchResult Match(IValue value, Scope scope) {
             if (value is List) {
 				List list = value as List;
 
@@ -27,7 +27,7 @@ namespace Lumen.Lang.Patterns {
                 }
 
                 Int32 index = 0;
-                foreach(Value i in list.Value) {
+                foreach(IValue i in list.Value) {
 					MatchResult result = this.subpatterns[index].Match(i, scope);
 					if (!result.IsSuccess) {
                         return result;

@@ -24,7 +24,7 @@ namespace Lumen.Lmi {
 			this.fileName = fileName;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			ClosureManager manager = new ClosureManager(scope);
 
 			// Make closure of arguments patterns
@@ -54,7 +54,7 @@ namespace Lumen.Lmi {
 
 			// Multi dispatching
 			if (scope.IsExistsInThisScope(this.name)) {
-				Value value = scope[this.name];
+				IValue value = scope[this.name];
 
 				if (value is DispatcherFunction dispatcher) {
 					// Dispatcher is already exists
@@ -80,7 +80,7 @@ namespace Lumen.Lmi {
 			return result;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

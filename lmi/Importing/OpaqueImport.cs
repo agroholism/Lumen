@@ -18,8 +18,8 @@ namespace Lumen.Lmi.Importing {
 			this.fileName = fileName;
 		}
 
-		public (Module root, Value value) Import(String currentModuleDirectory, List<String> modulesPath, Scope scope) {
-			if (TryImportFromScope(scope, modulesPath, out Value? result, out Module? module)) {
+		public (Module root, IValue value) Import(String currentModuleDirectory, List<String> modulesPath, Scope scope) {
+			if (TryImportFromScope(scope, modulesPath, out IValue? result, out Module? module)) {
 				return (module!, result!);
 			}
 
@@ -119,7 +119,7 @@ namespace Lumen.Lmi.Importing {
 			return (rootModule, currentModule);
 		}
 
-		private static Boolean TryImportFromScope(Scope scope, List<String> modulesPath, out Value? result, out Module? root) {
+		private static Boolean TryImportFromScope(Scope scope, List<String> modulesPath, out IValue? result, out Module? root) {
 			if (scope.TryGet(modulesPath.First(), out result)) {
 				if (result is not Module moduleLike) {
 					result = null;
@@ -242,8 +242,8 @@ namespace Lumen.Lmi.Importing {
 			return null;
 		}
 
-		private static Value ImportRestAsVirtual(List<String> namesToImport, IType value) {
-			Value result = value;
+		private static IValue ImportRestAsVirtual(List<String> namesToImport, IType value) {
+			IValue result = value;
 
 			foreach (String name in namesToImport) {
 				result = ImportFromVirtualModule(name, (result as IType)!);
@@ -252,7 +252,7 @@ namespace Lumen.Lmi.Importing {
 			return result;
 		}
 
-		private static Value ImportFromVirtualModule(String requiredModuleName, IType parent) {
+		private static IValue ImportFromVirtualModule(String requiredModuleName, IType parent) {
 			return parent.GetMember(requiredModuleName, null);
 		}
 
@@ -266,7 +266,7 @@ namespace Lumen.Lmi.Importing {
 				expression.Eval(moduleScope);
 			}
 
-			foreach (KeyValuePair<String, Value> i in moduleScope.variables) {
+			foreach (KeyValuePair<String, IValue> i in moduleScope.variables) {
 				module.SetMember(i.Key, i.Value);
 			}
 

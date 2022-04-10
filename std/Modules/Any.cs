@@ -9,14 +9,14 @@ namespace Lumen.Lang {
 			this.Name = "Any";
 
 			this.SetMember("toText", new LambdaFun((e, args) => {
-				Value self = e["self"];
+				IValue self = e["self"];
 
 				if (self is SingletonConstructor sc) {
 					return new Text(sc.Name);
 				}
 
 				if (self is Instance instance) {
-					return new Text($"({instance.Type} {String.Join<Value>(" ", instance.Items)})");
+					return new Text($"({instance.Type} {String.Join<IValue>(" ", instance.Items)})");
 				}
 
 				return new Text(self.ToString());
@@ -27,8 +27,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.EQUALS, new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
 
 				return new Logical(x.Equals(y));
 			}) {
@@ -39,8 +39,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.NOT_EQUALS, new LambdaFun((scope, args) => {
-				Value x = scope["x"];
-				Value y = scope["y"];
+				IValue x = scope["x"];
+				IValue y = scope["y"];
 
 				return new Logical(!x.Equals(y));
 			}) {

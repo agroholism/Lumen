@@ -17,7 +17,7 @@ namespace Lumen.Lmi {
             this.moduleExpressions = moduleExpressions;
         }
  
-        public Value Eval(Scope scope) {
+        public IValue Eval(Scope scope) {
             Scope moduleScope = new Scope(scope);
 
 			foreach (Expression expression in this.moduleExpressions) {
@@ -26,7 +26,7 @@ namespace Lumen.Lmi {
 
 			Module moduleValue = new Module(this.name);
 
-            foreach (KeyValuePair<String, Value> i in moduleScope.variables) {
+            foreach (KeyValuePair<String, IValue> i in moduleScope.variables) {
                 moduleValue.SetMember(i.Key, i.Value);
             }
 
@@ -60,7 +60,7 @@ namespace Lumen.Lmi {
 			return result;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

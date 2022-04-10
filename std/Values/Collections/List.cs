@@ -13,11 +13,11 @@ namespace Lumen.Lang {
 			this.Value = LinkedList.Empty;
 		}
 
-		public List(params Value[] elements) {
+		public List(params IValue[] elements) {
 			this.Value = LinkedList.Create(elements);
 		}
 
-		public List(IEnumerable<Value> elements) {
+		public List(IEnumerable<IValue> elements) {
 			this.Value = LinkedList.Create(elements);
 		}
 
@@ -42,10 +42,10 @@ namespace Lumen.Lang {
 		}
 	}
 
-	public class LinkedList : IEnumerable<Value> {
+	public class LinkedList : IEnumerable<IValue> {
 		public LinkedListNode First { get; private set; }
 
-		public Value Head => this.First.Value;
+		public IValue Head => this.First.Value;
 		public LinkedList Tail => new LinkedList(this.First.NextNode);
 
 		public static LinkedList Empty { get; } = new LinkedList();
@@ -54,11 +54,11 @@ namespace Lumen.Lang {
 			this.First = new LinkedListNode(Const.UNIT, null);
 		}
 
-		public LinkedList(Value value) {
+		public LinkedList(IValue value) {
 			this.First = new LinkedListNode(value, null);
 		}
 
-		public LinkedList(Value value, LinkedListNode nextNode) {
+		public LinkedList(IValue value, LinkedListNode nextNode) {
 			this.First = new LinkedListNode(value, nextNode);
 		}
 
@@ -66,12 +66,12 @@ namespace Lumen.Lang {
 			this.First = new LinkedListNode(node.Value, node.NextNode);
 		}
 
-		public LinkedList(Value head, LinkedList tail) {
+		public LinkedList(IValue head, LinkedList tail) {
 			this.First = new LinkedListNode(head, tail.First);
 		}
 
-		public IEnumerator<Value> GetEnumerator() {
-			IEnumerable<Value> Get() {
+		public IEnumerator<IValue> GetEnumerator() {
+			IEnumerable<IValue> Get() {
 				LinkedListNode node = this.First;
 				while (node.NextNode != null) {
 					yield return node.Value;
@@ -82,7 +82,7 @@ namespace Lumen.Lang {
 			return Get().GetEnumerator();
 		}
 
-		private void Add(Value value) {
+		private void Add(IValue value) {
 			this.First = new LinkedListNode(value, this.First);
 		}
 
@@ -102,11 +102,11 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public static LinkedList Map(Func<Value, Value> f, LinkedList list) {
+		public static LinkedList Map(Func<IValue, IValue> f, LinkedList list) {
 			return Create(list.Select(f));
 		}
 
-		public static LinkedList Choose(Func<Value, Value> f, LinkedList list) {
+		public static LinkedList Choose(Func<IValue, IValue> f, LinkedList list) {
 			return Create(list.Select(f).Where(i => i != Prelude.None).Select(i => Prelude.DeconstructSome(i)));
 		}
 
@@ -115,16 +115,16 @@ namespace Lumen.Lang {
 				First = list2.First
 			};
 
-			foreach (Value item in list1.Reverse()) {
+			foreach (IValue item in list1.Reverse()) {
 				result.Add(item);
 			}
 
 			return result;
 		}
 
-		public static LinkedList Create(IEnumerable<Value> components) {
+		public static LinkedList Create(IEnumerable<IValue> components) {
 			LinkedList result = new LinkedList();
-			foreach (Value i in components.Reverse()) {
+			foreach (IValue i in components.Reverse()) {
 				result.Add(i);
 			}
 			return result;
@@ -144,14 +144,14 @@ namespace Lumen.Lang {
 	}
 
 	public class LinkedListNode {
-		public Value Value { get; private set; }
+		public IValue Value { get; private set; }
 		public LinkedListNode NextNode { get; private set; }
 
-		public LinkedListNode(Value value) {
+		public LinkedListNode(IValue value) {
 			this.Value = value;
 		}
 
-		public LinkedListNode(Value value, LinkedListNode nextNode) : this(value) {
+		public LinkedListNode(IValue value, LinkedListNode nextNode) : this(value) {
 			this.NextNode = nextNode;
 		}
 	}

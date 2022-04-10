@@ -7,7 +7,7 @@ namespace Lumen.Lmi {
 	internal class InternWithBindingDeclaration : Expression {
 		private Expression bindingDeclaration;
 
-		private Value evaluationResult;
+		private IValue evaluationResult;
 
 		public InternWithBindingDeclaration(Expression bindingDeclaration) {
 			this.bindingDeclaration = bindingDeclaration;
@@ -18,7 +18,7 @@ namespace Lumen.Lmi {
 					new InternWithBindingDeclaration(this.bindingDeclaration.Closure(manager));
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			if (this.evaluationResult == null) {
 				this.evaluationResult = this.bindingDeclaration.Eval(scope);
 				return this.evaluationResult;
@@ -39,7 +39,7 @@ namespace Lumen.Lmi {
 			return evaluationResult;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 	}

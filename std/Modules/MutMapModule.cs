@@ -9,13 +9,13 @@ namespace Lumen.Lang {
 			this.Name = "MutMap";
 
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
-				List<Value> indices = scope["indices"].ToList(scope);
+				Dictionary<IValue, IValue> self = scope["self"].ToDictionary(scope);
+				List<IValue> indices = scope["indices"].ToList(scope);
 
 				if (indices.Count == 1) {
-					Value index = indices[0];
+					IValue index = indices[0];
 
-					if (self.TryGetValue(index, out Value result)) {
+					if (self.TryGetValue(index, out IValue result)) {
 						return result;
 					}
 					else {
@@ -32,9 +32,9 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("get", new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
+				Dictionary<IValue, IValue> self = scope["self"].ToDictionary(scope);
 
-				if (self.TryGetValue(scope["key"], out Value result)) {
+				if (self.TryGetValue(scope["key"], out IValue result)) {
 					return Helper.CreateSome(result);
 				}
 
@@ -47,8 +47,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.SETI, new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
-				List<Value> indices = scope["indices"].ToList(scope);
+				Dictionary<IValue, IValue> self = scope["self"].ToDictionary(scope);
+				List<IValue> indices = scope["indices"].ToList(scope);
 
 				if (indices.Count == 1) {
 					self[indices[0]] = scope["value"];
@@ -65,14 +65,14 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("<init>", new LambdaFun((e, args) => {
-				Value value = e["initValue"];
+				IValue value = e["initValue"];
 				MutMap result = new MutMap();
 
 				if (value == Const.UNIT) {
 					return result;
 				}
 
-				foreach (Value i in value.ToFlow(e)) {
+				foreach (IValue i in value.ToFlow(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
@@ -85,7 +85,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("getValues", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((MutMap)e.Get("m")).InternalValue;
+				IDictionary<IValue, IValue> dict = ((MutMap)e.Get("m")).InternalValue;
 				return new MutArray(dict.Values.ToList());
 			}) {
 				Parameters = new List<IPattern> {
@@ -94,7 +94,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("getKeys", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> dict = ((MutMap)e.Get("m")).InternalValue;
+				IDictionary<IValue, IValue> dict = ((MutMap)e.Get("m")).InternalValue;
 				return new MutArray(dict.Keys.ToList());
 			}) {
 				Parameters = new List<IPattern> {
@@ -103,8 +103,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("contains", new LambdaFun((scope, args) => {
-				Dictionary<Value, Value> self = scope["self"].ToDictionary(scope);
-				Value key = scope["key"];
+				Dictionary<IValue, IValue> self = scope["self"].ToDictionary(scope);
+				IValue key = scope["key"];
 
 				return new Logical(self.ContainsKey(key));
 			}) {
@@ -115,10 +115,10 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("fromSeq", new LambdaFun((e, args) => {
-				Value value = e["stream"];
+				IValue value = e["stream"];
 				MutMap result = new MutMap();
 
-				foreach (Value i in value.ToFlow(e)) {
+				foreach (IValue i in value.ToFlow(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
@@ -131,7 +131,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toSeq", new LambdaFun((e, args) => {
-				IDictionary<Value, Value> self = ((MutMap)e["self"]).InternalValue;
+				IDictionary<IValue, IValue> self = ((MutMap)e["self"]).InternalValue;
 				return new Flow(self.Select(Helper.CreatePair));
 			}) {
 				Parameters = new List<IPattern> {

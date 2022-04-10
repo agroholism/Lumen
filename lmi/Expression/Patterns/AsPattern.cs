@@ -22,7 +22,7 @@ namespace Lumen.Lang.Patterns {
             return result;
         }
 
-        public MatchResult Match(Value value, Scope scope) {
+        public MatchResult Match(IValue value, Scope scope) {
 			MatchResult result = this.innerPattern.Match(value, scope);
 
 			if (result.IsSuccess) {

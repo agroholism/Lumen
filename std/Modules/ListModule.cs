@@ -26,8 +26,8 @@ namespace Lumen.Lang {
 
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
 				IType typeParameter = scope["values"].Type;
-				IEnumerable<Value> values = scope["values"].ToFlow(scope);
-				IEnumerable<Value> valuesx = scope["values'"].ToFlow(scope);
+				IEnumerable<IValue> values = scope["values"].ToFlow(scope);
+				IEnumerable<IValue> valuesx = scope["values'"].ToFlow(scope);
 
 				return new List(values.Concat(valuesx));
 			}) {
@@ -65,7 +65,7 @@ namespace Lumen.Lang {
 			this.SetMember("head", new LambdaFun((e, args) => {
 				LinkedList v = e["l"].ToLinkedList(e);
 
-				return v.Head == Const.UNIT ? Prelude.None : (Value)Helper.CreateSome(v.Head);
+				return v.Head == Const.UNIT ? Prelude.None : (IValue)Helper.CreateSome(v.Head);
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("l")
@@ -74,7 +74,7 @@ namespace Lumen.Lang {
 			this.SetMember("tail", new LambdaFun((e, args) => {
 				LinkedList v = e["l"].ToLinkedList(e);
 
-				return LinkedList.IsEmpty(v) ? Prelude.None : (Value)Helper.CreateSome(new List(v.Tail));
+				return LinkedList.IsEmpty(v) ? Prelude.None : (IValue)Helper.CreateSome(new List(v.Tail));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("l")
@@ -83,7 +83,7 @@ namespace Lumen.Lang {
 
 			this.SetMember("filter", new LambdaFun((scope, args) => {
 				Fun mapper = scope["pred"].ToFunction(scope);
-				IEnumerable<Value> values = scope["list"].ToFlow(scope);
+				IEnumerable<IValue> values = scope["list"].ToFlow(scope);
 
 				return new List(values.Where(i => mapper.Call(new Scope(scope), i).ToBoolean()));
 			}) {
@@ -95,7 +95,7 @@ namespace Lumen.Lang {
 
 			// Number -> List 'T -> List List 'T
 			this.SetMember("chunkBySize", new LambdaFun((scope, args) => {
-				Value[] firstList = scope["list"].ToLinkedList(scope).ToArray();
+				IValue[] firstList = scope["list"].ToLinkedList(scope).ToArray();
 				Double size = scope["size"].ToDouble(scope);
 
 				LinkedList result = new LinkedList();
@@ -118,13 +118,13 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("collect", new LambdaFun((scope, args) => {
-				Value[] firstList = scope["list"].ToLinkedList(scope).ToArray();
+				IValue[] firstList = scope["list"].ToLinkedList(scope).ToArray();
 				Fun fn = scope["fn"] as Fun;
 
 				LinkedList result = new LinkedList();
 
 				foreach (LinkedList i in firstList.Select(i => fn.Call(new Scope(scope), i).ToLinkedList(scope)).Reverse()) {
-					foreach (Value j in i.Reverse()) {
+					foreach (IValue j in i.Reverse()) {
 						result = new LinkedList(j, result);
 					}
 				}

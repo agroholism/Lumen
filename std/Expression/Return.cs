@@ -5,30 +5,30 @@ namespace Lumen.Lang.Expressions {
 	public sealed class Return : Exception, Expression {
 		private readonly Expression expression;
 
-		public Value Result { get; private set; }
+		public IValue Result { get; private set; }
 
 		public Return(Expression expression) {
 			this.expression = expression;
 		}
 
-		public Return(Value result) {
+		public Return(IValue result) {
 			this.Result = result;
 		}
 
-		public Return(Value result, Expression expression) {
+		public Return(IValue result, Expression expression) {
 			this.Result = result;
 			this.expression = expression;
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			this.Result = this.expression.Eval(e);
 			throw this;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> expressionEvaluationResults = this.expression.EvalWithYield(scope);
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerable<IValue> expressionEvaluationResults = this.expression.EvalWithYield(scope);
 			
-			foreach(Value evaluationResult in expressionEvaluationResults) {
+			foreach(IValue evaluationResult in expressionEvaluationResults) {
 				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					this.Result = terminalResult.Value;
 					break;

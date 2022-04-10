@@ -16,11 +16,11 @@ namespace Lumen.Lmi {
 			this.lineNumber = lineNumber;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			return new TailRecursion(this.argumentsExpressions.Select(i => i.Eval(scope)).ToArray());
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			throw new LumenException("evaluating tailrec in generator");
 		}
 

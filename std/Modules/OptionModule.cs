@@ -28,7 +28,7 @@ namespace Lumen.Lang {
 			});
 
 			LambdaFun fmap = new LambdaFun((scope, args) => {
-				Value functor = scope["fc"];
+				IValue functor = scope["fc"];
 
 				if (functor == this.None) {
 					return this.None;
@@ -50,7 +50,7 @@ namespace Lumen.Lang {
 
 			// Applicative
 			this.SetMember("lift", new LambdaFun((scope, args) => {
-				Value obj = scope["f"];
+				IValue obj = scope["f"];
 
 				if (obj == this.None) {
 					return this.None;
@@ -68,7 +68,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("bind", new LambdaFun((scope, args) => {
-				Value obj = scope["m"];
+				IValue obj = scope["m"];
 
 				if (obj == this.None) {
 					return this.None;
@@ -105,7 +105,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("contains", new LambdaFun((scope, args) => {
-				Value val = Prelude.DeconstructSome(scope["self"]);
+				IValue val = Prelude.DeconstructSome(scope["self"]);
 				return new Logical(val != null && scope["x"].Equals(val));
 			}) {
 				Parameters = new List<IPattern> {
@@ -115,7 +115,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toText", new LambdaFun((scope, args) => {
-				Value obj = scope["this"];
+				IValue obj = scope["this"];
 				if (this.Some.IsParentOf(obj)) {
 					return new Text($"Some {(obj as Instance).Items[0]}");
 				}

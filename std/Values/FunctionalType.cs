@@ -16,7 +16,7 @@ namespace Lumen.Lang {
 			this.predicate = predicate;
 		}
 
-		public Value GetMember(string name, Scope scope) {
+		public IValue GetMember(string name, Scope scope) {
 			throw new NotImplementedException();
 		}
 
@@ -24,15 +24,15 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public bool IsParentOf(Value value) {
+		public bool IsParentOf(IValue value) {
 			return this.predicate.Call(new Scope(), value).ToBoolean();
 		}
 
-		public void SetMember(string name, Value value, Scope scope) {
+		public void SetMember(string name, IValue value, Scope scope) {
 			throw new NotImplementedException();
 		}
 
-		public bool TryGetMember(string name, out Value result) {
+		public bool TryGetMember(string name, out IValue result) {
 			throw new NotImplementedException();
 		}
 

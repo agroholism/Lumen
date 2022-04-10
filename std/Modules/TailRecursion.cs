@@ -1,10 +1,10 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public class TailRecursion : Exception, Value {
-		public Value[] newArguments;
+	public class TailRecursion : Exception, IValue {
+		public IValue[] newArguments;
 
-		public TailRecursion(Value[] result) {
+		public TailRecursion(IValue[] result) {
 			this.newArguments = result;
 		}
 

@@ -5,7 +5,7 @@ namespace Lumen.Lang {
 	/// <summary> Contains more important Kernel constants. </summary>
 	public static class Const {
 		/// <summary> const null </summary>
-		public static Value UNIT { get; } = new Unit();
+		public static IValue UNIT { get; } = new Unit();
 
 		/// <summary> const true </summary>
 		public static Logical TRUE { get; } = new Logical(true);

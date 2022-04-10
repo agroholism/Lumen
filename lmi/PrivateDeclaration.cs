@@ -14,7 +14,7 @@ namespace Lumen.Lmi {
 			return new PrivateDeclaration(this.expression.Closure(manager));
 		}
 		
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			ClosureManager manager = new ClosureManager(scope);
 			this.expression.Closure(manager);
 			foreach (var declaration in manager.Declarations) {
@@ -24,7 +24,7 @@ namespace Lumen.Lmi {
 			return this.expression.Eval(scope);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			return this.expression.EvalWithYield(scope);
 		}
 	}

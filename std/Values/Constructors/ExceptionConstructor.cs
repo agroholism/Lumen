@@ -14,27 +14,27 @@ namespace Lumen.Lang {
 			:base(name, parent, fields) {
 		}
 
-		public LumenException MakeExceptionInstance(params Value[] values) {
-			Value instance = this.MakeInstance(values);
+		public LumenException MakeExceptionInstance(params IValue[] values) {
+			IValue instance = this.MakeInstance(values);
 
 			String message = null;
 
 			if(this.Parameters.Count == 0) {
 				message = "exception raised";
 			}
-			else if (this.TryGetMember("getMessage", out Value messageGenerator)
+			else if (this.TryGetMember("getMessage", out IValue messageGenerator)
 				&& messageGenerator.TryConvertToFunction(out Fun reallyMessageGenerator)) {
 				message = reallyMessageGenerator.Call(new Scope(), instance).ToString();
 			}
 
 			LumenException result = new LumenException(this, message);
 
-			if (this.TryGetMember("getNote", out Value noteGenerator)
+			if (this.TryGetMember("getNote", out IValue noteGenerator)
 				&& noteGenerator.TryConvertToFunction(out Fun reallyNoteGenerator)) {
 				result.Note = reallyNoteGenerator.Call(new Scope(), result).ToString();
 			}
 
-			if (this.TryGetMember("getHelpLink", out Value helpLinkGenerator)
+			if (this.TryGetMember("getHelpLink", out IValue helpLinkGenerator)
 				&& helpLinkGenerator.TryConvertToFunction(out Fun reallyHelpLinkGenerator)) {
 				result.HelpLink = reallyHelpLinkGenerator.Call(new Scope(), result).ToString();
 			}
@@ -42,7 +42,7 @@ namespace Lumen.Lang {
 			return result;
 		}
 
-		public override Value Call(Scope e, params Value[] arguments) {
+		public override IValue Call(Scope e, params IValue[] arguments) {
 			if (this.Parameters.Count > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
 			}

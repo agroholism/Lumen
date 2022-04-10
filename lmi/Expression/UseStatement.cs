@@ -20,13 +20,13 @@ namespace Lumen.Lmi {
 			this.line = line;
 		}
 
-		public Value Eval(Scope scope) {
-			Value context = this.assignable.Eval(scope);
+		public IValue Eval(Scope scope) {
+			IValue context = this.assignable.Eval(scope);
 
 			Fun onEnter = context.Type.GetMember("onEnter", scope).ToFunction(scope);
 			Fun onExit = context.Type.GetMember("onExit", scope).ToFunction(scope);
 
-			Value value = onEnter.Call(new Scope(scope), context);
+			IValue value = onEnter.Call(new Scope(scope), context);
 
 			MatchResult matchResult = this.pattern.Match(value, scope);
 			if (!matchResult.IsSuccess) {
@@ -35,10 +35,10 @@ namespace Lumen.Lmi {
 				};
 			}
 
-			Value bodyEvaluationResult = Const.UNIT;
+			IValue bodyEvaluationResult = Const.UNIT;
 
-			Value raisedException = Prelude.None;
-			Value useEvaluationResult;
+			IValue raisedException = Prelude.None;
+			IValue useEvaluationResult;
 			try {
 				bodyEvaluationResult = this.body.Eval(scope);
 			}
@@ -49,7 +49,7 @@ namespace Lumen.Lmi {
 				raisedException = Helper.CreateSome(new LumenException(exception.Message));
 			}
 			finally {
-				List<Value> arguments = new List<Value> {
+				List<IValue> arguments = new List<IValue> {
 					value,
 					bodyEvaluationResult,
 					raisedException
@@ -61,12 +61,12 @@ namespace Lumen.Lmi {
 			return useEvaluationResult;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			Value context = this.assignable.Eval(scope);
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IValue context = this.assignable.Eval(scope);
 			Fun onEnter = context.Type.GetMember("onEnter", scope).ToFunction(scope);
 			Fun onExit = context.Type.GetMember("onExit", scope).ToFunction(scope);
 
-			Value value = onEnter.Call(new Scope(scope), context);
+			IValue value = onEnter.Call(new Scope(scope), context);
 
 			MatchResult matchResult = this.pattern.Match(value, scope);
 			if (!matchResult.IsSuccess) {
@@ -75,8 +75,8 @@ namespace Lumen.Lmi {
 				};
 			}
 
-			IEnumerable<Value> result = this.body.EvalWithYield(scope);
-			foreach (Value i in result) {
+			IEnumerable<IValue> result = this.body.EvalWithYield(scope);
+			foreach (IValue i in result) {
 				yield return i;
 			}
 

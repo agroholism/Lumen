@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	public class InfinityRange : BaseValueImpl, IEnumerable<Value> {
+	public class InfinityRange : BaseValueImpl, IEnumerable<IValue> {
 		public Double Step { get; private set; }
 
 		public Boolean HasStart => false;
@@ -26,7 +26,7 @@ namespace Lumen.Lang {
 			return $"...";
 		}
 
-		public IEnumerator<Value> GetEnumerator() {
+		public IEnumerator<IValue> GetEnumerator() {
 			while (true) {
 				yield return new Number(Double.NegativeInfinity);
 			}
@@ -37,7 +37,7 @@ namespace Lumen.Lang {
 		}
 	}
 
-	public class NumberRange : BaseValueImpl, IEnumerable<Value> {
+	public class NumberRange : BaseValueImpl, IEnumerable<IValue> {
 		public Double? Start { get; private set; }
 		private Double? end;
 		public Double? End =>
@@ -84,7 +84,7 @@ namespace Lumen.Lang {
 			return this.end ?? or;
 		}
 
-		public IEnumerator<Value> GetEnumerator() {
+		public IEnumerator<IValue> GetEnumerator() {
 			Double current = this.Start ?? 0;
 			Double end = this.End ?? Double.PositiveInfinity;
 
@@ -118,8 +118,8 @@ namespace Lumen.Lang {
 
 			// self...other
 			this.SetMember(Constants.RANGE_INCLUSIVE, new LambdaFun((scope, args) => {
-				Value self = scope["self"];
-				Value other = scope["other"];
+				IValue self = scope["self"];
+				IValue other = scope["other"];
 
 				Double selfDouble = self == Const.UNIT ? Double.PositiveInfinity : self.ToDouble(scope);
 				Double otherDouble = other == Const.UNIT ? Double.PositiveInfinity : other.ToDouble(scope);
@@ -131,8 +131,8 @@ namespace Lumen.Lang {
 
 			// self..other
 			this.SetMember(Constants.RANGE_EXCLUSIVE, new LambdaFun((scope, args) => {
-				Value self = scope["self"];
-				Value other = scope["other"];
+				IValue self = scope["self"];
+				IValue other = scope["other"];
 
 				Double selfDouble = self == Const.UNIT ? Double.PositiveInfinity : self.ToDouble(scope);
 				Double otherDouble = other == Const.UNIT ? Double.PositiveInfinity : other.ToDouble(scope);
@@ -145,7 +145,7 @@ namespace Lumen.Lang {
 			// self + other
 			// Number -> Number -> Number
 			this.SetMember(Constants.PLUS, new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				if (other == Const.UNIT) {
 					return new Number(scope["self"].ToDouble(scope));
@@ -159,7 +159,7 @@ namespace Lumen.Lang {
 			// self - other
 			// Number -> Number -> Number
 			this.SetMember(Constants.MINUS, new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				if (other == Const.UNIT) {
 					return new Number(-scope["self"].ToDouble(scope));
@@ -173,7 +173,7 @@ namespace Lumen.Lang {
 			// self / other
 			// Number -> Number -> Number
 			this.SetMember(Constants.SLASH, new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return new Number(scope["self"].ToDouble(scope) / other.ToDouble(scope));
 			}) {
@@ -183,7 +183,7 @@ namespace Lumen.Lang {
 			// self * other
 			// Number -> Number -> Number
 			this.SetMember(Constants.STAR, new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return new Number(scope["self"].ToDouble(scope) * other.ToDouble(scope));
 			}) {
@@ -193,7 +193,7 @@ namespace Lumen.Lang {
 			// self ^ other
 			// Number -> Number -> Number
 			this.SetMember(Constants.POW, new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return new Number(Math.Pow(scope["self"].ToDouble(scope), other.ToDouble(scope)));
 			}) {
@@ -201,7 +201,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(Constants.MOD, new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return new Number(scope["self"].ToDouble(scope) % other.ToDouble(scope));
 			}) {
@@ -231,7 +231,7 @@ namespace Lumen.Lang {
 
 			// Number -> Number -> Number
 			this.SetMember("div", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return (Number)Math.Truncate(scope["self"].ToDouble(scope) / other.ToDouble(scope));
 			}) {
@@ -240,7 +240,7 @@ namespace Lumen.Lang {
 
 			// Number -> Number -> Number
 			this.SetMember("rem", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return new Number(scope["self"].ToDouble(scope) % other.ToDouble(scope));
 			}) {
@@ -249,7 +249,7 @@ namespace Lumen.Lang {
 
 			// Number -> Number -> Number
 			this.SetMember("mod", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				Double numOne = scope["self"].ToDouble(scope);
 				Double numTwo = other.ToDouble(scope);
@@ -268,7 +268,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("binaryAnd", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				Int32 numOne = scope["self"].ToInt(scope);
 				Int32 numTwo = other.ToInt(scope);
@@ -278,7 +278,7 @@ namespace Lumen.Lang {
 				Parameters = Const.SelfOther
 			});
 			this.SetMember("binaryOr", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				Int32 numOne = scope["self"].ToInt(scope);
 				Int32 numTwo = other.ToInt(scope);
@@ -289,7 +289,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("binaryXor", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				Int32 numOne = scope["self"].ToInt(scope);
 				Int32 numTwo = other.ToInt(scope);
@@ -300,7 +300,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("binaryLsh", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				Int32 numOne = scope["self"].ToInt(scope);
 				Int32 numTwo = other.ToInt(scope);
@@ -311,7 +311,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("binaryRsh", new LambdaFun((scope, args) => {
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				Int32 numOne = scope["self"].ToInt(scope);
 				Int32 numTwo = other.ToInt(scope);
@@ -480,7 +480,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toText", new LambdaFun((scope, args) => {
-				Value num = scope["self"];
+				IValue num = scope["self"];
 				return new Text(num.ToString());
 			}) {
 				Parameters = Const.Self
@@ -506,7 +506,7 @@ namespace Lumen.Lang {
 		}
 
 		private void NameIt() {
-			foreach (KeyValuePair<String, Value> i in this.Members) {
+			foreach (KeyValuePair<String, IValue> i in this.Members) {
 				if (i.Value is Fun fun) {
 					fun.Name = "Number." + i.Key;
 				}

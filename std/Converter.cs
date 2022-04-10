@@ -8,23 +8,23 @@ namespace Lumen.Lang {
 			return value;
 		}
 
-		public static Boolean IsFailed(this Value value) {
+		public static Boolean IsFailed(this IValue value) {
 			return Prelude.Failed.IsParentOf(value);
 		}
 
-		public static Boolean IsSuccess(this Value value) {
+		public static Boolean IsSuccess(this IValue value) {
 			return Prelude.Success.IsParentOf(value);
 		}
 
-		public static Boolean ToBoolean(this Value value) {
+		public static Boolean ToBoolean(this IValue value) {
 			return value is Logical logical ? logical : value != Const.UNIT;
 		}
 
-		public static Double ToDouble(this Value value, Scope scope) {
+		public static Double ToDouble(this IValue value, Scope scope) {
 			return value is Number number ? number.value : ToDouble(ToNum(value, scope), scope);
 		}
 
-		public static Int32 ToInt(this Value value, Scope scope) {
+		public static Int32 ToInt(this IValue value, Scope scope) {
 			if (value is Number number) {
 				return number.value % 1 == 0 ? (Int32)number.value :
 					throw new LumenException("required integer number");
@@ -33,13 +33,13 @@ namespace Lumen.Lang {
 			return ToInt(ToNum(value, scope), scope);
 		}
 
-		public static Boolean TryConvertToFunction(this Value value, out Fun function) {
+		public static Boolean TryConvertToFunction(this IValue value, out Fun function) {
 			switch (value) {
 				case Fun _function:
 					function = _function;
 					return true;
 
-				case Module module when module.TryGetMember("<init>", out Value init):
+				case Module module when module.TryGetMember("<init>", out IValue init):
 					return init.TryConvertToFunction(out function);
 
 				default:
@@ -48,34 +48,34 @@ namespace Lumen.Lang {
 			}
 		}
 
-		public static Fun ToFunction(this Value value, Scope scope) {
+		public static Fun ToFunction(this IValue value, Scope scope) {
 			return value.TryConvertToFunction(out Fun result) ? result :
 				throw Helper.CreateConvertError(value.Type, Prelude.Function).ToException();
 		}
 
-		public static Dictionary<Value, Value> ToDictionary(this Value value, Scope scope) {
+		public static Dictionary<IValue, IValue> ToDictionary(this IValue value, Scope scope) {
 			return value is MutMap map ? map.InternalValue :
 				throw Helper.CreateConvertError(value.Type, Prelude.MutMap).ToException();
 		}
 
-		public static List<Value> ToList(this Value value, Scope scope) {
+		public static List<IValue> ToList(this IValue value, Scope scope) {
 			return value is MutArray array ? array.InternalValue :
 				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException();
 		}
 
-		public static Boolean TryConvertToSeq(this Value value, Scope scope, out IEnumerable<Value> result) {
+		public static Boolean TryConvertToSeq(this IValue value, Scope scope, out IEnumerable<IValue> result) {
 			if (value is Flow stream) {
 				result = stream.InternalValue;
 				return true;
 			}
 
-			if (value is IEnumerable<Value> numberRange) {
+			if (value is IEnumerable<IValue> numberRange) {
 				result = numberRange;
 				return true;
 			}
 
 			if (value.Type.HasImplementation(Prelude.Collection)
-				&& value.Type.TryGetMember("toSeq", out Value converterPrototype)
+				&& value.Type.TryGetMember("toSeq", out IValue converterPrototype)
 				&& converterPrototype.TryConvertToFunction(out Fun converter)) {
 				result = converter.Call(new Scope(scope), value).ToFlow(scope);
 				return true;
@@ -85,7 +85,7 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public static IEnumerable<Value> ToFlow(this Value value, Scope scope) {
+		public static IEnumerable<IValue> ToFlow(this IValue value, Scope scope) {
 			if(value.TryConvertToSeq(scope, out var result)) {
 				return result;
 			}
@@ -93,7 +93,7 @@ namespace Lumen.Lang {
 			throw Helper.CreateConvertError(value.Type, Prelude.Flow).ToException();
 		}
 
-		public static Boolean TryConvertToException(this Value value, out LumenException result) {
+		public static Boolean TryConvertToException(this IValue value, out LumenException result) {
 			if (value is Text) {
 				result = new LumenException(value.ToString());
 				return true;
@@ -113,22 +113,22 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public static LumenException ToException(this Value value) {
+		public static LumenException ToException(this IValue value) {
 			return value.TryConvertToException(out LumenException result) ? result 
 				: Helper.CreateConvertError(value.Type, Prelude.Exception).ToException();
 		}
 
-		internal static LinkedList ToLinkedList(this Value value, Scope scope) {
+		internal static LinkedList ToLinkedList(this IValue value, Scope scope) {
 			return value is List list ? list.Value :
 				throw Helper.CreateConvertError(value.Type, Prelude.List).ToException();
 		}
 
-		private static Number ToNum(this Value value, Scope scope) {
+		private static Number ToNum(this IValue value, Scope scope) {
 			if (value is Number number) {
 				return number;
 			}
 
-			if (value.Type.TryGetMember("toNumber", out Value converterPrototype)
+			if (value.Type.TryGetMember("toNumber", out IValue converterPrototype)
 					&& converterPrototype.TryConvertToFunction(out Fun converter)) {
 				return ToNum(converter.Call(new Scope(scope), value), scope);
 			}
@@ -136,7 +136,7 @@ namespace Lumen.Lang {
 			throw Helper.CreateConvertError(value.Type, Prelude.Number).ToException();
 		}
 
-		public static Future ToFuture(this Value value, Scope scope) {
+		public static Future ToFuture(this IValue value, Scope scope) {
 			if(value is Future future) {
 				return future;
 			} 

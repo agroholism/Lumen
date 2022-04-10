@@ -4,19 +4,19 @@ using System.Linq;
 
 namespace Lumen.Lang {
 	public sealed class MutArray : BaseValueImpl {
-		internal List<Value> InternalValue { get; private set; }
+		internal List<IValue> InternalValue { get; private set; }
 
 		public override IType Type => Prelude.MutArray;
 
-		public MutArray(List<Value> value) {
+		public MutArray(List<IValue> value) {
 			this.InternalValue = value;
 		}
 
-		public MutArray(IEnumerable<Value> value) {
+		public MutArray(IEnumerable<IValue> value) {
 			this.InternalValue = value.ToList();
 		}
 
-		public MutArray(params Value[] args) {
+		public MutArray(params IValue[] args) {
 			this.InternalValue = args.ToList();
 		}
 
@@ -26,8 +26,8 @@ namespace Lumen.Lang {
 
 		public override Boolean Equals(Object obj) {
 			if (obj is MutArray array) {
-				List<Value> list1 = this.InternalValue;
-				List<Value> list2 = array.InternalValue;
+				List<IValue> list1 = this.InternalValue;
+				List<IValue> list2 = array.InternalValue;
 
 				if (list1.Count != list2.Count) {
 					return false;

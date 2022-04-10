@@ -13,7 +13,7 @@ namespace Lumen.Lmi {
 			this.body = body;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			while (true) {
 REDO:
 				try {
@@ -49,10 +49,10 @@ REDO:
 			return new Loop(this.cycleName, this.body.Closure(manager));
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			while (true) {
 REDO:
-				IEnumerable<Value> y;
+				IEnumerable<IValue> y;
 				try {
 					y = this.body.EvalWithYield(scope);
 				}
@@ -79,7 +79,7 @@ REDO:
 				}
 
 				if (y != null) {
-					foreach (Value it in y) {
+					foreach (IValue it in y) {
 						if (it is GeneratorExpressionTerminalResult) {
 							continue;
 						}

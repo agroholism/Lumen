@@ -13,9 +13,9 @@ namespace Lumen.Lang.Patterns {
 			this.subpatterns = patterns;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			if (value is MutArray array) {
-				List<Value> castedArray = array.ToList(scope);
+				List<IValue> castedArray = array.ToList(scope);
 
 				if (castedArray.Count != this.subpatterns.Count) {
 					return new MatchResult(
@@ -25,7 +25,7 @@ namespace Lumen.Lang.Patterns {
 				}
 
 				Int32 index = 0;
-				foreach (Value i in castedArray) {
+				foreach (IValue i in castedArray) {
 					MatchResult result = this.subpatterns[index].Match(i, scope);
 					if (!result.IsSuccess) {
 						return result;

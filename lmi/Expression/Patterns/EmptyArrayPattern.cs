@@ -13,7 +13,7 @@ namespace Lumen.Lang.Patterns {
 
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			if (value is MutArray list && list.ToList(scope).Count == 0) {
 				return MatchResult.Success;
 			}

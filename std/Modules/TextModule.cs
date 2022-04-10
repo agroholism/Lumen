@@ -21,7 +21,7 @@ namespace Lumen.Lang {
 
 			this.SetMember(Constants.STAR, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				// Unary operator
 				if (other == Const.UNIT) {
@@ -51,7 +51,7 @@ namespace Lumen.Lang {
 
 			this.SetMember(Constants.MOD, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				return new Text(String.Format(self, other.ToFlow(scope).ToArray()));
 			}) {
@@ -60,18 +60,18 @@ namespace Lumen.Lang {
 
 			this.SetMember(Constants.SLASH, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
-				Value other = scope["other"];
+				IValue other = scope["other"];
 
 				if (other is Text text) {
 					String[] parts =
 						self.Split(new[] { other.ToString() }, StringSplitOptions.RemoveEmptyEntries);
 
-					return new MutArray(parts.Select(x => (Value)new Text(x)).ToList());
+					return new MutArray(parts.Select(x => (IValue)new Text(x)).ToList());
 				}
 				else if (other is Number num) {
 					Int32 maxLength = num.ToInt(scope);
 
-					List<Value> result = new List<Value>();
+					List<IValue> result = new List<IValue>();
 					StringBuilder buffer = new StringBuilder();
 					for (Int32 i = 0; i < self.Length; i += maxLength) {
 						buffer.Clear();
@@ -94,10 +94,10 @@ namespace Lumen.Lang {
 			this.SetMember(Constants.GETI, new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				List<Value> indices = scope["indices"].ToList(scope);
+				List<IValue> indices = scope["indices"].ToList(scope);
 
 				if (indices.Count == 1) {
-					Value index = indices[0];
+					IValue index = indices[0];
 
 					if (index is Fun fun) {
 						return new Flow(from ch in self
@@ -118,7 +118,7 @@ namespace Lumen.Lang {
 
 					StringBuilder buffer = new StringBuilder();
 
-					foreach (Value i in index.ToFlow(scope)) {
+					foreach (IValue i in index.ToFlow(scope)) {
 						if (i is Number) {
 							Int32 newIndex = Helper.Index(i.ToInt(scope), self.Length);
 
@@ -297,7 +297,7 @@ namespace Lumen.Lang {
 			this.SetMember("getChars", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
 
-				return new Flow(self.Select<Char, Value>(x => new Number(x)));
+				return new Flow(self.Select<Char, IValue>(x => new Number(x)));
 			}) {
 				Parameters = Const.Self
 			});
@@ -587,7 +587,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
-				IEnumerable<Value> stream = scope["stream"].ToFlow(scope);
+				IEnumerable<IValue> stream = scope["stream"].ToFlow(scope);
 				return new Text(String.Concat(stream));
 			}) {
 				Parameters = new List<IPattern> {
@@ -608,7 +608,7 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Default);
 		}
 
-		public IEnumerable<Value> GlobalizationEach(String str) {
+		public IEnumerable<IValue> GlobalizationEach(String str) {
 			TextElementEnumerator iterator = StringInfo.GetTextElementEnumerator(str);
 
 			while (iterator.MoveNext()) {

@@ -12,7 +12,7 @@
 			this.SetMember("cause", new LambdaFun((scope, args) => {
 				LumenException exception = scope["self"].ToException();
 
-				return exception.Cause == null ? Prelude.None : (Value)Helper.CreateSome(exception.Cause);
+				return exception.Cause == null ? Prelude.None : (IValue)Helper.CreateSome(exception.Cause);
 			}) {
 				Parameters = Const.Self
 			});

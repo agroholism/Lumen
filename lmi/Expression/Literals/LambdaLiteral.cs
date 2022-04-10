@@ -16,7 +16,7 @@ namespace Lumen.Lmi {
 			this.body = body;
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			ClosureManager manager = new ClosureManager(scope);
 
 			List<IPattern> closuredParameters =
@@ -33,7 +33,7 @@ namespace Lumen.Lmi {
 			return new UserFun(closuredParameters, closuredBody, "[AnonymousFunction]");
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

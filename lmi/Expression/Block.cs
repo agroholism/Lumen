@@ -21,8 +21,8 @@ namespace Lumen.Lmi {
 			this.expressions.Add(Expression);
 		}
 
-		public Value Eval(Scope e) {
-			Dictionary<String, Value> savedBindings = new Dictionary<String, Value>();
+		public IValue Eval(Scope e) {
+			Dictionary<String, IValue> savedBindings = new Dictionary<String, IValue>();
 
 			for (Int32 i = 0; i < this.expressions.Count - 1; i++) {
 				if (this.expressions[i] is BindingDeclaration binding) {
@@ -38,13 +38,13 @@ namespace Lumen.Lmi {
 				this.expressions[i].Eval(e);
 			}
 
-			Value result = Const.UNIT;
+			IValue result = Const.UNIT;
 
 			if (this.expressions.Count > 0) {
 				result = this.expressions[this.expressions.Count - 1].Eval(e);
 			}
 
-			foreach (KeyValuePair<String, Value> item in savedBindings) {
+			foreach (KeyValuePair<String, IValue> item in savedBindings) {
 				e[item.Key] = item.Value;
 			}
 
@@ -60,11 +60,11 @@ namespace Lumen.Lmi {
 			return new Block(this.expressions.Select(expression => expression.Closure(manager)).ToList());
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			for (Int32 i = 0; i < this.expressions.Count - 1; i++) {
-				IEnumerable<Value> x = this.expressions[i].EvalWithYield(scope);
+				IEnumerable<IValue> x = this.expressions[i].EvalWithYield(scope);
 
-				foreach (Value it in x) {
+				foreach (IValue it in x) {
 					if (it is GeneratorExpressionTerminalResult) {
 						continue;
 					}
@@ -73,8 +73,8 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			IEnumerable<Value> z = this.expressions[this.expressions.Count - 1].EvalWithYield(scope);
-			foreach (Value it in z) {
+			IEnumerable<IValue> z = this.expressions[this.expressions.Count - 1].EvalWithYield(scope);
+			foreach (IValue it in z) {
 				yield return it;
 			}
 		}

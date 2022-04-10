@@ -13,7 +13,7 @@ namespace Lumen.Lang {
 			this.SetMember("Automat", Automat);
 
 			this.SetMember("empty", new LambdaFun((scope, args) => {
-				return new Flow(Enumerable.Empty<Value>());
+				return new Flow(Enumerable.Empty<IValue>());
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("x")
@@ -38,7 +38,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("default", new LambdaFun((scope, args) => {
-				return new Flow(Enumerable.Empty<Value>());
+				return new Flow(Enumerable.Empty<IValue>());
 			}) {
 				Parameters = new List<IPattern> { }
 			});
@@ -73,13 +73,13 @@ namespace Lumen.Lang {
 				this.SetMember("State", this.State);
 
 				this.SetMember("<init>", new LambdaFun((scope, args) => {
-					IEnumerable<Value> flow = scope["flow"].ToFlow(scope);
+					IEnumerable<IValue> flow = scope["flow"].ToFlow(scope);
 
 					// Enumerator in CustomFlow is FlowAutomat by default,
 					// so we should avoid additional wrappers to prevent problems
 					// with yield operators
 					if (flow is CustomFlow customFlow) {
-						return customFlow.GetEnumerator() as Value;
+						return customFlow.GetEnumerator() as IValue;
 					}
 
 					return new FlowAutomat(flow.GetEnumerator(), scope);
@@ -90,7 +90,7 @@ namespace Lumen.Lang {
 				});
 
 				this.SetMember("move", new LambdaFun((scope, args) => {
-					Value value = scope["automat"];
+					IValue value = scope["automat"];
 
 					if (value is FlowAutomat automat) {
 						if (automat.MoveNext(Const.UNIT)) {
@@ -108,7 +108,7 @@ namespace Lumen.Lang {
 				});
 
 				this.SetMember("moveWith", new LambdaFun((scope, args) => {
-					Value value = scope["automat"];
+					IValue value = scope["automat"];
 
 					if (value is FlowAutomat automat) {
 						if (automat.MoveNext(scope["value"])) {
@@ -127,7 +127,7 @@ namespace Lumen.Lang {
 				});
 
 				this.SetMember("throw", new LambdaFun((scope, args) => {
-					Value value = scope["automat"];
+					IValue value = scope["automat"];
 
 					if (value is FlowAutomat automat) {
 						if (automat.Throw(scope["exception"])) {
@@ -146,13 +146,13 @@ namespace Lumen.Lang {
 				});
 
 				this.SetMember("fromSeq", new LambdaFun((scope, args) => {
-					Value x = scope["stream"];
+					IValue x = scope["stream"];
 
 					if (x is Flow s && s.InternalValue is CustomFlow lgn) {
-						return lgn.GetEnumerator() as Value;
+						return lgn.GetEnumerator() as IValue;
 					}
 
-					IEnumerable<Value> stream = x.ToFlow(scope);
+					IEnumerable<IValue> stream = x.ToFlow(scope);
 
 					return new FlowAutomat(stream.GetEnumerator(), scope);
 				}) {
@@ -176,13 +176,13 @@ namespace Lumen.Lang {
 					this.SetMember("Final", this.Final);
 				}
 
-				public Value MakeInter(Value value) {
+				public IValue MakeInter(IValue value) {
 					Instance result = new Instance(this.Inter);
 					result.Items[0] = value;
 					return result;
 				}
 
-				public Value MakeFinal(Value value) {
+				public IValue MakeFinal(IValue value) {
 					Instance result = new Instance(this.Final);
 					result.Items[0] = value;
 					return result;

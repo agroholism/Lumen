@@ -6,9 +6,9 @@ using Lumen.Lang.Expressions;
 
 namespace Lumen.Lmi {
 	public class ValueLiteral : Expression {
-        public Value result;
+        public IValue result;
 
-        public ValueLiteral(Value value) {
+        public ValueLiteral(IValue value) {
             this.result = value;
         }
 
@@ -16,11 +16,11 @@ namespace Lumen.Lmi {
             this.result = new Number(Object);
         }
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
             return this.result;
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			yield return new GeneratorExpressionTerminalResult(this.Eval(scope));
 		}
 

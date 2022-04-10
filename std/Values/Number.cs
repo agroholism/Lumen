@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Lumen.Lang {
-	public class Number : Value {
+	public class Number : IValue {
 		internal Double value;
 
 		public IType Type => Prelude.Number;
@@ -28,7 +28,7 @@ namespace Lumen.Lang {
 		public Int32 CompareTo(Object obj) => obj switch
 		{
 			Number num => this.value.CompareTo(num.value),
-			Value value => throw new LumenException(Exceptions.TYPE_ERROR.F(this.Type, value.Type)),
+			IValue value => throw new LumenException(Exceptions.TYPE_ERROR.F(this.Type, value.Type)),
 			_ => throw new LumenException(Exceptions.TYPE_ERROR.F(this.Type, obj.GetType()))
 		};
 

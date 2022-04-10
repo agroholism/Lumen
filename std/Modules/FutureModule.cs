@@ -22,7 +22,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("wrap", new LambdaFun((scope, args) => {
-				Value val = scope["val"];
+				IValue val = scope["val"];
 
 				return new Future(Task.FromResult(val));
 			}) {
@@ -148,7 +148,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("await", new LambdaFun((scope, args) => {
-				Value futureOrFutures = scope["future"];
+				IValue futureOrFutures = scope["future"];
 
 				if (futureOrFutures is Future future) {
 					try {
@@ -161,7 +161,7 @@ namespace Lumen.Lang {
 					return future.Task.Result;
 				}
 
-				Task<Value>[] futures =
+				Task<IValue>[] futures =
 					futureOrFutures.ToFlow(scope)
 					.Select(i => i.ToFuture(scope).Task)
 					.ToArray();
@@ -179,14 +179,14 @@ namespace Lumen.Lang {
 
 
 			this.SetMember("whenAll", new LambdaFun((scope, args) => {
-				IEnumerable<Value> futures = scope["futures"].ToFlow(scope);
+				IEnumerable<IValue> futures = scope["futures"].ToFlow(scope);
 
-				IEnumerable<Task<Value>> tasks =
+				IEnumerable<Task<IValue>> tasks =
 					futures.Select(i => i.ToFuture(scope).Task);
 
 				return new Future(
 					Task.WhenAll(tasks)
-					.ContinueWith(task => (Value)new List(task.Result))
+					.ContinueWith(task => (IValue)new List(task.Result))
 				);
 			}) {
 				Parameters = new List<IPattern> {
@@ -195,9 +195,9 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("whenAny", new LambdaFun((scope, args) => {
-				IEnumerable<Value> futures = scope["futures"].ToFlow(scope);
+				IEnumerable<IValue> futures = scope["futures"].ToFlow(scope);
 
-				IEnumerable<Task<Value>> tasks =
+				IEnumerable<Task<IValue>> tasks =
 					futures.Select(i => (i as Future).Task); // unsafe!
 
 				return new Future(
@@ -211,7 +211,7 @@ namespace Lumen.Lang {
 			});
 
 
-			static Value Then(Task<Value> task, Fun continuation) {
+			static IValue Then(Task<IValue> task, Fun continuation) {
 				if (task.IsFaulted) {
 					throw task.Exception.GetBaseException();
 				}

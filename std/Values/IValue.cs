@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public interface Value : IComparable, IFormattable {
+	public interface IValue : IComparable, IFormattable {
 		IType Type { get; }
 	}
 }

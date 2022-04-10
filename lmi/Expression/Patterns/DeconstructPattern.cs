@@ -15,8 +15,8 @@ namespace Lumen.Lang.Patterns {
 			this.subpatterns = subPatterns;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
-			Value requiredType = null;
+		public MatchResult Match(IValue value, Scope scope) {
+			IValue requiredType = null;
 			String typeParameter = null;
 
 			if (this.constructor is IdExpression idExpression && idExpression.id.StartsWith("'")) {

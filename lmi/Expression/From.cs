@@ -22,11 +22,11 @@ namespace Lumen.Lmi {
             return this.i;
         }
 
-        public Value Eval(Scope e) {
+        public IValue Eval(Scope e) {
             return this.expression.Eval(e);
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}

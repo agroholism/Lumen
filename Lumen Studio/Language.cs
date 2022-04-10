@@ -23,13 +23,13 @@ namespace Lumen.Studio {
 		public event Action OnChanged;
 
 		internal virtual List<AutocompleteItem> GetAutocompleteItems(TextBoxManager manager) {
-			if (this.Fn != null && this.Fn.TryGetMember("get_autocomplete_items", out Value fn)) {
-				Value res = (fn as Fun).Call(new Scope());
+			if (this.Fn != null && this.Fn.TryGetMember("get_autocomplete_items", out IValue fn)) {
+				IValue res = (fn as Fun).Call(new Scope());
 				List<AutocompleteItem> result = new List<AutocompleteItem>();
 
-				foreach (Value i in res.ToList(null)) {
+				foreach (IValue i in res.ToList(null)) {
 					if (i is MutArray) {
-						List<Value> lst = i.ToList(null);
+						List<IValue> lst = i.ToList(null);
 						AutocompleteItem aci = new AutocompleteItem {
 							Text = lst[0].ToString(),
 							ImageIndex = (Int32)lst[1].ToDouble(null),

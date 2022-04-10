@@ -10,7 +10,7 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Functor);
 
 			this.SetMember("-<<", new LambdaFun((scope, args) => {
-				Value appl = scope["appl"];
+				IValue appl = scope["appl"];
 				return appl.Type.GetMember("lift", scope).ToFunction(scope)
 					.Call(scope, scope["func"], appl);
 			}) {
@@ -22,7 +22,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember(">>-", new LambdaFun((scope, args) => {
-				Value appl = scope["appl"];
+				IValue appl = scope["appl"];
 				return appl.Type.GetMember("lift", scope).ToFunction(scope)
 					.Call(scope, scope["func"], appl);
 			}) {
@@ -34,8 +34,8 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("map", new LambdaFun((scope, args) => {
-				Value appl = scope["appl"];
-				Value function = appl.Type.GetMember("wrap", scope).ToFunction(scope)
+				IValue appl = scope["appl"];
+				IValue function = appl.Type.GetMember("wrap", scope).ToFunction(scope)
 					.Call(new Scope(), scope["func"]);
 
 				return appl.Type.GetMember("lift", scope).ToFunction(scope)

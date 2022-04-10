@@ -14,7 +14,7 @@ namespace Lumen.Lang.Patterns {
 			this.condition = condition;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			return new MatchResult(
 				this.subpattern.Match(value, scope).IsSuccess && this.condition.Eval(scope).ToBoolean()
 			);

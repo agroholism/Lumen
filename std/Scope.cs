@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang {
 	public class Scope {
-		public readonly IDictionary<String, Value> variables;
+		public readonly IDictionary<String, IValue> variables;
 		public readonly List<Module> usings;
 		public readonly Scope? parent;
 		private readonly HashSet<String> privates;
@@ -38,9 +38,9 @@ namespace Lumen.Lang {
 			}
 		}
 
-		public IEnumerable<(String name, Value value)> ExportedVariables {
+		public IEnumerable<(String name, IValue value)> ExportedVariables {
 			get {
-				foreach (KeyValuePair<String, Value> variable in this.variables) {
+				foreach (KeyValuePair<String, IValue> variable in this.variables) {
 					if (!this.IsPrivate(variable.Key)) {
 						yield return  (variable.Key, variable.Value);
 					}
@@ -48,13 +48,13 @@ namespace Lumen.Lang {
 			}
 		}
 
-		public Value this[String name] {
+		public IValue this[String name] {
 			get => this.Get(name);
 			set => this.Bind(name, value);
 		}
 		
 		public Scope() {
-			this.variables = new Dictionary<String, Value>();
+			this.variables = new Dictionary<String, IValue>();
 			this.usings = new List<Module> { Prelude.Instance };
 			this.privates = new HashSet<String>();
 		}
@@ -80,7 +80,7 @@ namespace Lumen.Lang {
 				return true;
 			}
 
-			foreach (Value use in this.usings) {
+			foreach (IValue use in this.usings) {
 				if (use is Module m) {
 					if (m.Contains(name)) {
 						return true;
@@ -95,8 +95,8 @@ namespace Lumen.Lang {
 			return this.variables.ContainsKey(name);
 		}
 
-		public Boolean TryGetFromThisScope(String name, out Value? result) {
-			if (this.variables.TryGetValue(name, out Value value)) {
+		public Boolean TryGetFromThisScope(String name, out IValue? result) {
+			if (this.variables.TryGetValue(name, out IValue value)) {
 				result = value;
 				return true;
 			}
@@ -105,13 +105,13 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Boolean TryGet(String name, out Value? result) {
-			if (this.variables.TryGetValue(name, out Value value)) {
+		public Boolean TryGet(String name, out IValue? result) {
+			if (this.variables.TryGetValue(name, out IValue value)) {
 				result = value;
 				return true;
 			}
 
-			foreach (Value i in this.usings) {
+			foreach (IValue i in this.usings) {
 				if (i is Module m) {
 					if (m.TryGetMember(name, out result)) {
 						return true;
@@ -128,8 +128,8 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Value Get(String name) {
-			if (this.variables.TryGetValue(name, out Value value)) {
+		public IValue Get(String name) {
+			if (this.variables.TryGetValue(name, out IValue value)) {
 				return value;
 			}
 
@@ -146,7 +146,7 @@ namespace Lumen.Lang {
 			}
 
 			List<String> maybe = new List<String>();
-			foreach (KeyValuePair<String, Value> i in this.variables) {
+			foreach (KeyValuePair<String, IValue> i in this.variables) {
 				if (Helper.Levenshtein(i.Key, name) > 0.4) {
 					maybe.Add(i.Key);
 				}
@@ -160,7 +160,7 @@ namespace Lumen.Lang {
 		/// <summary>
 		/// Binds a value with some name (there is no checking for binding existense)
 		/// </summary>
-		public void Bind(String name, Value value) {
+		public void Bind(String name, IValue value) {
 			this.variables[name] = value;
 		}
 

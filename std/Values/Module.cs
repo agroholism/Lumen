@@ -5,14 +5,14 @@ using System.Linq;
 namespace Lumen.Lang {
 	public class Module : BaseValueImpl, IType {
 		public String Name { get; protected set; }
-		public Dictionary<String, Value> Members { get; protected set; }
+		public Dictionary<String, IValue> Members { get; protected set; }
 		internal List<Module> Mixins { get; private set; }
 		private readonly HashSet<String> privates;
 
 		public override IType Type => Prelude.Function;
 
 		public Module() {
-			this.Members = new Dictionary<String, Value>();
+			this.Members = new Dictionary<String, IValue>();
 			this.Mixins = new List<Module>();
 			this.privates = new HashSet<string>();
 		}
@@ -41,7 +41,7 @@ namespace Lumen.Lang {
 
 
 				foreach (Module use in this.Mixins) {
-					foreach (KeyValuePair<String, Value> item in use.Members) {
+					foreach (KeyValuePair<String, IValue> item in use.Members) {
 						yield return item.Key;
 					}
 				}
@@ -57,7 +57,7 @@ namespace Lumen.Lang {
 			return maybe;
 		}
 
-		public Boolean TryGetMember(String name, out Value result) {
+		public Boolean TryGetMember(String name, out IValue result) {
 			result = null;
 
 			if (!this.IsPrivate(name) && this.Members.TryGetValue(name, out result)) {
@@ -77,8 +77,8 @@ namespace Lumen.Lang {
 			return false;
 		}
 
-		public Value GetMember(String name, Scope _) {
-			if (this.TryGetMember(name, out Value result)) {
+		public IValue GetMember(String name, Scope _) {
+			if (this.TryGetMember(name, out IValue result)) {
 				return result;
 			}
 
@@ -105,18 +105,18 @@ namespace Lumen.Lang {
 			};
 		}
 
-		public void SetMember(String name, Value value, Scope _ = null) {
+		public void SetMember(String name, IValue value, Scope _ = null) {
 			this.Members[name] = value;
 		}
 
-		public void SetMemberIfAbsent(String name, Value value) {
+		public void SetMemberIfAbsent(String name, IValue value) {
 			if (!this.Members.ContainsKey(name)) {
 				this.Members[name] = value;
 			}
 		}
 
-		public Boolean IsParentOf(Value value) {
-			Value parent = value.Type;
+		public Boolean IsParentOf(IValue value) {
+			IValue parent = value.Type;
 
 			if(this == Prelude.Any) {
 				return true;
@@ -147,7 +147,7 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
-			if (this.TryGetMember(Constants.PARENT_MODULE_SPECIAL_NAME, out Value parent) && parent is Module module) {
+			if (this.TryGetMember(Constants.PARENT_MODULE_SPECIAL_NAME, out IValue parent) && parent is Module module) {
 				return $"{module}.{this.Name}";
 			}
 

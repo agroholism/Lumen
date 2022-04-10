@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lumen.Lang.Patterns {
 	public interface IPattern {
-		MatchResult Match(Value value, Scope scope);
+		MatchResult Match(IValue value, Scope scope);
 
 		List<String> GetDeclaredVariables();
 

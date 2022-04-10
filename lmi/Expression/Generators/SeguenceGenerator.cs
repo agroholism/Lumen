@@ -24,14 +24,14 @@ namespace Lumen.Lmi {
 			return new SequenceGenerator(this.cycleName, this.names.Closure(manager2) as IPattern, this.container.Closure(manager2), this.body.Closure(manager2));
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			return new Flow(this.Generator(new Scope(e)));
 		}
 
-		internal IEnumerable<Value> Generator(Scope scope) {
-			Value current;
+		internal IEnumerable<IValue> Generator(Scope scope) {
+			IValue current;
 
-			foreach (Value i in this.container.Eval(scope).ToFlow(scope)) {
+			foreach (IValue i in this.container.Eval(scope).ToFlow(scope)) {
 				var inner = new Scope(scope);
 				this.names.Match(i, inner);
 
@@ -57,7 +57,7 @@ namespace Lumen.Lmi {
 			}
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			this.Eval(scope);
 			yield break;
 		}

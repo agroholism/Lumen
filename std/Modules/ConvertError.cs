@@ -3,7 +3,7 @@ using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
 	interface IExceptionConstructor {
-		public LumenException MakeExceptionInstance(params Value[] values);
+		public LumenException MakeExceptionInstance(params IValue[] values);
 	}
 
 	public abstract class ErrorModule : Module, IExceptionConstructor {
@@ -13,7 +13,7 @@ namespace Lumen.Lang {
 			this.AppendImplementation(Prelude.Exception);
 		}
 
-		public LumenException MakeExceptionInstance(params Value[] values) {
+		public LumenException MakeExceptionInstance(params IValue[] values) {
 			return this.constructor.MakeExceptionInstance(values);
 		}
 	}

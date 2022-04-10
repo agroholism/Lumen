@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Lumen.Lang {
-	public class Text : Value {
+	public class Text : IValue {
 		private String internalValue;
 
 		public IType Type => Prelude.Text;

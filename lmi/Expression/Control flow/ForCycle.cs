@@ -18,11 +18,11 @@ namespace Lumen.Lmi {
 			this.expression = expression;
 		}
 
-		public Value Eval(Scope scope) {
-			Value container = this.expression.Eval(scope);
+		public IValue Eval(Scope scope) {
+			IValue container = this.expression.Eval(scope);
 
 			List<String> declared = this.pattern.GetDeclaredVariables();
-			foreach (Value i in container.ToFlow(scope)) {
+			foreach (IValue i in container.ToFlow(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.IsSuccess) {
@@ -63,11 +63,11 @@ REDO:
 			return Const.UNIT;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> containerEvaluationResults = this.expression.EvalWithYield(scope);
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerable<IValue> containerEvaluationResults = this.expression.EvalWithYield(scope);
 
-			Value container = Const.UNIT;
-			foreach (Value evaluationResult in containerEvaluationResults) {
+			IValue container = Const.UNIT;
+			foreach (IValue evaluationResult in containerEvaluationResults) {
 				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					container = terminalResult.Value;
 					break;
@@ -76,16 +76,16 @@ REDO:
 				yield return evaluationResult;
 			}
 
-			Value returnResult = null;
+			IValue returnResult = null;
 
-			foreach (Value i in container.ToFlow(scope)) {
+			foreach (IValue i in container.ToFlow(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.IsSuccess) {
 					throw new LumenException(matchResult.Note);
 				}
 
-				IEnumerable<Value> iterationEvaluationResults = null;
+				IEnumerable<IValue> iterationEvaluationResults = null;
 
 				try {
 					iterationEvaluationResults = this.body.EvalWithYield(scope);
@@ -113,7 +113,7 @@ REDO:
 				}
 
 				if (iterationEvaluationResults != null) {
-					foreach (Value it in iterationEvaluationResults) {
+					foreach (IValue it in iterationEvaluationResults) {
 						if (it is GeneratorExpressionTerminalResult) {
 							break;
 						}

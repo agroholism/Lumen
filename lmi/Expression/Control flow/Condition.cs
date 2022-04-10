@@ -15,17 +15,17 @@ namespace Lumen.Lmi {
             this.falseExpression = falseExpression;
         }
 
-        public Value Eval(Scope scope) {
+        public IValue Eval(Scope scope) {
             Boolean result = this.conditionExpression.Eval(scope).ToBoolean();
 
             return result ? this.trueExpression.Eval(scope) : this.falseExpression.Eval(scope);
         }
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> conditionEvaluationResult = this.conditionExpression.EvalWithYield(scope);
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerable<IValue> conditionEvaluationResult = this.conditionExpression.EvalWithYield(scope);
 
-			Value condition = Const.UNIT;
-			foreach (Value evaluationResult in conditionEvaluationResult) {
+			IValue condition = Const.UNIT;
+			foreach (IValue evaluationResult in conditionEvaluationResult) {
 				if (evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					condition = terminalResult.Value;
 					break;
@@ -34,11 +34,11 @@ namespace Lumen.Lmi {
 				yield return evaluationResult;
 			}
 
-			IEnumerable<Value> expressionResults = condition.ToBoolean() 
+			IEnumerable<IValue> expressionResults = condition.ToBoolean() 
                 ? this.trueExpression.EvalWithYield(scope) 
                 : this.falseExpression.EvalWithYield(scope);
 
-			foreach (Value expressionResult in expressionResults) {
+			foreach (IValue expressionResult in expressionResults) {
 				yield return expressionResult;
 			}
 		}

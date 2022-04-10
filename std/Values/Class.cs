@@ -28,7 +28,7 @@ namespace Lumen.Lang {
 				decl.Closure(manager).Eval(scope);
 			}
 
-			foreach (KeyValuePair<String, Value> member in scope.variables) {
+			foreach (KeyValuePair<String, IValue> member in scope.variables) {
 				if (member.Value != this && member.Value != target) {
 					target.SetMemberIfAbsent(member.Key, member.Value);
 				}

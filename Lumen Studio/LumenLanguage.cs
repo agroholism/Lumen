@@ -146,7 +146,7 @@ namespace Lumen.Studio {
 				return header;
 			}
 
-			List<Lang.Value> memory = new List<Lang.Value>();
+			List<Lang.IValue> memory = new List<Lang.IValue>();
 
 			String RestoreConstructorHeader(String name, Lang.Constructor fun) {
 				String header = name;
@@ -158,7 +158,7 @@ namespace Lumen.Studio {
 				return header;
 			}
 
-			AutocompleteItem Process(String name, String baseName, Lang.Value value) {
+			AutocompleteItem Process(String name, String baseName, Lang.IValue value) {
 				memory.Add(value);
 				if (value is Lang.Fun fun) {
 					if (baseName == null) {

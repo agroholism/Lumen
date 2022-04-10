@@ -19,7 +19,7 @@ namespace Lumen.Lang.Patterns {
             return pattern.GetDeclaredVariables();
         }
 
-        public MatchResult Match(Value value, Scope scope) {
+        public MatchResult Match(IValue value, Scope scope) {
             MatchResult result = this.pattern.Match(value, scope);
 
             if (result.IsSuccess) {

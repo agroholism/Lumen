@@ -18,8 +18,8 @@ namespace Lumen.Lmi {
 			this.file = file;
 		}
 
-		public Value Eval(Scope scope) {
-			Value testValue = this.expression.Eval(scope);
+		public IValue Eval(Scope scope) {
+			IValue testValue = this.expression.Eval(scope);
 			IType type = this.type.Eval(scope) as IType;
 
 			if(type == null) {
@@ -29,11 +29,11 @@ namespace Lumen.Lmi {
 			return new Logical(type.IsParentOf(testValue));
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
-			IEnumerable<Value> evaluationResults = this.expression.EvalWithYield(scope);
-			Value testValue = null;
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
+			IEnumerable<IValue> evaluationResults = this.expression.EvalWithYield(scope);
+			IValue testValue = null;
 
-			foreach (Value evaluationResult in evaluationResults) {
+			foreach (IValue evaluationResult in evaluationResults) {
 				if(evaluationResult is GeneratorExpressionTerminalResult terminalResult) {
 					testValue = terminalResult.Value;
 					break;

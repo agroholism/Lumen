@@ -30,7 +30,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("isEmpty", new LambdaFun((scope, args) => {
-				Value monoid = scope["monoid"];
+				IValue monoid = scope["monoid"];
 				return new Logical(monoid.CallMethod("empty", scope).Equals(monoid));
 			}) {
 				Name = "isEmpty",

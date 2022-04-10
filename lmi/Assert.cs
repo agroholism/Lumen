@@ -19,7 +19,7 @@ namespace Lumen.Lmi {
 			return new Assert(this.expression.Closure(manager), this.file, this.line);
 		}
 
-		public Value Eval(Scope scope) {
+		public IValue Eval(Scope scope) {
 			var result = this.expression.Eval(scope);
 
 			if (!result.ToBoolean()) {
@@ -41,7 +41,7 @@ namespace Lumen.Lmi {
 			return result;
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope scope) {
+		public IEnumerable<IValue> EvalWithYield(Scope scope) {
 			throw new NotImplementedException();
 		}
 	}

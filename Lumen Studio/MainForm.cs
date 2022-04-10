@@ -339,7 +339,7 @@ namespace Lumen.Studio {
 				DebugGrid.Rows.Add(row);
 			}
 
-			foreach (KeyValuePair<String, Lang.Value> i in e.variables) {
+			foreach (KeyValuePair<String, Lang.IValue> i in e.variables) {
 				row = new DataGridViewRow();
 				row.Cells.Add(new DataGridViewImageCell() { Value = Settings.EmptyImage });
 				row.Cells.Add(new DataGridViewTextBoxCell() { Value = i.Key });
@@ -384,7 +384,7 @@ namespace Lumen.Studio {
 					DebugGrid.Rows.Add(row);
 				}
 
-				foreach (KeyValuePair<String, Lang.Value> i in scope.variables) {
+				foreach (KeyValuePair<String, Lang.IValue> i in scope.variables) {
 					DataGridViewRow row = new DataGridViewRow();
 					row.Cells.Add(new DataGridViewImageCell() { Value = Settings.EmptyImage });
 					row.Cells.Add(new DataGridViewTextBoxCell() { Value = i.Key });
@@ -395,7 +395,7 @@ namespace Lumen.Studio {
 			else if(value is Lang.List list) {
 				this.ChangeNameColumn("Index", 1);
 				Int32 index = 0;
-				foreach (Lang.Value i in list.Value) {
+				foreach (Lang.IValue i in list.Value) {
 					DataGridViewRow row = new DataGridViewRow();
 					row.Cells.Add(new DataGridViewImageCell() { Value = Settings.EmptyImage });
 					row.Cells.Add(new DataGridViewTextBoxCell() { Value = index });
@@ -477,7 +477,7 @@ namespace Lumen.Studio {
 			this.textBox.DoRangeVisible(i);
 		}
 
-		public static String Rename(Lang.Value value) {
+		public static String Rename(Lang.IValue value) {
 			if (value is Lang.List list) {
 				if (list.Value.Count() < 10) {
 					return list.ToString();
@@ -913,7 +913,7 @@ namespace Lumen.Studio {
 
 					Console.SetIn(localReader);
 					Console.SetOut(localWriter);
-					Lang.Value result = Lmi.Interpriter.Eval(command.TrimEnd(new System.Char[] { ' ', '\t', '\r', '\n', ';' }), "interactive", mainScope);
+					Lang.IValue result = Lmi.Interpriter.Eval(command.TrimEnd(new System.Char[] { ' ', '\t', '\r', '\n', ';' }), "interactive", mainScope);
 					mainScope.Bind("ans", result);
 					Console.WriteLine($"\t{result} :: {result.Type}");
 					Console.SetIn(ConsoleReader.Instance);

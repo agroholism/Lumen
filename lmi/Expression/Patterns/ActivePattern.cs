@@ -15,14 +15,14 @@ namespace Lumen.Lang.Patterns {
 			this.subpatterns = subpatterns;
 		}
 
-		public MatchResult Match(Value value, Scope scope) {
+		public MatchResult Match(IValue value, Scope scope) {
 			Fun testFunction = this.patternFunction.Eval(scope).ToFunction(scope);
 
-			Value testResult = testFunction.Call(new Scope(scope), value);
+			IValue testResult = testFunction.Call(new Scope(scope), value);
 			if (Prelude.Some.IsParentOf(testResult)) {
-				Value val = Prelude.DeconstructSome(testResult);
+				IValue val = Prelude.DeconstructSome(testResult);
 
-				List<Value> results = val.ToFlow(scope).ToList();
+				List<IValue> results = val.ToFlow(scope).ToList();
 				Int32 index = 0;
 				foreach (IPattern subpattern in this.subpatterns) {
 					MatchResult matchResult = subpattern.Match(results[index], scope);

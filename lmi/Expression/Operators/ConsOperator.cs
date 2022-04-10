@@ -19,7 +19,7 @@ namespace Lumen.Lmi {
 			this.lineNumber = lineNumber;
 		}
 
-		public Value Eval(Scope e) {
+		public IValue Eval(Scope e) {
 			if (this.leftExpression is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.rightExpression is IdExpression ide2 && ide2.id == "_") {
@@ -49,8 +49,8 @@ namespace Lumen.Lmi {
 						this.fileName, this.lineNumber));
 			}
 
-			Value rightOperand = this.rightExpression.Eval(e);
-			Value leftOperand = this.leftExpression.Eval(e);
+			IValue rightOperand = this.rightExpression.Eval(e);
+			IValue leftOperand = this.leftExpression.Eval(e);
 
 			if (rightOperand is List list) {
 				return new List(new LinkedList(leftOperand, list.Value));
@@ -61,7 +61,7 @@ namespace Lumen.Lmi {
 			return new Applicate(new DotOperator(new ValueLiteral(type), "::", this.fileName, this.lineNumber), new List<Expression> { new ValueLiteral(leftOperand), new ValueLiteral(rightOperand) }, this.fileName, this.lineNumber).Eval(e);
 		}
 
-		public IEnumerable<Value> EvalWithYield(Scope e) {
+		public IEnumerable<IValue> EvalWithYield(Scope e) {
 			if (this.leftExpression is IdExpression ide) {
 				if (ide.id == "_") {
 					if (this.rightExpression is IdExpression ide2 && ide2.id == "_") {
@@ -91,13 +91,13 @@ namespace Lumen.Lmi {
 						this.fileName, this.lineNumber)));
 			}
 
-			Value rightOperand = null;
-			Value leftOperand = null;
+			IValue rightOperand = null;
+			IValue leftOperand = null;
 
-			IEnumerable<Value> rightExpressionEvaluationResults = this.rightExpression.EvalWithYield(e);
-			IEnumerable<Value> leftExpressionEvaluationResults = this.leftExpression.EvalWithYield(e);
+			IEnumerable<IValue> rightExpressionEvaluationResults = this.rightExpression.EvalWithYield(e);
+			IEnumerable<IValue> leftExpressionEvaluationResults = this.leftExpression.EvalWithYield(e);
 
-			foreach (Value result in rightExpressionEvaluationResults) {
+			foreach (IValue result in rightExpressionEvaluationResults) {
 				if (result is GeneratorExpressionTerminalResult cgv1) {
 					rightOperand = cgv1.Value;
 				}
@@ -106,7 +106,7 @@ namespace Lumen.Lmi {
 				}
 			}
 
-			foreach (Value result in leftExpressionEvaluationResults) {
+			foreach (IValue result in leftExpressionEvaluationResults) {
 				if (result is GeneratorExpressionTerminalResult cgv1) {
 					leftOperand = cgv1.Value;
 				}
