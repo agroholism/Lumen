@@ -266,7 +266,7 @@ namespace Lumen.Lmi {
 					if (this.Match(TokenType.IMPLEMENTS)) {
 						derivings.Add(this.Expression());
 					} else {
-						members.Add(this.Expression());
+						members.Add(this.PrivateExpression());
 					}
 					this.Match(TokenType.EOC);
 				}
@@ -324,7 +324,7 @@ namespace Lumen.Lmi {
 					if (this.Match(TokenType.IMPLEMENTS)) {
 						derivings.Add(this.Expression());
 					} else {
-						members.Add(this.Expression());
+						members.Add(this.PrivateExpression());
 					}
 					this.Match(TokenType.EOC);
 				}

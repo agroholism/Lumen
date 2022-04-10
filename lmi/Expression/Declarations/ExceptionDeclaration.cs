@@ -52,6 +52,10 @@ namespace Lumen.Lmi {
 				createdType.SetMember(i.Key, i.Value);
 			}
 
+			foreach (String privateName in helperScope.Privates) {
+				createdType.DeclarePrivate(privateName);
+			}
+
 			foreach (Expression deriving in this.derivings) {
 				Class typeClass = deriving.Eval(scope) as Class;
 				createdType.AppendImplementation(typeClass);
