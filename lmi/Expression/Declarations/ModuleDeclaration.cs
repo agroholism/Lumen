@@ -30,6 +30,10 @@ namespace Lumen.Lmi {
                 moduleValue.SetMember(i.Key, i.Value);
             }
 
+            foreach (String privateName in moduleScope.Privates) {
+                moduleValue.DeclarePrivate(privateName);
+			}
+
             // Add rename
 
             scope[this.name] = moduleValue;
@@ -46,7 +50,7 @@ namespace Lumen.Lmi {
         }
 
 		public override String ToString() {
-			String result = $"module {this.name} where{Environment.NewLine}";
+			String result = $"module {this.name} ={Environment.NewLine}";
 
 			foreach(Expression i in this.moduleExpressions) {
 				String[] inner = i.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);

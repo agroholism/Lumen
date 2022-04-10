@@ -603,7 +603,7 @@ namespace Lumen.Lmi {
 			}
 
 			while (!this.Match(TokenType.BLOCK_END)) {
-				declarations.Add(this.Expression());
+				declarations.Add(this.PrivateExpression());
 				this.Match(TokenType.EOC);
 			}
 
