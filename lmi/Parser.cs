@@ -592,14 +592,22 @@ namespace Lumen.Lmi {
 
 		private Expression ParseModule() {
 			this.Consume(TokenType.MODULE);
-			String name = this.Consume(TokenType.WORD).Text;
+
+			String moduleName = this.Consume(TokenType.WORD).Text;
+			this.Consume(TokenType.EQUALS);
+
 			List<Expression> declarations = new List<Expression>();
-			this.Match(TokenType.BLOCK_START);
+
+			if (!this.Match(TokenType.BLOCK_START)) {
+				throw new LumenException("module declaration require module body", this.line, this.file);
+			}
+
 			while (!this.Match(TokenType.BLOCK_END)) {
 				declarations.Add(this.Expression());
 				this.Match(TokenType.EOC);
 			}
-			return new ModuleDeclaration(name, declarations);
+
+			return new ModuleDeclaration(moduleName, declarations);
 		}
 
 		private Expression ParseDeclaration() {
