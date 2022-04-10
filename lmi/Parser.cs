@@ -36,7 +36,7 @@ namespace Lumen.Lmi {
 			if (this.Match(TokenType.PRIVATE)) {
 				Expression declaraion = this.Expression();
 
-				if (declaraion is FunctionDeclaration or VariantDeclaration or BindingDeclaration) {
+				if (declaraion is FunctionDeclaration or VariantDeclaration or BindingDeclaration or ModuleDeclaration) {
 					return new PrivateDeclaration(declaraion);
 				} else {
 					throw new LumenException("can not use private modifier here");

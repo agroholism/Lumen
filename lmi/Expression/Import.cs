@@ -42,7 +42,7 @@ namespace Lumen.Lmi {
 				List<String> privateNames = this.namesToImport
 					.Where(pair => module.IsPrivate(pair.name))
 					.Distinct()
-					.Select(name => $"\"{name}\"")
+					.Select(pair => $"\"{pair.name}\"")
 					.ToList();
 
 				if (privateNames.Count > 0) {
