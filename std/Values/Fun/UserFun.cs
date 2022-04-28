@@ -21,10 +21,6 @@ namespace Lumen.Lang {
 			this.Name = name;
 		}
 
-		public override String ToString() {
-			return this.Name ?? $"[Function {this.GetHashCode()}]";
-		}
-
 		public IValue Call(Scope e, params IValue[] arguments) {
 			if (this.Parameters.Count(i => i is not ContextPattern) > arguments.Length) {
 				return Helper.MakePartial(this, arguments);
@@ -105,8 +101,12 @@ namespace Lumen.Lang {
 			throw new NotImplementedException();
 		}
 
+		public override String ToString() {
+			return $"[Function {this.Name ?? this.GetHashCode().ToString()}]";
+		}
+
 		public String ToString(String format, IFormatProvider formatProvider) {
-			return "user fun";
+			return this.ToString();
 		}
 	}
 }

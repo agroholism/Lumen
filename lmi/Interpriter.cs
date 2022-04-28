@@ -71,7 +71,7 @@ namespace Lumen.Lmi {
 				WriteException(ex.Message);
 			}
 
-			return Const.UNIT;
+			return null;
 		}
 
 		public static List<Expression>? GetAST(String code, String file, Scope? scope = null) {

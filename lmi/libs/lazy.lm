@@ -1,0 +1,31 @@
+﻿type LazyValue = NotEvaluated | Evaluated value
+
+type Lazy = record
+    private property getFunction: Function
+    private property getCache: Mut.<LazyValue> = Mut.<LazyValue> NotEvaluated
+
+    let constuctor (fn: Function) = [fn]
+
+    let ! (self: Lazy) =
+        match !getCache self
+        | NotEvaluated ->
+            let result = getFunction self ()
+            getCache self <- Evaluated result
+            result
+        | Evaluated x -> x
+
+type Lazy = Lazy fn cache
+    let ! (Lazy fn cache) _ = 
+        match !cache
+        | NotEvaluated ->
+            let result = fn ()
+            cache <- Evaluated result
+            result
+        | Evaluated x -> x
+
+let lazyOf (fn: Function) = 
+    Lazy fn (Mut NotEvaluated)
+
+let lazy (fn: Function) = 
+    fun (x: Any) -> 
+        lazyOf fun -> fn x

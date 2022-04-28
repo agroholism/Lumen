@@ -22,7 +22,7 @@ namespace Lumen.Lang.Patterns {
 			if (Prelude.Some.IsParentOf(testResult)) {
 				IValue val = Prelude.DeconstructSome(testResult);
 
-				List<IValue> results = val.ToFlow(scope).ToList();
+				List<IValue> results = val.ToSeq(scope).ToList();
 				Int32 index = 0;
 				foreach (IPattern subpattern in this.subpatterns) {
 					MatchResult matchResult = subpattern.Match(results[index], scope);

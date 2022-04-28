@@ -4,16 +4,16 @@ using System.Linq;
 using Lumen.Lang.Patterns;
 
 namespace Lumen.Lang {
-	internal class FlowModule : Module {
+	internal class SeqModule : Module {
 		public AutomatModule Automat { get; } = new AutomatModule();
 
-		public FlowModule() {
-			this.Name = "Flow";
+		public SeqModule() {
+			this.Name = "Seq";
 
 			this.SetMember("Automat", Automat);
 
 			this.SetMember("empty", new LambdaFun((scope, args) => {
-				return new Flow(Enumerable.Empty<IValue>());
+				return Const.UNIT;
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("x")
@@ -68,12 +68,12 @@ namespace Lumen.Lang {
 			public AutomatStateModule State { get; private set; } = new AutomatStateModule();
 
 			public AutomatModule() {
-				this.Name = "Flow.Automat";
+				this.Name = "Seq.Automat";
 
 				this.SetMember("State", this.State);
 
 				this.SetMember("<init>", new LambdaFun((scope, args) => {
-					IEnumerable<IValue> flow = scope["flow"].ToFlow(scope);
+					IEnumerable<IValue> flow = scope["flow"].ToSeq(scope);
 
 					// Enumerator in CustomFlow is FlowAutomat by default,
 					// so we should avoid additional wrappers to prevent problems
@@ -152,7 +152,7 @@ namespace Lumen.Lang {
 						return lgn.GetEnumerator() as IValue;
 					}
 
-					IEnumerable<IValue> stream = x.ToFlow(scope);
+					IEnumerable<IValue> stream = x.ToSeq(scope);
 
 					return new FlowAutomat(stream.GetEnumerator(), scope);
 				}) {

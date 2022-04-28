@@ -49,7 +49,7 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
-			return "partial";
+			return $"[Function {this.Name ?? this.GetHashCode().ToString()} partial of {this.InnerFunction}]";
 		}
 
 		public String ToString(String format, IFormatProvider formatProvider) {

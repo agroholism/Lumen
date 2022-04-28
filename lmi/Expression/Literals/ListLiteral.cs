@@ -19,7 +19,7 @@ namespace Lumen.Lmi {
 			IEnumerable<IValue> ToStream(List<Expression> exps) {
 				foreach(Expression exp in exps) {
 					if(exp is From from) {
-						foreach(IValue i in from.Eval(e).ToFlow(e)) {
+						foreach(IValue i in from.Eval(e).ToSeq(e)) {
 							yield return i;
 						}
 					} else {

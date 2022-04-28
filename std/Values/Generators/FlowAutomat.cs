@@ -7,7 +7,7 @@ namespace Lumen.Lang {
 		private IEnumerator<IValue> internalValue;
 		private Scope scope;
 
-		public override IType Type => Prelude.Flow.Automat;
+		public override IType Type => Prelude.Seq.Automat;
 
 		public IValue Current => this.internalValue.Current;
 		Object IEnumerator.Current => this.internalValue.Current;

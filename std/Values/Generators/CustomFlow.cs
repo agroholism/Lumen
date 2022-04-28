@@ -7,6 +7,7 @@ namespace Lumen.Lang {
 	public class CustomFlow : IEnumerable<IValue> {
 		private Expression generatorBody;
 		private Scope associatedScope;
+		public Fun lambdaLink { get => associatedScope.Get("rec") as Fun; }
 
 		public CustomFlow(Expression generatorBody, Scope associatedScope) {
 			this.generatorBody = generatorBody;
@@ -36,6 +37,10 @@ namespace Lumen.Lang {
 				}
 
 				if(enumerator.Current is GeneratorExpressionTerminalResult terminalResult) {
+					if (terminalResult.Value is TailRecursion tailrec) {
+		
+					}
+
 					scope.Bind(Constants.YIELD_RESULT_SPECIAL_NAME, terminalResult);
 					yield break;
 				}

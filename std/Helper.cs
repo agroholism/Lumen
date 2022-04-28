@@ -107,7 +107,7 @@ namespace Lumen.Lang {
 		}
 
 		public static IValue CreatePair(KeyValuePair<IValue, IValue> pair) {
-			return new List(pair.Key, pair.Value);
+			return new Flow(new List<IValue> { pair.Key, pair.Value });
 		}
 
 		internal static IValue FromSeq(IType type, IEnumerable<IValue> values, Scope scope) {
@@ -119,7 +119,7 @@ namespace Lumen.Lang {
 				return new MutArray(values.ToList());
 			}
 
-			if (type == Prelude.Flow) {
+			if (type == Prelude.Seq) {
 				return new Flow(values);
 			}
 

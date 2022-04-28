@@ -129,6 +129,7 @@
     <Compile Include="PrivateDeclaration.cs" />
     <Compile Include="RangeOperator.cs" />
     <Compile Include="Expression\Literals\SeqLiteral.cs" />
+    <Compile Include="SeqPattern.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenType.cs" />
     <Compile Include="Expression\Patterns\WhenPattern.cs" />
@@ -156,6 +157,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="libs\atom.lm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="libs\lazy.lm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -78,7 +78,7 @@
     <Compile Include="Values\Constructors\Constructor.cs" />
     <Compile Include="ClosureManager.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="Modules\FlowModule.cs" />
+    <Compile Include="Modules\SeqModule.cs" />
     <Compile Include="Modules\OptionModule.cs" />
     <Compile Include="Classes\Format.cs" />
     <Compile Include="Classes\Ord.cs" />

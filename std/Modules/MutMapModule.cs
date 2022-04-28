@@ -72,7 +72,7 @@ namespace Lumen.Lang {
 					return result;
 				}
 
-				foreach (IValue i in value.ToFlow(e)) {
+				foreach (IValue i in value.ToSeq(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}
@@ -118,7 +118,7 @@ namespace Lumen.Lang {
 				IValue value = e["stream"];
 				MutMap result = new MutMap();
 
-				foreach (IValue i in value.ToFlow(e)) {
+				foreach (IValue i in value.ToSeq(e)) {
 					LinkedList stream = i.ToLinkedList(e);
 					result.InternalValue[stream.Head] = stream.Tail.Head;
 				}

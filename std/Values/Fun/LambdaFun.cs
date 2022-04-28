@@ -71,7 +71,7 @@ namespace Lumen.Lang {
 		}
 
 		public override String ToString() {
-			return this.Name ?? $"[Function {this.GetHashCode()}]";
+			return $"[Function {this.Name ?? this.GetHashCode().ToString()}]";
 		}
 
 		public String ToString(String format, IFormatProvider formatProvider) {

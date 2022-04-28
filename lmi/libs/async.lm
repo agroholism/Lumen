@@ -1,16 +1,16 @@
-﻿private let rec makeContinuation (future: Future) (automat: Flow.Automat) = 
+﻿private let rec makeContinuation (future: Future) (automat: Seq.Automat) = 
 	future
-	|> Future.catch (Flow.Automat.throw _ automat)
+	|> Future.catch (Seq.Automat.throw _ automat)
 	>>= fun yielded ->
-		match Flow.Automat.moveWith yielded automat:
-        | Flow.Automat.State.Inter value -> makeContinuation value automat
-        | Flow.Automat.State.Final value -> value |> Future.wrap
+		match Seq.Automat.moveWith yielded automat:
+        | Seq.Automat.State.Inter value -> makeContinuation value automat
+        | Seq.Automat.State.Final value -> value |> Future.wrap
 
 private let initialContinuationMaker = 
-	Future.wrap () |> makeContinuation
+	Seq.wrap () |> makeContinuation
 
-private let wrapToAutomat (x: Flow) = x |> Flow.Automat
-private let wrapToAutomat _ = Flow.empty () |> Flow.Automat
+private let wrapToAutomat (x: Seq) = x |> Seq.Automat
+private let wrapToAutomat _ = Seq.empty () |> Seq.Automat
 
 let async = _ >> (wrapToAutomat >> initialContinuationMaker)
 

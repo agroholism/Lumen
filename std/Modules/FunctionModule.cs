@@ -71,7 +71,8 @@ namespace Lumen.Lang {
 
 				return new LambdaFun((inScope, inArgs) =>
 					function.Call(new Scope(inScope), functor.Call(new Scope(inScope), inArgs))) {
-					Parameters = functor.Parameters
+					Parameters = functor.Parameters,
+					Name = $"composition of {functor} and {function}",
 				};
 			}) {
 				Parameters = new List<IPattern> {
@@ -140,7 +141,7 @@ namespace Lumen.Lang {
 			}
 
 			this.SetMember("concatWith", new LambdaFun((scope, args) => {
-				IEnumerable<IValue> functions = scope["functions"].ToFlow(scope);
+				IEnumerable<IValue> functions = scope["functions"].ToSeq(scope);
 				Fun with = scope["with"].ToFunction(scope);
 
 				return functions.Select(i => i.ToFunction(scope))

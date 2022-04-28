@@ -53,7 +53,7 @@ namespace Lumen.Lang {
 				String self = scope["self"].ToString();
 				IValue other = scope["other"];
 
-				return new Text(String.Format(self, other.ToFlow(scope).ToArray()));
+				return new Text(String.Format(self, other.ToSeq(scope).ToArray()));
 			}) {
 				Parameters = Const.SelfOther
 			});
@@ -118,7 +118,7 @@ namespace Lumen.Lang {
 
 					StringBuilder buffer = new StringBuilder();
 
-					foreach (IValue i in index.ToFlow(scope)) {
+					foreach (IValue i in index.ToSeq(scope)) {
 						if (i is Number) {
 							Int32 newIndex = Helper.Index(i.ToInt(scope), self.Length);
 
@@ -181,7 +181,7 @@ namespace Lumen.Lang {
 			// Исключения: 
 			//	ConvertException: невозможно преобразовать объект к типу Stream
 			this.SetMember("concat", new LambdaFun((scope, args) => {
-				return new Text(String.Concat(scope["values"].ToFlow(scope)));
+				return new Text(String.Concat(scope["values"].ToSeq(scope)));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("values")
@@ -557,24 +557,29 @@ namespace Lumen.Lang {
 				}
 			});
 
-			this.SetMember("iterLine", new LambdaFun((scope, args) => {
-				Fun action = scope["action"].ToFunction(scope);
+			this.SetMember("getWords", new LambdaFun((scope, args) => {
+				String[] words = scope["self"].ToString().Split(
+					new[] { " " },
+					StringSplitOptions.RemoveEmptyEntries);
+
+				return new Flow(words.Select(word => new Text(word.Trim())));
+			}) {
+				Parameters = new List<IPattern> {
+					new NamePattern("self"),
+				}
+			});
+
+			this.SetMember("getLines", new LambdaFun((scope, args) => {
 				String[] self = scope["self"].ToString().Split(
 					new[] { Environment.NewLine },
 					StringSplitOptions.None);
 
-				foreach (String i in self) {
-					action.Call(new Scope(scope), new Text(i));
-				}
-
-				return Const.UNIT;
+				return new Flow(self.Select(line => new Text(line)));
 			}) {
 				Parameters = new List<IPattern> {
-						new NamePattern("self"),
-					new NamePattern("action")
+					new NamePattern("self"),
 				}
 			});
-
 
 			this.SetMember("toSeq", new LambdaFun((scope, args) => {
 				String self = scope["self"].ToString();
@@ -587,7 +592,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
-				IEnumerable<IValue> stream = scope["stream"].ToFlow(scope);
+				IEnumerable<IValue> stream = scope["stream"].ToSeq(scope);
 				return new Text(String.Concat(stream));
 			}) {
 				Parameters = new List<IPattern> {

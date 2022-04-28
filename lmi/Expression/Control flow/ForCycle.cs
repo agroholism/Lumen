@@ -22,7 +22,7 @@ namespace Lumen.Lmi {
 			IValue container = this.expression.Eval(scope);
 
 			List<String> declared = this.pattern.GetDeclaredVariables();
-			foreach (IValue i in container.ToFlow(scope)) {
+			foreach (IValue i in container.ToSeq(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.IsSuccess) {
@@ -78,7 +78,7 @@ REDO:
 
 			IValue returnResult = null;
 
-			foreach (IValue i in container.ToFlow(scope)) {
+			foreach (IValue i in container.ToSeq(scope)) {
 REDO:
 				MatchResult matchResult = this.pattern.Match(i, scope);
 				if (!matchResult.IsSuccess) {

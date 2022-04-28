@@ -150,7 +150,7 @@ tail_recursion_entry:
 		}
 
 		public override String ToString() {
-			return $"[Function #{this.GetHashCode()}]";
+			return $"[Function {this.Name ?? this.GetHashCode().ToString()} dispatcher]";
 		}
 	}
 }

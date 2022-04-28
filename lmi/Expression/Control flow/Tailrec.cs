@@ -21,7 +21,8 @@ namespace Lumen.Lmi {
 		}
 
 		public IEnumerable<IValue> EvalWithYield(Scope scope) {
-			throw new LumenException("evaluating tailrec in generator");
+			yield return new TailRecursion(this.argumentsExpressions.Select(i => i.Eval(scope)).ToArray());
+			//throw new LumenException("evaluating tailrec in generator");
 		}
 
 		public Expression Closure(ClosureManager manager) {

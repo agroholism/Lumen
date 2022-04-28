@@ -37,20 +37,22 @@ namespace Lumen.Lmi {
 
 			// If it's true - this is generator
 			if (manager.HasYield) {
-				if (manager.HasTailRecursion) {
-					throw new LumenException("function can not have tail recursion and yield at the same time");
-				}
+				//if (manager.HasTailRecursion) {
+				//	throw new LumenException("function can not have tail recursion and yield at the same time");
+				//}
 				
 				result = new LambdaFun((scope1, args) => 
 					new Flow(new CustomFlow(closuredBody, scope1))) {
 					Parameters = closuredPatterns,
-					Name = this.name
+					Name = this.name,
 				};
 			}
 
 			// If it's not generator - just create a regular function
 			result ??=
 				new UserFun(closuredPatterns, closuredBody, this.name);
+
+			
 
 			// Multi dispatching
 			if (scope.IsExistsInThisScope(this.name)) {

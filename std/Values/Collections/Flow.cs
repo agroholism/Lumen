@@ -30,7 +30,7 @@ namespace Lumen.Lang {
 			return null;
 		}
 
-		public IType Type => Prelude.Flow;
+		public IType Type => Prelude.Seq;
 
 		public override String ToString() {
 			return $"[Flow #{this.GetHashCode()}]";

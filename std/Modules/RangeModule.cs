@@ -67,7 +67,7 @@ namespace Lumen.Lang {
 			});
 
 			this.SetMember("toSeq", new LambdaFun((e, args) => {
-				return new Flow(e["self"].ToFlow(e));
+				return new Flow(e["self"].ToSeq(e));
 			}) {
 				Parameters = new List<IPattern> {
 					new NamePattern("self")

@@ -87,7 +87,7 @@ Array.refs
 
 			this.SetMember("filter", new LambdaFun((scope, args) => {
 				Fun predicate = scope["predicate"].ToFunction(scope);
-				IEnumerable<IValue> values = scope["self"].ToFlow(scope);
+				IEnumerable<IValue> values = scope["self"].ToSeq(scope);
 
 				return new MutArray(values.Where(i => predicate.Call(new Scope(scope), i).ToBoolean()));
 			}) {
@@ -113,7 +113,7 @@ Array.refs
 			this.SetMember("addAll", new LambdaFun((scope, args) => {
 				List<IValue> array = scope["self"].ToList(scope);
 
-				array.AddRange(scope["elements"].ToFlow(scope));
+				array.AddRange(scope["elements"].ToSeq(scope));
 
 				return Const.UNIT;
 			}) {
@@ -375,7 +375,7 @@ Array.refs
 			});
 
 			this.SetMember("fromSeq", new LambdaFun((scope, args) => {
-				return new MutArray(scope["x"].ToFlow(scope));
+				return new MutArray(scope["x"].ToSeq(scope));
 			}) {
 				Name = "fromSeq",
 				Parameters = new List<IPattern> {

@@ -9,7 +9,7 @@ namespace Lumen.Lang {
 		internal List<Module> Mixins { get; private set; }
 		private readonly HashSet<String> privates;
 
-		public override IType Type => Prelude.Function;
+		public override IType Type => Prelude.Module;
 
 		public Module() {
 			this.Members = new Dictionary<String, IValue>();
